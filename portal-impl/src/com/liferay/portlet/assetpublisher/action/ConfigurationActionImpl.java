@@ -36,6 +36,7 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.AssetTagException;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
@@ -86,7 +87,8 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 					addScope(actionRequest, preferences);
 				}
 				else if (cmd.equals("add-selection")) {
-					AssetPublisherUtil.addSelection(actionRequest, preferences);
+					AssetPublisherUtil.addSelection(actionRequest, preferences,
+						portletResource );
 				}
 				else if (cmd.equals("move-selection-down")) {
 					moveSelectionDown(actionRequest, preferences);
