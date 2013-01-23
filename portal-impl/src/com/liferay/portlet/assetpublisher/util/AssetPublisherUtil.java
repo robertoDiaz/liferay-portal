@@ -335,6 +335,11 @@ public class AssetPublisherUtil {
 
 		assetEntryQuery.setNotAnyTagIds(notAnyAssetTagIds);
 
+		long[] classTypeIds = GetterUtil.getLongValues(
+			portletPreferences.getValues("classTypeIds", null));
+
+		assetEntryQuery.setClassTypeIds(classTypeIds);
+
 		return assetEntryQuery;
 	}
 
