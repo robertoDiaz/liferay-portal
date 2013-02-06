@@ -257,7 +257,8 @@ public class UserGroupRoleLocalServiceWrapper
 	}
 
 	public void checkMembershipPolicy(com.liferay.portal.model.User user)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		_userGroupRoleLocalService.checkMembershipPolicy(user);
 	}
 

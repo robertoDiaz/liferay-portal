@@ -361,6 +361,12 @@ public class OrganizationLocalServiceUtil {
 		getService().deleteLogo(organizationId);
 	}
 
+	public static void checkMembershipPolicy(com.liferay.portal.model.User user)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().checkMembershipPolicy(user);
+	}
+
 	/**
 	* Returns all the organizations belonging to the group.
 	*
