@@ -69,86 +69,141 @@ if (Validator.isNotNull(target)) {
 			keyProperty="organizationId"
 			modelVar="organization"
 		>
+			<c:choose>
+				<c:when test="<%= MembershipPolicyUtil.isMembershipAllowed(organization, user) %>">
 
-			<%
-			String rowHREF = null;
+					<%
+					String rowHREF = null;
 
-			if (OrganizationPermissionUtil.contains(permissionChecker, organization.getOrganizationId(), ActionKeys.ASSIGN_MEMBERS)) {
-				StringBundler sb = new StringBundler(13);
+					if (OrganizationPermissionUtil.contains(permissionChecker, organization.getOrganizationId(), ActionKeys.ASSIGN_MEMBERS)) {
+						StringBundler sb = new StringBundler(13);
 
-				sb.append("javascript:Liferay.Util.getOpener().");
-				sb.append(renderResponse.getNamespace());
-				sb.append("selectOrganization('");
-				sb.append(organization.getOrganizationId());
-				sb.append("', '");
-				sb.append(organization.getGroup().getGroupId());
-				sb.append("', '");
-				sb.append(UnicodeFormatter.toString(organization.getName()));
-				sb.append("', '");
-				sb.append(UnicodeLanguageUtil.get(pageContext, organization.getType()));
-				sb.append("', '");
-				sb.append(target);
-				sb.append("');Liferay.Util.getWindow().close();");
+						sb.append("javascript:Liferay.Util.getOpener().");
+						sb.append(renderResponse.getNamespace());
+						sb.append("selectOrganization('");
+						sb.append(organization.getOrganizationId());
+						sb.append("', '");
+						sb.append(organization.getGroup().getGroupId());
+						sb.append("', '");
+						sb.append(UnicodeFormatter.toString(organization.getName()));
+						sb.append("', '");
+						sb.append(UnicodeLanguageUtil.get(pageContext, organization.getType()));
+						sb.append("', '");
+						sb.append(target);
+						sb.append("');Liferay.Util.getWindow().close();");
 
-				rowHREF = sb.toString();
-			}
-			%>
-
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="name"
-				orderable="<%= true %>"
-				property="name"
-			/>
-
-			<liferay-ui:search-container-column-text
-				buffer="buffer"
-				href="<%= rowHREF %>"
-				name="parent-organization"
-			>
-
-				<%
-				String parentOrganizationName = StringPool.BLANK;
-
-				if (organization.getParentOrganizationId() > 0) {
-					try {
-						Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(organization.getParentOrganizationId());
-
-						parentOrganizationName = parentOrganization.getName();
+						rowHREF = sb.toString();
 					}
-					catch (Exception e) {
-					}
-				}
+					%>
 
-				buffer.append(HtmlUtil.escape(parentOrganizationName));
-				%>
+					<liferay-ui:search-container-column-text
+						href="<%= rowHREF %>"
+						name="name"
+						orderable="<%= true %>"
+						property="name"
+					/>
 
-			</liferay-ui:search-container-column-text>
+					<liferay-ui:search-container-column-text
+						buffer="buffer"
+						href="<%= rowHREF %>"
+						name="parent-organization"
+					>
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="type"
-				orderable="<%= true %>"
-				value="<%= LanguageUtil.get(pageContext, organization.getType()) %>"
-			/>
+						<%
+						String parentOrganizationName = StringPool.BLANK;
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="city"
-				property="address.city"
-			/>
+						if (organization.getParentOrganizationId() > 0) {
+							try {
+								Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(organization.getParentOrganizationId());
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="region"
-				property="address.region.name"
-			/>
+								parentOrganizationName = parentOrganization.getName();
+							}
+							catch (Exception e) {
+							}
+						}
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="country"
-				property="address.country.name"
-			/>
+						buffer.append(HtmlUtil.escape(parentOrganizationName));
+						%>
+
+					</liferay-ui:search-container-column-text>
+
+					<liferay-ui:search-container-column-text
+						href="<%= rowHREF %>"
+						name="type"
+						orderable="<%= true %>"
+						value="<%= LanguageUtil.get(pageContext, organization.getType()) %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						href="<%= rowHREF %>"
+						name="city"
+						property="address.city"
+					/>
+
+					<liferay-ui:search-container-column-text
+						href="<%= rowHREF %>"
+						name="region"
+						property="address.region.name"
+					/>
+
+					<liferay-ui:search-container-column-text
+						href="<%= rowHREF %>"
+						name="country"
+						property="address.country.name"
+					/>
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:search-container-column-text
+						name="name"
+						orderable="<%= true %>"
+						property="name"
+						/>
+
+					<liferay-ui:search-container-column-text
+						buffer="buffer"
+						name="parent-organization"
+						>
+
+						<%
+							String parentOrganizationName = StringPool.BLANK;
+
+							if (organization.getParentOrganizationId() > 0) {
+								try {
+									Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(organization.getParentOrganizationId());
+
+									parentOrganizationName = parentOrganization.getName();
+								}
+								catch (Exception e) {
+								}
+							}
+
+							buffer.append(HtmlUtil.escape(parentOrganizationName));
+						%>
+
+					</liferay-ui:search-container-column-text>
+
+					<liferay-ui:search-container-column-text
+						name="type"
+						orderable="<%= true %>"
+						value="<%= LanguageUtil.get(pageContext, organization.getType()) %>"
+						/>
+
+					<liferay-ui:search-container-column-text
+						name="city"
+						property="address.city"
+						/>
+
+					<liferay-ui:search-container-column-text
+						name="region"
+						property="address.region.name"
+						/>
+
+					<liferay-ui:search-container-column-text
+						name="country"
+						property="address.country.name"
+						/>
+				</c:otherwise>
+			</c:choose>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator />
