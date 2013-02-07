@@ -200,34 +200,44 @@ if (step == 1) {
 					keyProperty="roleId"
 					modelVar="role"
 				>
-					<liferay-util:param name="className" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-					<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
+					<c:choose>
+						<c:when test="<%= MembershipPolicyUtil.isMembershipAllowed(role, user, group) %>">
+							<liferay-util:param name="className" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
+							<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
 
-					<%
-					StringBundler sb = new StringBundler(13);
+							<%
+								StringBundler sb = new StringBundler(13);
 
-					sb.append("javascript:opener.");
-					sb.append(renderResponse.getNamespace());
-					sb.append("selectRole('");
-					sb.append(role.getRoleId());
-					sb.append("', '");
-					sb.append(UnicodeFormatter.toString(role.getTitle(locale)));
-					sb.append("', '");
-					sb.append("siteRoles");
-					sb.append("', '");
-					sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
-					sb.append("', '");
-					sb.append(group.getGroupId());
-					sb.append("'); window.close();");
+								sb.append("javascript:opener.");
+								sb.append(renderResponse.getNamespace());
+								sb.append("selectRole('");
+								sb.append(role.getRoleId());
+								sb.append("', '");
+								sb.append(UnicodeFormatter.toString(role.getTitle(locale)));
+								sb.append("', '");
+								sb.append("siteRoles");
+								sb.append("', '");
+								sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
+								sb.append("', '");
+								sb.append(group.getGroupId());
+								sb.append("'); window.close();");
 
-					String rowHREF = sb.toString();
-					%>
+								String rowHREF = sb.toString();
+							%>
 
-					<liferay-ui:search-container-column-text
-						href="<%= rowHREF %>"
-						name="title"
-						value="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
-					/>
+							<liferay-ui:search-container-column-text
+								href="<%= rowHREF %>"
+								name="title"
+								value="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+								/>
+						</c:when>
+						<c:otherwise>
+							<liferay-ui:search-container-column-text
+								name="title"
+								value="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+								/>
+						</c:otherwise>
+					</c:choose>
 				</liferay-ui:search-container-row>
 
 				<liferay-ui:search-iterator />

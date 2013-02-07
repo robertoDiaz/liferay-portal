@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@ package com.liferay.portlet.sites.search;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.MembershipPolicyUtil;
@@ -28,16 +28,16 @@ import java.util.Set;
 import javax.portlet.RenderResponse;
 
 /**
- * @author Jorge Ferrer
+ * @author Roberto Díaz
  */
-public class UserGroupRoleUserChecker extends RowChecker {
+public class OrganizationRoleUserChecker extends RowChecker {
 
-	public UserGroupRoleUserChecker(
-		RenderResponse renderResponse, Group group, Role role) {
+	public OrganizationRoleUserChecker(
+		RenderResponse renderResponse, Organization organization, Role role) {
 
 		super(renderResponse);
 
-		_group = group;
+		_organization = organization;
 		_role = role;
 	}
 
@@ -47,7 +47,8 @@ public class UserGroupRoleUserChecker extends RowChecker {
 
 		try {
 			return UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-				user.getUserId(), _group.getGroupId(), _role.getRoleId());
+				user.getUserId(), _organization.getGroupId(),
+				_role.getRoleId());
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -61,10 +62,10 @@ public class UserGroupRoleUserChecker extends RowChecker {
 		User user = (User)obj;
 
 		Set<Role> mandatoryRoles = MembershipPolicyUtil.getMandatoryRoles(
-			_group, user);
+			_organization, user);
 
-		if ((!MembershipPolicyUtil.isMembershipAllowed(_role, user, _group) &&
-				!isChecked(user)) ||
+		if ((!MembershipPolicyUtil.isMembershipAllowed(
+				_role, user, _organization) && !isChecked(user)) ||
 			(mandatoryRoles.contains(_role) && isChecked(user))) {
 			return true;
 		}
@@ -73,9 +74,9 @@ public class UserGroupRoleUserChecker extends RowChecker {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
-		UserGroupRoleUserChecker.class);
+		OrganizationRoleUserChecker.class);
 
-	private Group _group;
+	private Organization _organization;
 	private Role _role;
 
 }
