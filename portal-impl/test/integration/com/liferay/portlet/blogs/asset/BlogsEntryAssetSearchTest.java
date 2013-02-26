@@ -12,21 +12,20 @@
  * details.
  */
 
-package com.liferay.portlet.blogs.search;
+package com.liferay.portlet.blogs.asset;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.model.BaseModel;
-import com.liferay.portal.search.BaseSearchTestCase;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portlet.asset.service.persistence.BaseAssetSearchTestCase;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.BlogsTestUtil;
 
-import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 /**
@@ -39,32 +38,16 @@ import org.junit.runner.RunWith;
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-public class BlogsEntrySearchTest extends BaseSearchTestCase {
+public class BlogsEntryAssetSearchTest extends BaseAssetSearchTestCase {
 
 	@Override
-	public void testSearchAttachments() throws Exception {
-		Assert.assertTrue("This test does not apply", true);
-	}
-
-	@Override
-	public void testSearchByStructureField() throws Exception {
-		Assert.assertTrue("This test does not apply", true);
-	}
-
-	@Override
-	public void testSearchWithInStructure() throws Exception {
-		Assert.assertTrue("This test does not apply", true);
-	}
-
-	@Override
-	protected BaseModel<?> addBaseModelWithWorkflow(
-			BaseModel<?> parentBaseModel, boolean approved, String keywords,
+	protected BaseModel<?> addBaseModel(
+			BaseModel<?> parentBaseModel, String keywords,
 			ServiceContext serviceContext)
 		throws Exception {
 
 		return BlogsTestUtil.addEntry(
-			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
-			keywords, approved);
+			TestPropsValues.getUserId(), keywords, true, serviceContext);
 	}
 
 	@Override
@@ -74,7 +57,7 @@ public class BlogsEntrySearchTest extends BaseSearchTestCase {
 
 	@Override
 	protected String getSearchKeywords() {
-		return "Title";
+		return "title";
 	}
 
 }
