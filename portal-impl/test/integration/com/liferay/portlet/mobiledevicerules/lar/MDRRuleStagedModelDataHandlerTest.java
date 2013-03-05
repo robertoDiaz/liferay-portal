@@ -12,20 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.lar;
+package com.liferay.portlet.mobiledevicerules.lar;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portlet.bookmarks.model.BookmarksFolder;
-import com.liferay.portlet.bookmarks.service.BookmarksFolderLocalServiceUtil;
-import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
+import com.liferay.portlet.mobiledevicerules.model.MDRRule;
+import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup;
+import com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupLocalServiceUtil;
+import com.liferay.portlet.mobiledevicerules.service.MDRRuleLocalServiceUtil;
+import com.liferay.portlet.mobiledevicerules.util.MDRTestUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 /**
- * @author Daniel Kocsis
+ * @author Mate Thurzo
  */
 @ExecutionTestListeners(
 	listeners = {
@@ -42,55 +43,49 @@ import org.junit.runner.RunWith;
 		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-public class BookmarksFolderStagedModelDataHandlerTest
+public class MDRRuleStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
 	@Override
-	protected Map<String, List<StagedModel>> addDependentStagedModels(
+	protected Map<String, List<StagedModel>> addDependentStagedModelsMap(
 			Group group)
 		throws Exception {
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
 			new HashMap<String, List<StagedModel>>();
 
-		List<StagedModel> dependentStagedModels = new ArrayList<StagedModel>();
+		MDRRuleGroup ruleGroup = MDRTestUtil.addRuleGroup(group.getGroupId());
 
-		dependentStagedModels.add(
-			BookmarksTestUtil.addFolder(
-				group.getGroupId(), ServiceTestUtil.randomString()));
-
-		dependentStagedModelsMap.put(
-			BookmarksFolder.class.getName(), dependentStagedModels);
+		addDependentStagedModel(
+			dependentStagedModelsMap, MDRRuleGroup.class, ruleGroup);
 
 		return dependentStagedModelsMap;
 	}
 
 	@Override
 	protected StagedModel addStagedModel(
-			Group group,
-			Map<String, List<StagedModel>> dependentStagedModelsMap)
+			Group group, Map<String,
+			List<StagedModel>> dependentStagedModelsMap)
 		throws Exception {
 
 		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
-			BookmarksFolder.class.getName());
+			MDRRuleGroup.class.getName());
 
-		BookmarksFolder folder = (BookmarksFolder)dependentStagedModels.get(0);
+		MDRRuleGroup ruleGroup = (MDRRuleGroup)dependentStagedModels.get(0);
 
-		return BookmarksTestUtil.addFolder(
-			group.getGroupId(), folder.getFolderId(),
-			ServiceTestUtil.randomString());
+		return MDRTestUtil.addRule(ruleGroup.getRuleGroupId());
 	}
 
 	@Override
 	protected String getElementName() {
-		return "folder";
+		return "rule";
 	}
 
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group) {
 		try {
-			return BookmarksFolderLocalServiceUtil.
-				getBookmarksFolderByUuidAndGroupId(uuid, group.getGroupId());
+			return MDRRuleLocalServiceUtil.getMDRRuleByUuidAndGroupId(
+				uuid, group.getGroupId());
 		}
 		catch (Exception e) {
 			return null;
@@ -99,7 +94,7 @@ public class BookmarksFolderStagedModelDataHandlerTest
 
 	@Override
 	protected String getStagedModelClassName() {
-		return BookmarksFolder.class.getName();
+		return MDRRule.class.getName();
 	}
 
 	@Override
@@ -109,14 +104,14 @@ public class BookmarksFolderStagedModelDataHandlerTest
 		throws Exception {
 
 		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
-			BookmarksFolder.class.getName());
+			MDRRuleGroup.class.getName());
 
 		Assert.assertEquals(1, dependentStagedModels.size());
 
-		BookmarksFolder folder = (BookmarksFolder)dependentStagedModels.get(0);
+		MDRRuleGroup ruleGroup = (MDRRuleGroup)dependentStagedModels.get(0);
 
-		BookmarksFolderLocalServiceUtil.getBookmarksFolderByUuidAndGroupId(
-			folder.getUuid(), group.getGroupId());
+		MDRRuleGroupLocalServiceUtil.getMDRRuleGroupByUuidAndGroupId(
+			ruleGroup.getUuid(), ruleGroup.getGroupId());
 	}
 
 }

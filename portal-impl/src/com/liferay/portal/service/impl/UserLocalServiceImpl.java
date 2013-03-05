@@ -133,6 +133,7 @@ import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.Encryptor;
 import com.liferay.util.EncryptorException;
+import com.liferay.util.PwdGenerator;
 
 import java.awt.image.RenderedImage;
 
@@ -2695,7 +2696,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return     the user with the UUID
 	 * @throws     PortalException if a user with the UUID could not be found
 	 * @throws     SystemException if a system exception occurred
-	 * @deprecated {@link #getUserByUuidAndCompanyId(String, long)}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #getUserByUuidAndCompanyId(String, long)}
 	 */
 	public User getUserByUuid(String uuid)
 		throws PortalException, SystemException {
@@ -4076,6 +4078,17 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		User defaultUser = getDefaultUser(companyId);
+
+		if (facebookId > 0) {
+			autoPassword = false;
+
+			if ((password1 == null) || (password2 == null)) {
+				password1 = PwdGenerator.getPassword();
+				password2 = password1;
+			}
+
+			sendEmail = false;
+		}
 
 		if (updateUserInformation) {
 			autoScreenName = false;

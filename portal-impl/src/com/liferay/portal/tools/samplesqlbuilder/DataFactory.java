@@ -18,6 +18,7 @@ import com.liferay.counter.model.Counter;
 import com.liferay.counter.model.impl.CounterImpl;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -352,14 +353,12 @@ public class DataFactory {
 
 		_guestGroup = newGroup(
 			guestGroupId, groupClassNameId, guestGroupId, GroupConstants.GUEST,
-			"guest", true);
+			true);
 
 		_groups = new ArrayList<Group>(_maxGroupsCount);
 
 		for (int i = 1; i <= _maxGroupsCount; i++) {
-			String name = "Site " + i;
-
-			Group group = newGroup(i, groupClassNameId, i, name, name, true);
+			Group group = newGroup(i, groupClassNameId, i, "Site " + i, true);
 
 			_groups.add(group);
 		}
@@ -784,7 +783,7 @@ public class DataFactory {
 	public Group newGroup(User user) throws Exception {
 		return newGroup(
 			_counter.get(), getUserClassNameId(), user.getUserId(),
-			String.valueOf(user.getUserId()), user.getScreenName(), false);
+			user.getScreenName(), false);
 	}
 
 	public IntegerWrapper newInteger() {
@@ -1085,7 +1084,7 @@ public class DataFactory {
 
 	protected Group newGroup(
 			long groupId, long classNameId, long classPK, String name,
-			String friendlyURL, boolean site)
+			boolean site)
 		throws Exception {
 
 		Group group = new GroupImpl();
@@ -1097,7 +1096,9 @@ public class DataFactory {
 		group.setClassPK(classPK);
 		group.setTreePath(group.buildTreePath());
 		group.setName(name);
-		group.setFriendlyURL(StringPool.FORWARD_SLASH + friendlyURL);
+		group.setFriendlyURL(
+			StringPool.FORWARD_SLASH +
+				FriendlyURLNormalizerUtil.normalize(name));
 		group.setSite(site);
 		group.setActive(true);
 

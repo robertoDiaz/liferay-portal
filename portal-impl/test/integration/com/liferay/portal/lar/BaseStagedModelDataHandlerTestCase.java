@@ -64,14 +64,14 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 	public void setUp() throws Exception {
 		FinderCacheUtil.clearCache();
 
-		_liveGroup = GroupTestUtil.addGroup();
-		_stagingGroup = GroupTestUtil.addGroup();
+		liveGroup = GroupTestUtil.addGroup();
+		stagingGroup = GroupTestUtil.addGroup();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(_liveGroup);
-		GroupLocalServiceUtil.deleteGroup(_stagingGroup);
+		GroupLocalServiceUtil.deleteGroup(liveGroup);
+		GroupLocalServiceUtil.deleteGroup(stagingGroup);
 	}
 
 	@Test
@@ -83,15 +83,15 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 		PortletDataContext portletDataContext = new PortletDataContextImpl(
-			_stagingGroup.getCompanyId(), _stagingGroup.getGroupId(),
+			stagingGroup.getCompanyId(), stagingGroup.getGroupId(),
 			getParameterMap(), new HashSet<String>(), getStartDate(),
 			getEndDate(), zipWriter);
 
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
-			addDependentStagedModels(_stagingGroup);
+			addDependentStagedModelsMap(stagingGroup);
 
 		StagedModel stagedModel = addStagedModel(
-			_stagingGroup, dependentStagedModelsMap);
+			stagingGroup, dependentStagedModelsMap);
 
 		Element[] dependentStagedModelsElements =
 			getDependentStagedModelsElements(dependentStagedModelsMap);
@@ -112,11 +112,10 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 			zipWriter.getFile());
 
 		portletDataContext = new PortletDataContextImpl(
-			_liveGroup.getCompanyId(), _liveGroup.getGroupId(),
-			getParameterMap(), new HashSet<String>(), userIdStrategy,
-			zipReader);
+			liveGroup.getCompanyId(), liveGroup.getGroupId(), getParameterMap(),
+			new HashSet<String>(), userIdStrategy, zipReader);
 
-		portletDataContext.setSourceGroupId(_stagingGroup.getGroupId());
+		portletDataContext.setSourceGroupId(stagingGroup.getGroupId());
 
 		Element importedStagedModelElement = getImportedStagedModelElement(
 			stagedModel, dependentStagedModelsElements);
@@ -126,10 +125,23 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		StagedModelDataHandlerUtil.importStagedModel(
 			portletDataContext, importedStagedModelElement);
 
-		validateImport(stagedModel, dependentStagedModelsMap, _liveGroup);
+		validateImport(stagedModel, dependentStagedModelsMap, liveGroup);
 	}
 
-	protected Map<String, List<StagedModel>> addDependentStagedModels(
+	protected List<StagedModel> addDependentStagedModel(
+		Map<String, List<StagedModel>> dependentStagedModelsMap, Class<?> clazz,
+		StagedModel dependentStagedModel) {
+
+		List<StagedModel> dependentStagedModels = new ArrayList<StagedModel>();
+
+		dependentStagedModels.add(dependentStagedModel);
+
+		dependentStagedModelsMap.put(clazz.getName(), dependentStagedModels);
+
+		return dependentStagedModels;
+	}
+
+	protected Map<String, List<StagedModel>> addDependentStagedModelsMap(
 			Group group)
 		throws Exception {
 
@@ -299,7 +311,7 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		validateImport(dependentStagedModelsMap, group);
 	}
 
-	private Group _liveGroup;
-	private Group _stagingGroup;
+	protected Group liveGroup;
+	protected Group stagingGroup;
 
 }

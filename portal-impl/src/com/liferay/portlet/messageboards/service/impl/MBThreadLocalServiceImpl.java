@@ -264,7 +264,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreads(long, QueryDefinition)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long,
+	 *             QueryDefinition)}
 	 */
 	public List<MBThread> getGroupThreads(
 			long groupId, int status, int start, int end)
@@ -603,6 +604,12 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			category = mbCategoryPersistence.findByPrimaryKey(categoryId);
 		}
 
+		// Thread
+
+		thread.setCategoryId(categoryId);
+
+		mbThreadPersistence.update(thread);
+
 		// Messages
 
 		List<MBMessage> messages = mbMessagePersistence.findByG_C_T(
@@ -622,12 +629,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				indexer.reindex(message);
 			}
 		}
-
-		// Thread
-
-		thread.setCategoryId(categoryId);
-
-		mbThreadPersistence.update(thread);
 
 		// Category
 
@@ -924,7 +925,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #incrementViewCounter(long, int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #incrementViewCounter(long,
+	 *             int)}
 	 */
 	public MBThread updateThread(long threadId, int viewCount)
 		throws PortalException, SystemException {

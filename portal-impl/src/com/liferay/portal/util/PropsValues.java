@@ -1434,6 +1434,8 @@ public class PropsValues {
 
 	public static final int RATINGS_MIN_SCORE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.RATINGS_MIN_SCORE));
 
+	public static final int RECENT_CONTENT_MAX_DISPLAY_ITEMS = GetterUtil.getInteger(PropsUtil.get(PropsKeys.RECENT_CONTENT_MAX_DISPLAY_ITEMS));
+
 	public static final String[] REDIRECT_URL_DOMAINS_ALLOWED = PropsUtil.getArray(PropsKeys.REDIRECT_URL_DOMAINS_ALLOWED);
 
 	public static final String[] REDIRECT_URL_IPS_ALLOWED = PropsUtil.getArray(PropsKeys.REDIRECT_URL_IPS_ALLOWED);
@@ -1692,7 +1694,7 @@ public class PropsValues {
 
 	public static final boolean TRANSLATIONS_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TRANSLATIONS_DISABLED));
 
-	public static final int TRASH_ENABLED = GetterUtil.getInteger(PropsUtil.get(PropsKeys.TRASH_ENABLED));
+	public static final boolean TRASH_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TRASH_ENABLED));
 
 	public static final int TRASH_ENTRIES_MAX_AGE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.TRASH_ENTRIES_MAX_AGE));
 
