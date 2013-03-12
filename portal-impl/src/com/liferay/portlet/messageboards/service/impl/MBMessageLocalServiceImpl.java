@@ -371,12 +371,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			message.getWorkflowClassName(), message.getMessageId(), message,
 			serviceContext);
 
-		// Testing roll back
-
-		/*if (true) {
-			throw new SystemException("Testing roll back");
-		}*/
-
 		return message;
 	}
 
