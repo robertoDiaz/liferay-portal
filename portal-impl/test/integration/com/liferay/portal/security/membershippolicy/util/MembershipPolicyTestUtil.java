@@ -34,8 +34,10 @@ import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.announcements.model.AnnouncementsDelivery;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -46,38 +48,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
-
-import org.powermock.api.mockito.PowerMockito;
-
 /**
  * @author Roberto Díaz
  */
-public class MembershipPolicyTestUtil extends PowerMockito {
+public class MembershipPolicyTestUtil {
+
+	// All these methods are not using UserTestUtil.java or GroupTestUtil.java
+	// because we need to call the Remote Service in order to verify the
+	// Membership Policies
 
 	public static Group addGroup() throws Exception {
-		String name = "TestGroup";
+		String name = ServiceTestUtil.randomString();
 		String friendlyURL =
 			StringPool.SLASH + FriendlyURLNormalizerUtil.normalize(name);
 
-		Group group = null;
-
-		try {
-			group = GroupServiceUtil.addGroup(
-				GroupConstants.DEFAULT_PARENT_GROUP_ID,
-				GroupConstants.DEFAULT_LIVE_GROUP_ID, name,
-				"This is a test group", GroupConstants.TYPE_SITE_OPEN,
-				friendlyURL, true, true, _getServiceContext());
-		}catch (Exception e) {
-		}
-
-		if (group != null) {
-			return group;
-		}
-		else {
-			Assert.fail();
-			return null;
-		}
+		return GroupServiceUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, name, "This is a test group",
+			GroupConstants.TYPE_SITE_OPEN, friendlyURL, true, true,
+			populateServiceContext());
 	}
 
 	public static User addUser(
@@ -185,46 +174,36 @@ public class MembershipPolicyTestUtil extends PowerMockito {
 			announcementsDelivers, serviceContext);
 	}
 
-	private static ServiceContext _getServiceContext() throws Exception {
+	protected static ServiceContext populateServiceContext() throws Exception {
 		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
-		AssetTag assetTag = addAssetTag();
-		serviceContext.setAssetTagNames(new String[]{assetTag.getName()});
+		AssetTag tag = AssetTagLocalServiceUtil.addTag(
+			TestPropsValues.getUserId(), ServiceTestUtil.randomString(), null,
+			new ServiceContext());
 
-		AssetCategory assetCategory = addAssetCategory();
+		serviceContext.setAssetTagNames(new String[]{tag.getName()});
+
+		AssetVocabulary vocabulary =
+			AssetVocabularyLocalServiceUtil.addVocabulary(
+				TestPropsValues.getUserId(), ServiceTestUtil.randomString(),
+				new ServiceContext());
+
+		AssetCategory category = AssetCategoryLocalServiceUtil.addCategory(
+			TestPropsValues.getUserId(), ServiceTestUtil.randomString(),
+			vocabulary.getVocabularyId(), serviceContext);
+
 		serviceContext.setAssetCategoryIds(
-			new long[]{assetCategory.getCategoryId()});
+			new long[]{category.getCategoryId()});
 
-		Map<String, Serializable> expandoMap = addExpandoMap();
-		serviceContext.setExpandoBridgeAttributes(expandoMap);
+		serviceContext.setExpandoBridgeAttributes(addExpandoMap());
 
 		return serviceContext;
 	}
 
-	private static AssetCategory addAssetCategory() throws Exception {
-		AssetCategory assetCategory =
-			AssetCategoryLocalServiceUtil.createAssetCategory(
-				CounterLocalServiceUtil.increment(
-					AssetCategory.class.getName()));
-
-		assetCategory.setName("TestCategory");
-
-		return AssetCategoryLocalServiceUtil.addAssetCategory(assetCategory);
-	}
-
-	private static AssetTag addAssetTag() throws Exception {
-		AssetTag assetTag = AssetTagLocalServiceUtil.createAssetTag(
-			CounterLocalServiceUtil.increment(AssetTag.class.getName()));
-
-		assetTag.setName("TestAssetTag");
-
-		return AssetTagLocalServiceUtil.addAssetTag(assetTag);
-	}
-
-	private static Map<String, Serializable> addExpandoMap() {
+	protected static Map<String, Serializable> addExpandoMap() {
 		Map<String, Serializable> expandoMap =
 			new HashMap<String, Serializable>();
 

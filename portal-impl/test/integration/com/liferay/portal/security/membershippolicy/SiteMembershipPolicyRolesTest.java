@@ -17,6 +17,7 @@ package com.liferay.portal.security.membershippolicy;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.membershippolicy.util.MembershipPolicyTestUtil;
@@ -72,11 +73,10 @@ public class SiteMembershipPolicyRolesTest
 		addUsers();
 		addForbiddenRoles();
 
-		long groupId = getGroup().getGroupId();
-		long roleId = getForbiddenRoleIds()[0];
+		Group group = getGroup();
 
 		UserGroupRoleServiceUtil.addUserGroupRoles(
-			getUserIds(), groupId, roleId);
+			getUserIds(), group.getGroupId(), getForbiddenRoleIds()[0]);
 	}
 
 	@Test(expected = MembershipPolicyException.class)
@@ -144,7 +144,7 @@ public class SiteMembershipPolicyRolesTest
 
 	@Test(expected = MembershipPolicyException.class)
 	@Transactional
-	public void testExceptionThrowWhenSetForbiddenSiteRoleFToUser()
+	public void testExceptionThrowWhenSetForbiddenSiteRoleToUser()
 		throws Exception {
 
 		addUsers();

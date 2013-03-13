@@ -42,7 +42,7 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 			long[] userIds, long[] addGroupIds, long[] removeGroupIds)
 		throws PortalException, SystemException {
 
-		for (long forbiddenGroupId : _getForbiddenGroupIds()) {
+		for (long forbiddenGroupId : getForbiddenGroupIds()) {
 			if (forbiddenGroupId == 0) {
 				continue;
 			}
@@ -53,7 +53,7 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 			}
 		}
 
-		for (long requiredGroupId : _getRequiredGroupIds()) {
+		for (long requiredGroupId : getRequiredGroupIds()) {
 			if (requiredGroupId == 0) {
 				continue;
 			}
@@ -85,7 +85,7 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 			}
 		}
 
-		for (long forbiddenGroupRoleId : _getForbiddenGroupRoleIds()) {
+		for (long forbiddenGroupRoleId : getForbiddenGroupRoleIds()) {
 			if (forbiddenGroupRoleId == 0) {
 				continue;
 			}
@@ -96,7 +96,7 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 			}
 		}
 
-		for (long requiredGroupRoleId : _getRequiredGroupRoleIds()) {
+		for (long requiredGroupRoleId : getRequiredGroupRoleIds()) {
 			if (requiredGroupRoleId == 0) {
 				continue;
 			}
@@ -123,7 +123,6 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 		throws PortalException, SystemException {
 
 		BaseSiteMembershipPolicyTestCase.setPropagateRolesMethodFlag(true);
-
 	}
 
 	public void verifyPolicy() throws PortalException, SystemException {
@@ -179,19 +178,19 @@ public class SiteMembershipPolicyTestImpl extends BaseSiteMembershipPolicy {
 		verifyPolicy(role);
 	}
 
-	private long[] _getForbiddenGroupIds() {
+	protected long[] getForbiddenGroupIds() {
 		return BaseSiteMembershipPolicyTestCase.getForbiddenSiteIds();
 	}
 
-	private long[] _getForbiddenGroupRoleIds() {
+	protected long[] getForbiddenGroupRoleIds() {
 		return BaseSiteMembershipPolicyTestCase.getForbiddenRoleIds();
 	}
 
-	private long[] _getRequiredGroupIds() {
+	protected long[] getRequiredGroupIds() {
 		return BaseSiteMembershipPolicyTestCase.getRequiredSiteIds();
 	}
 
-	private long[] _getRequiredGroupRoleIds() {
+	protected long[] getRequiredGroupRoleIds() {
 		return BaseSiteMembershipPolicyTestCase.getRequiredRoleIds();
 	}
 
