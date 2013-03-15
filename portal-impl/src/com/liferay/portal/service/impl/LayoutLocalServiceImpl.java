@@ -74,7 +74,6 @@ import com.liferay.portal.util.comparator.LayoutPriorityComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.dynamicdatalists.RecordSetDuplicateRecordSetKeyException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
@@ -264,6 +263,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				0, PropsValues.LAYOUT_DEFAULT_TEMPLATE_ID, false);
 		}
 
+		layout.setExpandoBridgeAttributes(serviceContext);
+
 		layoutPersistence.update(layout);
 
 		if (Validator.isNotNull(layoutPrototypeUuid) &&
@@ -325,12 +326,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			groupId, privateLayout);
 
 		layout.setLayoutSet(layoutSet);
-
-		// Expando
-
-		ExpandoBridge expandoBridge = layout.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Message boards
 
@@ -843,6 +838,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the layout matching the UUID, group, and privacy.
+	 *
 	 * @param  uuid the layout's UUID
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
@@ -1844,6 +1841,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.setLayoutPrototypeLinkEnabled(layoutPrototypeLinkEnabled);
 		}
 
+		layout.setExpandoBridgeAttributes(serviceContext);
+
 		layoutPersistence.update(layout);
 
 		// Icon
@@ -1864,12 +1863,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			updateScopedPortletNames(
 				groupId, privateLayout, layoutId, nameMap, modifiedLocales);
 		}
-
-		// Expando
-
-		ExpandoBridge expandoBridge = layout.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		return layout;
 	}

@@ -58,6 +58,9 @@ public class HttpServiceWrapper implements ExtendedHttpService, HttpService {
 	public void registerListener(
 		Object listener, Map<String, String> initParameters,
 		HttpContext httpContext) {
+
+		bundleServletContext.registerListener(
+			listener, initParameters, httpContext);
 	}
 
 	public void registerResources(
@@ -100,6 +103,7 @@ public class HttpServiceWrapper implements ExtendedHttpService, HttpService {
 	}
 
 	public void unregisterListener(Object listener) {
+		bundleServletContext.unregisterListener(listener);
 	}
 
 	public void unregisterServlet(String servletName) {

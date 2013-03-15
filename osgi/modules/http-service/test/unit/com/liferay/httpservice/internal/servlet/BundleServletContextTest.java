@@ -20,11 +20,20 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import java.text.SimpleDateFormat;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpSessionActivationListener;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionBindingListener;
+import javax.servlet.http.HttpSessionListener;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -93,6 +102,26 @@ public class BundleServletContextTest extends PowerMockito {
 	}
 
 	@Test
+	public void testRegisterHttpSessionActivationListener() {
+		registerListener(_httpSessionActivationListener);
+	}
+
+	@Test
+	public void testRegisterHttpSessionAttributeListener() {
+		registerListener(_httpSessionAttributeListener);
+	}
+
+	@Test
+	public void testRegisterHttpSessionBindingListener() {
+		registerListener(_httpSessionBindingListener);
+	}
+
+	@Test
+	public void testRegisterHttpSessionListener() {
+		registerListener(_httpSessionListener);
+	}
+
+	@Test
 	public void testRegisterNullFilter()
 		throws NamespaceException, ServletException {
 
@@ -156,6 +185,16 @@ public class BundleServletContextTest extends PowerMockito {
 	}
 
 	@Test
+	public void testRegisterServletContextAttributeListener() {
+		registerListener(_servletContextAttributeListener);
+	}
+
+	@Test
+	public void testRegisterServletContextListener() {
+		registerListener(_servletContextListener);
+	}
+
+	@Test
 	public void testRegisterServletMappingTwice()
 		throws NamespaceException, ServletException {
 
@@ -179,10 +218,133 @@ public class BundleServletContextTest extends PowerMockito {
 	}
 
 	@Test
+	public void testRegisterServletRequestAttributeListener() {
+		List<ServletRequestAttributeListener> servletRequestAttributeListeners =
+			_bundleServletContext.getServletRequestAttributeListeners();
+
+		int initialSize = servletRequestAttributeListeners.size();
+
+		registerListener(_servletRequestAttributeListener);
+
+		servletRequestAttributeListeners =
+			_bundleServletContext.getServletRequestAttributeListeners();
+
+		Assert.assertEquals(
+			initialSize + 1, servletRequestAttributeListeners.size());
+	}
+
+	@Test
+	public void testRegisterServletRequestListener() {
+		List<ServletRequestListener> servletRequestListeners =
+			_bundleServletContext.getServletRequestListeners();
+
+		int initialSize = servletRequestListeners.size();
+
+		registerListener(_servletRequestListener);
+
+		servletRequestListeners =
+			_bundleServletContext.getServletRequestListeners();
+
+		Assert.assertEquals(initialSize + 1, servletRequestListeners.size());
+	}
+
+	@Test
 	public void testRegisterServletSingleMapping()
 		throws NamespaceException, ServletException {
 
 		registerServlet("Servlet B", "/a");
+	}
+
+	@Test
+	public void testUnegisterHttpSessionAttributeListener() {
+		unregisterListener(_httpSessionAttributeListener);
+	}
+
+	@Test
+	public void testUnegisterServletContextListener() {
+		unregisterListener(_servletContextListener);
+	}
+
+	@Test
+	public void testUnregisterExistingServlet()
+		throws NamespaceException, ServletException {
+
+		String servletName = "Servlet A";
+
+		registerServlet(servletName, "/a");
+
+		_bundleServletContext.unregisterServlet(servletName);
+
+		Servlet servlet = _bundleServletContext.getServlet(servletName);
+
+		Assert.assertNull(servlet);
+	}
+
+	@Test
+	public void testUnregisterHttpSessionActivationListener() {
+		unregisterListener(_httpSessionActivationListener);
+	}
+
+	@Test
+	public void testUnregisterHttpSessionBindingListener() {
+
+		unregisterListener(_httpSessionBindingListener);
+	}
+
+	@Test
+	public void testUnregisterHttpSessionListener() {
+		unregisterListener(_httpSessionListener);
+	}
+
+	@Test
+	public void testUnregisterNonExistingServlet() {
+		String servletName = "Nonexisting Servlet";
+
+		_bundleServletContext.unregisterServlet(servletName);
+
+		Servlet servlet = _bundleServletContext.getServlet(servletName);
+
+		Assert.assertNull(servlet);
+	}
+
+	@Test
+	public void testUnregisterServletContextAttributeListener() {
+		registerListener(_servletContextAttributeListener);
+	}
+
+	@Test
+	public void testUnregisterServletRequestAttributeListener() {
+		List<ServletRequestAttributeListener> servletRequestAttributeListeners =
+			_bundleServletContext.getServletRequestAttributeListeners();
+
+		int initialSize = servletRequestAttributeListeners.size();
+
+		registerListener(_servletRequestAttributeListener);
+
+		unregisterListener(_servletRequestAttributeListener);
+
+		servletRequestAttributeListeners =
+			_bundleServletContext.getServletRequestAttributeListeners();
+
+		Assert.assertEquals(
+			initialSize, servletRequestAttributeListeners.size());
+	}
+
+	@Test
+	public void testUnregisterServletRequestListener() {
+		List<ServletRequestListener> servletRequestListeners =
+			_bundleServletContext.getServletRequestListeners();
+
+		int initialSize = servletRequestListeners.size();
+
+		registerListener(_servletRequestListener);
+
+		unregisterListener(_servletRequestListener);
+
+		servletRequestListeners =
+			_bundleServletContext.getServletRequestListeners();
+
+		Assert.assertEquals(initialSize, servletRequestListeners.size());
 	}
 
 	protected void mockBundleWiring() {
@@ -199,6 +361,14 @@ public class BundleServletContextTest extends PowerMockito {
 		).thenReturn(
 			clazz.getClassLoader()
 		);
+	}
+
+	protected void registerListener(Object listener) {
+		mockBundleWiring();
+
+		_bundleServletContext.registerListener(listener, null, _httpContext);
+
+		verifyBundleWiring();
 	}
 
 	protected void registerResource(String servletName, String alias)
@@ -245,6 +415,14 @@ public class BundleServletContextTest extends PowerMockito {
 		verifyBundleWiring();
 	}
 
+	protected void unregisterListener(Object listener) {
+		mockBundleWiring();
+
+		_bundleServletContext.unregisterListener(listener);
+
+		verifyBundleWiring();
+	}
+
 	protected void verifyBundleWiring() {
 		Bundle bundle = Mockito.verify(_bundle);
 
@@ -270,9 +448,33 @@ public class BundleServletContextTest extends PowerMockito {
 	private HttpContext _httpContext;
 
 	@Mock
+	private HttpSessionActivationListener _httpSessionActivationListener;
+
+	@Mock
+	private HttpSessionAttributeListener _httpSessionAttributeListener;
+
+	@Mock
+	private HttpSessionBindingListener _httpSessionBindingListener;
+
+	@Mock
+	private HttpSessionListener _httpSessionListener;
+
+	@Mock
 	private Servlet _servlet;
 
 	@Mock
 	private ServletContext _servletContext;
+
+	@Mock
+	private ServletContextAttributeListener _servletContextAttributeListener;
+
+	@Mock
+	private ServletContextListener _servletContextListener;
+
+	@Mock
+	private ServletRequestAttributeListener _servletRequestAttributeListener;
+
+	@Mock
+	private ServletRequestListener _servletRequestListener;
 
 }

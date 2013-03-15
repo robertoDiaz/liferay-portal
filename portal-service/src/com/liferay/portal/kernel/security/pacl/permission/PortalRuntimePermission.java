@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.security.pacl.permission;
 
 import com.liferay.portal.kernel.security.pacl.PACLConstants;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.security.BasicPermission;
 import java.security.Permission;
@@ -55,6 +56,28 @@ public class PortalRuntimePermission extends BasicPermission {
 		securityManager.checkPermission(permission);
 	}
 
+	public static void checkGetClassLoader(String classLoaderReferenceId) {
+		SecurityManager securityManager = System.getSecurityManager();
+
+		if (securityManager == null) {
+			return;
+		}
+
+		Permission permission = null;
+
+		if (Validator.isNotNull(classLoaderReferenceId)) {
+			permission = new RuntimePermission(
+				PACLConstants.RUNTIME_PERMISSION_GET_CLASSLOADER,
+				classLoaderReferenceId);
+		}
+		else {
+			permission = new RuntimePermission(
+				PACLConstants.RUNTIME_PERMISSION_GET_CLASSLOADER);
+		}
+
+		securityManager.checkPermission(permission);
+	}
+
 	public static void checkSearchEngine(String searchEngineId) {
 		SecurityManager securityManager = System.getSecurityManager();
 
@@ -83,6 +106,19 @@ public class PortalRuntimePermission extends BasicPermission {
 		Permission permission = new PortalRuntimePermission(
 			PACLConstants.PORTAL_RUNTIME_PERMISSION_SET_BEAN_PROPERTY, clazz,
 			property);
+
+		securityManager.checkPermission(permission);
+	}
+
+	public static void checkThreadPoolExecutor(String name) {
+		SecurityManager securityManager = System.getSecurityManager();
+
+		if (securityManager == null) {
+			return;
+		}
+
+		Permission permission = new PortalRuntimePermission(
+			PACLConstants.PORTAL_RUNTIME_PERMISSION_THREAD_POOL_EXECUTOR, name);
 
 		securityManager.checkPermission(permission);
 	}

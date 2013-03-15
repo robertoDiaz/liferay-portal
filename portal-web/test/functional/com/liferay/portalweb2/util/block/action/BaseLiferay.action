@@ -1,2 +1,10 @@
-<action-definition name="BaseLiferay">
+<action-definition>
+	<action-command name="Click">
+		<case contains="/input">
+			<execute function="Click#clickAtAndWait" />
+		</case>
+		<default>
+			<execute function="Click#clickAt" />
+		</default>
+	</action-command>
 </action-definition>
