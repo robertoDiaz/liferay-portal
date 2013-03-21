@@ -19,6 +19,8 @@ import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.membershippolicy.util.MembershipPolicyTestUtil;
+import com.liferay.portal.service.OrganizationServiceUtil;
+import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserServiceUtil;
 
@@ -161,7 +163,7 @@ public class OrganizationMembershipPolicyMembershipsTest
 
 		User user = UserLocalServiceUtil.getUser(userIds[0]);
 
-		List<Organization> organizations =  user.getOrganizations();
+		List<Organization> organizations = user.getOrganizations();
 
 		Assert.assertEquals(0, organizations.size());
 
@@ -180,7 +182,7 @@ public class OrganizationMembershipPolicyMembershipsTest
 			user, standardOrganizationIds, null, null, null,
 			Collections.<UserGroupRole>emptyList());
 
-		// We have tried to remove the user from required Organizations,
+		// We have tried to remove the user from his required Organizations,
 		// but they are kept
 
 		organizations = user.getOrganizations();
@@ -264,7 +266,12 @@ public class OrganizationMembershipPolicyMembershipsTest
 	public void testVerifyWhenUpdatingOrganization() throws Exception {
 		Organization organization = MembershipPolicyTestUtil.addOrganization();
 
-		MembershipPolicyTestUtil.updateOrganization(organization);
+		OrganizationServiceUtil.updateOrganization(
+			organization.getOrganizationId(),
+			organization.getParentOrganizationId(), organization.getName(),
+			organization.getType(), false, 0, 0, organization.getStatusId(),
+			organization.getComments(), false,
+			ServiceTestUtil.getServiceContext());
 
 		Assert.assertTrue(isVerify());
 	}

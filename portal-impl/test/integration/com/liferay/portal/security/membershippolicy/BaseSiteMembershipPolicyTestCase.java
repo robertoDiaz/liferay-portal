@@ -116,8 +116,8 @@ public abstract class BaseSiteMembershipPolicyTestCase {
 	}
 
 	protected long[] addForbiddenRoles() throws Exception {
-		_forbiddenRoleIds[0] = RoleTestUtil.addGroupRole(group.getGroupId());
-		_forbiddenRoleIds[1] = RoleTestUtil.addGroupRole(group.getGroupId());
+		_forbiddenRoleIds[0] = RoleTestUtil.addSiteRole(group.getGroupId());
+		_forbiddenRoleIds[1] = RoleTestUtil.addSiteRole(group.getGroupId());
 
 		return _forbiddenRoleIds;
 	}
@@ -137,8 +137,8 @@ public abstract class BaseSiteMembershipPolicyTestCase {
 	}
 
 	protected long[] addRequiredRoles() throws Exception {
-		_requiredRoleIds[0] = RoleTestUtil.addGroupRole(group.getGroupId());
-		_requiredRoleIds[1] = RoleTestUtil.addGroupRole(group.getGroupId());
+		_requiredRoleIds[0] = RoleTestUtil.addSiteRole(group.getGroupId());
+		_requiredRoleIds[1] = RoleTestUtil.addSiteRole(group.getGroupId());
 
 		return _requiredRoleIds;
 	}
@@ -158,8 +158,8 @@ public abstract class BaseSiteMembershipPolicyTestCase {
 	}
 
 	protected long[] addStandardRoles() throws Exception {
-		_standardRoleIds[0] = RoleTestUtil.addGroupRole(group.getGroupId());
-		_standardRoleIds[1] = RoleTestUtil.addGroupRole(group.getGroupId());
+		_standardRoleIds[0] = RoleTestUtil.addSiteRole(group.getGroupId());
+		_standardRoleIds[1] = RoleTestUtil.addSiteRole(group.getGroupId());
 
 		return _standardRoleIds;
 	}

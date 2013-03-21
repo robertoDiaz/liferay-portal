@@ -75,17 +75,13 @@ public class MembershipPolicyTestUtil {
 	}
 
 	public static Organization addOrganization() throws Exception {
-		long parentOrganizationId =
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
 		String name = ServiceTestUtil.randomString();
-		String type = OrganizationConstants.TYPE_REGULAR_ORGANIZATION;
-		int statusId = ListTypeConstants.ORGANIZATION_STATUS_DEFAULT;
-		String comments = StringPool.BLANK;
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
 
 		return OrganizationServiceUtil.addOrganization(
-			parentOrganizationId, name, type, false, 0, 0, statusId, comments,
-			false, serviceContext);
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID, name,
+			OrganizationConstants.TYPE_REGULAR_ORGANIZATION, false, 0, 0,
+			ListTypeConstants.ORGANIZATION_STATUS_DEFAULT, StringPool.BLANK,
+			false, populateServiceContext());
 	}
 
 	public static User addUser(
@@ -123,21 +119,6 @@ public class MembershipPolicyTestUtil {
 			locale, firstName, middleName, lastName, prefixId, suffixId, male,
 			birthdayMonth, birthdayDay, birthdayYear, jobTitle, siteIds,
 			organizationIds, roleIds, userGroupIds, sendMail, serviceContext);
-	}
-
-	public static Organization updateOrganization(Organization organization)
-		throws Exception {
-
-		return OrganizationServiceUtil.updateOrganization(
-			organization.getOrganizationId(),
-			organization.getParentOrganizationId(), organization.getName(),
-			organization.getType(), false, 0, 0, organization.getStatusId(),
-			organization.getComments(), false, Collections.<Address>emptyList(),
-			Collections.<EmailAddress>emptyList(),
-			Collections.<OrgLabor>emptyList(), Collections.<Phone>emptyList(),
-			Collections.<Website>emptyList(),
-			ServiceTestUtil.getServiceContext());
-
 	}
 
 	public static void updateUser(
