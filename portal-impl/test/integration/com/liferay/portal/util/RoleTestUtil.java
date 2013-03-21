@@ -24,9 +24,18 @@ import com.liferay.portal.service.ServiceTestUtil;
  */
 public class RoleTestUtil {
 
-	public static long addGroupRole(long groupId) throws Exception {
+	public static long addOrganizationRole(long groupId) throws Exception {
 		Role role = ServiceTestUtil.addRole(
-			"TestRole", RoleConstants.TYPE_SITE);
+			ServiceTestUtil.randomString(), RoleConstants.TYPE_ORGANIZATION);
+
+		RoleLocalServiceUtil.addGroupRole(groupId, role.getRoleId());
+
+		return role.getRoleId();
+	}
+
+	public static long addSiteRole(long groupId) throws Exception {
+		Role role = ServiceTestUtil.addRole(
+			ServiceTestUtil.randomString(), RoleConstants.TYPE_SITE);
 
 		RoleLocalServiceUtil.addGroupRole(groupId, role.getRoleId());
 
