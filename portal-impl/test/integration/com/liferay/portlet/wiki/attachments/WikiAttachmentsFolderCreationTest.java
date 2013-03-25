@@ -17,8 +17,10 @@ package com.liferay.portlet.wiki.attachments;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
@@ -30,6 +32,7 @@ import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.util.WikiTestUtil;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +43,7 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		MainServletExecutionTestListener.class,
+		EnvironmentExecutionTestListener.class,
 		TransactionalCallbackAwareExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
@@ -54,10 +57,75 @@ public class WikiAttachmentsFolderCreationTest {
 		_group = GroupTestUtil.addGroup();
 	}
 
-	@Test
-	public void testAddSecondWikiPageAttachmentCreatesNoFolder()
-		throws Exception {
+	@After
+	public void tearDown() {
+		_group = null;
+		_node  =null;
+		_page = null;
+	}
 
+	@Test
+	public void testAddWikiNode() throws Exception {
+		int expectedFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		addWikiNode();
+		int currentFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		Assert.assertNotNull(_node);
+		Assert.assertEquals(expectedFolderCount, currentFolderCount);
+	}
+
+	@Test
+	public void testAddWikiPage() throws Exception {
+		int expectedFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		addWikiPage();
+		int currentFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		Assert.assertNotNull(_page);
+		Assert.assertEquals(expectedFolderCount, currentFolderCount);
+	}
+
+	@Test
+	public void testAddWikiPageAttachments() throws Exception {
+		int initialFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		int newRepositoryFolder = 1;
+		int newNodeFolder = 1;
+		int newPageFolder = 1;
+
+		int newFolders = newRepositoryFolder + newNodeFolder + newPageFolder;
+
+		int firstFolderCount = assertAttachFileToPage1InNode1FromGroup1(
+			initialFolderCount + newFolders);
+
+		int totalNewFolders = newFolders;
+
+		int secondFolderCount = assertAttachFileToPage2InNode1FromGroup1(
+			firstFolderCount + newPageFolder);
+
+		totalNewFolders += newPageFolder;
+
+		newFolders = newNodeFolder + newPageFolder;
+
+		int thirdFolderCount = assertAttachFileToPage2InNode2FromGroup1(
+			secondFolderCount + newFolders);
+
+		totalNewFolders += newFolders;
+
+		newFolders = newRepositoryFolder + newNodeFolder + newPageFolder;
+
+		int finalFolderCount = assertAttachFileToPage1InNode1FromGroup2(
+			thirdFolderCount + newFolders );
+
+		totalNewFolders += newFolders;
+
+		Assert.assertEquals(
+			initialFolderCount + totalNewFolders, finalFolderCount);
+	}
+
+	@Test
+	public void testAddWikiPageSecondAttachment() throws Exception {
 		int originalFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
 
 		addWikiPageAttachment();
@@ -73,66 +141,135 @@ public class WikiAttachmentsFolderCreationTest {
 	}
 
 	@Test
-	public void testAddWikiNodeCreatesNoFolder() throws Exception {
-		int expectedFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+	public void testMoveToTrashWikiPageWithAttachments() throws Exception {
+		addWikiPageAttachment();
 
-		addWikiNode();
-		int currentFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+		WikiPageLocalServiceUtil.movePageToTrash(
+			TestPropsValues.getUserId(), _page);
 
-		Assert.assertNotNull(_node);
-		Assert.assertEquals(expectedFolderCount, currentFolderCount);
-	}
-
-	@Test
-	public void testAddWikiPageAttachmentsCreatesFolder() throws Exception {
-		int initialFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
-
-		int firstFolderCount = assertAttachFileToPage1InNode1FromGroup1(
-			initialFolderCount + createFolders(3));
-
-		int secondFolderCount = assertAttachFileToPage2InNode1FromGroup1(
-			firstFolderCount + createFolders(1));
-
-		int thirdFolderCount = assertAttachFileToPage2InNode2FromGroup1(
-			secondFolderCount + createFolders(2));
-
-		int finalFolderCount = assertAttachFileToPage1InNode1FromGroup2(
-			thirdFolderCount + createFolders(3));
+		WikiPage wikiPage =
+			WikiPageLocalServiceUtil.getWikiPage(_page.getPageId());
 
 		Assert.assertEquals(
-			initialFolderCount + createFolders(9), finalFolderCount);
+			WorkflowConstants.STATUS_IN_TRASH, wikiPage.getStatus());
 	}
 
 	@Test
-	public void testAddWikiPageCreatesNoFolder() throws Exception {
-		int expectedFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
-
+	public void testMoveToTrashWikiPageWithoutAttachments() throws Exception {
 		addWikiPage();
-		int currentFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
 
-		Assert.assertNotNull(_page);
-		Assert.assertEquals(expectedFolderCount, currentFolderCount);
+		WikiPageLocalServiceUtil.movePageToTrash(
+			TestPropsValues.getUserId(), _page);
+
+		WikiPage wikiPage =
+			WikiPageLocalServiceUtil.getWikiPage(_page.getPageId());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_IN_TRASH, wikiPage.getStatus());
 	}
 
 	@Test
 	public void testDeleteWikiPageWithAttachments() throws Exception {
 		addWikiPageAttachment();
 
-		long attachmentsFolderId = _page.getAttachmentsFolderId();
-		long nodeAttachmentsFolderId = _page.getNodeAttachmentsFolderId();
+		int expectedWikiPageCount =
+			(WikiPageLocalServiceUtil.getPagesCount(_node.getNodeId()) - 1);
 
-		Assert.assertNotEquals(attachmentsFolderId, 0L);
-		Assert.assertNotEquals(nodeAttachmentsFolderId, 0L);
+		WikiPageLocalServiceUtil.deletePage(
+			_page.getNodeId(), _page.getTitle());
 
-		try {
-			WikiPageLocalServiceUtil.deletePage(
-				_page.getNodeId(), _page.getTitle(), _page.getVersion());
-		}
-		catch (Exception e) {
-			Assert.fail(
-				"An exception was thrown, " +
-				"testDeleteWikiPageWithAttachments failed");
-		}
+		int finalWikiPageCount = WikiPageLocalServiceUtil.getPagesCount(
+			_node.getNodeId());
+
+		Assert.assertEquals(expectedWikiPageCount, finalWikiPageCount);
+	}
+
+	@Test
+	public void testDeleteWikiPageWithoutAttachments() throws Exception {
+		addWikiPage();
+
+		int expectedWikiPageCount =
+			(WikiPageLocalServiceUtil.getPagesCount(_node.getNodeId()) - 1);
+
+		WikiPageLocalServiceUtil.deletePage(
+			_page.getNodeId(), _page.getTitle());
+
+		int finalWikiPageCount = WikiPageLocalServiceUtil.getPagesCount(
+			_node.getNodeId());
+
+		Assert.assertEquals(expectedWikiPageCount, finalWikiPageCount);
+	}
+
+
+	@Test
+	public void testCountDLFoldersWhenDeletingWikiPageWithAttachments()
+		throws Exception {
+
+		int initialFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		addWikiPageAttachment();
+
+		int firstFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		int newRepositoryFolder = 1;
+		int newNodeFolder = 1;
+		int newPageFolder = 1;
+
+		int newFolders = newRepositoryFolder + newNodeFolder + newPageFolder;
+
+		int expectedFolders = initialFolderCount + newFolders;
+
+		Assert.assertEquals(expectedFolders, firstFolderCount);
+
+		WikiPageLocalServiceUtil.deletePage(
+			_page.getNodeId(), _page.getTitle());
+
+		int finalFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		Assert.assertEquals(
+			expectedFolders - newPageFolder, finalFolderCount);
+	}
+
+	@Test
+	public void testCountDLFoldersWhenDeletingWikiPageWithoutAttachments()
+		throws Exception {
+
+		int intialFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		addWikiPage();
+
+		int firstFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		Assert.assertEquals(intialFolderCount, firstFolderCount);
+
+		WikiPageLocalServiceUtil.deletePage(
+			_page.getNodeId(), _page.getTitle());
+
+		int finalFolderCount = DLFolderLocalServiceUtil.getDLFoldersCount();
+
+		Assert.assertEquals(intialFolderCount, finalFolderCount);
+	}
+
+	public void testExportWikiPageWithAttachments() throws Exception {
+		//TODO
+	}
+
+	public void testExportWikiPageWithoutAttachments() throws Exception {
+	 	//TODO
+	}
+
+	public void testImportWikiPageWithAttachments() throws Exception {
+		//TODO
+	}
+
+	public void testImportWikiPageWithoutAttachments() throws Exception {
+		//TODO
+	}
+
+	public void testCountDLFoldersWhenImportingWikiPageWithoutAttachments()
+		throws Exception {
+
+		//TODO
 	}
 
 	protected void addWikiNode() throws Exception {
@@ -209,10 +346,6 @@ public class WikiAttachmentsFolderCreationTest {
 		_node = null;
 
 		return assertAttachFile(expectedFolderCount);
-	}
-
-	private int createFolders(int i) {
-		return i;
 	}
 
 	private Group _group;

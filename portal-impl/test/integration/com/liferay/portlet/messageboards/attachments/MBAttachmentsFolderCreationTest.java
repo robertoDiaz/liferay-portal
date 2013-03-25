@@ -73,7 +73,7 @@ public class MBAttachmentsFolderCreationTest {
 	@Test
 	public void testAddMessageAttachmentCreatesFolder() throws Exception {
 		int expectedFolderCount =
-			DLFolderLocalServiceUtil.getDLFoldersCount() + _createFolders(3);
+			DLFolderLocalServiceUtil.getDLFoldersCount() + 3;
 
 		addMessageAttachment();
 
@@ -133,10 +133,6 @@ public class MBAttachmentsFolderCreationTest {
 			MBMessageConstants.DEFAULT_FORMAT,
 			_getInputStreamOVPs("company_logo.png"), false, 0, false,
 			serviceContext);
-	}
-
-	private int _createFolders(int i) {
-		return i;
 	}
 
 	private List<ObjectValuePair<String, InputStream>> _getInputStreamOVPs(
