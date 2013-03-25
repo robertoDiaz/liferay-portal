@@ -151,13 +151,13 @@ if (fileEntryTypeId >= 0) {
 		entryStart = (searchContainer.getCur() - 1) * searchContainer.getDelta();
 		entryEnd = entryStart + searchContainer.getDelta();;
 
-        searchContext.setEnd(entryEnd);
-        searchContext.setStart(entryStart);
+		searchContext.setEnd(entryEnd);
+		searchContext.setStart(entryStart);
 
-        hits = indexer.search(searchContext);
-    }
+		hits = indexer.search(searchContext);
+	}
 
-    results = new ArrayList();
+	results = new ArrayList();
 
 	for (int i = 0; i < hits.getDocs().length; i++) {
 		Document doc = hits.doc(i);
@@ -190,7 +190,7 @@ else {
 			assetEntryQuery.setEnd(entryEnd);
 			assetEntryQuery.setExcludeZeroViewCount(false);
 			assetEntryQuery.setStart(entryStart);
-			
+
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
 			searchContainer.setTotal(total);
@@ -201,12 +201,12 @@ else {
 
 				assetEntryQuery.setEnd(entryEnd);
 				assetEntryQuery.setStart(entryStart);
-			}			
+			}
 
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 		}
 		else {
-            total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, false);
+			total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, false);
 
 			searchContainer.setTotal(total);
 
@@ -215,7 +215,7 @@ else {
 				entryEnd = entryStart + searchContainer.getDelta();;
 			}
 
-            results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, false, entryStart, entryEnd, searchContainer.getOrderByComparator());
+			results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, false, entryStart, entryEnd, searchContainer.getOrderByComparator());
 		}
 	}
 	else if (navigation.equals("mine") || navigation.equals("recent")) {
@@ -225,7 +225,7 @@ else {
 			groupFileEntriesUserId = user.getUserId();
 		}
 
-        total = DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, folderId, null, status);
+		total = DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, folderId, null, status);
 
 		searchContainer.setTotal(total);
 
@@ -234,7 +234,7 @@ else {
 			entryEnd = entryStart + searchContainer.getDelta();;
 		}
 
-        results = DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, folderId, null, status, entryStart, entryEnd, null);
+		results = DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, folderId, null, status, entryStart, entryEnd, null);
 	}
 }
 
