@@ -20,12 +20,12 @@ import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ColorSchemeFactoryUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.ThemeFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.LayoutSetStagingHandler;
-import com.liferay.portal.model.impl.ThemeImpl;
 import com.liferay.portal.service.LayoutSetLocalService;
 import com.liferay.portal.staging.StagingAdvicesThreadLocal;
 import com.liferay.portal.util.ClassLoaderUtil;
@@ -87,7 +87,7 @@ public class LayoutSetLocalServiceStagingAdvice
 				(InputStream)arguments[3], (Boolean)arguments[4]);
 		}
 		else if (methodName.equals("updateLookAndFeel") &&
-				(arguments.length == 6)) {
+				 (arguments.length == 6)) {
 
 			returnValue = updateLookAndFeel(
 				(LayoutSetLocalService)thisObject, (Long)arguments[0],
@@ -239,7 +239,7 @@ public class LayoutSetLocalServiceStagingAdvice
 		layoutSetBranch.setModifiedDate(new Date());
 
 		if (Validator.isNull(themeId)) {
-			themeId = ThemeImpl.getDefaultRegularThemeId(
+			themeId = ThemeFactoryUtil.getDefaultRegularThemeId(
 				layoutSetBranch.getCompanyId());
 		}
 

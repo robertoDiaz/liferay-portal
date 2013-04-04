@@ -6,6 +6,7 @@
 		<pattern></pattern>
 		<implicit-parameter name="instanceId">0000</implicit-parameter>
 		<implicit-parameter name="folderId">0</implicit-parameter>
+		<implicit-parameter name="instanceId">0000</implicit-parameter>
 		<implicit-parameter name="struts_action">/image_gallery_display/view</implicit-parameter>
 	</route>
 	<route>

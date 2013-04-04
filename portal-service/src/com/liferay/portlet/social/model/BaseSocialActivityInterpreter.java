@@ -39,6 +39,8 @@ import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.List;
 
+import javax.portlet.PortletURL;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Ryan Park
@@ -291,12 +293,14 @@ public abstract class BaseSocialActivityInterpreter
 
 		long classPK = getClassPK(activity);
 
-		if ((trashHandler != null) && (trashHandler.isInTrash(classPK) ||
-			trashHandler.isInTrashContainer(classPK))) {
+		if ((trashHandler != null) &&
+			(trashHandler.isInTrash(classPK) ||
+			 trashHandler.isInTrashContainer(classPK))) {
 
-			return TrashUtil.getViewContentURL(
-				getClassName(activity), classPK,
-				serviceContext.getThemeDisplay());
+			PortletURL portletURL = TrashUtil.getViewContentURL(
+				serviceContext.getRequest(), getClassName(activity), classPK);
+
+			return portletURL.toString();
 		}
 
 		StringBundler sb = new StringBundler(4);

@@ -29,6 +29,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -55,6 +56,11 @@ public class DLFolderAssetRenderer
 
 	public long getClassPK() {
 		return _folder.getPrimaryKey();
+	}
+
+	@Override
+	public Date getDisplayDate() {
+		return _folder.getModifiedDate();
 	}
 
 	public long getGroupId() {
@@ -86,6 +92,29 @@ public class DLFolderAssetRenderer
 
 	public String getSummary(Locale locale) {
 		return HtmlUtil.stripHtml(_folder.getDescription());
+	}
+
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		int foldersCount = DLAppServiceUtil.getFoldersCount(
+			_folder.getRepositoryId(), _folder.getFolderId());
+		int entriesCount =
+			DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(
+				_folder.getRepositoryId(), _folder.getFolderId(),
+				WorkflowConstants.STATUS_APPROVED);
+
+		if ((entriesCount > 0) || (foldersCount > 0)) {
+			return themeDisplay.getPathThemeImages() +
+				"/file_system/large/folder_full_document.png";
+		}
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/folder_empty.png";
 	}
 
 	public String getTitle(Locale locale) {
@@ -152,6 +181,15 @@ public class DLFolderAssetRenderer
 
 	public String getUuid() {
 		return _folder.getUuid();
+	}
+
+	@Override
+	public boolean isDisplayable() {
+		if (_folder.isMountPoint()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public String render(

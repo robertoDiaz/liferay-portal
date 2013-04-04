@@ -1,13 +1,18 @@
 <#assign action = actionElement.attributeValue("action")>
 
-<#if actionElement.getName() == "execute" && action?starts_with("Is")>
+<#if actionElement.getName() == "execute" && action?contains("#is")>
 	return
 </#if>
 
 <#assign x = action?last_index_of("#")>
 
-${seleniumBuilderFileUtil.getVariableName(action?substring(0, x))}Action.${seleniumBuilderFileUtil.getVariableName(action?substring(x + 1))}(
-	<#list 1..seleniumBuilderContext.getFunctionLocatorCount(action?substring(x + 1)) as i>
+<#assign actionCommand = action?substring(x + 1)>
+
+${seleniumBuilderFileUtil.getVariableName(action?substring(0, x))}Action.${actionCommand}(
+
+<#assign functionName = seleniumBuilderFileUtil.getObjectName(actionCommand)>
+
+	<#list 1..seleniumBuilderContext.getFunctionLocatorCount(functionName) as i>
 		<#if actionElement.attributeValue("locator${i}")??>
 			<#assign actionLocator = actionElement.attributeValue("locator${i}")>
 
@@ -35,7 +40,7 @@ ${seleniumBuilderFileUtil.getVariableName(action?substring(0, x))}Action.${selen
 
 			"${actionLocatorKey}"
 		<#else>
-			null
+			""
 		</#if>
 
 		,
@@ -51,7 +56,7 @@ ${seleniumBuilderFileUtil.getVariableName(action?substring(0, x))}Action.${selen
 
 			"${actionValue}"
 		<#else>
-			null
+			""
 		</#if>
 
 		<#if i_has_next>

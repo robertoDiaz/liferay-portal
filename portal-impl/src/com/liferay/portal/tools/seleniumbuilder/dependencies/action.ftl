@@ -38,9 +38,11 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 		<#list commandElements as commandElement>
 			<#assign commandName = commandElement.attributeValue("name")>
 
-			public ${seleniumBuilderContext.getFunctionReturnType(commandName)} ${seleniumBuilderFileUtil.getVariableName(commandName)}(
+			<#assign functionName = seleniumBuilderFileUtil.getObjectName(commandName)>
 
-			<#list 1..seleniumBuilderContext.getFunctionLocatorCount(commandName) as i>
+			public ${seleniumBuilderContext.getFunctionReturnType(functionName)} ${commandName}(
+
+			<#list 1..seleniumBuilderContext.getFunctionLocatorCount(functionName) as i>
 				String locator${i}, String locatorKey${i}, String value${i}
 
 				<#if i_has_next>
@@ -49,7 +51,7 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 			</#list>
 
 			) throws Exception {
-				<#list 1..seleniumBuilderContext.getFunctionLocatorCount(commandName) as i>
+				<#list 1..seleniumBuilderContext.getFunctionLocatorCount(functionName) as i>
 					locator${i} = getLocator(locator${i}, locatorKey${i});
 				</#list>
 
@@ -79,14 +81,14 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 									<#assign caseComparator = "equals">
 								</#if>
 
-								<#if caseElement.attributeValue("locator")??>
-									<#assign caseLocator = caseElement.attributeValue("locator")>
+								<#if caseElement.attributeValue("locator1")??>
+									<#assign caseLocator1 = caseElement.attributeValue("locator1")>
 
-									locator1.${caseComparator}("${caseLocator}")
-								<#elseif caseElement.attributeValue("locator-key")??>
-									<#assign caseLocatorKey = caseElement.attributeValue("locator-key")>
+									locator1.${caseComparator}("${caseLocator1}")
+								<#elseif caseElement.attributeValue("locator-key1")??>
+									<#assign caseLocatorKey1 = caseElement.attributeValue("locator-key1")>
 
-									locatorKey1.${caseComparator}("${caseLocatorKey}")
+									locatorKey1.${caseComparator}("${caseLocatorKey1}")
 								<#else>
 									false
 								</#if>
@@ -95,8 +97,6 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 							</#if>
 						) {
 							<#assign functionElement = caseElement.element("execute")>
-
-							<#assign functionName = commandName>
 
 							<#include "function_element.ftl">
 						}
@@ -112,13 +112,15 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 
 							<#assign functionElement = defaultElement.element("execute")>
 
-							<#assign functionName = commandName>
-
 							<#include "function_element.ftl">
 						<#else>
-							super.${seleniumBuilderFileUtil.getVariableName(commandName)}(
+							<#if commandName?starts_with("is")>
+								return
+							</#if>
 
-							<#list 1..seleniumBuilderContext.getFunctionLocatorCount(commandName) as i>
+							super.${seleniumBuilderFileUtil.getVariableName(functionName)}(
+
+							<#list 1..seleniumBuilderContext.getFunctionLocatorCount(functionName) as i>
 								locator${i}, locatorKey${i}, value${i}
 
 								<#if i_has_next>
@@ -133,8 +135,6 @@ public class ${seleniumBuilderContext.getActionSimpleClassName(actionName)} exte
 					<#assign defaultElement = commandElement.element("default")>
 
 					<#assign functionElement = defaultElement.element("execute")>
-
-					<#assign functionName = commandName>
 
 					<#include "function_element.ftl">
 				</#if>

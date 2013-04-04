@@ -28,6 +28,7 @@ import com.liferay.portlet.asset.model.BaseAssetRenderer;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.service.permission.BookmarksEntryPermission;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -55,6 +56,11 @@ public class BookmarksEntryAssetRenderer
 		return _entry.getEntryId();
 	}
 
+	@Override
+	public Date getDisplayDate() {
+		return _entry.getModifiedDate();
+	}
+
 	public long getGroupId() {
 		return _entry.getGroupId();
 	}
@@ -72,6 +78,17 @@ public class BookmarksEntryAssetRenderer
 
 	public String getSummary(Locale locale) {
 		return HtmlUtil.stripHtml(_entry.getDescription());
+	}
+
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/bookmark.png";
 	}
 
 	public String getTitle(Locale locale) {

@@ -25,9 +25,11 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
 import com.liferay.portlet.journal.service.JournalFolderServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -54,6 +56,11 @@ public class JournalFolderAssetRenderer
 
 	public long getClassPK() {
 		return _folder.getFolderId();
+	}
+
+	@Override
+	public Date getDisplayDate() {
+		return _folder.getModifiedDate();
 	}
 
 	public long getGroupId() {
@@ -85,6 +92,27 @@ public class JournalFolderAssetRenderer
 
 	public String getSummary(Locale locale) {
 		return HtmlUtil.stripHtml(_folder.getDescription());
+	}
+
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		int articlesCount = JournalArticleServiceUtil.getArticlesCount(
+			_folder.getGroupId(), _folder.getFolderId());
+		int foldersCount = JournalFolderServiceUtil.getFoldersCount(
+			_folder.getGroupId(), _folder.getFolderId());
+
+		if ((articlesCount > 0) || (foldersCount > 0)) {
+			return themeDisplay.getPathThemeImages() +
+				"/file_system/large/folder_full_article.png";
+		}
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/folder_empty.png";
 	}
 
 	public String getTitle(Locale locale) {

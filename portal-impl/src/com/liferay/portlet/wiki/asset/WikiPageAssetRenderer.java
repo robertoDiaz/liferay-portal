@@ -31,6 +31,7 @@ import com.liferay.portlet.wiki.model.WikiPageConstants;
 import com.liferay.portlet.wiki.service.permission.WikiPagePermission;
 import com.liferay.portlet.wiki.util.WikiUtil;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -82,6 +83,11 @@ public class WikiPageAssetRenderer
 		}
 	}
 
+	@Override
+	public Date getDisplayDate() {
+		return _page.getModifiedDate();
+	}
+
 	public long getGroupId() {
 		return _page.getGroupId();
 	}
@@ -101,6 +107,17 @@ public class WikiPageAssetRenderer
 		}
 
 		return content;
+	}
+
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/wiki_page.png";
 	}
 
 	public String getTitle(Locale locale) {

@@ -29,6 +29,7 @@ import com.liferay.portlet.asset.model.BaseAssetRenderer;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.permission.BlogsEntryPermission;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -68,6 +69,11 @@ public class BlogsEntryAssetRenderer
 		}
 	}
 
+	@Override
+	public Date getDisplayDate() {
+		return _entry.getDisplayDate();
+	}
+
 	public long getGroupId() {
 		return _entry.getGroupId();
 	}
@@ -85,6 +91,17 @@ public class BlogsEntryAssetRenderer
 
 	public String getSummary(Locale locale) {
 		return HtmlUtil.stripHtml(_entry.getDescription());
+	}
+
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/blog.png";
 	}
 
 	public String getTitle(Locale locale) {

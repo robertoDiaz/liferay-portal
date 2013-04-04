@@ -439,6 +439,34 @@ public class SourceFormatter {
 	}
 
 	private static void _checkIfClause(
+			String ifClause, boolean isMultiLine, String fileName,
+			int lineCount)
+		throws IOException {
+
+		if (!isMultiLine) {
+			_checkIfClauseParentheses(ifClause, fileName, lineCount);
+
+			return;
+		}
+
+		_checkIfClauseTabsAndSpaces(ifClause, fileName, lineCount);
+
+		ifClause = StringUtil.replace(
+			ifClause, 
+			new String[] {
+				StringPool.TAB + StringPool.SPACE, StringPool.TAB,
+				StringPool.OPEN_PARENTHESIS + StringPool.NEW_LINE,
+				StringPool.NEW_LINE
+			},
+			new String[] {
+				StringPool.TAB, StringPool.BLANK, StringPool.OPEN_PARENTHESIS,
+				StringPool.SPACE
+			});
+
+		_checkIfClauseParentheses(ifClause, fileName, lineCount);
+	}
+
+	private static void _checkIfClauseParentheses(
 		String ifClause, String fileName, int lineCount) {
 
 		int quoteCount = StringUtil.count(ifClause, StringPool.QUOTE);
@@ -447,7 +475,9 @@ public class SourceFormatter {
 			return;
 		}
 
-		ifClause = _stripQuotes(ifClause);
+		ifClause = _stripQuotes(ifClause, StringPool.QUOTE);
+
+		ifClause = _stripQuotes(ifClause, StringPool.APOSTROPHE);
 
 		if (ifClause.contains(StringPool.DOUBLE_SLASH) ||
 			ifClause.contains("/*") || ifClause.contains("*/")) {
@@ -456,10 +486,6 @@ public class SourceFormatter {
 		}
 
 		ifClause = _stripRedundantParentheses(ifClause);
-
-		ifClause = StringUtil.replace(
-			ifClause, new String[] {"'('", "')'"},
-			new String[] {StringPool.BLANK, StringPool.BLANK});
 
 		int level = 0;
 		int max = StringUtil.count(ifClause, StringPool.OPEN_PARENTHESIS);
@@ -477,7 +503,12 @@ public class SourceFormatter {
 					String s = ifClause.substring(
 						previousParenthesisPos + 1, i);
 
-					_checkMissingParentheses(s, fileName, lineCount);
+					if (_hasMissingParentheses(s)) {
+						_processErrorMessage(
+							fileName,
+							"missing parentheses: " + fileName + " " +
+								lineCount);
+					}
 				}
 
 				previousParenthesisPos = i;
@@ -502,9 +533,7 @@ public class SourceFormatter {
 							String s = ifClause.substring(
 								posOpenParenthesis + 1, i);
 
-							if (Validator.isNotNull(s) &&
-								!s.contains(StringPool.SPACE)) {
-
+							if (_hasRedundantParentheses(s)) {
 								_processErrorMessage(
 									fileName,
 									"redundant parentheses: " + fileName + " " +
@@ -525,6 +554,79 @@ public class SourceFormatter {
 					level -= 1;
 				}
 			}
+		}
+	}
+
+	private static void _checkIfClauseTabsAndSpaces(
+			String ifClause, String fileName, int lineCount)
+		throws IOException {
+
+		if (ifClause.contains("!(") ||
+			ifClause.contains(StringPool.TAB + "//")) {
+
+			return;
+		}
+
+		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
+			new UnsyncStringReader(ifClause));
+
+		String line = null;
+
+		boolean previousLineEndsCriterium = false;
+		int previousLineLeadingWhiteSpace = 0;
+
+		int closeParenthesesCount = 0;
+		int openParenthesesCount = 0;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			line = StringUtil.replace(
+				line, StringPool.TAB, StringPool.FOUR_SPACES);
+
+			line = _stripQuotes(line, StringPool.QUOTE);
+
+			line = _stripQuotes(line, StringPool.APOSTROPHE);
+
+			if (previousLineLeadingWhiteSpace == 0) {
+				previousLineLeadingWhiteSpace = line.indexOf(
+					StringPool.OPEN_PARENTHESIS);
+			}
+			else if (previousLineEndsCriterium) {
+				int expectedLeadingWhiteSpace =
+					previousLineLeadingWhiteSpace + openParenthesesCount -
+						closeParenthesesCount;
+				int leadingWhiteSpace =
+					line.length() - StringUtil.trimLeading(line).length();
+
+				if (leadingWhiteSpace > expectedLeadingWhiteSpace) {
+					_processErrorMessage(
+						fileName,
+						"redundant whitespace: " + fileName + " " + lineCount);
+				}
+				else if (leadingWhiteSpace < expectedLeadingWhiteSpace) {
+					_processErrorMessage(
+						fileName,
+						"missing whitespace: " + fileName + " " + lineCount);
+				}
+
+				previousLineLeadingWhiteSpace = leadingWhiteSpace;
+			}
+
+			if (line.endsWith(") {")) {
+				return;
+			}
+
+			if (previousLineEndsCriterium) {
+				closeParenthesesCount = 0;
+				openParenthesesCount = 0;
+			}
+
+			closeParenthesesCount += StringUtil.count(
+				line, StringPool.CLOSE_PARENTHESIS);
+			openParenthesesCount += StringUtil.count(
+				line, StringPool.OPEN_PARENTHESIS);
+
+			previousLineEndsCriterium =
+				line.endsWith("||") || line.endsWith("&&");
 		}
 	}
 
@@ -575,34 +677,6 @@ public class SourceFormatter {
 							StringPool.SPACE + fileName);
 				}
 			}
-		}
-	}
-
-	private static void _checkMissingParentheses(
-		String s, String fileName, int lineCount) {
-
-		if (Validator.isNull(s)) {
-			return;
-		}
-
-		boolean containsAndOrOperator = (s.contains("&&") || s.contains("||"));
-
-		boolean containsCompareOperator =
-			(s.contains(" == ") || s.contains(" != ") || s.contains(" < ") ||
-			 s.contains(" > ") || s.contains(" =< ") || s.contains(" => ") ||
-			 s.contains(" <= ") || s.contains(" >= "));
-
-		boolean containsMathOperator =
-			(s.contains(" = ") || s.contains(" - ") || s.contains(" + ") ||
-			 s.contains(" & ") || s.contains(" % ") || s.contains(" * ") ||
-			 s.contains(" / "));
-
-		if (containsCompareOperator &&
-			(containsAndOrOperator ||
-			 (containsMathOperator && !s.contains(StringPool.OPEN_BRACKET)))) {
-
-			_processErrorMessage(
-				fileName, "missing parentheses: " + fileName + " " + lineCount);
 		}
 	}
 
@@ -691,8 +765,7 @@ public class SourceFormatter {
 	}
 
 	private static String _fixAntXMLProjectName(
-			String basedir, String fileName, String content)
-		throws IOException {
+		String basedir, String fileName, String content) {
 
 		int x = 0;
 
@@ -779,8 +852,6 @@ public class SourceFormatter {
 
 			_processErrorMessage(
 				fileName, fileName + " has an incorrect project name");
-
-			_fileUtil.write(basedir + fileName, content);
 		}
 
 		return content;
@@ -974,6 +1045,9 @@ public class SourceFormatter {
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
 
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 			String content = _fileUtil.read(file);
 
 			String newContent = _trimContent(content, true);
@@ -1044,6 +1118,9 @@ public class SourceFormatter {
 
 			if ((newContent != null) && !content.equals(newContent)) {
 				_fileUtil.write(file, newContent);
+
+				fileName = StringUtil.replace(
+					fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 				_sourceFormatterHelper.printError(fileName, file);
 			}
@@ -1118,6 +1195,9 @@ public class SourceFormatter {
 
 			if ((newContent != null) && !content.equals(newContent)) {
 				_fileUtil.write(file, newContent);
+
+				fileName = StringUtil.replace(
+					fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 				_sourceFormatterHelper.printError(fileName, file);
 			}
@@ -1279,6 +1359,9 @@ public class SourceFormatter {
 			if ((newContent != null) && !content.equals(newContent)) {
 				_fileUtil.write(file, newContent);
 
+				fileName = StringUtil.replace(
+					fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 				_sourceFormatterHelper.printError(fileName, file);
 			}
 		}
@@ -1369,6 +1452,9 @@ public class SourceFormatter {
 
 		for (String fileName : fileNames) {
 			File file = new File(fileName);
+
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 			String content = _fileUtil.read(file);
 
@@ -1647,26 +1733,16 @@ public class SourceFormatter {
 				trimmedLine.startsWith("while (") ||
 				Validator.isNotNull(ifClause)) {
 
-				if (Validator.isNull(ifClause) ||
-					ifClause.endsWith(StringPool.OPEN_PARENTHESIS)) {
+				ifClause = ifClause + line + StringPool.NEW_LINE;
 
-					ifClause = ifClause + trimmedLine;
-				}
-				else {
-					ifClause = ifClause + StringPool.SPACE + trimmedLine;
-				}
-
-				if (ifClause.endsWith(") {")) {
-					_checkIfClause(ifClause, fileName, lineCount);
+				if (line.endsWith(") {")) {
+					_checkIfClause(ifClause, true, fileName, lineCount);
 
 					ifClause = StringPool.BLANK;
 				}
 			}
 
 			String excluded = null;
-
-			String fileNameWithForwardSlashes = StringUtil.replace(
-				fileName, "\\", "/");
 
 			if (line.startsWith(StringPool.TAB + "private ") ||
 				line.startsWith(StringPool.TAB + "protected ") ||
@@ -1848,7 +1924,8 @@ public class SourceFormatter {
 			if (trimmedLine.endsWith(StringPool.PLUS) &&
 				!trimmedLine.startsWith(StringPool.OPEN_PARENTHESIS)) {
 
-				String strippedQuotesLine = _stripQuotes(trimmedLine);
+				String strippedQuotesLine = _stripQuotes(
+					trimmedLine, StringPool.QUOTE);
 
 				int closeParenthesisCount = StringUtil.count(
 					strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
@@ -1913,11 +1990,10 @@ public class SourceFormatter {
 
 			if (_lineLengthExclusions != null) {
 				excluded = _lineLengthExclusions.getProperty(
-					fileNameWithForwardSlashes + StringPool.AT + lineCount);
+					fileName + StringPool.AT + lineCount);
 
 				if (excluded == null) {
-					excluded = _lineLengthExclusions.getProperty(
-						fileNameWithForwardSlashes);
+					excluded = _lineLengthExclusions.getProperty(fileName);
 				}
 			}
 
@@ -2180,6 +2256,9 @@ public class SourceFormatter {
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
 
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 			String content = _fileUtil.read(file);
 
 			String newContent = _trimContent(content, false);
@@ -2262,10 +2341,10 @@ public class SourceFormatter {
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
 
-			String content = _fileUtil.read(file);
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
-			fileName = fileName.replace(
-				CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
+			String content = _fileUtil.read(file);
 
 			_jspContents.put(fileName, content);
 		}
@@ -2274,6 +2353,9 @@ public class SourceFormatter {
 
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
+
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 			String content = _fileUtil.read(file);
 
@@ -2467,7 +2549,7 @@ public class SourceFormatter {
 				 trimmedLine.startsWith("while (")) &&
 				trimmedLine.endsWith(") {")) {
 
-				_checkIfClause(trimmedLine, fileName, lineCount);
+				_checkIfClause(trimmedLine, false, fileName, lineCount);
 			}
 
 			if (readAttributes) {
@@ -2579,22 +2661,25 @@ public class SourceFormatter {
 				}
 			}
 
-			int x = line.indexOf("<%@ include file");
+			if (!fileName.endsWith("/touch.jsp")) {
+				int x = line.indexOf("<%@ include file");
 
-			if (x != -1) {
-				x = line.indexOf(StringPool.QUOTE, x);
+				if (x != -1) {
+					x = line.indexOf(StringPool.QUOTE, x);
 
-				int y = line.indexOf(StringPool.QUOTE, x + 1);
+					int y = line.indexOf(StringPool.QUOTE, x + 1);
 
-				if (y != -1) {
-					String includeFileName = line.substring(x + 1, y);
+					if (y != -1) {
+						String includeFileName = line.substring(x + 1, y);
 
-					Matcher matcher = _jspIncludeFilePattern.matcher(
-						includeFileName);
+						Matcher matcher = _jspIncludeFilePattern.matcher(
+							includeFileName);
 
-					if (!matcher.find()) {
-						_processErrorMessage(
-							fileName, "include: " + fileName + " " + lineCount);
+						if (!matcher.find()) {
+							_processErrorMessage(
+								fileName,
+								"include: " + fileName + " " + lineCount);
+						}
 					}
 				}
 			}
@@ -2691,6 +2776,9 @@ public class SourceFormatter {
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
 
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 			String content = _fileUtil.read(file);
 
 			_formatPortalProperties(fileName, content, portalPortalProperties);
@@ -2780,6 +2868,9 @@ public class SourceFormatter {
 				if ((newContent != null) && !content.equals(newContent)) {
 					_fileUtil.write(file, newContent);
 
+					fileName = StringUtil.replace(
+						fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 					_sourceFormatterHelper.printError(fileName, file);
 				}
 			}
@@ -2828,6 +2919,9 @@ public class SourceFormatter {
 
 		for (String fileName : fileNames) {
 			File file = new File(basedir + fileName);
+
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 			String content = _fileUtil.read(file);
 
@@ -2969,6 +3063,9 @@ public class SourceFormatter {
 
 			if ((newContent != null) && !content.equals(newContent)) {
 				_fileUtil.write(file, newContent);
+
+				fileName = StringUtil.replace(
+					fileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
 				_sourceFormatterHelper.printError(fileName, file);
 			}
@@ -3205,6 +3302,9 @@ public class SourceFormatter {
 			if ((newContent != null) && !content.equals(newContent)) {
 				_fileUtil.write(file, newContent);
 
+				fileName = StringUtil.replace(
+					fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 				_sourceFormatterHelper.printError(fileName, file);
 			}
 		}
@@ -3319,6 +3419,9 @@ public class SourceFormatter {
 				String content = _fileUtil.read(basedir + fileName);
 
 				if (content.equals(webXML)) {
+					fileName = StringUtil.replace(
+						fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
 					_processErrorMessage(fileName, fileName);
 				}
 			}
@@ -4217,6 +4320,64 @@ public class SourceFormatter {
 		}
 	}
 
+	private static boolean _hasMissingParentheses(String s) {
+		if (Validator.isNull(s)) {
+			return false;
+		}
+
+		boolean containsAndOrOperator = (s.contains("&&") || s.contains("||"));
+
+		boolean containsCompareOperator =
+			(s.contains(" == ") || s.contains(" != ") || s.contains(" < ") ||
+			 s.contains(" > ") || s.contains(" =< ") || s.contains(" => ") ||
+			 s.contains(" <= ") || s.contains(" >= "));
+
+		boolean containsMathOperator =
+			(s.contains(" = ") || s.contains(" - ") || s.contains(" + ") ||
+			 s.contains(" & ") || s.contains(" % ") || s.contains(" * ") ||
+			 s.contains(" / "));
+
+		if (containsCompareOperator &&
+			(containsAndOrOperator ||
+			 (containsMathOperator && !s.contains(StringPool.OPEN_BRACKET)))) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	private static boolean _hasRedundantParentheses(String s) {
+		if (!s.contains("&&") && !s.contains("||")) {
+			for (int x = 0;;) {
+				x = s.indexOf(StringPool.CLOSE_PARENTHESIS);
+
+				if (x == -1) {
+					break;
+				}
+
+				int y = s.substring(0, x).lastIndexOf(
+					StringPool.OPEN_PARENTHESIS);
+
+				if (y == -1) {
+					break;
+				}
+
+				s = s.substring(0, y)  + s.substring(x + 1);
+			}
+		}
+
+		if (Validator.isNotNull(s) &&
+			!s.contains(StringPool.SPACE)) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	private static boolean _isGenerated(String content) {
 		if (content.contains("* @generated") || content.contains("$ANTLR")) {
 			return true;
@@ -4367,7 +4528,7 @@ public class SourceFormatter {
 			return false;
 		}
 
-		javaParameter = _stripQuotes(javaParameter);
+		javaParameter = _stripQuotes(javaParameter, StringPool.QUOTE);
 
 		int openParenthesisCount = StringUtil.count(
 			javaParameter, StringPool.OPEN_PARENTHESIS);
@@ -4480,9 +4641,6 @@ public class SourceFormatter {
 		String previousJavaTermName = StringPool.BLANK;
 		int previousJavaTermType = -1;
 
-		String fileNameWithForwardSlashes = StringUtil.replace(
-			fileName, "\\", "/");
-
 		Iterator<JavaTerm> itr = javaTerms.iterator();
 
 		while (itr.hasNext()) {
@@ -4497,18 +4655,15 @@ public class SourceFormatter {
 
 			if (_javaTermSortExclusions != null) {
 				excluded = _javaTermSortExclusions.getProperty(
-					fileNameWithForwardSlashes + StringPool.AT +
-						javaTermLineCount);
+					fileName + StringPool.AT + javaTermLineCount);
 
 				if (excluded == null) {
 					excluded = _javaTermSortExclusions.getProperty(
-						fileNameWithForwardSlashes + StringPool.AT +
-							javaTermName);
+						fileName + StringPool.AT + javaTermName);
 				}
 
 				if (excluded == null) {
-					excluded = _javaTermSortExclusions.getProperty(
-						fileNameWithForwardSlashes);
+					excluded = _javaTermSortExclusions.getProperty(fileName);
 				}
 			}
 
@@ -4770,15 +4925,14 @@ public class SourceFormatter {
 		return content;
 	}
 
-	private static String _stripQuotes(String s) {
-		String[] parts = StringUtil.split(s, CharPool.QUOTE);
+	private static String _stripQuotes(String s, String delimeter) {
+		String[] parts = StringUtil.split(s, delimeter);
 
 		int i = 1;
 
 		while (i < parts.length) {
 			s = StringUtil.replaceFirst(
-				s, StringPool.QUOTE + parts[i] + StringPool.QUOTE,
-				StringPool.BLANK);
+				s, delimeter + parts[i] + delimeter, StringPool.BLANK);
 
 			i = i + 2;
 		}

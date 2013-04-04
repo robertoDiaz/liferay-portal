@@ -489,6 +489,11 @@
 			<bean class="com.liferay.portal.util.ServiceBeanMethodInvocationFactoryImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.util.ThemeFactoryUtil" class="com.liferay.portal.kernel.util.ThemeFactoryUtil">
+		<property name="ThemeFactory">
+			<bean class="com.liferay.portal.util.ThemeFactoryImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.util.ThreadLocalDistributor" class="com.liferay.portal.kernel.util.ThreadLocalDistributor">
 		<property name="threadLocalSources">
 			<list>
@@ -680,6 +685,26 @@
 		<property name="passwordPolicyPermission">
 			<bean class="com.liferay.portal.service.permission.PasswordPolicyPermissionImpl" />
 		</property>
+	</bean>
+	<bean id="com.liferay.portal.security.pwd.CompositePasswordEncryptor" class="com.liferay.portal.security.pwd.CompositePasswordEncryptor">
+		<property name="defaultPasswordEncryptor">
+			<bean class="com.liferay.portal.security.pwd.DefaultPasswordEncryptor" />
+		</property>
+		<property name="passwordEncryptors">
+			<util:list>
+				<bean class="com.liferay.portal.security.pwd.BCryptPasswordEncryptor" />
+				<bean class="com.liferay.portal.security.pwd.CryptPasswordEncryptor" />
+				<bean class="com.liferay.portal.security.pwd.NullPasswordEncryptor" />
+				<bean class="com.liferay.portal.security.pwd.PBKDF2PasswordEncryptor" />
+				<bean class="com.liferay.portal.security.pwd.SSHAPasswordEncryptor" />
+			</util:list>
+		</property>
+	</bean>
+	<bean id="com.liferay.portal.security.pwd.PasswordEncryptor" class="com.liferay.portal.security.pwd.LegacyAlgorithmAwarePasswordEncryptor">
+		<property name="parentPasswordEncryptor" ref="com.liferay.portal.security.pwd.CompositePasswordEncryptor" />
+	</bean>
+	<bean id="com.liferay.portal.security.pwd.PasswordEncryptorUtil" class="com.liferay.portal.security.pwd.PasswordEncryptorUtil">
+		<property name="passwordEncryptor" ref="com.liferay.portal.security.pwd.PasswordEncryptor" />
 	</bean>
 	<bean id="com.liferay.portal.service.permission.PortalPermissionUtil" class="com.liferay.portal.service.permission.PortalPermissionUtil">
 		<property name="portalPermission">
