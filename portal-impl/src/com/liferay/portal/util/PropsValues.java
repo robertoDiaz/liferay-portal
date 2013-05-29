@@ -26,6 +26,18 @@ import com.liferay.portal.kernel.util.Time;
  */
 public class PropsValues {
 
+	public static final String SITES_EMAIL_FROM_ADDRESS = PropsUtil.get(PropsKeys.SITES_EMAIL_FROM_ADDRESS);
+
+	public static final String SITES_EMAIL_FROM_NAME = PropsUtil.get(PropsKeys.SITES_EMAIL_FROM_NAME);
+
+	public static final String SITES_EMAIL_MEMBERSHIP_REPLY_BODY = PropsUtil.get(PropsKeys.SITES_EMAIL_MEMBERSHIP_REPLY_BODY);
+
+	public static final String SITES_EMAIL_MEMBERSHIP_REPLY_SUBJECT = PropsUtil.get(PropsKeys.SITES_EMAIL_MEMBERSHIP_REPLY_SUBJECT);
+
+	public static final String SITES_EMAIL_MEMBERSHIP_REQUEST_BODY = PropsUtil.get(PropsKeys.SITES_EMAIL_MEMBERSHIP_REQUEST_BODY);
+
+	public static final String SITES_EMAIL_MEMBERSHIP_REQUEST_SUBJECT = PropsUtil.get(PropsKeys.SITES_EMAIL_MEMBERSHIP_REQUEST_SUBJECT);
+
 	public static String[] ADMIN_ANALYTICS_TYPES =  StringUtil.splitLines(PropsUtil.get(PropsKeys.ADMIN_ANALYTICS_TYPES));
 
 	public static String[] ADMIN_DEFAULT_GROUP_NAMES = StringUtil.splitLines(PropsUtil.get(PropsKeys.ADMIN_DEFAULT_GROUP_NAMES));

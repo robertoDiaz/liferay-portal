@@ -17,6 +17,10 @@ package com.liferay.portlet.sites.util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutPrototype;
@@ -25,6 +29,9 @@ import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.InputStream;
@@ -333,4 +340,50 @@ public class SitesUtil {
 
 	private static Sites _sites;
 
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId) 
+		throws SystemException {
+		
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.SITES_EMAIL_FROM_ADDRESS);
+	}
+
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId) 
+		throws SystemException {
+
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.SITES_EMAIL_FROM_NAME);
+	}
+
+	public static boolean getEmailMembershipReplyEnabled(
+		PortletPreferences preferences) {
+
+		String emailMembershipReplyEnabled = preferences.getValue(
+			"emailMembershipReplyEnabled", StringPool.BLANK);
+
+		if (Validator.isNotNull(emailMembershipReplyEnabled)) {
+			return GetterUtil.getBoolean(emailMembershipReplyEnabled);
+		}
+		else {
+			return GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.SITES_EMAIL_MEMBERSHIP_REPLY_ENABLED));
+		}
+	}
+
+	public static boolean getEmailMembershipRequestEnabled(
+		PortletPreferences preferences) {
+
+		String emailMembershipRequestEnabled = preferences.getValue(
+			"emailMembershipRequestEnabled", StringPool.BLANK);
+
+		if (Validator.isNotNull(emailMembershipRequestEnabled)) {
+			return GetterUtil.getBoolean(emailMembershipRequestEnabled);
+		}
+		else {
+			return GetterUtil.getBoolean(
+				PropsUtil.get(
+					PropsKeys.SITES_EMAIL_MEMBERSHIP_REQUEST_ENABLED));
+		}
+	}
 }

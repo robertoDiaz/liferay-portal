@@ -2605,4 +2605,7 @@ public interface PropsKeys {
 
 	public static final String YUI_COMPRESSOR_JS_VERBOSE = "yui.compressor.js.verbose";
 
+	public static final String SITES_EMAIL_MEMBERSHIP_REPLY_ENABLED = "sites.email.membership.reply.enabled";
+
+	public static final String SITES_EMAIL_MEMBERSHIP_REQUEST_ENABLED = "sites.email.membership.request.enabled";
 }
