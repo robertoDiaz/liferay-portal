@@ -16,19 +16,17 @@ package com.liferay.portal.upgrade.v6_2_0;
 
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletPreferences;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.util.RSSUtil;
 
 import javax.portlet.PortletPreferences;
 
 /**
- * @author Eduardo Garcia
- * @author Daniel Kocsis
  * @author Roberto Díaz
  */
-public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
+public class UpgradeWiki extends BaseUpgradePortletPreferences {
 
 	@Override
 	protected void doUpgrade() throws Exception {
@@ -37,7 +35,7 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 
 	@Override
 	protected String[] getPortletIds() {
-		return new String[] {"19"};
+		return new String[] {"36"};
 	}
 
 	@Override
@@ -50,33 +48,19 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 			PortletPreferencesFactoryUtil.fromXML(
 				companyId, ownerId, ownerType, plid, portletId, xml);
 
-		String rssFormat = GetterUtil.getString(
-			portletPreferences.getValue("rssFormat", null));
-
-		if (Validator.isNotNull(rssFormat)) {
-			String rssFeedType = RSSUtil.getFeedType(
-				RSSUtil.getFormatType(rssFormat),
-				RSSUtil.getFormatVersion(rssFormat));
-
-			portletPreferences.setValue("rssFeedType", rssFeedType);
-		}
-
-		portletPreferences.reset("rssFormat");
-
 		portletPreferences = upgradeSubscriptionSubject(
-			"mailMessageAddedSubject", "mailMessageAddedSubjectPrefix",
+			"mailPageAddedSubject", "mailPageAddedSubjectPrefix",
 			portletPreferences);
 
 		portletPreferences = upgradeSubscriptionSubject(
-			"mailMessageUpdatedSubject", "mailMessageUpdatedSubjectPrefix",
+			"mailPageUpdatedSubject", "mailPageUpdatedSubjectPrefix",
 			portletPreferences);
 
 		portletPreferences = upgradeSubscriptionBody(
-			"mailMessageAddedBody", "mailMessageAddedSignature",
-			portletPreferences);
+			"mailPageAddedBody", "mailPageAddedSignature", portletPreferences);
 
 		portletPreferences = upgradeSubscriptionBody(
-			"mailMessageUpdatedBody", "mailMessageUpdatedSignature",
+			"mailPageUpdatedBody", "mailPageUpdatedSignature",
 			portletPreferences);
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
@@ -98,13 +82,59 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 		}
 
 		if (Validator.isNull(signature)) {
-			signature =
-				"[$COMPANY_NAME$] Message Boards [$MESSAGE_URL$]" +
-					"[$MAILING_LIST_ADDRESS$][$PORTAL_URL$]";
+			StringBundler sb = new StringBundler(8);
+
+			sb.append(
+				"<div style=\"background: #eee; border-top: 1px solid #ccc; " +
+					"color: #999; margin: 5px; padding: 5px; " +
+					"text-align: center;\">\n");
+
+			if (bodyName.startsWith("mailPageAdded")) {
+				sb.append(
+					"\t<a href=\"[$PAGE_URL$]\">View Page ([$PAGE_TITLE$])\n");
+			}
+			else {
+				sb.append(
+					"\t<a href=\"[$PAGE_URL$]\">View Page " +
+						"([$PAGE_TITLE$])</a> | <a href=\"[$DIFFS_URL$]\">" +
+						"View Changes</a>\n");
+			}
+
+			sb.append("\n");
+			sb.append("\t<p>\n");
+			sb.append("\t\t[$COMPANY_NAME$] Wiki<br />\n");
+			sb.append("\t\t[$PORTAL_URL$]\n");
+			sb.append("\t</p>\n");
+			sb.append("</div>");
+
+			signature = sb.toString();
 		}
 
 		if (Validator.isNull(body)) {
-			body = "[$MESSAGE_BODY$]";
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(
+				"<div style=\"background: #dff4ff; " +
+					"border: 1px solid #a7cedf; color: #34404f; " +
+					"margin: 5px; padding: 5px;\">\n");
+			sb.append(
+				"\tBy <strong>[$PAGE_USER_NAME$]</strong> "+
+					"([$PAGE_DATE_UPDATE$])<br />\n");
+
+			if (bodyName.startsWith("mailPageAdded")) {
+				sb.append("\tPage Title: [$PAGE_TITLE$]\n");
+				sb.append("</div>\n");
+				sb.append("\n");
+				sb.append("[$PAGE_CONTENT$]");
+			}
+			else {
+				sb.append("\tSummary: [$PAGE_SUMMARY$]\n");
+				sb.append("</div>\n");
+				sb.append("\n");
+				sb.append("[$PAGE_DIFFS$]");
+			}
+
+			body = sb.toString();
 		}
 
 		body = body.concat("\n--\n").concat(signature);
@@ -127,8 +157,8 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 		if (Validator.isNotNull(subjectPrefix)) {
 			String subject = subjectPrefix;
 
-			if (!subjectPrefix.contains("[$MESSAGE_SUBJECT$]")) {
-				subject = subject.concat(" [$MESSAGE_SUBJECT$]");
+			if (!subjectPrefix.contains("[$PAGE_TITLE$]")) {
+				subject = subject.concat(" [$PAGE_TITLE$]");
 			}
 
 			portletPreferences.setValue(subjectName, subject);
