@@ -65,19 +65,19 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 		portletPreferences.reset("rssFormat");
 
 		portletPreferences = upgradeSubscriptionSubject(
-			"mailMessageAddedSubject", "mailMessageAddedSubjectPrefix",
+			"emailMessageAddedSubject", "emailMessageAddedSubjectPrefix",
 			portletPreferences);
 
 		portletPreferences = upgradeSubscriptionSubject(
-			"mailMessageUpdatedSubject", "mailMessageUpdatedSubjectPrefix",
+			"emailMessageUpdatedSubject", "emailMessageUpdatedSubjectPrefix",
 			portletPreferences);
 
 		portletPreferences = upgradeSubscriptionBody(
-			"mailMessageAddedBody", "mailMessageAddedSignature",
+			"emailMessageAddedBody", "emailMessageAddedSignature",
 			portletPreferences);
 
 		portletPreferences = upgradeSubscriptionBody(
-			"mailMessageUpdatedBody", "mailMessageUpdatedSignature",
+			"emailMessageUpdatedBody", "emailMessageUpdatedSignature",
 			portletPreferences);
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
@@ -99,26 +99,27 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 		}
 
 		if (Validator.isNull(signature)) {
-			if (bodyName.startsWith("mailMessageAdded")) {
+			if (bodyName.startsWith("emailMessageAdded")) {
 				signature = ContentUtil.get(
 					_RESOURCE_PATH +
-						_MESSAGE_BOARDS_EMAIL_PAGE_ADDED_SIGNATURE);
+						_MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SIGNATURE);
 			}
 			else {
 				signature = ContentUtil.get(
 					_RESOURCE_PATH +
-						_MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_SIGNATURE);
+						_MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SIGNATURE);
 			}
 		}
 
 		if (Validator.isNull(body)) {
-			if (bodyName.startsWith("mailMessageAdded")) {
+			if (bodyName.startsWith("emailMessageAdded")) {
 				body = ContentUtil.get(
-					_RESOURCE_PATH + __MESSAGE_BOARDS_EMAIL_PAGE_ADDED_BODY);
+					_RESOURCE_PATH + _MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_BODY);
 			}
 			else {
 				body = ContentUtil.get(
-					_RESOURCE_PATH + _MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_BODY);
+					_RESOURCE_PATH +
+						_MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_BODY);
 			}
 		}
 
@@ -143,15 +144,15 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 			String subject = subjectPrefix;
 
 			if (!subjectPrefix.contains("[$MESSAGE_SUBJECT$]")) {
-				if (subjectName.startsWith("mailMessageAdded")) {
+				if (subjectName.startsWith("emailMessageAdded")) {
 					subject = ContentUtil.get(
 						_RESOURCE_PATH +
-							_MESSAGE_BOARDS_EMAIL_PAGE_ADDED_SUBJECT);
+							_MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SUBJECT);
 				}
 				else {
 					subject = ContentUtil.get(
 						_RESOURCE_PATH +
-							_MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_SUBJECT);
+							_MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SUBJECT);
 				}
 			}
 
@@ -163,17 +164,18 @@ public class UpgradeMessageBoards extends BaseUpgradePortletPreferences {
 		return portletPreferences;
 	}
 
-	private static final String __MESSAGE_BOARDS_EMAIL_PAGE_ADDED_BODY =
+	private static final String _MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_BODY =
 		"email_message_added_body.tmpl";
-	private static final String _MESSAGE_BOARDS_EMAIL_PAGE_ADDED_SIGNATURE =
+	private static final String _MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SIGNATURE =
 		"email_message_added_signature.tmpl";
-	private static final String _MESSAGE_BOARDS_EMAIL_PAGE_ADDED_SUBJECT =
+	private static final String _MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SUBJECT =
 		"email_message_added_subject.tmpl";
-	private static final String _MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_BODY =
+	private static final String _MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_BODY =
 		"email_message_updated_body.tmpl";
-	private static final String _MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_SIGNATURE =
-		"email_message_updated_signature.tmpl";
-	private static final String _MESSAGE_BOARDS_EMAIL_PAGE_UPDATED_SUBJECT =
+	private static final String
+		_MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SIGNATURE =
+			"email_message_updated_signature.tmpl";
+	private static final String _MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SUBJECT =
 		"email_message_updated_subject.tmpl";
 	private static final String _RESOURCE_PATH =
 		"com/liferay/portal/upgrade/v6_2_0/dependencies/messageboards/";
