@@ -19,7 +19,9 @@
 <%
 FileEntry fileEntry = (FileEntry)request.getAttribute("view_entries.jsp-fileEntry");
 
-FileVersion latestFileVersion = fileEntry.getFileVersion();
+FileVersion fileVersion = fileEntry.getFileVersion();
+
+FileVersion latestFileVersion = fileVersion;
 
 if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isCompanyAdmin() || permissionChecker.isGroupAdmin(scopeGroupId) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
 	latestFileVersion = fileEntry.getLatestFileVersion();
@@ -40,17 +42,27 @@ if (fileShortcut != null) {
 
 <liferay-ui:app-view-entry
 	actionJsp="/html/portlet/document_library/file_entry_action.jsp"
-	description="<%= fileEntry.getDescription() %>"
+	assetCategoryClassName="<%= DLFileEntryConstants.getClassName() %>"
+	assetCategoryClassPK="<%= (latestFileVersion.getStatus() > WorkflowConstants.STATUS_APPROVED) ? latestFileVersion.getFileVersionId() : fileEntry.getFileEntryId() %>"
+	assetTagClassName="<%= DLFileEntryConstants.getClassName() %>"
+	assetTagClassPK="<%= (latestFileVersion.getStatus() > WorkflowConstants.STATUS_APPROVED) ? latestFileVersion.getFileVersionId() : fileEntry.getFileEntryId() %>"
+	author="<%= latestFileVersion.getUserName() %>"
+	createDate="<%= latestFileVersion.getCreateDate() %>"
+	description="<%= latestFileVersion.getDescription() %>"
 	displayStyle="descriptive"
+	latestApprovedVersion="<%= fileVersion.getVersion() %>"
+	latestApprovedVersionAuthor="<%= fileVersion.getUserName() %>"
 	locked="<%= fileEntry.isCheckedOut() %>"
+	modifiedDate="<%= latestFileVersion.getModifiedDate() %>"
 	rowCheckerId="<%= String.valueOf(rowCheckerId) %>"
 	rowCheckerName="<%= rowCheckerName %>"
 	shortcut="<%= fileShortcut != null %>"
 	showCheckbox="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>"
 	status="<%= latestFileVersion.getStatus() %>"
 	thumbnailDivStyle="<%= DLUtil.getThumbnailStyle(false, 4) %>"
-	thumbnailSrc="<%= DLUtil.getThumbnailSrc(fileEntry, fileShortcut, themeDisplay) %>"
+	thumbnailSrc="<%= DLUtil.getThumbnailSrc(fileEntry, latestFileVersion, fileShortcut, themeDisplay) %>"
 	thumbnailStyle="<%= DLUtil.getThumbnailStyle() %>"
-	title="<%= fileEntry.getTitle() %>"
+	title="<%= latestFileVersion.getTitle() %>"
 	url="<%= tempRowURL.toString() %>"
+	version="<%= latestFileVersion.getVersion() %>"
 />
