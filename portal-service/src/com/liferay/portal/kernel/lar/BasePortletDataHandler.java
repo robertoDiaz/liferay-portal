@@ -88,6 +88,13 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			portletDataContext.addDeletionSystemEventClassNames(
 				getDeletionSystemEventClassNames());
 
+			for (PortletDataHandlerControl portletDataHandlerControl :
+					getExportControls()) {
+
+				addUncheckedModelAdditionCount(
+					portletDataContext, portletDataHandlerControl);
+			}
+
 			return doExportData(
 				portletDataContext, portletId, portletPreferences);
 		}
@@ -420,6 +427,64 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		portletDataContext.setExportDataRootElement(rootElement);
 
 		return rootElement;
+	}
+
+	protected void addUncheckedModelAdditionCount(
+		PortletDataContext portletDataContext,
+		PortletDataHandlerControl portletDataHandlerControl) {
+
+		if (!(portletDataHandlerControl instanceof PortletDataHandlerBoolean)) {
+			return;
+		}
+
+		PortletDataHandlerBoolean portletDataHandlerBoolean =
+			(PortletDataHandlerBoolean)portletDataHandlerControl;
+
+		PortletDataHandlerControl[] childPortletDataHandlerControls =
+			portletDataHandlerBoolean.getChildren();
+
+		if (childPortletDataHandlerControls != null) {
+			for (PortletDataHandlerControl childPortletDataHandlerControl :
+					childPortletDataHandlerControls) {
+
+				addUncheckedModelAdditionCount(
+					portletDataContext, childPortletDataHandlerControl);
+			}
+		}
+
+		if (Validator.isNull(portletDataHandlerControl.getClassName())) {
+			return;
+		}
+
+		boolean checkedControl = GetterUtil.getBoolean(
+			portletDataContext.getBooleanParameter(
+				portletDataHandlerControl.getNamespace(),
+				portletDataHandlerControl.getControlName(), false));
+
+		if (!checkedControl) {
+			ManifestSummary manifestSummary =
+				portletDataContext.getManifestSummary();
+
+			StagedModelDataHandler<?> stagedModelDataHandler =
+				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
+					portletDataHandlerControl.getClassName());
+
+			String manifestSummaryKey = null;
+
+			if (Validator.isNotNull(
+					portletDataHandlerBoolean.getReferrerClassName())) {
+
+				ManifestSummary.getManifestSummaryKey(
+					portletDataHandlerControl.getClassName(),
+					portletDataHandlerBoolean.getReferrerClassName());
+			}
+			else {
+				manifestSummaryKey =
+					stagedModelDataHandler.getManifestSummaryKey(null);
+			}
+
+			manifestSummary.addModelAdditionCount(manifestSummaryKey, 0);
+		}
 	}
 
 	protected PortletPreferences doDeleteData(
