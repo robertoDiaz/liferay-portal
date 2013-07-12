@@ -31,6 +31,9 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 
 	public static final String DEFAULT_RESULTS_VAR = "results";
 
+	/**
+	 * @deprecated As of 6.2.0
+	 */
 	public static final String DEFAULT_TOTAL_VAR = "total";
 
 	@Override
@@ -51,7 +54,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 
 			if (_results == null) {
 				_results = (List<R>)pageContext.getAttribute(_resultsVar);
-				_total = (Integer)pageContext.getAttribute(_totalVar);
 			}
 
 			if (_results != null) {
@@ -69,7 +71,7 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 			searchContainerTag.setHasResults(true);
 
 			pageContext.setAttribute(_resultsVar, _results);
-			pageContext.setAttribute(_totalVar, _total);
+			pageContext.setAttribute(searchContainer.getTotalVar(), _total);
 
 			return EVAL_PAGE;
 		}
@@ -81,7 +83,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 				_results = null;
 				_resultsVar = DEFAULT_RESULTS_VAR;
 				_total = 0;
-				_totalVar = DEFAULT_TOTAL_VAR;
 			}
 		}
 	}
@@ -98,7 +99,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 
 		if (_results == null) {
 			pageContext.setAttribute(_resultsVar, new ArrayList<R>());
-			pageContext.setAttribute(_totalVar, 0);
 		}
 
 		return EVAL_BODY_INCLUDE;
@@ -116,10 +116,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		return _total;
 	}
 
-	public String getTotalVar() {
-		return _totalVar;
-	}
-
 	public void setResults(List<R> results) {
 		_results = results;
 	}
@@ -132,13 +128,8 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		_total = total;
 	}
 
-	public void setTotalVar(String totalVar) {
-		_totalVar = totalVar;
-	}
-
 	private List<R> _results;
 	private String _resultsVar = DEFAULT_RESULTS_VAR;
 	private int _total;
-	private String _totalVar = DEFAULT_TOTAL_VAR;
 
 }
