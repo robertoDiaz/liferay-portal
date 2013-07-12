@@ -60,6 +60,7 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 		_rowChecker = null;
 		_searchContainer = null;
 		_searchTerms = null;
+		_total = 0;
 		_totalVar = SearchContainer.DEFAULT_TOTAL_VAR;
 		_var = SearchContainer.DEFAULT_VAR;
 
