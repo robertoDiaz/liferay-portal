@@ -32,7 +32,7 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 	public static final String DEFAULT_RESULTS_VAR = "results";
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
+	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainer.
 	 *             DEFAULT_TOTAL_VAR}
 	 */
 	public static final String DEFAULT_TOTAL_VAR =
