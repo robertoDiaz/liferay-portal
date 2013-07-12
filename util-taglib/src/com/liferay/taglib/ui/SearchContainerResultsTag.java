@@ -32,9 +32,11 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 	public static final String DEFAULT_RESULTS_VAR = "results";
 
 	/**
-	 * @deprecated As of 6.2.0
+	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
+	 *             DEFAULT_TOTAL_VAR}
 	 */
-	public static final String DEFAULT_TOTAL_VAR = "total";
+	public static final String DEFAULT_TOTAL_VAR =
+		SearchContainer.DEFAULT_TOTAL_VAR;
 
 	@Override
 	public int doEndTag() throws JspException {
@@ -112,6 +114,10 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		return _resultsVar;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
+	 *             getTotal()}
+	 */
 	public int getTotal() {
 		return _total;
 	}
@@ -124,6 +130,10 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		_resultsVar = resultsVar;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
+	 *             setTotal(int)}
+	 */
 	public void setTotal(int total) {
 		_total = total;
 	}
