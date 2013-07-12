@@ -29,7 +29,12 @@ import javax.servlet.jsp.tagext.TagSupport;
  */
 public class SearchContainerResultsTag<R> extends TagSupport {
 
-	public static final String DEFAULT_RESULTS_VAR = "results";
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainer.
+	 *             DEFAULT_RESULTS_VAR}
+	 */
+	public static final String DEFAULT_RESULTS_VAR =
+		SearchContainer.DEFAULT_RESULTS_VAR;
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainer.
@@ -83,7 +88,7 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		finally {
 			if (!ServerDetector.isResin()) {
 				_results = null;
-				_resultsVar = DEFAULT_RESULTS_VAR;
+				_resultsVar = SearchContainer.DEFAULT_RESULTS_VAR;
 				_total = 0;
 			}
 		}
@@ -139,7 +144,7 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 	}
 
 	private List<R> _results;
-	private String _resultsVar = DEFAULT_RESULTS_VAR;
+	private String _resultsVar = SearchContainer.DEFAULT_RESULTS_VAR;
 	private int _total;
 
 }
