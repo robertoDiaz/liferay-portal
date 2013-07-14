@@ -41,6 +41,9 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 
 	@Override
 	public int doEndTag() {
+		pageContext.setAttribute(
+			_searchContainer.getTotalVar(), _searchContainer, getTotal());
+
 		_curParam = SearchContainer.DEFAULT_CUR_PARAM;
 		_delta = SearchContainer.DEFAULT_DELTA;
 		_deltaConfigurable = SearchContainer.DEFAULT_DELTA_CONFIGURABLE;

@@ -55,30 +55,21 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 
 			int total = searchContainer.getTotal();
 
-			if (_total == 0) {
-				_total = total;
-			}
-
 			if (_results == null) {
 				_results = (List<R>)pageContext.getAttribute(_resultsVar);
 			}
 
 			if (_results != null) {
-				if (_total < _results.size()) {
-					_total = _results.size();
+				if (total < _results.size()) {
+					searchContainer.setTotal(_results.size());
 				}
 			}
 
 			searchContainer.setResults(_results);
 
-			if (total == 0) {
-				searchContainer.setTotal(_total);
-			}
-
 			searchContainerTag.setHasResults(true);
 
 			pageContext.setAttribute(_resultsVar, _results);
-			pageContext.setAttribute(searchContainer.getTotalVar(), _total);
 
 			return EVAL_PAGE;
 		}
@@ -89,7 +80,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 			if (!ServerDetector.isResin()) {
 				_results = null;
 				_resultsVar = SearchContainer.DEFAULT_RESULTS_VAR;
-				_total = 0;
 			}
 		}
 	}
@@ -119,14 +109,6 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		return _resultsVar;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
-	 *             getTotal()}
-	 */
-	public int getTotal() {
-		return _total;
-	}
-
 	public void setResults(List<R> results) {
 		_results = results;
 	}
@@ -135,16 +117,7 @@ public class SearchContainerResultsTag<R> extends TagSupport {
 		_resultsVar = resultsVar;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #SearchContainerTag.
-	 *             setTotal(int)}
-	 */
-	public void setTotal(int total) {
-		_total = total;
-	}
-
 	private List<R> _results;
 	private String _resultsVar = SearchContainer.DEFAULT_RESULTS_VAR;
-	private int _total;
 
 }
