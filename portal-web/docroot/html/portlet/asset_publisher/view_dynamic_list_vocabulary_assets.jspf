@@ -14,8 +14,6 @@
  */
 --%>
 
-<h3 class="asset-entries-group-label"><%= assetCategory.getTitle(locale) %></h3>
-
 <c:choose>
 	<c:when test="<%= portletDisplayDDMTemplateId > 0 %>">
 		<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, results, contextObjects) %>
@@ -66,17 +64,45 @@
 			request.setAttribute("view.jsp-show", new Boolean(show));
 			request.setAttribute("view.jsp-print", new Boolean(print));
 
-			try {
-		%>
+			List<String> currentAssetCategoryNames = new ArrayList<String>();
 
-				<%@ include file="/html/portlet/asset_publisher/view_display.jspf" %>
+			for (AssetCategory assetCategory : assetCategories) {
+				List<AssetCategory> currentAssetCategories = assetEntry.getCategories();
+
+				List<AssetCategory> concurrentAssetCategories = new ArrayList<AssetCategory>();
+
+				if (currentAssetCategories.contains(assetCategory)) {
+					concurrentAssetCategories.add(assetCategory);
+				}
+
+				for (AssetCategory concurrentAssetCategory : concurrentAssetCategories) {
+					currentAssetCategoryNames.add(concurrentAssetCategory.getTitle(locale));
+				}
+			}
+
+			String label = ListUtil.toString(currentAssetCategoryNames, (String)null, StringPool.COMMA_AND_SPACE);
+
+			if (previousLabel.equals(StringPool.BLANK) || !previousLabel.equals(label)) {
+			%>
+
+				<h3 class="asset-entries-group-label"><%= label %></h3>
 
 		<%
-			}
-			catch (Exception e) {
-				_log.error(e.getMessage());
-			}
+				previousLabel = label;
 		}
+
+		try {
 		%>
+
+			<%@ include file="/html/portlet/asset_publisher/view_display.jspf" %>
+
+	<%
+		}
+		catch (Exception e) {
+			_log.error(e.getMessage());
+		}
+	}
+	%>
+
 	</c:otherwise>
 </c:choose>
