@@ -117,7 +117,6 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 		assetEntryQuery.setClassNameIds(classNameIds);
 
 		for (long classNameId : classNameIds) {
-
 			String groupClassName = PortalUtil.getClassName(classNameId);
 
 			AssetRendererFactory groupAssetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(groupClassName);
