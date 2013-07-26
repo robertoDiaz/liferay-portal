@@ -14,8 +14,6 @@
  */
 --%>
 
-<h3 class="asset-entries-group-label"><%= assetCategory.getTitle(locale) %></h3>
-
 <c:choose>
 	<c:when test="<%= portletDisplayDDMTemplateId > 0 %>">
 		<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, results, contextObjects) %>
@@ -66,8 +64,23 @@
 			request.setAttribute("view.jsp-show", new Boolean(show));
 			request.setAttribute("view.jsp-print", new Boolean(print));
 
-			try {
+			long currentAssetClassNameId = assetEntry.getClassNameId();
+
+			AssetRendererFactory groupAssetRendererFactory = groupAssetRendererFactoryMap.get(Long.valueOf(currentAssetClassNameId));
+
+			String label = ResourceActionsUtil.getModelResource(locale, groupAssetRendererFactory.getClassName());
+
+			if (previousLabel.equals(StringPool.BLANK) || !previousLabel.equals(label)) {
 		%>
+
+				<h3 class="asset-entries-group-label"><%= label %></h3>
+
+			<%
+				previousLabel = label;
+			}
+
+			try {
+			%>
 
 				<%@ include file="/html/portlet/asset_publisher/view_display.jspf" %>
 
