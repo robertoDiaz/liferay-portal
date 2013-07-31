@@ -50,5 +50,5 @@ else {
 	results = DDMStructureServiceUtil.search(company.getCompanyId(), groupIds, scopeClassNameIds, searchTerms.getKeywords(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 }
 
-pageContext.setAttribute("results", results);
+searchContainer.setResults(results);;
 %>

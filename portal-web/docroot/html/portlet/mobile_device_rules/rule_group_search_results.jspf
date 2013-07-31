@@ -34,5 +34,5 @@ else {
 	results = MDRRuleGroupLocalServiceUtil.searchByKeywords(searchTerms.getGroupId(), searchTerms.getKeywords(), params, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd());
 }
 
-pageContext.setAttribute("results", results);
+searchContainer.setResults(results);
 %>

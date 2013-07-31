@@ -72,7 +72,7 @@ portletURL.setParameter("eventName", eventName);
 				results = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR}, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 			}
 
-			pageContext.setAttribute("results", results);
+			searchContainer.setResults(results);
 			%>
 
 		</liferay-ui:search-container-results>

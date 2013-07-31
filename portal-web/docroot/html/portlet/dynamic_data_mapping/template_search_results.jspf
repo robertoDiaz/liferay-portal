@@ -36,5 +36,5 @@ else {
 	results = DDMTemplateServiceUtil.search(company.getCompanyId(), groupIds, classNameIds, classPKs, searchTerms.getKeywords(), searchTerms.getType(), ddmDisplay.getTemplateMode(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 }
 
-pageContext.setAttribute("results", results);
+searchContainer.setResults(results);
 %>

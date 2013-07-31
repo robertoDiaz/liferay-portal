@@ -80,7 +80,7 @@
 				}
 			}
 
-			pageContext.setAttribute("results", results);
+			searchContainer.setResults(results);
 			%>
 
 		</liferay-ui:search-container-results>

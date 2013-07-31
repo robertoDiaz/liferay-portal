@@ -25,5 +25,5 @@ searchContainer.setTotal(total);
 
 results = DLFileEntryTypeServiceUtil.search(company.getCompanyId(), PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), searchTerms.getKeywords(), includeBasicFileEntryType, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 
-pageContext.setAttribute("results", results);
+searchContainer.setResults(results);
 %>

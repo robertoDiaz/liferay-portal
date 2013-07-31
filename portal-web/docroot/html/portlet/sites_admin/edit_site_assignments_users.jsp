@@ -95,7 +95,7 @@ searchContainer.setEmptyResultsMessage(emptyResultsMessage);
 
 				results = UserLocalServiceUtil.getGroupUsers(group.getParentGroupId(), userSearchContainer.getStart(), userSearchContainer.getEnd());
 
-				pageContext.setAttribute("results", results);
+				searchContainer.setResults(results);
 				%>
 
 			</c:otherwise>

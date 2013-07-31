@@ -298,7 +298,7 @@ if (organization != null) {
 
 											results = ListUtil.subList(organizations, searchContainer.getStart(), searchContainer.getEnd());
 
-											pageContext.setAttribute("results", results);
+											searchContainer.setResults(results);
 											%>
 
 										</c:when>

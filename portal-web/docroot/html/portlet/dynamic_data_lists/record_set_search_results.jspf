@@ -30,5 +30,5 @@ else {
 	results = DDLRecordSetLocalServiceUtil.search(company.getCompanyId(), scopeGroupId, searchTerms.getKeywords(), DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 }
 
-pageContext.setAttribute("results", results);
+searchContainer.setResults(results);
 %>

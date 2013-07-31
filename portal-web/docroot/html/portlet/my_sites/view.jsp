@@ -83,7 +83,7 @@ request.setAttribute("view.jsp-tabs1", tabs1);
 				results = GroupLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), groupParams, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 			}
 
-			pageContext.setAttribute("results", results);
+			searchContainer.setResults(results);
 			%>
 
 		</liferay-ui:search-container-results>

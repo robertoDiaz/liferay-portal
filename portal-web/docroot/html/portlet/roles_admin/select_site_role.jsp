@@ -194,7 +194,7 @@ if (step == 1) {
 						results = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_SITE}, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 					}
 
-					pageContext.setAttribute("results", results);
+					searchContainer.setResults(results);
 					%>
 
 				</liferay-ui:search-container-results>

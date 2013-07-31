@@ -434,7 +434,7 @@ if ((category != null) && layout.isTypeControlPanel()) {
 
 					results = MBThreadServiceUtil.getGroupThreads(scopeGroupId, groupThreadsUserId, calendar.getTime(), WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd());
 
-					pageContext.setAttribute("results", results);
+					searchContainer.setResults(results);
 					%>
 
 				</liferay-ui:search-container-results>

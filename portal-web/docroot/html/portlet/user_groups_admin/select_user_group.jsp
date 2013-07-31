@@ -68,7 +68,7 @@ portletURL.setParameter("eventName", eventName);
 				results = UserGroupLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), null, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 			}
 
-			pageContext.setAttribute("results", results);
+			searchContainer.setResults(results);
 			%>
 
 		</liferay-ui:search-container-results>
