@@ -124,8 +124,9 @@ if (group != null) {
 					<c:when test="<%= !searchTerms.hasSearchTerms() && (parentGroupId <= 0) && (filterManageableGroups) %>">
 
 						<%
+						searchContainer.setTotal(groups.size());
+
 						results = ListUtil.subList(groups, searchContainer.getStart(), searchContainer.getEnd());
-						total = groups.size();
 						%>
 
 					</c:when>
