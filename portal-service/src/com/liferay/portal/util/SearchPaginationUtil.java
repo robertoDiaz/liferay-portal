@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
@@ -12,14 +11,33 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%
-total = UserGroupLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), userGroupParams);
+package com.liferay.portal.util;
 
-searchContainer.setTotal(total);
+/**
+ * @author Roberto Díaz
+ */
+public class SearchPaginationUtil {
 
-results = UserGroupLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), userGroupParams, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+	public static int[] getRecalculatedStartAndEnd(int start, int end) {
+		int delta = end - start;
+		int cur = start / delta;
 
-searchContainer.setResults(results);
-%>
+		return getRecalculatedStartAndEnd(0, 0, start, end);
+	}
+
+	public static int[] getRecalculatedStartAndEnd(
+		int cur, int delta, int start, int end) {
+
+		start = 0;
+
+		if (cur > 0) {
+			start = (cur - 1) * delta;
+		}
+
+		end = start + delta;
+
+		return new int[] {start, end};
+	}
+
+}

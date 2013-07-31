@@ -120,16 +120,12 @@ portletURL.setParameter("tabs1", tabs1);
 
 			searchContainer.setTotal(trashEntryList.getCount());
 
-			if (searchContainer.isRecalculateCur()) {
-				trashEntryList = TrashEntryServiceUtil.getEntries(groupId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-			}
-
 			results = TrashEntryImpl.toModels(trashEntryList.getArray());
 
 			approximate = trashEntryList.isApproximate();
 		}
 
-		pageContext.setAttribute("results", results);
+		searchContainer.setResults(results);
 
 		if ((searchContainer.getTotal() == 0) && Validator.isNotNull(searchTerms.getKeywords())) {
 			searchContainer.setEmptyResultsMessage(LanguageUtil.format(pageContext, "no-entries-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(searchTerms.getKeywords()) + "</strong>"));
