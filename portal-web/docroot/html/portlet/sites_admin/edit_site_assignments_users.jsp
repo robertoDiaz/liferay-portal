@@ -89,11 +89,13 @@ searchContainer.setEmptyResultsMessage(emptyResultsMessage);
 			<c:otherwise>
 
 				<%
-				results = UserLocalServiceUtil.getGroupUsers(group.getParentGroupId(), userSearchContainer.getStart(), userSearchContainer.getEnd());
 				total = UserLocalServiceUtil.getGroupUsersCount(group.getParentGroupId());
 
+				searchContainer.setTotal(total);
+
+				results = UserLocalServiceUtil.getGroupUsers(group.getParentGroupId(), userSearchContainer.getStart(), userSearchContainer.getEnd());
+
 				pageContext.setAttribute("results", results);
-				pageContext.setAttribute("total", total);
 				%>
 
 			</c:otherwise>
