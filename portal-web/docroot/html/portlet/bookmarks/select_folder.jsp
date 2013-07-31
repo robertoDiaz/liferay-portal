@@ -51,10 +51,12 @@ if (folder != null) {
 
 	<br />
 
-	<liferay-ui:search-container iteratorURL="<%= portletURL %>">
+	<liferay-ui:search-container
+		iteratorURL="<%= portletURL %>"
+		total="<%= bookmarksFoldersCount %>"
+	>
 		<liferay-ui:search-container-results
 			results="<%= BookmarksFolderServiceUtil.getFolders(scopeGroupId, folderId, searchContainer.getStart(), searchContainer.getEnd()) %>"
-			total="<%= bookmarksFoldersCount %>"
 		/>
 
 		<liferay-ui:search-container-row
