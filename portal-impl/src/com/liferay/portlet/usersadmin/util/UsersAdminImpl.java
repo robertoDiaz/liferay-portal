@@ -1020,6 +1020,8 @@ public class UsersAdminImpl implements UsersAdmin {
 					document.get(Field.COMPANY_ID));
 
 				indexer.delete(companyId, document.getUID());
+
+				users.remove(user);
 			}
 		}
 
