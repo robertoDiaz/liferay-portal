@@ -15,8 +15,6 @@
 --%>
 
 <%
-AssetEntry assetEntry = (AssetEntry)results.get(assetEntryIndex);
-
 String className = PortalUtil.getClassName(assetEntry.getClassNameId());
 long classPK = assetEntry.getClassPK();
 

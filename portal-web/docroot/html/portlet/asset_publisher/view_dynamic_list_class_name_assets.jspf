@@ -18,7 +18,7 @@
 	<c:when test="<%= portletDisplayDDMTemplateId > 0 %>">
 
 		<%
-		Map<String, List<AssetEntry>> filteredEntriesMap = AssetPublisherUtil.getFilteredClassLabelAndEntries(results, classNameIds, themeDisplay.getLocale());
+		Map<String, List<AssetEntry>> filteredEntriesMap = AssetPublisherUtil.getClassNameLabelsAndEntries(results, classNameIds, themeDisplay.getLocale());
 
 		Iterator filteredEntriesIterator = filteredEntriesMap.entrySet().iterator();
 
@@ -47,6 +47,7 @@
 
 		<%
 		for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex++) {
+			AssetEntry assetEntry = results.get(assetEntryIndex);
 		%>
 
 			<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>

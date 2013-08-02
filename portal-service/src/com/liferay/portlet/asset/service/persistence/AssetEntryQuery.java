@@ -98,6 +98,8 @@ public class AssetEntryQuery {
 		setEnd(assetEntryQuery.getEnd());
 		setExcludeZeroViewCount(assetEntryQuery.isExcludeZeroViewCount());
 		setExpirationDate(assetEntryQuery.getExpirationDate());
+		setOrderByCategory(assetEntryQuery.isOrderByCategory());
+		setOrderByClassName(assetEntryQuery.isOrderByClassName());
 		setGroupIds(assetEntryQuery.getGroupIds());
 		setKeywords(assetEntryQuery.getKeywords());
 		setLayout(assetEntryQuery.getLayout());
@@ -534,7 +536,7 @@ public class AssetEntryQuery {
 			return _toString;
 		}
 
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{allCategoryIds=");
 		sb.append(StringUtil.merge(_allCategoryIds));
@@ -562,6 +564,10 @@ public class AssetEntryQuery {
 		sb.append(_excludeZeroViewCount);
 		sb.append(", expirationDate=");
 		sb.append(_expirationDate);
+		sb.append(", orderByCategory=");
+		sb.append(_orderByCategory);
+		sb.append(", orderByClassName=");
+		sb.append(_orderByClassName);
 		sb.append(", groupIds=");
 		sb.append(_keywords);
 		sb.append(", keywords=");
@@ -667,6 +673,8 @@ public class AssetEntryQuery {
 	private boolean _excludeZeroViewCount;
 	private Date _expirationDate;
 	private long[] _groupIds = new long[0];
+	private boolean _orderByCategory;
+	private boolean _orderByClassName;
 	private String _keywords;
 	private Layout _layout;
 	private long _linkedAssetEntryId = 0;
@@ -685,5 +693,21 @@ public class AssetEntryQuery {
 	private String _title;
 	private String _toString;
 	private Boolean _visible = Boolean.TRUE;
+
+	public boolean isOrderByCategory () {
+		return _orderByCategory;
+	}
+
+	public void setOrderByCategory (boolean orderByCategory) {
+		_orderByCategory = orderByCategory;
+	}
+
+	public boolean isOrderByClassName () {
+		return _orderByClassName;
+	}
+
+	public void setOrderByClassName (boolean orderByClassName) {
+		_orderByClassName =  orderByClassName;
+	}
 
 }

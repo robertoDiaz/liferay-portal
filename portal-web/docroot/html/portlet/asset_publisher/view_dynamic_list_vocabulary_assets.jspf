@@ -13,13 +13,14 @@
  * details.
  */
 --%>
+<%
+Map<String, List<AssetEntry>> filteredEntriesMap = AssetPublisherUtil.getCategoryLabelsAndEntries(results, assetCategories, locale);
+%>
 
 <c:choose>
 	<c:when test="<%= portletDisplayDDMTemplateId > 0 %>">
 
 		<%
-		Map<String, List<AssetEntry>> filteredEntriesMap = AssetPublisherUtil.getFilteredCategoryLabelsAndEntries(results);
-
 		Iterator filteredEntriesIterator = filteredEntriesMap.entrySet().iterator();
 
 		while (filteredEntriesIterator.hasNext()) {
@@ -44,51 +45,40 @@
 	<c:otherwise>
 
 		<%
-		for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex++) {
+		for (AssetCategory category : assetCategories) {
+			for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex++) {
+				AssetEntry assetEntry = results.get(assetEntryIndex);
+
+				String label = category.getTitle(locale);
+
+				List<AssetCategory> assetCategoryList = assetEntry.getCategories();
+
+				if (assetCategoryList.contains(category)) {
 		%>
 
-			<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+					<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
 
-			<%
-			List<String> currentAssetCategoryNames = new ArrayList<String>();
+					<%
+					if (previousLabel.equals(StringPool.BLANK) || !previousLabel.equals(label)) {
+					%>
 
-			for (AssetCategory assetCategory : assetCategories) {
-				List<AssetCategory> currentAssetCategories = assetEntry.getCategories();
+						<h3 class="asset-entries-group-label"><%= label  %></h3>
 
-				List<AssetCategory> concurrentAssetCategories = new ArrayList<AssetCategory>();
+					<%
+						previousLabel = label;
+					}
+					try {
+					%>
 
-				if (currentAssetCategories.contains(assetCategory)) {
-					concurrentAssetCategories.add(assetCategory);
-				}
-
-				for (AssetCategory concurrentAssetCategory : concurrentAssetCategories) {
-					currentAssetCategoryNames.add(concurrentAssetCategory.getTitle(locale));
-				}
-			}
-
-			String label = ListUtil.toString(currentAssetCategoryNames, (String)null, StringPool.COMMA_AND_SPACE);
-
-			if (previousLabel.equals(StringPool.BLANK) || !previousLabel.equals(label)) {
-			%>
-
-				<h3 class="asset-entries-group-label"><%= label %></h3>
-
-			<%
-				previousLabel = label;
-			}
-
-			try {
-			%>
-
-				<%@ include file="/html/portlet/asset_publisher/view_display.jspf" %>
+						<%@ include file="/html/portlet/asset_publisher/view_display.jspf" %>
 
 		<%
-			}
-			catch (Exception e) {
-				_log.error(e.getMessage());
+					} catch (Exception e) {
+						_log.error(e.getMessage());
+					}
+				}
 			}
 		}
 		%>
-
 	</c:otherwise>
 </c:choose>

@@ -22,6 +22,7 @@
 
 		<%
 		for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex++) {
+			AssetEntry assetEntry = results.get(assetEntryIndex);
 		%>
 
 			<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>

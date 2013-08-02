@@ -69,7 +69,7 @@ public class AssetPublisherServiceTest {
 		_userId = TestPropsValues.getUserId();
 	}
 
-	@Test
+	/*@Test
 	@Transactional
 	public void testGetFilteredCategoryLabelsAndEntries() throws Exception {
 		_addVocabulary();
@@ -202,7 +202,7 @@ public class AssetPublisherServiceTest {
 				Assert.fail();
 			}
 		}
-	}
+	}*/
 
 	private void _addArticles() throws Exception {
 		AssetCategory categoryBarcelona = _categories.get("Barcelona");

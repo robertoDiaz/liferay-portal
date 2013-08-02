@@ -749,13 +749,14 @@ public class AssetPublisherImpl implements AssetPublisher {
 	}
 
 	@Override
-	public Map<String, List<AssetEntry>> getFilteredCategoryLabelsAndEntries(
-			List<AssetEntry> entries)
+	public Map<String, List<AssetEntry>> getCategoryLabelsAndEntries(
+			List<AssetEntry> entries,List<AssetCategory> categories,
+			Locale locale)
 		throws SystemException {
 
 		Map<String, List<AssetEntry>> filteredEntriesMap = new HashMap();
 
-		List<AssetEntry> groupedEntries = new ArrayList<AssetEntry>();
+		/*List<AssetEntry> groupedEntries = new ArrayList<AssetEntry>();
 
 		List<AssetCategory> previousCategories = new ArrayList<AssetCategory>();
 
@@ -783,13 +784,29 @@ public class AssetPublisherImpl implements AssetPublisher {
 				ListUtil.toString(categoryNames), groupedEntries);
 
 			previousCategories = entryCategories;
+		}*/
+
+		for (AssetCategory category : categories) {
+			List<AssetEntry> currentCategoryAssets = new ArrayList<AssetEntry>();
+
+			for (int assetEntryIndex = 0; assetEntryIndex < entries.size(); assetEntryIndex++) {
+				AssetEntry assetEntry = (AssetEntry)entries.get(assetEntryIndex);
+
+				List<AssetCategory> assetCategoryList = assetEntry.getCategories();
+
+				if (assetCategoryList.contains(category)) {
+					currentCategoryAssets.add(assetEntry);
+				}
+			}
+
+			filteredEntriesMap.put(category.getTitle(locale), currentCategoryAssets);
 		}
 
 		return filteredEntriesMap;
 	}
 
 	@Override
-	public Map<String, List<AssetEntry>> getFilteredClassLabelAndEntries(
+	public Map<String, List<AssetEntry>> getClassNameLabelsAndEntries(
 		List<AssetEntry> entries, long[] classNameIds, Locale locale) {
 
 		Map<String, List<AssetEntry>> filteredEntriesMap = new HashMap();

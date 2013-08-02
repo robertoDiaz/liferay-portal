@@ -167,10 +167,10 @@ public class AssetEntryFinderImpl
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
-	protected void buildAnyCategoriesSQL(long[] categoryIds, StringBundler sb)
+	protected String buildAnyCategoriesSQL(long[] categoryIds, StringBundler sb)
 		throws SystemException {
 
-		String sql = CustomSQLUtil.get(FIND_BY_AND_CATEGORY_IDS);
+		/*String sql = CustomSQLUtil.get(FIND_BY_AND_CATEGORY_IDS);
 
 		String categoryIdsString = null;
 
@@ -195,7 +195,22 @@ public class AssetEntryFinderImpl
 		sb.append(" AND (");
 		sb.append(
 			StringUtil.replace(sql, "[$CATEGORY_ID$]", categoryIdsString));
+		sb.append(StringPool.CLOSE_PARENTHESIS);*/
+
+		sb.append(" AND (");
+
+		for (int i = 0; i < categoryIds.length; i++) {
+			sb.append("AssetCategory.categoryId = ");
+			sb.append(categoryIds[i]);
+
+			if ((i + 1) != categoryIds.length) {
+				sb.append(" OR ");
+			}
+		}
+
 		sb.append(StringPool.CLOSE_PARENTHESIS);
+
+		return sb.toString();
 	}
 
 	protected String buildAnyTagsSQL(long[] tagIds, StringBundler sb) {
@@ -222,8 +237,13 @@ public class AssetEntryFinderImpl
 		StringBundler sb = new StringBundler();
 
 		if (count) {
-			sb.append(
-				"SELECT COUNT(DISTINCT AssetEntry.entryId) AS COUNT_VALUE ");
+			sb.append("SELECT COUNT(DISTINCT AssetEntry.entryId");
+
+			if (entryQuery.isOrderByCategory()) {
+				sb.append(", AssetCategory.categoryId ");
+			}
+
+			sb.append("AS COUNT_VALUE ");
 		}
 		else {
 			sb.append("SELECT DISTINCT {AssetEntry.*} ");
@@ -235,6 +255,10 @@ public class AssetEntryFinderImpl
 				orderByCol2.equals("ratings")) {
 
 				sb.append(", RatingsStats.averageScore ");
+			}
+
+			if (entryQuery.isOrderByCategory()) {
+				sb.append(", AssetCategory.categoryId ");
 			}
 		}
 
@@ -248,6 +272,17 @@ public class AssetEntryFinderImpl
 			sb.append("INNER JOIN ");
 			sb.append("AssetTag ON ");
 			sb.append("(AssetTag.tagId = AssetEntries_AssetTags.tagId) ");
+		}
+
+		if (entryQuery.getAnyCategoryIds().length > 0) {
+			sb.append("INNER JOIN ");
+			sb.append("AssetEntries_AssetCategories ON ");
+			sb.append("(AssetEntries_AssetCategories.entryId = ");
+			sb.append("AssetEntry.entryId) ");
+			sb.append("INNER JOIN ");
+			sb.append("AssetCategory ON ");
+			sb.append("(AssetCategory.categoryId = ");
+			sb.append("AssetEntries_AssetCategories.categoryId) ");
 		}
 
 		if (entryQuery.getLinkedAssetEntryId() > 0) {
@@ -360,7 +395,28 @@ public class AssetEntryFinderImpl
 		sb.append(getClassNameIds(entryQuery.getClassNameIds()));
 
 		if (!count) {
+			if (entryQuery.isOrderByCategory()) {
+				sb.append(" GROUP BY ");
+				sb.append("AssetEntry.entryId ");
+				sb.append(", AssetCategory.categoryId ");
+			}
+
 			sb.append(" ORDER BY ");
+
+			if (entryQuery.isOrderByCategory() ||
+				entryQuery.isOrderByClassName()) {
+
+				if (entryQuery.isOrderByCategory()) {
+					sb.append("AssetCategory.categoryId");
+				}
+				else {
+					sb.append("AssetEntry.classNameId");
+				}
+
+				sb.append(StringPool.SPACE);
+				sb.append(entryQuery.getOrderByType1());
+				sb.append(StringPool.COMMA);
+			}
 
 			if (entryQuery.getOrderByCol1().equals("ratings")) {
 				sb.append("RatingsStats.averageScore");

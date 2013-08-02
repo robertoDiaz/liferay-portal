@@ -22,6 +22,7 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
@@ -185,18 +186,19 @@ public class AssetPublisherUtil {
 		return getAssetPublisher().getEmailFromName(preferences, companyId);
 	}
 
-	public static Map<String, List<AssetEntry>>
-		getFilteredCategoryLabelsAndEntries(List<AssetEntry> entries)
-			throws SystemException {
+	public static Map<String, List<AssetEntry>> getCategoryLabelsAndEntries(
+			List<AssetEntry> entries,List<AssetCategory> categories,
+			Locale locale)
+		throws SystemException {
 
-		return getAssetPublisher().getFilteredCategoryLabelsAndEntries(entries);
+		return getAssetPublisher().getCategoryLabelsAndEntries(
+			entries, categories, locale);
 	}
 
-	public static Map<String, List<AssetEntry>>
-		getFilteredClassLabelAndEntries(
-			List<AssetEntry> entries, long[] classNameIds, Locale locale) {
+	public static Map<String, List<AssetEntry>> getClassNameLabelsAndEntries(
+		List<AssetEntry> entries, long[] classNameIds, Locale locale) {
 
-		return getAssetPublisher().getFilteredClassLabelAndEntries(
+		return getAssetPublisher().getClassNameLabelsAndEntries(
 			entries, classNameIds, locale);
 	}
 

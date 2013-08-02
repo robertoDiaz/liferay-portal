@@ -21,6 +21,7 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
@@ -120,13 +121,13 @@ public interface AssetPublisher {
 			PortletPreferences preferences, long companyId)
 		throws SystemException;
 
-	public Map<String, List<AssetEntry>>
-		getFilteredCategoryLabelsAndEntries(List<AssetEntry> entries)
-			throws SystemException;
+	public Map<String, List<AssetEntry>> getCategoryLabelsAndEntries(
+			List<AssetEntry> entries,List<AssetCategory> categories,
+			Locale locale)
+		throws SystemException;
 
-	public Map<String, List<AssetEntry>>
-		getFilteredClassLabelAndEntries(
-			List<AssetEntry> entries, long[] classNameIds, Locale locale);
+	public Map<String, List<AssetEntry>> getClassNameLabelsAndEntries(
+		List<AssetEntry> entries, long[] classNameIds, Locale locale);
 
 	public long getGroupIdFromScopeId(
 			String scopeId, long siteGroupId, boolean privateLayout)

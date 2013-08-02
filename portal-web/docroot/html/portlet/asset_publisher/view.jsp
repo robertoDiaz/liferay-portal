@@ -80,7 +80,7 @@ if (enableTagBasedNavigation && selectionStyle.equals("manual") && ((assetEntryQ
 
 Group scopeGroup = themeDisplay.getScopeGroup();
 %>
-
+<h1>hola amigo</h1>
 <c:if test="<%= showAddContentButton && (scopeGroup != null) && (!scopeGroup.hasStagingGroup() || scopeGroup.isStagingGroup()) && !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
 
 	<%

@@ -49,7 +49,9 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 		assetEntryQuery.setAnyCategoryIds(assetCategoryIds);
 
-		if (PropsValues.ASSET_PUBLISHER_SEARCH_WITH_INDEX && (assetEntryQuery.getLinkedAssetEntryId() == 0)) {
+		assetEntryQuery.setOrderByCategory(true);
+
+		if (false && PropsValues.ASSET_PUBLISHER_SEARCH_WITH_INDEX && (assetEntryQuery.getLinkedAssetEntryId() == 0)) {
 			Hits hits = AssetUtil.search(request, assetEntryQuery, start, end);
 
 			total = hits.getLength();
@@ -62,6 +64,9 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
 			searchContainer.setTotal(total);
+
+			assetEntryQuery.setStart(searchContainer.getStart());
+			assetEntryQuery.setEnd(searchContainer.getEnd());
 
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 		}
@@ -115,6 +120,8 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 		Map<Long, AssetRendererFactory> groupAssetRendererFactoryMap = new HashMap<Long, AssetRendererFactory>();
 
 		assetEntryQuery.setClassNameIds(classNameIds);
+
+		assetEntryQuery.setOrderByClassName(true);
 
 		for (long classNameId : classNameIds) {
 			String groupClassName = PortalUtil.getClassName(classNameId);
