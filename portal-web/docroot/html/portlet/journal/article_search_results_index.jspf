@@ -28,9 +28,10 @@ Sort sort = SortFactoryUtil.getSort(JournalArticle.class, searchContainer.getOrd
 
 boolean corruptIndex = false;
 
-do {
-	Hits hits = null;
+Hits hits = null;
+Tuple tuple = null;
 
+do {
 	if (searchTerms.isAdvancedSearch()) {
 		hits = JournalArticleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getArticleId(), searchTerms.getTitle(), searchTerms.getDescription(), searchTerms.getContent(), searchTerms.getType(), StringUtil.valueOf(searchTerms.getStatusCode()), searchTerms.getStructureId(), searchTerms.getTemplateId(), journalParams, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), sort);
 	}
@@ -38,17 +39,14 @@ do {
 		hits = JournalArticleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getStructureId(), searchTerms.getTemplateId(), searchTerms.getKeywords(), journalParams, searchContainer.getStart(), searchContainer.getEnd(), sort);
 	}
 
-	Tuple tuple = JournalUtil.getArticles(hits);
+	tuple = JournalUtil.getArticles(hits);
 
 	corruptIndex = (Boolean)tuple.getObject(1);
-
-	if (!corruptIndex) {
-		results = (List<JournalArticle>)tuple.getObject(0);
-
-		searchContainer.setTotal(hits.getLength());
-	}
 }
 while (corruptIndex);
 
+results = (List<JournalArticle>)tuple.getObject(0);
+
+searchContainer.setTotal(hits.getLength());
 searchContainer.setResults(results);
 %>
