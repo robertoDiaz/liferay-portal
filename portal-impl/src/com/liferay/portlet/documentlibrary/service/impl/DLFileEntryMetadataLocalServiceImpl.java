@@ -59,6 +59,17 @@ public class DLFileEntryMetadataLocalServiceImpl
 		}
 	}
 
+	public void deleteDDMStructureFileEntryMetadata(long ddmStructureId)
+		throws SystemException, PortalException {
+
+		List<DLFileEntryMetadata> fileEntryMetadatas =
+			dlFileEntryMetadataPersistence.findByDDMStructureId(ddmStructureId);
+
+		for (DLFileEntryMetadata fileEntryMetadata : fileEntryMetadatas) {
+			deleteFileEntryMetadata(fileEntryMetadata);
+		}
+	}
+
 	@Override
 	public DLFileEntryMetadata fetchFileEntryMetadata(long fileEntryMetadataId)
 		throws SystemException {
