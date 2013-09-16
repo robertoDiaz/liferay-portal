@@ -406,6 +406,17 @@ public class ArrayUtilTest {
 	}
 
 	@Test
+	public void testRemoveAllStringArray() {
+		String[] array1 = {"a", "b", "c", "d"};
+		String[] array2 = {"c", "d"};
+
+		String[] result = ArrayUtil.removeAll(array1, array2);
+
+		Assert.assertEquals(result[0], "a");
+		Assert.assertEquals(result[1], "b");
+	}
+
+	@Test
 	public void testReverseBooleanArray() throws Exception {
 		boolean[] array = new boolean[] {true, true, false};
 
