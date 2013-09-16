@@ -247,6 +247,7 @@ create index IX_64F0FE40 on DLFileEntry (uuid_);
 create index IX_31079DE8 on DLFileEntry (uuid_, companyId);
 create unique index IX_BC2E7E6A on DLFileEntry (uuid_, groupId);
 
+create index IX_F815E598 on DLFileEntryMetadata (DDMStructureId);
 create unique index IX_7332B44F on DLFileEntryMetadata (DDMStructureId, fileVersionId);
 create index IX_4F40FE5E on DLFileEntryMetadata (fileEntryId);
 create index IX_A44636C9 on DLFileEntryMetadata (fileEntryId, fileVersionId);
@@ -287,6 +288,7 @@ create index IX_A0A283F4 on DLFileVersion (companyId, status);
 create index IX_C68DC967 on DLFileVersion (fileEntryId);
 create index IX_D47BB14D on DLFileVersion (fileEntryId, status);
 create unique index IX_E2815081 on DLFileVersion (fileEntryId, version);
+create index IX_175722C1 on DLFileVersion (fileEntryTypeId);
 create index IX_DFD809D3 on DLFileVersion (groupId, folderId, status);
 create index IX_9BE769ED on DLFileVersion (groupId, folderId, title, version);
 create index IX_FFB3395C on DLFileVersion (mimeType);

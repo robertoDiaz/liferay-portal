@@ -272,6 +272,173 @@ public class DLFileEntryMetadataUtil {
 	}
 
 	/**
+	* Returns all the document library file entry metadatas where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @return the matching document library file entry metadatas
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> findByDDMStructureId(
+		long DDMStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByDDMStructureId(DDMStructureId);
+	}
+
+	/**
+	* Returns a range of all the document library file entry metadatas where DDMStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.documentlibrary.model.impl.DLFileEntryMetadataModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param start the lower bound of the range of document library file entry metadatas
+	* @param end the upper bound of the range of document library file entry metadatas (not inclusive)
+	* @return the range of matching document library file entry metadatas
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> findByDDMStructureId(
+		long DDMStructureId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByDDMStructureId(DDMStructureId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the document library file entry metadatas where DDMStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.documentlibrary.model.impl.DLFileEntryMetadataModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param start the lower bound of the range of document library file entry metadatas
+	* @param end the upper bound of the range of document library file entry metadatas (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching document library file entry metadatas
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> findByDDMStructureId(
+		long DDMStructureId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByDDMStructureId(DDMStructureId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first document library file entry metadata in the ordered set where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching document library file entry metadata
+	* @throws com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException if a matching document library file entry metadata could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata findByDDMStructureId_First(
+		long DDMStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException {
+		return getPersistence()
+				   .findByDDMStructureId_First(DDMStructureId, orderByComparator);
+	}
+
+	/**
+	* Returns the first document library file entry metadata in the ordered set where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching document library file entry metadata, or <code>null</code> if a matching document library file entry metadata could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchByDDMStructureId_First(
+		long DDMStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByDDMStructureId_First(DDMStructureId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last document library file entry metadata in the ordered set where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching document library file entry metadata
+	* @throws com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException if a matching document library file entry metadata could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata findByDDMStructureId_Last(
+		long DDMStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException {
+		return getPersistence()
+				   .findByDDMStructureId_Last(DDMStructureId, orderByComparator);
+	}
+
+	/**
+	* Returns the last document library file entry metadata in the ordered set where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching document library file entry metadata, or <code>null</code> if a matching document library file entry metadata could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchByDDMStructureId_Last(
+		long DDMStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByDDMStructureId_Last(DDMStructureId, orderByComparator);
+	}
+
+	/**
+	* Returns the document library file entry metadatas before and after the current document library file entry metadata in the ordered set where DDMStructureId = &#63;.
+	*
+	* @param fileEntryMetadataId the primary key of the current document library file entry metadata
+	* @param DDMStructureId the d d m structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next document library file entry metadata
+	* @throws com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException if a document library file entry metadata with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata[] findByDDMStructureId_PrevAndNext(
+		long fileEntryMetadataId, long DDMStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException {
+		return getPersistence()
+				   .findByDDMStructureId_PrevAndNext(fileEntryMetadataId,
+			DDMStructureId, orderByComparator);
+	}
+
+	/**
+	* Removes all the document library file entry metadatas where DDMStructureId = &#63; from the database.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByDDMStructureId(long DDMStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByDDMStructureId(DDMStructureId);
+	}
+
+	/**
+	* Returns the number of document library file entry metadatas where DDMStructureId = &#63;.
+	*
+	* @param DDMStructureId the d d m structure ID
+	* @return the number of matching document library file entry metadatas
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByDDMStructureId(long DDMStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByDDMStructureId(DDMStructureId);
+	}
+
+	/**
 	* Returns all the document library file entry metadatas where fileEntryTypeId = &#63;.
 	*
 	* @param fileEntryTypeId the file entry type ID

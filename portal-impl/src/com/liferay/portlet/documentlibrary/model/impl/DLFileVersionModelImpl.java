@@ -113,14 +113,15 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 			true);
 	public static long COMPANYID_COLUMN_BITMASK = 1L;
 	public static long FILEENTRYID_COLUMN_BITMASK = 2L;
-	public static long FOLDERID_COLUMN_BITMASK = 4L;
-	public static long GROUPID_COLUMN_BITMASK = 8L;
-	public static long MIMETYPE_COLUMN_BITMASK = 16L;
-	public static long STATUS_COLUMN_BITMASK = 32L;
-	public static long TITLE_COLUMN_BITMASK = 64L;
-	public static long UUID_COLUMN_BITMASK = 128L;
-	public static long VERSION_COLUMN_BITMASK = 256L;
-	public static long CREATEDATE_COLUMN_BITMASK = 512L;
+	public static long FILEENTRYTYPEID_COLUMN_BITMASK = 4L;
+	public static long FOLDERID_COLUMN_BITMASK = 8L;
+	public static long GROUPID_COLUMN_BITMASK = 16L;
+	public static long MIMETYPE_COLUMN_BITMASK = 32L;
+	public static long STATUS_COLUMN_BITMASK = 64L;
+	public static long TITLE_COLUMN_BITMASK = 128L;
+	public static long UUID_COLUMN_BITMASK = 256L;
+	public static long VERSION_COLUMN_BITMASK = 512L;
+	public static long CREATEDATE_COLUMN_BITMASK = 1024L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -753,7 +754,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 
 	@Override
 	public void setFileEntryTypeId(long fileEntryTypeId) {
+		_columnBitmask |= FILEENTRYTYPEID_COLUMN_BITMASK;
+
+		if (!_setOriginalFileEntryTypeId) {
+			_setOriginalFileEntryTypeId = true;
+
+			_originalFileEntryTypeId = _fileEntryTypeId;
+		}
+
 		_fileEntryTypeId = fileEntryTypeId;
+	}
+
+	public long getOriginalFileEntryTypeId() {
+		return _originalFileEntryTypeId;
 	}
 
 	@JSON
@@ -1133,6 +1146,10 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 
 		dlFileVersionModelImpl._originalTitle = dlFileVersionModelImpl._title;
 
+		dlFileVersionModelImpl._originalFileEntryTypeId = dlFileVersionModelImpl._fileEntryTypeId;
+
+		dlFileVersionModelImpl._setOriginalFileEntryTypeId = false;
+
 		dlFileVersionModelImpl._originalVersion = dlFileVersionModelImpl._version;
 
 		dlFileVersionModelImpl._originalStatus = dlFileVersionModelImpl._status;
@@ -1508,6 +1525,8 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	private String _changeLog;
 	private String _extraSettings;
 	private long _fileEntryTypeId;
+	private long _originalFileEntryTypeId;
+	private boolean _setOriginalFileEntryTypeId;
 	private String _version;
 	private String _originalVersion;
 	private long _size;

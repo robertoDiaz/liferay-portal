@@ -280,6 +280,12 @@ public class DLFileEntryMetadataLocalServiceUtil {
 		getService().deleteFileVersionFileEntryMetadata(fileVersionId);
 	}
 
+	public static void deleteDDMStructureFileEntryMetadata(long ddmStructureId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteDDMStructureFileEntryMetadata(ddmStructureId);
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchFileEntryMetadata(
 		long fileEntryMetadataId)
 		throws com.liferay.portal.kernel.exception.SystemException {
