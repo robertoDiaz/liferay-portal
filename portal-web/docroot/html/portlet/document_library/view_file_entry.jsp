@@ -908,8 +908,29 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 						}
 					}
 				},
-				{
+				<c:if test="<%= hasImages %>">
+					 {
+						<portlet:renderURL var="inlineEditURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+							<portlet:param name="struts_action" value="/document_library/inline_edit_file_entry" />
+							<portlet:param name="redirect" value="<%= redirect %>" />
+							<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
+						</portlet:renderURL>
 
+						icon: 'icon-edit',
+						label: '<%= UnicodeLanguageUtil.get(pageContext, "modify-image") %>',
+						on: {
+							click: function(event) {
+								Liferay.Util.openWindow(
+									{
+										title: '<%= UnicodeLanguageUtil.format(pageContext, "edit-x", fileEntry.getTitle()) %>',
+										uri: '<%= inlineEditURL.toString() %>',
+									}
+								);
+							}
+						}
+					},
+				</c:if>
+				{
 					<portlet:renderURL var="moveURL">
 						<portlet:param name="struts_action" value="/document_library/move_file_entry" />
 						<portlet:param name="redirect" value="<%= redirect %>" />
