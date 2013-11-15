@@ -16,11 +16,15 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
+<%
+FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
+%>
+
 <div class="lfr-preview-file lfr-preview-image" id="<portlet:namespace />previewFile">
 	<div class="lfr-preview-file-content lfr-preview-image-content" id="<portlet:namespace />previewFileContent">
 		<div class="lfr-preview-file-image-current-column">
 			<div class="lfr-preview-file-image-container">
-				<img class="lfr-preview-file-image-current" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, previewQueryString); %>" />
+				<img class="lfr-preview-file-image-current" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getLatestFileVersion(), themeDisplay, "&imagePreview=1") %>" />
 			</div>
 		</div>
 	</div>
