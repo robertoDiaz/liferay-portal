@@ -29,3 +29,23 @@ FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_F
 		</div>
 	</div>
 </div>
+
+<%
+PortletURL editFileEntryURL = renderResponse.createActionURL();
+
+editFileEntryURL.setParameter("struts_action", "/document_library/edit_file_entry");
+%>
+
+<aui:form action="<%= editFileEntryURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry();" %>'>
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.INLINE_EDIT %>" />
+	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
+	<aui:input name="blob" type="hidden" />
+
+	<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry();" %>' value="save" />
+</aui:form>
+
+<aui:script>
+	function <portlet:namespace />saveFileEntry() {
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
