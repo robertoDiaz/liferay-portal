@@ -69,6 +69,8 @@ public interface Constants {
 
 	public static final String IMPORT = "import";
 
+	public static final String INLINE_EDIT = "inline_edit";
+
 	public static final String LOCK = "lock";
 
 	public static final String MAIL_ACCOUNT = "mail_account";
