@@ -14,12 +14,18 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 
 import java.io.File;
 
@@ -50,6 +56,20 @@ public class DLAppUtil {
 		}
 
 		return mimeType;
+	}
+
+	public static boolean isEditableImage(FileVersion fileVersion)
+		throws SystemException {
+
+		if (fileVersion instanceof LiferayFileVersion) {
+			String[] editableMimeTypes = PrefsPropsUtil.getStringArray(
+				"editable.mime.types", StringPool.COMMA);
+
+			return ArrayUtil.contains(
+				editableMimeTypes, fileVersion.getMimeType());
+		}
+
+		return false;
 	}
 
 	public static boolean isMajorVersion(
