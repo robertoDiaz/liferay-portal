@@ -908,6 +908,29 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 						}
 					}
 				},
+				<c:if test="<%= DLAppUtil.isEditableImage(fileVersion) %>">
+					{
+
+						<portlet:renderURL var="editImageURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+							<portlet:param name="struts_action" value="/document_library/edit_image" />
+							<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
+							<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryTypeId) %>" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+						</portlet:renderURL>
+
+						label: '<%= UnicodeLanguageUtil.get(pageContext, "edit-image") %>',
+						 on: {
+							click: function(event) {
+								Liferay.Util.openWindow(
+									{
+										title: '<%= UnicodeLanguageUtil.format(pageContext, "edit-x", fileEntry.getTitle()) %>',
+										uri: '<%= editImageURL.toString() %>',
+									}
+								);
+							}
+						}
+					},
+				</c:if>
 				{
 
 					<portlet:renderURL var="moveURL">

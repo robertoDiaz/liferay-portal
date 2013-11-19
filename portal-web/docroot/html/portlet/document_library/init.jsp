@@ -61,6 +61,7 @@ page import="com.liferay.portlet.documentlibrary.service.permission.DLFileShortc
 page import="com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.service.permission.DLPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.util.AudioProcessorUtil" %><%@
+page import="com.liferay.portlet.documentlibrary.util.DLAppUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.ImageProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.PDFProcessorUtil" %><%@
