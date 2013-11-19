@@ -514,6 +514,11 @@
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
+		<action path="/document_library/edit_image" type="com.liferay.portlet.documentlibrary.action.EditImageAction">
+			<forward name="portlet.document_library.edit_image" path="portlet.document_library.edit_image" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
+		</action>
+
 		<action path="/document_library/edit_repository" type="com.liferay.portlet.documentlibrary.action.EditRepositoryAction">
 			<forward name="portlet.document_library.edit_repository" path="portlet.document_library.edit_repository" />
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
