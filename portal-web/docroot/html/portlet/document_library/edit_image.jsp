@@ -37,11 +37,12 @@ if ((fileEntryTypeId == -1) && (fileVersion.getModel() instanceof DLFileVersion)
 <div class="lfr-preview-file" id="<portlet:namespace />previewFile">
 	<div class="lfr-preview-file-content" id="<portlet:namespace />previewFileContent">
 		<div class="lfr-preview-file-image-current-column">
-			<div class="lfr-preview-file-image-container">
-				<img class="lfr-preview-file-image-current" id="<portlet:namespace />previewFileImage" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imagePreview=1") %>" />
+			<div class="lfr-preview-file-image-container image-processor">
+				<img class="lfr-preview-file-image-current" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getLatestFileVersion(), themeDisplay, "&imagePreview=1") %>" />
 			</div>
 		</div>
 	</div>
+	<div class="toolbar"></div>
 </div>
 
 <liferay-portlet:actionURL varImpl="editImageURL">
@@ -54,11 +55,16 @@ if ((fileEntryTypeId == -1) && (fileVersion.getModel() instanceof DLFileVersion)
 	<aui:input name="fileEntryTypeId" type="hidden" value="<%= fileEntryTypeId %>" />
 	<aui:input name="blob" type="hidden" />
 
-	<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveImage();" %>' value="save" />
+	<aui:button name="saveButton" value="save" />
 </aui:form>
 
-<aui:script>
-	function <portlet:namespace />saveImage() {
-		submitForm(document.<portlet:namespace />fm);
-	}
+<aui:script use="aui-image-editor">
+	var imageEditor = new A.ImageEditor({
+        srcNode: '#<portlet:namespace />previewFile'
+    }).render();
+
+    A.one('#<portlet:namespace />saveButton').on('click', function(event) {
+        A.one('#<portlet:namespace />blob').val(imageEditor.getImageData());
+        submitForm(document.<portlet:namespace />fm);
+    });
 </aui:script>
