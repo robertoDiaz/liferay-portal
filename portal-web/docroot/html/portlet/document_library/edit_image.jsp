@@ -35,3 +35,21 @@ if (fileVersion == null) {
 		</div>
 	</div>
 </div>
+
+<liferay-portlet:actionURL varImpl="editImageURL">
+	<liferay-portlet:param name="struts_action" value="/document_library/edit_image" />
+</liferay-portlet:actionURL>
+
+<aui:form action="<%= editImageURL %>" cssClass="lfr-dynamic-form" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry();" %>'>
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.EDIT %>" />
+	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
+	<aui:input name="blob" type="hidden" />
+
+	<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveImage();" %>' value="save" />
+</aui:form>
+
+<aui:script>
+	function <portlet:namespace />saveImage() {
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
