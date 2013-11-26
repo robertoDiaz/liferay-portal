@@ -30,7 +30,7 @@ if (fileVersion == null) {
 	<div class="lfr-preview-file-content" id="<portlet:namespace />previewFileContent">
 		<div class="lfr-preview-file-image-current-column">
 			<div class="lfr-preview-file-image-container">
-				<img class="lfr-preview-file-image-current" id="<portlet:namespace />previewFileImage" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imagePreview=1") %>" />
+				<canvas id="lfr-preview-file-image" />
 			</div>
 		</div>
 	</div>
@@ -45,11 +45,54 @@ if (fileVersion == null) {
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
 	<aui:input name="blob" type="hidden" />
 
+	<aui:button name="hokiti pokiti" onClick='<%= renderResponse.getNamespace() + "randomImg();" %>' value="Hokiti Pokiti" />
 	<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveImage();" %>' value="save" />
 </aui:form>
 
 <aui:script>
+	var canvas = document.getElementById('lfr-preview-file-image'),
+		width = 0,
+		height = 0,
+		ctx = canvas.getContext('2d'),
+		img = new Image();
+
+	img.onload = function() {
+		width = img.width;
+		height = img.height;
+		canvas.setAttribute('width', width);
+		canvas.setAttribute('height', height);
+		ctx.drawImage(img, 0, 0);
+	};
+
+	img.src = '<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imagePreview=1") %>';
+
 	function <portlet:namespace />saveImage() {
+		var blob = canvas.toDataURL().replace();
+
+		var blobInput = document.getElementById('<portlet:namespace />blob');
+		blobInput.setAttribute('value', blob);
+
 		submitForm(document.<portlet:namespace />fm);
+	}
+
+	function <portlet:namespace />randomImg() {
+		var imageData = ctx.getImageData(0, 0, width, height),
+			data = imageData.data;
+
+		var extraRed = Math.round((Math.random() -0.5) * 40),
+			extraGreen = Math.round((Math.random() -0.5) * 40),
+			extraBlue = Math.round((Math.random() -0.5) * 40);
+
+		for (var i=0; i < data.length; i+=4) {
+			var r = data[i] + extraRed;
+			var g = data[i+1] + extraGreen;
+			var b = data[i+2] + extraBlue;
+
+			data[i] = r;
+			data[i+1] = g;
+			data[i+2] = b;
+		}
+
+		ctx.putImageData(imageData, 0, 0);
 	}
 </aui:script>
