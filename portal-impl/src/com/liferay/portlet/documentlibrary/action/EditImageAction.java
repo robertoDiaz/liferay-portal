@@ -14,19 +14,27 @@
 
 package com.liferay.portlet.documentlibrary.action;
 
+import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TempFileUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
+
+import java.io.File;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -53,12 +61,9 @@ public class EditImageAction extends EditFileEntryAction {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		FileEntry fileEntry = null;
-
 		try {
-			if (cmd.equals(Constants.ADD)) {
-				fileEntry = updateFileEntry(
-					portletConfig, actionRequest, actionResponse);
+			if (cmd.equals(Constants.EDIT)) {
+				updateImage(actionRequest);
 			}
 
 			WindowState windowState = actionRequest.getWindowState();
@@ -71,21 +76,6 @@ public class EditImageAction extends EditFileEntryAction {
 					ParamUtil.getString(actionRequest, "redirect"));
 
 				if (Validator.isNotNull(redirect)) {
-					if (cmd.equals(Constants.ADD) && (fileEntry != null)) {
-						String portletId = HttpUtil.getParameter(
-							redirect, "p_p_id", false);
-
-						String namespace = PortalUtil.getPortletNamespace(
-							portletId);
-
-						redirect = HttpUtil.addParameter(
-							redirect, namespace + "className",
-							DLFileEntry.class.getName());
-						redirect = HttpUtil.addParameter(
-							redirect, namespace + "classPK",
-							fileEntry.getFileEntryId());
-					}
-
 					actionResponse.sendRedirect(redirect);
 				}
 			}
@@ -122,9 +112,66 @@ public class EditImageAction extends EditFileEntryAction {
 			}
 		}
 
-		String forward = "portlet.document_library.edit_file_entry";
+		String forward = "portlet.document_library.edit_image";
 
 		return actionMapping.findForward(getForward(renderRequest, forward));
+	}
+
+	protected void updateImage(ActionRequest actionRequest) throws Exception {
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
+
+		if (fileEntryId == 0) {
+			throw new NoSuchFileEntryException();
+		}
+
+		FileEntry fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
+
+		String blob = ParamUtil.getString(actionRequest, "blob");
+
+		if (Validator.isNull(blob)) {
+			throw new NoSuchImageException();
+		}
+
+		String mimeType = fileEntry.getMimeType();
+
+		String formatName = mimeType.substring(
+			mimeType.indexOf(StringPool.SLASH) + 1);
+
+		File imageFile = ActionUtil.getImageFromBlob(blob, formatName);
+
+		FileEntry tempFileEntry = TempFileUtil.addTempFile(
+			fileEntry.getGroupId(), fileEntry.getUserId(),
+			fileEntry.getTitle() + fileEntry.getVersion(), _TEMP_FOLDER_NAME,
+			imageFile, fileEntry.getMimeType());
+
+		try {
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				actionRequest);
+
+			fileEntry = DLAppServiceUtil.updateFileEntry(
+				fileEntryId, fileEntry.getTitle(), fileEntry.getMimeType(),
+				fileEntry.getTitle(), fileEntry.getDescription(),
+				ActionUtil.getChangeLog(actionRequest), false, imageFile,
+				serviceContext);
+
+			AssetPublisherUtil.addAndStoreSelection(
+				actionRequest, DLFileEntry.class.getName(),
+				fileEntry.getFileEntryId(), -1);
+
+			AssetPublisherUtil.addRecentFolderId(
+				actionRequest, DLFileEntry.class.getName(),
+				fileEntry.getFolderId());
+
+			return;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (tempFileEntry != null) {
+				TempFileUtil.deleteTempFile(tempFileEntry.getFileEntryId());
+			}
+		}
 	}
 
 	private static final String _TEMP_FOLDER_NAME =

@@ -14,12 +14,16 @@
 
 package com.liferay.portlet.documentlibrary.action;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Repository;
@@ -38,9 +42,21 @@ import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 import com.liferay.portlet.documentlibrary.util.RawMetadataProcessorUtil;
 
+import java.awt.image.BufferedImage;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
@@ -51,6 +67,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author Sergio González
  */
 public class ActionUtil {
+
+	public static String getChangeLog(ActionRequest actionRequest) {
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return LanguageUtil.get(
+			themeDisplay.getLocale(),
+			"this-image-has-been-modified-using-web-image-editor");
+	}
 
 	public static void getFileEntries(HttpServletRequest request)
 		throws Exception {
@@ -261,6 +286,37 @@ public class ActionUtil {
 			portletRequest);
 
 		getFolders(request);
+	}
+
+	public static File getImageFromBlob(String blob, String formatName)
+		throws Exception {
+
+		blob = blob.substring(blob.indexOf(StringPool.COMMA) + 1);
+
+		byte[] decodedBytes = Base64.decode(blob);
+
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+			decodedBytes);
+
+		ImageInputStream imageInputStream = ImageIO.createImageInputStream(
+			byteArrayInputStream);
+
+		Iterator<?> readerIterator = ImageIO.getImageReadersByFormatName(
+			formatName);
+
+		ImageReader reader = (ImageReader)readerIterator.next();
+
+		reader.setInput(imageInputStream, true);
+
+		ImageReadParam defaultReadParam = reader.getDefaultReadParam();
+
+		BufferedImage bufferedImage = reader.read(0, defaultReadParam);
+
+		File imageFile = FileUtil.createTempFile();
+
+		ImageIO.write(bufferedImage, formatName, imageFile);
+
+		return imageFile;
 	}
 
 	public static void getRepository(HttpServletRequest request)
