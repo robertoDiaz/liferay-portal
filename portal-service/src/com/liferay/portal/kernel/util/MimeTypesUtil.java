@@ -108,6 +108,10 @@ public class MimeTypesUtil {
 		return getMimeTypes().getExtensions(contentType);
 	}
 
+	public static String getFormatName(String mimeType) {
+		return getMimeTypes(). getFormatName(mimeType);
+	}
+
 	public static MimeTypes getMimeTypes() {
 		PortalRuntimePermission.checkGetBeanProperty(MimeTypesUtil.class);
 

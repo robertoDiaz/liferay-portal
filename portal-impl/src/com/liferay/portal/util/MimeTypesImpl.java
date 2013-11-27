@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
@@ -202,6 +203,11 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		}
 
 		return extensions;
+	}
+
+	@Override
+	public String getFormatName(String contentType) {
+		return contentType.substring(contentType.indexOf(StringPool.SLASH) + 1);
 	}
 
 	@Override
