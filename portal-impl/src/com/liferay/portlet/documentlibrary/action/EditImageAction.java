@@ -16,6 +16,8 @@ package com.liferay.portlet.documentlibrary.action;
 
 import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
+import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -23,7 +25,9 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TempFileUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -38,8 +42,15 @@ import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Iterator;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
@@ -136,10 +147,14 @@ public class EditImageAction extends EditFileEntryAction {
 			throw new NoSuchImageException();
 		}
 
-		File imageFile = _getImageFromBlob(blob);
+		String formatName =
+			MimeTypesUtil.getFormatName(fileEntry.getMimeType());
+
+		File imageFile = _getImageFromBlob(blob, formatName);
 
 		FileEntry tempFileEntry = TempFileUtil.addTempFile(
-			fileEntry.getGroupId(), fileEntry.getUserId(), fileEntry.getTitle(),
+			fileEntry.getGroupId(), fileEntry.getUserId(),
+			fileEntry.getTitle() + fileEntry.getVersion(),
 			_TEMP_FOLDER_NAME, imageFile, fileEntry.getMimeType());
 
 		try {
@@ -180,16 +195,34 @@ public class EditImageAction extends EditFileEntryAction {
 			"this-image-has-been-modified-using-web-image-editor");
 	}
 
-	private File _getImageFromBlob(String blob) throws Exception {
-		blob = blob.substring(blob.indexOf(",") + 1);
+	private File _getImageFromBlob(String blob, String formatName)
+		throws Exception {
+
+		blob = blob.substring(blob.indexOf(StringPool.COMMA) + 1);
 
 		byte[] decodedBytes = Base64.decode(blob);
 
-		File tempImage = FileUtil.createTempFile(decodedBytes);
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+			decodedBytes);
 
-		FileUtil.write(tempImage, decodedBytes);
+		ImageInputStream imageInputStream = ImageIO.createImageInputStream(
+			byteArrayInputStream);
 
-		return tempImage;
+		Iterator<?> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
+
+		ImageReader reader = (ImageReader) readerIterator.next();
+
+		reader.setInput(imageInputStream, true);
+
+		ImageReadParam defaultReadParam = reader.getDefaultReadParam();
+
+		BufferedImage bufferedImage = reader.read(0, defaultReadParam);
+
+		File imageFile = FileUtil.createTempFile();
+
+		ImageIO.write(bufferedImage, formatName, imageFile);
+
+		return imageFile;
 	}
 
 	private static final String _TEMP_FOLDER_NAME =
