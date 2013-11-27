@@ -813,6 +813,24 @@ public class DLFileEntryLocalServiceUtil {
 			fileEntryTypeId, fieldsMap, file, is, size, serviceContext);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry updateFileEntry(
+		long userId, long fileEntryId, java.lang.String sourceFileName,
+		java.lang.String extension, java.lang.String mimeType,
+		java.lang.String title, java.lang.String description,
+		java.lang.String changeLog, boolean majorVersion,
+		java.lang.String extraSettings, long fileEntryTypeId,
+		java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> fieldsMap,
+		java.io.File file, java.io.InputStream is, long size,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateFileEntry(userId, fileEntryId, sourceFileName,
+			extension, mimeType, title, description, changeLog, majorVersion,
+			extraSettings, fileEntryTypeId, fieldsMap, file, is, size,
+			serviceContext);
+	}
+
 	public static void updateSmallImage(long smallImageId, long largeImageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
