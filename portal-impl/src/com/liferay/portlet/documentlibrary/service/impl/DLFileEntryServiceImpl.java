@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -664,6 +665,24 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 			getUserId(), fileEntryId, sourceFileName, mimeType, title,
 			description, changeLog, majorVersion, fileEntryTypeId, fieldsMap,
 			file, is, size, serviceContext);
+	}
+
+	@Override
+	public DLFileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String e, String mimeType,
+			String title, String description, String changeLog,
+			boolean majorVersion, long fileEntryTypeId,
+			Map<String, Fields> fieldsMap, File file, InputStream is, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		DLFileEntryPermission.check(
+			getPermissionChecker(), fileEntryId, ActionKeys.UPDATE);
+
+		return dlFileEntryLocalService.updateFileEntry(
+			getUserId(), fileEntryId, sourceFileName, e, mimeType, title,
+			description, changeLog, majorVersion, StringPool.BLANK,
+			fileEntryTypeId, fieldsMap, file, is, size, serviceContext);
 	}
 
 	@Override

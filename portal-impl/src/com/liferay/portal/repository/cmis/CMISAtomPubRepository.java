@@ -19,10 +19,15 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.cmis.CMISRepositoryHandler;
 import com.liferay.portal.kernel.repository.cmis.Session;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.service.ServiceContext;
+
+import java.io.File;
+import java.io.InputStream;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -105,4 +110,25 @@ public class CMISAtomPubRepository extends CMISRepositoryHandler {
 		{_ATOMPUB_URL, _REPOSITORY_ID}
 	};
 
+	@Override
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, InputStream is, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, File file, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		throw new UnsupportedOperationException();
+	}
 }

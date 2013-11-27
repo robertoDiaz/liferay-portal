@@ -16,8 +16,6 @@ package com.liferay.portlet.documentlibrary.action;
 
 import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
-import com.liferay.portal.kernel.image.ImageBag;
-import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -43,14 +41,17 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 
 import java.awt.image.BufferedImage;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
+
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
@@ -154,17 +155,19 @@ public class EditImageAction extends EditFileEntryAction {
 
 		FileEntry tempFileEntry = TempFileUtil.addTempFile(
 			fileEntry.getGroupId(), fileEntry.getUserId(),
-			fileEntry.getTitle() + fileEntry.getVersion(),
-			_TEMP_FOLDER_NAME, imageFile, fileEntry.getMimeType());
+			fileEntry.getTitle() + fileEntry.getVersion(), _TEMP_FOLDER_NAME,
+			imageFile, fileEntry.getMimeType());
+
+		String extension = formatName;
 
 		try {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
 			fileEntry = DLAppServiceUtil.updateFileEntry(
-				fileEntryId, fileEntry.getTitle(), fileEntry.getMimeType(),
-				fileEntry.getTitle(), fileEntry.getDescription(),
-				_getChangeLog(actionRequest), false, imageFile, serviceContext);
+				fileEntryId, null, extension, fileEntry.getMimeType(), null,
+				fileEntry.getDescription(), _getChangeLog(actionRequest), false,
+				imageFile, 0, serviceContext);
 
 			AssetPublisherUtil.addAndStoreSelection(
 				actionRequest, DLFileEntry.class.getName(),
@@ -210,7 +213,7 @@ public class EditImageAction extends EditFileEntryAction {
 
 		Iterator<?> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
 
-		ImageReader reader = (ImageReader) readerIterator.next();
+		ImageReader reader = (ImageReader)readerIterator.next();
 
 		reader.setInput(imageInputStream, true);
 

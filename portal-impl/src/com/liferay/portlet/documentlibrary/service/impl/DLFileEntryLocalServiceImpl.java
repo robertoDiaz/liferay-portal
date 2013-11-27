@@ -1520,6 +1520,199 @@ public class DLFileEntryLocalServiceImpl
 			fileEntryTypeId, fieldsMap, file, is, size, serviceContext);
 	}
 
+	public DLFileEntry updateFileEntry(
+			long userId, long fileEntryId, String sourceFileName,
+			String extension, String mimeType, String title, String description,
+			String changeLog, boolean majorVersion, String extraSettings,
+			long fileEntryTypeId, Map<String, Fields> fieldsMap, File file,
+			InputStream is, long size, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
+		DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
+			fileEntryId);
+
+		boolean checkedOut = dlFileEntry.isCheckedOut();
+
+		DLFileVersion dlFileVersion =
+			dlFileVersionLocalService.getLatestFileVersion(
+				fileEntryId, !checkedOut);
+
+		boolean autoCheckIn = !checkedOut && dlFileVersion.isApproved();
+
+		if (autoCheckIn) {
+			dlFileEntry = checkOutFileEntry(
+				userId, fileEntryId, serviceContext);
+		}
+		else if (!checkedOut) {
+			lockFileEntry(userId, fileEntryId);
+		}
+
+		if (!hasFileEntryLock(userId, fileEntryId)) {
+			lockFileEntry(userId, fileEntryId);
+		}
+
+		if (checkedOut || autoCheckIn) {
+			dlFileVersion = dlFileVersionLocalService.getLatestFileVersion(
+				fileEntryId, false);
+		}
+
+		try {
+			if (Validator.isNull(extension)) {
+				extension = dlFileEntry.getExtension();
+			}
+
+			if (Validator.isNull(mimeType)) {
+				mimeType = dlFileEntry.getMimeType();
+			}
+
+			if (Validator.isNull(title)) {
+				title = sourceFileName;
+
+				if (Validator.isNull(title)) {
+					title = dlFileEntry.getTitle();
+				}
+			}
+
+			Date now = new Date();
+
+			validateFile(
+				dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
+				dlFileEntry.getFileEntryId(), title, extension, sourceFileName,
+				file, is);
+
+			// File version
+
+			String version = dlFileVersion.getVersion();
+
+			if (size == 0) {
+				size = dlFileVersion.getSize();
+			}
+
+			updateFileVersion(
+				user, dlFileVersion, sourceFileName, extension, mimeType, title,
+				description, changeLog, extraSettings, fileEntryTypeId,
+				fieldsMap, version, size, dlFileVersion.getStatus(),
+				serviceContext.getModifiedDate(now), serviceContext);
+
+			// Folder
+
+			if (!checkedOut &&
+				(dlFileEntry.getFolderId() !=
+					DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
+
+				DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(
+					dlFileEntry.getFolderId());
+
+				dlFolder.setLastPostDate(serviceContext.getModifiedDate(now));
+
+				dlFolderPersistence.update(dlFolder);
+			}
+
+			// App helper
+
+			dlAppHelperLocalService.updateAsset(
+				userId, new LiferayFileEntry(dlFileEntry),
+				new LiferayFileVersion(dlFileVersion),
+				serviceContext.getAssetCategoryIds(),
+				serviceContext.getAssetTagNames(),
+				serviceContext.getAssetLinkEntryIds());
+
+			// File
+
+			if ((file != null) || (is != null)) {
+				try {
+					DLStoreUtil.deleteFile(
+						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+						dlFileEntry.getName(), version);
+				}
+				catch (NoSuchModelException nsme) {
+				}
+
+				if (file != null) {
+					DLStoreUtil.updateFile(
+						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+						dlFileEntry.getName(), dlFileEntry.getExtension(),
+						false, version, sourceFileName, file);
+				}
+				else {
+					DLStoreUtil.updateFile(
+						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+						dlFileEntry.getName(), dlFileEntry.getExtension(),
+						false, version, sourceFileName, is);
+				}
+			}
+
+			if (autoCheckIn) {
+				if (ExportImportThreadLocal.isImportInProcess()) {
+					checkInFileEntry(
+						userId, fileEntryId, majorVersion, changeLog,
+						serviceContext);
+				}
+				else {
+					dlFileEntryService.checkInFileEntry(
+						fileEntryId, majorVersion, changeLog, serviceContext);
+				}
+			}
+			else if (!checkedOut &&
+					 (serviceContext.getWorkflowAction() ==
+						WorkflowConstants.ACTION_PUBLISH)) {
+
+				String syncEvent = DLSyncConstants.EVENT_UPDATE;
+
+				if (dlFileVersion.getVersion().equals(
+						DLFileEntryConstants.VERSION_DEFAULT)) {
+
+					syncEvent = DLSyncConstants.EVENT_ADD;
+				}
+
+				startWorkflowInstance(
+					userId, serviceContext, dlFileVersion, syncEvent);
+			}
+		}
+		catch (PortalException pe) {
+			if (autoCheckIn) {
+				try {
+					if (ExportImportThreadLocal.isImportInProcess()) {
+						cancelCheckOut(userId, fileEntryId);
+					}
+					else {
+						dlFileEntryService.cancelCheckOut(fileEntryId);
+					}
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
+			}
+
+			throw pe;
+		}
+		catch (SystemException se) {
+			if (autoCheckIn) {
+				try {
+					if (ExportImportThreadLocal.isImportInProcess()) {
+						cancelCheckOut(userId, fileEntryId);
+					}
+					else {
+						dlFileEntryService.cancelCheckOut(fileEntryId);
+					}
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
+			}
+
+			throw se;
+		}
+		finally {
+			if (!autoCheckIn && !checkedOut) {
+				unlockFileEntry(fileEntryId);
+			}
+		}
+
+		return dlFileEntryPersistence.findByPrimaryKey(fileEntryId);
+	}
+
 	@Override
 	public void updateSmallImage(long smallImageId, long largeImageId)
 		throws PortalException, SystemException {
@@ -2188,199 +2381,6 @@ public class DLFileEntryLocalServiceImpl
 			dlFileVersion.getCompanyId(), dlFileVersion.getGroupId(), userId,
 			DLFileEntry.class.getName(), dlFileVersion.getFileVersionId(),
 			dlFileVersion, serviceContext, workflowContext);
-	}
-
-	protected DLFileEntry updateFileEntry(
-			long userId, long fileEntryId, String sourceFileName,
-			String extension, String mimeType, String title, String description,
-			String changeLog, boolean majorVersion, String extraSettings,
-			long fileEntryTypeId, Map<String, Fields> fieldsMap, File file,
-			InputStream is, long size, ServiceContext serviceContext)
-		throws PortalException, SystemException {
-
-		User user = userPersistence.findByPrimaryKey(userId);
-		DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
-			fileEntryId);
-
-		boolean checkedOut = dlFileEntry.isCheckedOut();
-
-		DLFileVersion dlFileVersion =
-			dlFileVersionLocalService.getLatestFileVersion(
-				fileEntryId, !checkedOut);
-
-		boolean autoCheckIn = !checkedOut && dlFileVersion.isApproved();
-
-		if (autoCheckIn) {
-			dlFileEntry = checkOutFileEntry(
-				userId, fileEntryId, serviceContext);
-		}
-		else if (!checkedOut) {
-			lockFileEntry(userId, fileEntryId);
-		}
-
-		if (!hasFileEntryLock(userId, fileEntryId)) {
-			lockFileEntry(userId, fileEntryId);
-		}
-
-		if (checkedOut || autoCheckIn) {
-			dlFileVersion = dlFileVersionLocalService.getLatestFileVersion(
-				fileEntryId, false);
-		}
-
-		try {
-			if (Validator.isNull(extension)) {
-				extension = dlFileEntry.getExtension();
-			}
-
-			if (Validator.isNull(mimeType)) {
-				mimeType = dlFileEntry.getMimeType();
-			}
-
-			if (Validator.isNull(title)) {
-				title = sourceFileName;
-
-				if (Validator.isNull(title)) {
-					title = dlFileEntry.getTitle();
-				}
-			}
-
-			Date now = new Date();
-
-			validateFile(
-				dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
-				dlFileEntry.getFileEntryId(), title, extension, sourceFileName,
-				file, is);
-
-			// File version
-
-			String version = dlFileVersion.getVersion();
-
-			if (size == 0) {
-				size = dlFileVersion.getSize();
-			}
-
-			updateFileVersion(
-				user, dlFileVersion, sourceFileName, extension, mimeType, title,
-				description, changeLog, extraSettings, fileEntryTypeId,
-				fieldsMap, version, size, dlFileVersion.getStatus(),
-				serviceContext.getModifiedDate(now), serviceContext);
-
-			// Folder
-
-			if (!checkedOut &&
-				(dlFileEntry.getFolderId() !=
-					DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
-
-				DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(
-					dlFileEntry.getFolderId());
-
-				dlFolder.setLastPostDate(serviceContext.getModifiedDate(now));
-
-				dlFolderPersistence.update(dlFolder);
-			}
-
-			// App helper
-
-			dlAppHelperLocalService.updateAsset(
-				userId, new LiferayFileEntry(dlFileEntry),
-				new LiferayFileVersion(dlFileVersion),
-				serviceContext.getAssetCategoryIds(),
-				serviceContext.getAssetTagNames(),
-				serviceContext.getAssetLinkEntryIds());
-
-			// File
-
-			if ((file != null) || (is != null)) {
-				try {
-					DLStoreUtil.deleteFile(
-						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-						dlFileEntry.getName(), version);
-				}
-				catch (NoSuchModelException nsme) {
-				}
-
-				if (file != null) {
-					DLStoreUtil.updateFile(
-						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-						dlFileEntry.getName(), dlFileEntry.getExtension(),
-						false, version, sourceFileName, file);
-				}
-				else {
-					DLStoreUtil.updateFile(
-						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-						dlFileEntry.getName(), dlFileEntry.getExtension(),
-						false, version, sourceFileName, is);
-				}
-			}
-
-			if (autoCheckIn) {
-				if (ExportImportThreadLocal.isImportInProcess()) {
-					checkInFileEntry(
-						userId, fileEntryId, majorVersion, changeLog,
-						serviceContext);
-				}
-				else {
-					dlFileEntryService.checkInFileEntry(
-						fileEntryId, majorVersion, changeLog, serviceContext);
-				}
-			}
-			else if (!checkedOut &&
-					 (serviceContext.getWorkflowAction() ==
-						WorkflowConstants.ACTION_PUBLISH)) {
-
-				String syncEvent = DLSyncConstants.EVENT_UPDATE;
-
-				if (dlFileVersion.getVersion().equals(
-						DLFileEntryConstants.VERSION_DEFAULT)) {
-
-					syncEvent = DLSyncConstants.EVENT_ADD;
-				}
-
-				startWorkflowInstance(
-					userId, serviceContext, dlFileVersion, syncEvent);
-			}
-		}
-		catch (PortalException pe) {
-			if (autoCheckIn) {
-				try {
-					if (ExportImportThreadLocal.isImportInProcess()) {
-						cancelCheckOut(userId, fileEntryId);
-					}
-					else {
-						dlFileEntryService.cancelCheckOut(fileEntryId);
-					}
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-
-			throw pe;
-		}
-		catch (SystemException se) {
-			if (autoCheckIn) {
-				try {
-					if (ExportImportThreadLocal.isImportInProcess()) {
-						cancelCheckOut(userId, fileEntryId);
-					}
-					else {
-						dlFileEntryService.cancelCheckOut(fileEntryId);
-					}
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-
-			throw se;
-		}
-		finally {
-			if (!autoCheckIn && !checkedOut) {
-				unlockFileEntry(fileEntryId);
-			}
-		}
-
-		return dlFileEntryPersistence.findByPrimaryKey(fileEntryId);
 	}
 
 	protected DLFileVersion updateFileVersion(
