@@ -16,6 +16,8 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
+
+
 <%
 FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
 
@@ -43,6 +45,7 @@ if (fileVersion == null) {
 <aui:form action="<%= editImageURL %>" cssClass="lfr-dynamic-form" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.EDIT %>" />
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
+	<aui:input name="version" type="hidden" value="<%= String.valueOf(fileVersion.getVersion()) %>" />
 	<aui:input name="blob" type="hidden" />
 
 	<aui:button name="hokiti pokiti" onClick='<%= renderResponse.getNamespace() + "randomImg();" %>' value="Hokiti Pokiti" />
@@ -67,7 +70,7 @@ if (fileVersion == null) {
 	img.src = '<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imagePreview=1") %>';
 
 	function <portlet:namespace />saveImage() {
-		var blob = canvas.toDataURL().replace();
+		var blob = canvas.toDataURL('<%= fileVersion.getMimeType() %>');
 
 		var blobInput = document.getElementById('<portlet:namespace />blob');
 		blobInput.setAttribute('value', blob);
