@@ -26,6 +26,15 @@ FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIB
 if (fileVersion == null) {
 	fileVersion = fileEntry.getLatestFileVersion();
 }
+
+long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId", -1);
+
+if ((fileEntryTypeId == -1) && (fileVersion.getModel() instanceof DLFileVersion)) {
+	DLFileVersion dlFileVersion = (DLFileVersion)fileVersion.getModel();
+
+	fileEntryTypeId = dlFileVersion.getFileEntryTypeId();
+}
+
 %>
 
 <div class="lfr-preview-file" id="<portlet:namespace />previewFile">
@@ -45,7 +54,7 @@ if (fileVersion == null) {
 <aui:form action="<%= editImageURL %>" cssClass="lfr-dynamic-form" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.EDIT %>" />
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
-	<aui:input name="version" type="hidden" value="<%= String.valueOf(fileVersion.getVersion()) %>" />
+	<aui:input name="fileEntryTypeId" type="hidden" value="<%= fileEntryTypeId %>" />
 	<aui:input name="blob" type="hidden" />
 
 	<aui:button name="hokiti pokiti" onClick='<%= renderResponse.getNamespace() + "randomImg();" %>' value="Hokiti Pokiti" />
