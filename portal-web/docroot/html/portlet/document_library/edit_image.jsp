@@ -17,7 +17,6 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 
-
 <%
 FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
 
@@ -34,7 +33,6 @@ if ((fileEntryTypeId == -1) && (fileVersion.getModel() instanceof DLFileVersion)
 
 	fileEntryTypeId = dlFileVersion.getFileEntryTypeId();
 }
-
 %>
 
 <div class="lfr-preview-file" id="<portlet:namespace />previewFile">
