@@ -147,8 +147,8 @@ public class EditImageAction extends EditFileEntryAction {
 			throw new NoSuchImageException();
 		}
 
-		String formatName =
-			MimeTypesUtil.getFormatName(fileEntry.getMimeType());
+		String formatName = MimeTypesUtil.getFormatName(
+			fileEntry.getMimeType());
 
 		File imageFile = _getImageFromBlob(blob, formatName);
 
