@@ -2375,6 +2375,58 @@ public class DLAppServiceWrapper implements DLAppService,
 	}
 
 	/**
+	* Updates a file entry and associated metadata based on a {@link
+	* java.io.File} object. If the file data is <code>null</code>, then only
+	* the associated metadata (i.e., <code>title</code>,
+	* <code>description</code>, and parameters in the
+	* <code>serviceContext</code>) will be updated.
+	*
+	* <p>
+	* This method takes two file names, the <code>sourceFileName</code> and the
+	* <code>title</code>. The <code>sourceFileName</code> corresponds to the
+	* name of the actual file being uploaded. The <code>title</code>
+	* corresponds to a name the client wishes to assign this file after it has
+	* been uploaded to the portal.
+	* </p>
+	*
+	* @param fileEntryId the primary key of the file entry
+	* @param sourceFileName the original file's name (optionally
+	<code>null</code>)
+	* @param extension the file's extension
+	* @param mimeType the file's MIME type (optionally <code>null</code>)
+	* @param title the new name to be assigned to the file (optionally <code>
+	<code>null</code></code>)
+	* @param description the file's new description
+	* @param changeLog the file's version change log (optionally
+	<code>null</code>)
+	* @param majorVersion whether the new file version is a major version
+	* @param file the file's data (optionally <code>null</code>)
+	* @param size the file's size (optionally <code>0</code>)
+	* @param serviceContext the service context to be applied. Can set the
+	asset category IDs, asset tag names, and expando bridge
+	attributes for the file entry. In a Liferay repository, it may
+	include:  <ul> <li> fileEntryTypeId - ID for a custom file entry
+	type </li> <li> fieldsMap - mapping for fields associated with a
+	custom file entry type </li> </ul>
+	* @return the file entry
+	* @throws PortalException if the file entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.kernel.repository.model.FileEntry updateFileEntry(
+		long fileEntryId, java.lang.String sourceFileName,
+		java.lang.String extension, java.lang.String mimeType,
+		java.lang.String title, java.lang.String description,
+		java.lang.String changeLog, boolean majorVersion, java.io.File file,
+		long size, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlAppService.updateFileEntry(fileEntryId, sourceFileName,
+			extension, mimeType, title, description, changeLog, majorVersion,
+			file, size, serviceContext);
+	}
+
+	/**
 	* Updates a file entry and associated metadata based on an {@link
 	* InputStream} object. If the file data is <code>null</code>, then only the
 	* associated metadata (i.e., <code>title</code>, <code>description</code>,
