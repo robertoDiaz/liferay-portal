@@ -18,6 +18,7 @@ import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -134,10 +135,11 @@ public class EditImageAction extends EditFileEntryAction {
 
 		String mimeType = fileEntry.getMimeType();
 
-		String formatName = mimeType.substring(
-			mimeType.indexOf(StringPool.SLASH) + 1);
+		FileVersion latestFileVersion = fileEntry.getLatestFileVersion();
 
-		File imageFile = ActionUtil.getImageFromBlob(blob, formatName);
+		String extension = latestFileVersion.getExtension();
+
+		File imageFile = ActionUtil.getImageFromBlob(blob, extension);
 
 		FileEntry tempFileEntry = TempFileUtil.addTempFile(
 			fileEntry.getGroupId(), fileEntry.getUserId(),
@@ -149,9 +151,9 @@ public class EditImageAction extends EditFileEntryAction {
 				actionRequest);
 
 			fileEntry = DLAppServiceUtil.updateFileEntry(
-				fileEntryId, fileEntry.getTitle(), fileEntry.getMimeType(),
-				fileEntry.getTitle(), fileEntry.getDescription(),
-				ActionUtil.getChangeLog(actionRequest), false, imageFile,
+				fileEntryId, null, extension, fileEntry.getMimeType(), null,
+				fileEntry.getDescription(),
+				ActionUtil.getChangeLog(actionRequest), false, imageFile, 0,
 				serviceContext);
 
 			AssetPublisherUtil.addAndStoreSelection(

@@ -765,6 +765,21 @@ public class BaseRepositoryProxyBean
 	}
 
 	@Override
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, File file, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		FileEntry fileEntry = _baseRepository.updateFileEntry(
+			fileEntryId, sourceFileName, extension, mimeType, title,
+			description, changeLog, majorVersion, file, size, serviceContext);
+
+		return newFileEntryProxyBean(fileEntry);
+	}
+
+	@Override
 	public Folder updateFolder(
 			long folderId, String title, String description,
 			ServiceContext serviceContext)

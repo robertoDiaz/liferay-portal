@@ -37,6 +37,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 
+import java.io.File;
 import java.io.InputStream;
 
 import java.util.List;
@@ -46,6 +47,19 @@ import java.util.Map;
  * @author Alexander Chow
  */
 public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
+
+	@Override
+	public FileEntry updateFileEntry (
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, File file, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		return _baseCmisRepository.updateFileEntry(
+			fileEntryId, sourceFileName, extension, mimeType, title,
+			description, changeLog, majorVersion, file, size, serviceContext);
+	}
 
 	@Override
 	public FileEntry addFileEntry(

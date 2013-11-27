@@ -822,6 +822,28 @@ public class LiferayRepository
 	}
 
 	@Override
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, File file, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		long fileEntryTypeId = ParamUtil.getLong(
+			serviceContext, "fileEntryTypeId", -1L);
+
+		Map<String, Fields> fieldsMap = getFieldsMap(
+			serviceContext, fileEntryTypeId);
+
+		DLFileEntry dlFileEntry = dlFileEntryService.updateFileEntry(
+			fileEntryId, sourceFileName, extension, mimeType, title,
+			description, changeLog, majorVersion, fileEntryTypeId, fieldsMap,
+			file, null, size, serviceContext);
+
+		return new LiferayFileEntry(dlFileEntry);
+	}
+
+	@Override
 	public Folder updateFolder(
 			long folderId, String title, String description,
 			ServiceContext serviceContext)

@@ -71,6 +71,7 @@ import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifi
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameComparator;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelSizeComparator;
 
+import java.io.File;
 import java.io.InputStream;
 
 import java.math.BigInteger;
@@ -1399,6 +1400,17 @@ public class CMISRepository extends BaseCmisRepository {
 				document.cancelCheckOut();
 			}
 		}
+	}
+
+	@Override
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String extension,
+			String mimeType, String title, String description, String changeLog,
+			boolean majorVersion, File file, long size,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
