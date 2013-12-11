@@ -23,11 +23,12 @@ FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_F
 <div class="lfr-preview-file lfr-preview-image" id="<portlet:namespace />previewFile">
 	<div class="lfr-preview-file-content lfr-preview-image-content" id="<portlet:namespace />previewFileContent">
 		<div class="lfr-preview-file-image-current-column">
-			<div class="lfr-preview-file-image-container">
+			<div class="lfr-preview-file-image-container image-processor">
 				<img class="lfr-preview-file-image-current" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getLatestFileVersion(), themeDisplay, "&imagePreview=1") %>" />
 			</div>
 		</div>
 	</div>
+	<div class="toolbar"></div>
 </div>
 
 <%
@@ -41,11 +42,16 @@ editFileEntryURL.setParameter("struts_action", "/document_library/edit_file_entr
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntry.getFileEntryId() %>" />
 	<aui:input name="blob" type="hidden" />
 
-	<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry();" %>' value="save" />
+	<aui:button name="saveButton" value="save" />
 </aui:form>
 
-<aui:script>
-	function <portlet:namespace />saveFileEntry() {
-		submitForm(document.<portlet:namespace />fm);
-	}
+<aui:script use="aui-image-editor">
+	var imageEditor = new A.ImageEditor({
+        srcNode: '#<portlet:namespace />previewFile'
+    }).render();
+
+    A.one('#<portlet:namespace />saveButton').on('click', function(event) {
+        A.one('#<portlet:namespace />blob').val(imageEditor.getImageData());
+        submitForm(document.<portlet:namespace />fm);
+    });
 </aui:script>
