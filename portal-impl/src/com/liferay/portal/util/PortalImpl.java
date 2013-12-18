@@ -992,6 +992,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             LanguageUtil#getAvailableLocales}
 	 */
+	@Deprecated
 	@Override
 	public Locale[] getAlternateLocales(HttpServletRequest request) {
 		return LanguageUtil.getAvailableLocales();
@@ -1084,6 +1085,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#getPortletCSRFWhitelistActions}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> getAuthTokenIgnoreActions() {
 		return AuthTokenWhitelistUtil.getPortletCSRFWhitelistActions();
@@ -1093,6 +1095,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#getPortletCSRFWhitelist}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> getAuthTokenIgnorePortlets() {
 		return AuthTokenWhitelistUtil.getPortletCSRFWhitelist();
@@ -1296,6 +1299,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getCDNHost(boolean)}
 	 */
+	@Deprecated
 	@Override
 	public String getCDNHost() {
 		long companyId = CompanyThreadLocal.getCompanyId();
@@ -3043,27 +3047,7 @@ public class PortalImpl implements Portal {
 			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
 
-		String virtualHostname = layoutSet.getVirtualHostname();
-
-		if (Validator.isNull(virtualHostname) &&
-			Validator.isNotNull(PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
-			!layoutSet.isPrivateLayout()) {
-
-			try {
-				Group group = GroupLocalServiceUtil.getGroup(
-					themeDisplay.getCompanyId(),
-					PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME);
-
-				if (layoutSet.getGroupId() == group.getGroupId()) {
-					Company company = themeDisplay.getCompany();
-
-					virtualHostname = company.getVirtualHostname();
-				}
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
+		String virtualHostname = getVirtualHostname(layoutSet);
 
 		if (Validator.isNotNull(virtualHostname) &&
 			!StringUtil.equalsIgnoreCase(virtualHostname, _LOCALHOST)) {
@@ -3648,6 +3632,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.2.0 renamed to #getSiteGroupId(groupId)
 	 */
+	@Deprecated
 	@Override
 	public long getParentGroupId(long groupId)
 		throws PortalException, SystemException {
@@ -3875,6 +3860,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getPortalPort(boolean)}
 	 */
+	@Deprecated
 	@Override
 	public int getPortalPort() {
 		return _portalPort.get();
@@ -4023,6 +4009,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#getPortletInvocationWhitelist}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> getPortletAddDefaultResourceCheckWhitelist() {
 		return AuthTokenWhitelistUtil.getPortletInvocationWhitelist();
@@ -4032,6 +4019,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#getPortletInvocationWhitelistActions}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> getPortletAddDefaultResourceCheckWhitelistActions() {
 		return AuthTokenWhitelistUtil.getPortletInvocationWhitelistActions();
@@ -4041,6 +4029,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.1.0, replaced by {@link
 	 *             #getPortletBreadcrumbs(HttpServletRequest)}
 	 */
+	@Deprecated
 	@Override
 	public List<BreadcrumbEntry> getPortletBreadcrumbList(
 		HttpServletRequest request) {
@@ -5604,6 +5593,34 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
+	public String getVirtualHostname(LayoutSet layoutSet) {
+		String virtualHostname = layoutSet.getVirtualHostname();
+
+		if (Validator.isNull(virtualHostname) &&
+			Validator.isNotNull(PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
+			!layoutSet.isPrivateLayout()) {
+
+			try {
+				Group group = GroupLocalServiceUtil.getGroup(
+					layoutSet.getCompanyId(),
+					PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME);
+
+				if (layoutSet.getGroupId() == group.getGroupId()) {
+					Company company = CompanyLocalServiceUtil.getCompany(
+						layoutSet.getCompanyId());
+
+					virtualHostname = company.getVirtualHostname();
+				}
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+
+		return virtualHostname;
+	}
+
+	@Override
 	public String getVirtualLayoutActualURL(
 			long groupId, boolean privateLayout, String mainPath,
 			String friendlyURL, Map<String, String[]> params,
@@ -5826,6 +5843,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.2.0 with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	public boolean isAllowAddPortletDefaultResource(
 			HttpServletRequest request, Portlet portlet)
@@ -6016,6 +6034,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.1.0, renamed to {@link #isGroupAdmin(User, long)}
 	 */
+	@Deprecated
 	@Override
 	public boolean isCommunityAdmin(User user, long groupId) throws Exception {
 		return isGroupAdmin(user, groupId);
@@ -6024,6 +6043,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.1.0, renamed to {@link #isGroupOwner(User, long)}
 	 */
+	@Deprecated
 	@Override
 	public boolean isCommunityOwner(User user, long groupId) throws Exception {
 		return isGroupOwner(user, groupId);
@@ -6476,6 +6496,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#resetPortletInvocationWhitelist}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> resetPortletAddDefaultResourceCheckWhitelist() {
 		return AuthTokenWhitelistUtil.resetPortletInvocationWhitelist();
@@ -6485,6 +6506,7 @@ public class PortalImpl implements Portal {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             AuthTokenWhitelistUtil#resetPortletInvocationWhitelistActions}
 	 */
+	@Deprecated
 	@Override
 	public Set<String> resetPortletAddDefaultResourceCheckWhitelistActions() {
 		return AuthTokenWhitelistUtil.resetPortletInvocationWhitelistActions();
@@ -7425,28 +7447,7 @@ public class PortalImpl implements Portal {
 			!StringUtil.equalsIgnoreCase(
 				themeDisplay.getServerName(), _LOCALHOST)) {
 
-			String virtualHostname = layoutSet.getVirtualHostname();
-
-			if (Validator.isNull(virtualHostname) &&
-				Validator.isNotNull(
-					PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
-				!layoutSet.isPrivateLayout()) {
-
-				try {
-					Group defaultGroup = GroupLocalServiceUtil.getGroup(
-						themeDisplay.getCompanyId(),
-						PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME);
-
-					if (layoutSet.getGroupId() == defaultGroup.getGroupId()) {
-						Company company = themeDisplay.getCompany();
-
-						virtualHostname = company.getVirtualHostname();
-					}
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
+			String virtualHostname = getVirtualHostname(layoutSet);
 
 			String portalDomain = HttpUtil.getDomain(portalURL);
 
@@ -7724,6 +7725,7 @@ public class PortalImpl implements Portal {
 	/**
 	 * @deprecated As of 6.2.0 with no direct replacement
 	 */
+	@Deprecated
 	protected boolean isPanelSelectedPortlet(
 		ThemeDisplay themeDisplay, String portletId) {
 
