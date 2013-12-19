@@ -796,20 +796,14 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		PasswordPolicy passwordPolicy = defaultUser.getPasswordPolicy();
 
-		boolean passwordReset = false;
+		if ((passwordPolicy != null) && passwordPolicy.isChangeable() &&
+			passwordPolicy.isChangeRequired()) {
 
-		if (passwordPolicy != null) {
-			if (passwordPolicy.isChangeable() &&
-				passwordPolicy.isChangeRequired()) {
-
-				passwordReset = true;
-			}
-
-			addPasswordPolicyUsers(
-				passwordPolicy.getPasswordPolicyId(), new long[] {userId});
+			user.setPasswordReset(true);
 		}
-
-		user.setPasswordReset(passwordReset);
+		else {
+			user.setPasswordReset(false);
+		}
 
 		user.setDigest(StringPool.BLANK);
 		user.setScreenName(screenName);
@@ -2751,6 +2745,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #getUserByUuidAndCompanyId(String, long)}
 	 */
+	@Deprecated
 	@Override
 	public User getUserByUuid(String uuid)
 		throws PortalException, SystemException {
@@ -5154,6 +5149,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *             String, String, long[], long[], long[], java.util.List,
 	 *             long[], boolean, byte[], ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public User updateUser(
 			long userId, String oldPassword, String newPassword1,
