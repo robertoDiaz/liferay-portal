@@ -472,6 +472,10 @@
 		<put name="portlet_content" value="/portlet/document_library/error.jsp" />
 	</definition>
 
+	<definition name="portlet.document_library.inline_edit_file_entry" extends="portlet.document_library">
+		<put name="portlet_content" value="/portlet/document_library/inline_edit_file_entry.jsp" />
+	</definition>
+
 	<definition name="portlet.document_library.move_entries" extends="portlet.document_library">
 		<put name="portlet_content" value="/portlet/document_library/move_entries.jsp" />
 	</definition>
