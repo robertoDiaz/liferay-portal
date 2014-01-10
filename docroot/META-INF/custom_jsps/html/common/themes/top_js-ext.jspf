@@ -1,0 +1,1 @@
+<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathJavaScript() + "/liferay/modules-ext.js", "", javaScriptLastModified)) %>" type="text/javascript"></script>

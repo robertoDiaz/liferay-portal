@@ -1,0 +1,1 @@
+YUI.add("aui-image-filter-polaroid",function(e,t){var n="image-polaroid-filter",r=[1.438,-0.122,-0.016,0,.03*255,-0.062,1.378,-0.016,0,12.75,-0.062,-0.122,1.483,0,-0.02*255,0,0,0,1,0,0,0,0,0,255],i=e.Base.create(n,e.ImageColorFilter,[],{},{ATTRS:{label:{value:"Polaroid"},matrix:{readOnly:!0,value:r}}});e.ImagePolaroidFilter=i},"2.0.0",{requires:["aui-image-color-filter-base"]});

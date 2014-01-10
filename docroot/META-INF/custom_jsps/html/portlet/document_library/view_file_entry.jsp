@@ -31,22 +31,9 @@
 	<aui:button name="saveButton" value="save" />
 </aui:form>
 
-<aui:script>
-	AUI({
-		modules: {
-			external: {
-				fullpath: '/html/js/alloy/aui-image-editor/aui-image-editor.js',
-				requires: ['aui-base']
-			}
-		}
-	}).use('image-editor', function(A) {
-		debugger;
-	});
-</aui:script>
-
 <aui:script use="aui-image-editor">
 	var imageEditor = new A.ImageEditor({
-		srcNode: '#<portlet:namespace />previewFile'
+		srcNode: '.lfr-preview-file-image-container'
 	}).render();
 
 	A.one('#<portlet:namespace />saveButton').on('click', function(event) {
@@ -71,3 +58,42 @@ private boolean _isEditableImage(FileVersion fileVersion)
 
 private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.portlet.document_library.edit_file_entry_jsp");
 %>
+
+<style type="text/css">
+	.image-editor-base {
+	    display: inline-block;
+	    position: relative;
+	}
+
+	.image-editor-base canvas {
+	    display: block;
+	    position: absolute;
+	    top: 0;
+	}
+
+	.image-editor-base .image-editor-processors {
+	    bottom: 0;
+	    position: absolute;
+	    width: 100%;
+	}
+
+	.image-editor-base .image-editor-processors .image-processor-status {
+	    background-color: #000000;
+	    background-color: rgba(0, 0, 0, 0.4);
+	    color: #FFFFFF;
+	}
+
+	.image-editor-base .image-processor-info, .image-editor-base .image-processor-widgets {
+	    text-align: center;
+	}
+
+	.image-editor-base .image-processor-swf {
+	    position: absolute;
+	}
+
+	.image-editor-base .image-editor-trigger-default, .image-editor-base .toolbar {
+	    bottom: 10px;
+	    left: 10px;
+	    position: absolute;
+	}
+</style>

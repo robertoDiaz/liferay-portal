@@ -1,0 +1,1 @@
+YUI.add("aui-image-blur-filter",function(e,t){var n=e.Lang,r="image-blur-filter",i=e.Base.create(r,e.ImageFilterBase,[],{},{NAME:r,ATTRS:{blurX:{validator:n.isNumber,value:4},blurY:{validator:n.isNumber,value:4},swfCfg:{readonly:!0,value:{processFn:"blurMatrixFilter",params:["blurX","blurY"]}}}});e.ImageBlurFilter=i},"2.0.0",{requires:["aui-image-filter"]});

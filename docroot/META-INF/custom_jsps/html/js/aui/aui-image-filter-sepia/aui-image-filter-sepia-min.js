@@ -1,0 +1,1 @@
+YUI.add("aui-image-filter-sepia",function(e,t){var n="image-sepia-filter",r=[.393,.769,.189,0,0,.349,.686,.168,0,0,.272,.534,.131,0,0,0,0,0,1,0,0,0,0,0,0],i=e.Base.create(n,e.ImageColorFilter,[],{},{ATTRS:{label:{value:"Sepia"},matrix:{readOnly:!0,value:r}}});e.ImageSepiaFilter=i},"2.0.0",{requires:["aui-image-color-filter-base"]});
