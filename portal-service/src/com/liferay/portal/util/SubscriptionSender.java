@@ -498,57 +498,57 @@ public class SubscriptionSender implements Serializable {
 			return;
 		}
 
-		if (bulk) {
-			InternetAddress bulkAddress = new InternetAddress(
-				user.getEmailAddress(), user.getFullName());
+		try {
+			if (UserNotificationManagerUtil.isDeliver(
+					user.getUserId(), portletId, _notificationClassNameId,
+					_notificationType,
+					UserNotificationDeliveryConstants.TYPE_EMAIL)) {
 
-			if (_bulkAddresses == null) {
-				_bulkAddresses = new ArrayList<InternetAddress>();
-			}
+				if (bulk) {
+					InternetAddress bulkAddress = new InternetAddress(
+						user.getEmailAddress(), user.getFullName());
 
-			_bulkAddresses.add(bulkAddress);
-		}
-		else {
-			try {
-				if (UserNotificationManagerUtil.isDeliver(
-						user.getUserId(), portletId, _notificationClassNameId,
-						_notificationType,
-						UserNotificationDeliveryConstants.TYPE_EMAIL)) {
+					if (_bulkAddresses == null) {
+						_bulkAddresses = new ArrayList<InternetAddress>();
+					}
 
+					_bulkAddresses.add(bulkAddress);
+				}
+				else {
 					InternetAddress to = new InternetAddress(
 						user.getEmailAddress(), user.getFullName());
 
 					sendEmail(to, user.getLocale());
 				}
-
-				if (UserNotificationManagerUtil.isDeliver(
-						user.getUserId(), portletId, _notificationClassNameId,
-						_notificationType,
-						UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
-
-					JSONObject notificationEventJSONObject =
-						JSONFactoryUtil.createJSONObject();
-
-					notificationEventJSONObject.put("classPK", _classPK);
-					notificationEventJSONObject.put("userId", user.getUserId());
-					notificationEventJSONObject.put(
-						"notificationType", _notificationType);
-
-					NotificationEvent notificationEvent =
-						NotificationEventFactoryUtil.createNotificationEvent(
-							System.currentTimeMillis(), portletId,
-							notificationEventJSONObject);
-
-					notificationEvent.setDeliveryRequired(0);
-
-					UserNotificationEventLocalServiceUtil.
-						addUserNotificationEvent(
-							user.getUserId(), notificationEvent);
-				}
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+
+			if (UserNotificationManagerUtil.isDeliver(
+					user.getUserId(), portletId, _notificationClassNameId,
+					_notificationType,
+					UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
+
+				JSONObject notificationEventJSONObject =
+					JSONFactoryUtil.createJSONObject();
+
+				notificationEventJSONObject.put("classPK", _classPK);
+				notificationEventJSONObject.put("userId", user.getUserId());
+				notificationEventJSONObject.put(
+					"notificationType", _notificationType);
+
+				NotificationEvent notificationEvent =
+					NotificationEventFactoryUtil.createNotificationEvent(
+						System.currentTimeMillis(), portletId,
+						notificationEventJSONObject);
+
+				notificationEvent.setDeliveryRequired(0);
+
+				UserNotificationEventLocalServiceUtil.
+					addUserNotificationEvent(
+						user.getUserId(), notificationEvent);
 			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 	}
 
