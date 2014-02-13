@@ -456,23 +456,24 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	public void testWikiPageMovePageRedirectTitle1() throws Exception {
 		List<WikiPage> wikiPages = setUpTestWikiPageMovePageRedirectTitle();
 
-		WikiPage oldWikiPage = wikiPages.get(0);
+		WikiPage oldPage = wikiPages.get(0);
 		WikiPage page = wikiPages.get(1);
 
-		moveBaseModelToTrash(oldWikiPage.getPrimaryKey());
+		moveBaseModelToTrash(oldPage.getPrimaryKey());
 		moveBaseModelToTrash(page.getPrimaryKey());
 
 		page = (WikiPage)getBaseModel(page.getPrimaryKey());
-		oldWikiPage = (WikiPage)getBaseModel(oldWikiPage.getPrimaryKey());
+		oldPage = (WikiPage)getBaseModel(oldPage.getPrimaryKey());
 
-		Assert.assertTrue(
-			"OldWikiPage redirectTitle should be the same as page's title" +
-				" when oldWikiPage and page are explicitly sent to trash" +
-				" in this order",
-			oldWikiPage.isInTrash() && page.isInTrash());
+		Assert.assertTrue(oldPage.isInTrash());
+		Assert.assertTrue(page.isInTrash());
 
 		Assert.assertEquals(page.getRedirectTitle(), StringPool.BLANK);
-		Assert.assertEquals(oldWikiPage.getRedirectTitle(), page.getTitle());
+		Assert.assertEquals(
+			"OldWikiPage redirectTitle should be the same as page's title" +
+				" when oldPage and page are explicitly sent to trash" +
+					" in this order",
+			oldPage.getRedirectTitle(), page.getTitle());
 	}
 
 	@Test
@@ -480,22 +481,23 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	public void testWikiPageMovePageRedirectTitle2() throws Exception {
 		List<WikiPage> wikiPages = setUpTestWikiPageMovePageRedirectTitle();
 
-		WikiPage oldWikiPage = wikiPages.get(0);
+		WikiPage oldPage = wikiPages.get(0);
 		WikiPage page = wikiPages.get(1);
 
 		moveBaseModelToTrash(page.getPrimaryKey());
 
 		page = (WikiPage)getBaseModel(page.getPrimaryKey());
-		oldWikiPage = (WikiPage)getBaseModel(oldWikiPage.getPrimaryKey());
+		oldPage = (WikiPage)getBaseModel(oldPage.getPrimaryKey());
 
-		Assert.assertTrue(oldWikiPage.isInTrash() && page.isInTrash());
+		Assert.assertTrue(oldPage.isInTrash());
+		Assert.assertTrue(page.isInTrash());
 
 		Assert.assertEquals(page.getRedirectTitle(), StringPool.BLANK);
 		Assert.assertEquals(
 			"OldWikiPage redirectTitle should be the same as page's title" +
-				" when oldWikiPage is implicitly sent to trash on page" +
-				" deletion",
-			oldWikiPage.getRedirectTitle(), page.getTitle());
+				" when oldPage is implicitly sent to trash on page" +
+					" deletion",
+			oldPage.getRedirectTitle(), page.getTitle());
 	}
 
 	@Test
@@ -503,22 +505,23 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	public void testWikiPageMovePageRedirectTitle3() throws Exception {
 		List<WikiPage> wikiPages = setUpTestWikiPageMovePageRedirectTitle();
 
-		WikiPage oldWikiPage = wikiPages.get(0);
+		WikiPage oldPage = wikiPages.get(0);
 		WikiPage page = wikiPages.get(1);
 
-		moveBaseModelToTrash(oldWikiPage.getPrimaryKey());
+		moveBaseModelToTrash(oldPage.getPrimaryKey());
 
 		page = (WikiPage)getBaseModel(page.getPrimaryKey());
-		oldWikiPage = (WikiPage)getBaseModel(oldWikiPage.getPrimaryKey());
+		oldPage = (WikiPage)getBaseModel(oldPage.getPrimaryKey());
 
-		Assert.assertTrue(oldWikiPage.isInTrash() && !page.isInTrash());
+		Assert.assertTrue(oldPage.isInTrash());
+		Assert.assertFalse(page.isInTrash());
 
 		Assert.assertEquals(page.getRedirectTitle(), StringPool.BLANK);
 		Assert.assertEquals(
 			"OldWikiPage redirectTitle should be the same as page's title" +
-				" when oldWikiPage is explicitly sent to trash and page is" +
-				" not in trash",
-			oldWikiPage.getRedirectTitle(), page.getTitle());
+				" when oldPage is explicitly sent to trash and page is" +
+					" not in trash",
+			oldPage.getRedirectTitle(), page.getTitle());
 	}
 
 	@Override
@@ -662,19 +665,19 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 		String oldTitle = page.getTitle();
 
 		WikiPageLocalServiceUtil.movePage(
-			TestPropsValues.getUserId(), node.getNodeId(), page.getTitle(),
-			newTitle, serviceContext);
+			TestPropsValues.getUserId(), node.getNodeId(), oldTitle, newTitle,
+			serviceContext);
 
-		WikiPage oldWikiPage = WikiPageLocalServiceUtil.getPage(
+		WikiPage oldPage = WikiPageLocalServiceUtil.getPage(
 			node.getNodeId(), oldTitle);
 		page = (WikiPage)getBaseModel(page.getPrimaryKey());
 
 		Assert.assertEquals(page.getRedirectTitle(), StringPool.BLANK);
-		Assert.assertEquals(oldWikiPage.getRedirectTitle(), page.getTitle());
+		Assert.assertEquals(oldPage.getRedirectTitle(), page.getTitle());
 
 		List<WikiPage> wikiPages = new ArrayList<WikiPage>();
 
-		wikiPages.add(oldWikiPage);
+		wikiPages.add(oldPage);
 		wikiPages.add(page);
 
 		return wikiPages;
