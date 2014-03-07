@@ -1569,16 +1569,17 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		String trashTitle = TrashUtil.getTrashTitle(trashEntry.getEntryId());
 
-		List<WikiPage> redirectPages = wikiPagePersistence.findByN_H_R_NotS(
-			page.getNodeId(), true, oldTitle,
-			WorkflowConstants.STATUS_IN_TRASH);
+		List<WikiPage> redirectPages = wikiPagePersistence.findByN_H_R(
+			page.getNodeId(), true, oldTitle);
 
 		for (WikiPage redirectPage : redirectPages) {
 			redirectPage.setRedirectTitle(trashTitle);
 
 			wikiPagePersistence.update(redirectPage);
 
-			movePageToTrash(userId, redirectPage);
+			if (!redirectPage.isInTrash()) {
+				movePageToTrash(userId, redirectPage);
+			}
 		}
 
 		for (WikiPage pageVersion : pageVersions) {
@@ -1598,16 +1599,17 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		// Children
 
-		List<WikiPage> children = wikiPagePersistence.findByN_H_P_NotS(
-			page.getNodeId(), true, oldTitle,
-			WorkflowConstants.STATUS_IN_TRASH);
+		List<WikiPage> children = wikiPagePersistence.findByN_H_P(
+			page.getNodeId(), true, oldTitle);
 
 		for (WikiPage curPage : children) {
 			curPage.setParentTitle(trashTitle);
 
 			wikiPagePersistence.update(curPage);
 
-			movePageToTrash(userId, curPage);
+			if (!curPage.isInTrash()) {
+				movePageToTrash(userId, curPage);
+			}
 		}
 
 		// Asset
