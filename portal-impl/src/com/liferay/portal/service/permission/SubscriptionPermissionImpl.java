@@ -69,13 +69,12 @@ public class SubscriptionPermissionImpl implements SubscriptionPermission {
 	@Override
 	public void check(
 			PermissionChecker permissionChecker, String subscriptionClassName,
-			long subscriptionClassPK, String inferredClassName,
-			long inferredClassPK)
+			long subscriptionClassPK, String className, long classPK)
 		throws PortalException, SystemException {
 
 		if (!contains(
 				permissionChecker, subscriptionClassName, subscriptionClassPK,
-				inferredClassName, inferredClassPK)) {
+				className, classPK)) {
 
 			throw new PrincipalException();
 		}
@@ -97,18 +96,16 @@ public class SubscriptionPermissionImpl implements SubscriptionPermission {
 	@Override
 	public boolean contains(
 			PermissionChecker permissionChecker, String subscriptionClassName,
-			long subscriptionClassPK, String inferredClassName,
-			long inferredClassPK)
+			long subscriptionClassPK, String className, long classPK)
 		throws PortalException, SystemException {
 
 		if (subscriptionClassName == null) {
 			return false;
 		}
 
-		if (Validator.isNotNull(inferredClassName)) {
+		if (Validator.isNotNull(className)) {
 			Boolean hasPermission = hasPermission(
-				permissionChecker, inferredClassName, inferredClassPK,
-				ActionKeys.VIEW);
+				permissionChecker, className, classPK, ActionKeys.VIEW);
 
 			if ((hasPermission == null) || !hasPermission) {
 				return false;

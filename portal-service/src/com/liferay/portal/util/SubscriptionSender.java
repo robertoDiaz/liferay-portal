@@ -124,18 +124,6 @@ public class SubscriptionSender implements Serializable {
 				currentThread.setContextClassLoader(_classLoader);
 			}
 
-			String inferredClassName = null;
-			long inferredClassPK = 0;
-
-			if (_persistestedSubscribersOVPs.size() > 1) {
-				ObjectValuePair<String, Long> objectValuePair =
-					_persistestedSubscribersOVPs.get(
-						_persistestedSubscribersOVPs.size() - 1);
-
-				inferredClassName = objectValuePair.getKey();
-				inferredClassPK = objectValuePair.getValue();
-			}
-
 			for (ObjectValuePair<String, Long> ovp :
 					_persistestedSubscribersOVPs) {
 
@@ -148,8 +136,7 @@ public class SubscriptionSender implements Serializable {
 
 				for (Subscription subscription : subscriptions) {
 					try {
-						notifySubscriber(
-							subscription, inferredClassName, inferredClassPK);
+						notifySubscriber(subscription, _className, _classPK);
 					}
 					catch (PortalException pe) {
 						_log.error(
@@ -425,165 +412,39 @@ public class SubscriptionSender implements Serializable {
 			subscription.getSubscriptionId());
 	}
 
-	protected boolean hasPermission(
-			Subscription subscription, String inferredClassName,
-			long inferredClassPK, User user)
-		throws Exception {
-
-		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(user);
-
-		return SubscriptionPermissionUtil.contains(
-			permissionChecker, subscription.getClassName(),
-			subscription.getClassPK(), inferredClassName, inferredClassPK);
-	}
-
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #hasPermission(Subscription,
-	 *             String, long, User)}
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
+	protected boolean hasPermission(
+			Subscription subscription, String className, long classPK,
+			User user)
+		throws Exception {
+
+		return _hasPermission(subscription, className, classPK, user);
+	}
+
 	protected boolean hasPermission(Subscription subscription, User user)
 		throws Exception {
 
-		return hasPermission(subscription, null, 0, user);
+		return _hasPermission(subscription, _className, _classPK, user);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #notifySubscriber(Subscription, String, long)}
-	 */
-	@Deprecated
 	protected void notifySubscriber(Subscription subscription)
 		throws Exception {
 
-		notifySubscriber(subscription, null, 0);
+		_notifySubscriber(subscription, _className, _classPK);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	protected void notifySubscriber(
-			Subscription subscription, String inferredClassName,
-			long inferredClassPK)
+			Subscription subscription, String className, long classPK)
 		throws Exception {
 
-		User user = UserLocalServiceUtil.fetchUserById(
-			subscription.getUserId());
-
-		if (user == null) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Subscription " + subscription.getSubscriptionId() +
-						" is stale and will be deleted");
-			}
-
-			deleteSubscription(subscription);
-
-			return;
-		}
-
-		String emailAddress = user.getEmailAddress();
-
-		if (_sentEmailAddresses.contains(emailAddress)) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Do not send a duplicate email to " + emailAddress);
-			}
-
-			return;
-		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Add " + emailAddress +
-						" to the list of users who have received an email");
-			}
-
-			_sentEmailAddresses.add(emailAddress);
-		}
-
-		if (!user.isActive()) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Skip inactive user " + user.getUserId());
-			}
-
-			return;
-		}
-
-		try {
-			if (!hasPermission(
-					subscription, inferredClassName, inferredClassPK, user)) {
-
-				if (_log.isDebugEnabled()) {
-					_log.debug("Skip unauthorized user " + user.getUserId());
-				}
-
-				return;
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			return;
-		}
-
-		if (bulk) {
-			InternetAddress bulkAddress = new InternetAddress(
-				user.getEmailAddress(), user.getFullName());
-
-			if (_bulkAddresses == null) {
-				_bulkAddresses = new ArrayList<InternetAddress>();
-			}
-
-			_bulkAddresses.add(bulkAddress);
-		}
-		else {
-			try {
-				if (UserNotificationManagerUtil.isDeliver(
-						user.getUserId(), portletId, _notificationClassNameId,
-						_notificationType,
-						UserNotificationDeliveryConstants.TYPE_EMAIL)) {
-
-					InternetAddress to = new InternetAddress(
-						user.getEmailAddress(), user.getFullName());
-
-					sendEmail(to, user.getLocale());
-				}
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-
-			try {
-				if (UserNotificationManagerUtil.isDeliver(
-						user.getUserId(), portletId, _notificationClassNameId,
-						_notificationType,
-						UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
-
-					JSONObject notificationEventJSONObject =
-						JSONFactoryUtil.createJSONObject();
-
-					notificationEventJSONObject.put("className", _className);
-					notificationEventJSONObject.put("classPK", _classPK);
-					notificationEventJSONObject.put("entryTitle", _entryTitle);
-					notificationEventJSONObject.put("entryURL", _entryURL);
-					notificationEventJSONObject.put(
-						"notificationType", _notificationType);
-					notificationEventJSONObject.put("userId", user.getUserId());
-
-					NotificationEvent notificationEvent =
-						NotificationEventFactoryUtil.createNotificationEvent(
-							System.currentTimeMillis(), portletId,
-							notificationEventJSONObject);
-
-					notificationEvent.setDeliveryRequired(0);
-
-					UserNotificationEventLocalServiceUtil.
-						addUserNotificationEvent(
-							user.getUserId(), notificationEvent);
-				}
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
+		_notifySubscriber(subscription, className, classPK);
 	}
 
 	protected void processMailMessage(MailMessage mailMessage, Locale locale)
@@ -783,6 +644,142 @@ public class SubscriptionSender implements Serializable {
 	protected SMTPAccount smtpAccount;
 	protected String subject;
 	protected long userId;
+
+	private boolean _hasPermission(
+			Subscription subscription, String className, long classPK,
+			User user)
+		throws Exception {
+
+		PermissionChecker permissionChecker =
+			PermissionCheckerFactoryUtil.create(user);
+
+		return SubscriptionPermissionUtil.contains(
+			permissionChecker, subscription.getClassName(),
+			subscription.getClassPK(), className, classPK);
+	}
+
+	private void _notifySubscriber(
+			Subscription subscription, String className, long classPK)
+		throws Exception {
+
+		User user = UserLocalServiceUtil.fetchUserById(
+			subscription.getUserId());
+
+		if (user == null) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Subscription " + subscription.getSubscriptionId() +
+						" is stale and will be deleted");
+			}
+
+			deleteSubscription(subscription);
+
+			return;
+		}
+
+		String emailAddress = user.getEmailAddress();
+
+		if (_sentEmailAddresses.contains(emailAddress)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Do not send a duplicate email to " + emailAddress);
+			}
+
+			return;
+		}
+		else {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Add " + emailAddress +
+						" to the list of users who have received an email");
+			}
+
+			_sentEmailAddresses.add(emailAddress);
+		}
+
+		if (!user.isActive()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Skip inactive user " + user.getUserId());
+			}
+
+			return;
+		}
+
+		try {
+			if (!_hasPermission(subscription, className, classPK, user)) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Skip unauthorized user " + user.getUserId());
+				}
+
+				return;
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			return;
+		}
+
+		if (bulk) {
+			InternetAddress bulkAddress = new InternetAddress(
+				user.getEmailAddress(), user.getFullName());
+
+			if (_bulkAddresses == null) {
+				_bulkAddresses = new ArrayList<InternetAddress>();
+			}
+
+			_bulkAddresses.add(bulkAddress);
+		}
+		else {
+			try {
+				if (UserNotificationManagerUtil.isDeliver(
+						user.getUserId(), portletId, _notificationClassNameId,
+						_notificationType,
+						UserNotificationDeliveryConstants.TYPE_EMAIL)) {
+
+					InternetAddress to = new InternetAddress(
+						user.getEmailAddress(), user.getFullName());
+
+					sendEmail(to, user.getLocale());
+				}
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+
+			try {
+				if (UserNotificationManagerUtil.isDeliver(
+						user.getUserId(), portletId, _notificationClassNameId,
+						_notificationType,
+						UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
+
+					JSONObject notificationEventJSONObject =
+						JSONFactoryUtil.createJSONObject();
+
+					notificationEventJSONObject.put("className", _className);
+					notificationEventJSONObject.put("classPK", _classPK);
+					notificationEventJSONObject.put("entryTitle", _entryTitle);
+					notificationEventJSONObject.put("entryURL", _entryURL);
+					notificationEventJSONObject.put(
+						"notificationType", _notificationType);
+					notificationEventJSONObject.put("userId", user.getUserId());
+
+					NotificationEvent notificationEvent =
+						NotificationEventFactoryUtil.createNotificationEvent(
+							System.currentTimeMillis(), portletId,
+							notificationEventJSONObject);
+
+					notificationEvent.setDeliveryRequired(0);
+
+					UserNotificationEventLocalServiceUtil.
+						addUserNotificationEvent(
+							user.getUserId(), notificationEvent);
+				}
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+	}
 
 	private void readObject(ObjectInputStream objectInputStream)
 		throws ClassNotFoundException, IOException {
