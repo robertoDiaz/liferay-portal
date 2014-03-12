@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.atom.AtomCollectionAdapterRegistryUtil;
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.lar.StagedModelDataHandler;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
@@ -124,20 +123,20 @@ public class PortletBagFactory {
 
 		javax.portlet.Portlet portletInstance = getPortletInstance(portlet);
 
-		ConfigurationAction configurationActionInstance =
-			newConfigurationAction(portlet);
+		List<ConfigurationAction> configurationActionInstances =
+			newConfigurationActions(portlet);
 
 		List<Indexer> indexerInstances = newIndexers(portlet);
 
-		OpenSearch openSearchInstance = newOpenSearch(portlet);
+		List<OpenSearch> openSearchInstances = newOpenSearches(portlet);
 
-		FriendlyURLMapper friendlyURLMapperInstance = newFriendlyURLMapper(
-			portlet);
+		List<FriendlyURLMapper> friendlyURLMapperInstances =
+			newFriendlyURLMappers(portlet);
 
-		URLEncoder urlEncoderInstance = newURLEncoder(portlet);
+		List<URLEncoder> urlEncoderInstances = newURLEncoders(portlet);
 
-		PortletDataHandler portletDataHandlerInstance = newPortletDataHandler(
-			portlet);
+		List<PortletDataHandler> portletDataHandlerInstances =
+			newPortletDataHandlers(portlet);
 
 		List<StagedModelDataHandler<?>> stagedModelDataHandlerInstances =
 			newStagedModelDataHandler(portlet);
@@ -319,9 +318,9 @@ public class PortletBagFactory {
 
 		PortletBag portletBag = new PortletBagImpl(
 			portlet.getPortletId(), _servletContext, portletInstance,
-			configurationActionInstance, indexerInstances, openSearchInstance,
-			friendlyURLMapperInstance, urlEncoderInstance,
-			portletDataHandlerInstance, stagedModelDataHandlerInstances,
+			configurationActionInstances, indexerInstances, openSearchInstances,
+			friendlyURLMapperInstances, urlEncoderInstances,
+			portletDataHandlerInstances, stagedModelDataHandlerInstances,
 			templateHandlerInstance, portletLayoutListenerInstance,
 			pollerProcessorInstance, popMessageListenerInstance,
 			socialActivityInterpreterInstances,
@@ -714,15 +713,22 @@ public class PortletBagFactory {
 		return atomCollectionAdapterInstances;
 	}
 
-	protected ConfigurationAction newConfigurationAction(Portlet portlet)
+	protected List<ConfigurationAction> newConfigurationActions(Portlet portlet)
 		throws Exception {
 
-		if (Validator.isNull(portlet.getConfigurationActionClass())) {
-			return null;
+		ServiceTrackerList<ConfigurationAction> configurationActionInstances =
+			getServiceTrackerList(ConfigurationAction.class, portlet);
+
+		if (Validator.isNotNull(portlet.getConfigurationActionClass())) {
+			ConfigurationAction configurationAction =
+				(ConfigurationAction)newInstance(
+					ConfigurationAction.class,
+					portlet.getConfigurationActionClass());
+
+			configurationActionInstances.add(configurationAction);
 		}
 
-		return (ConfigurationAction)newInstance(
-			ConfigurationAction.class, portlet.getConfigurationActionClass());
+		return configurationActionInstances;
 	}
 
 	protected DDMDisplay newDDMDisplay(Portlet portlet) throws Exception {
@@ -734,25 +740,30 @@ public class PortletBagFactory {
 			DDMDisplay.class, portlet.getDDMDisplayClass());
 	}
 
-	protected FriendlyURLMapper newFriendlyURLMapper(Portlet portlet)
+	protected List<FriendlyURLMapper> newFriendlyURLMappers(Portlet portlet)
 		throws Exception {
 
-		if (Validator.isNull(portlet.getFriendlyURLMapperClass())) {
-			return null;
+		ServiceTrackerList<FriendlyURLMapper> friendlyURLMapperInstances =
+			getServiceTrackerList(FriendlyURLMapper.class, portlet);
+
+		if (Validator.isNotNull(portlet.getFriendlyURLMapperClass())) {
+			FriendlyURLMapper friendlyURLMapper =
+				(FriendlyURLMapper)newInstance(
+					FriendlyURLMapper.class,
+					portlet.getFriendlyURLMapperClass());
+
+			friendlyURLMapper.setMapping(portlet.getFriendlyURLMapping());
+			friendlyURLMapper.setPortletId(portlet.getPortletId());
+			friendlyURLMapper.setPortletInstanceable(portlet.isInstanceable());
+
+			Router router = newFriendlyURLRouter(portlet);
+
+			friendlyURLMapper.setRouter(router);
+
+			friendlyURLMapperInstances.add(friendlyURLMapper);
 		}
 
-		FriendlyURLMapper friendlyURLMapper = (FriendlyURLMapper)newInstance(
-			FriendlyURLMapper.class, portlet.getFriendlyURLMapperClass());
-
-		friendlyURLMapper.setMapping(portlet.getFriendlyURLMapping());
-		friendlyURLMapper.setPortletId(portlet.getPortletId());
-		friendlyURLMapper.setPortletInstanceable(portlet.isInstanceable());
-
-		Router router = newFriendlyURLRouter(portlet);
-
-		friendlyURLMapper.setRouter(router);
-
-		return friendlyURLMapper;
+		return friendlyURLMapperInstances;
 	}
 
 	protected Router newFriendlyURLRouter(Portlet portlet) throws Exception {
@@ -857,13 +868,20 @@ public class PortletBagFactory {
 		}
 	}
 
-	protected OpenSearch newOpenSearch(Portlet portlet) throws Exception {
-		if (Validator.isNull(portlet.getOpenSearchClass())) {
-			return null;
+	protected List<OpenSearch> newOpenSearches(Portlet portlet)
+		throws Exception {
+
+		ServiceTrackerList<OpenSearch> openSearchInstances =
+			getServiceTrackerList(OpenSearch.class, portlet);
+
+		if (Validator.isNotNull(portlet.getOpenSearchClass())) {
+			OpenSearch openSearch = (OpenSearch)newInstance(
+				OpenSearch.class, portlet.getOpenSearchClass());
+
+			openSearchInstances.add(openSearch);
 		}
 
-		return (OpenSearch)newInstance(
-			OpenSearch.class, portlet.getOpenSearchClass());
+		return openSearchInstances;
 	}
 
 	protected PermissionPropagator newPermissionPropagator(Portlet portlet)
@@ -914,20 +932,24 @@ public class PortletBagFactory {
 		return popMessageListenerInstance;
 	}
 
-	protected PortletDataHandler newPortletDataHandler(Portlet portlet)
+	protected List<PortletDataHandler> newPortletDataHandlers(Portlet portlet)
 		throws Exception {
 
-		if (Validator.isNull(portlet.getPortletDataHandlerClass())) {
-			return null;
+		ServiceTrackerList<PortletDataHandler> portletDataHandlerInstances =
+			getServiceTrackerList(PortletDataHandler.class, portlet);
+
+		if (Validator.isNotNull(portlet.getPortletDataHandlerClass())) {
+			PortletDataHandler portletDataHandlerInstance =
+				(PortletDataHandler)newInstance(
+					PortletDataHandler.class,
+					portlet.getPortletDataHandlerClass());
+
+			portletDataHandlerInstance.setPortletId(portlet.getPortletId());
+
+			portletDataHandlerInstances.add(portletDataHandlerInstance);
 		}
 
-		PortletDataHandler portletDataHandlerInstance =
-			(PortletDataHandler)newInstance(
-				PortletDataHandler.class, portlet.getPortletDataHandlerClass());
-
-		portletDataHandlerInstance.setPortletId(portlet.getPortletId());
-
-		return portletDataHandlerInstance;
+		return portletDataHandlerInstances;
 	}
 
 	protected PortletLayoutListener newPortletLayoutListener(Portlet portlet)
@@ -985,8 +1007,11 @@ public class PortletBagFactory {
 			Portlet portlet)
 		throws Exception {
 
-		List<StagedModelDataHandler<?>> stagedModelDataHandlerInstances =
-			new ArrayList<StagedModelDataHandler<?>>();
+		ServiceTrackerList<StagedModelDataHandler<?>>
+			stagedModelDataHandlerInstances =
+				getServiceTrackerList(
+					(Class<StagedModelDataHandler<?>>)(Class<?>)
+						StagedModelDataHandler.class, portlet);
 
 		List<String> stagedModelDataHandlerClasses =
 			portlet.getStagedModelDataHandlerClasses();
@@ -999,8 +1024,6 @@ public class PortletBagFactory {
 					StagedModelDataHandler.class, stagedModelDataHandlerClass);
 
 			stagedModelDataHandlerInstances.add(stagedModelDataHandler);
-
-			StagedModelDataHandlerRegistryUtil.register(stagedModelDataHandler);
 		}
 
 		return stagedModelDataHandlerInstances;
@@ -1017,13 +1040,20 @@ public class PortletBagFactory {
 			TemplateHandler.class, portlet.getTemplateHandlerClass());
 	}
 
-	protected URLEncoder newURLEncoder(Portlet portlet) throws Exception {
-		if (Validator.isNull(portlet.getURLEncoderClass())) {
-			return null;
+	protected List<URLEncoder> newURLEncoders(Portlet portlet)
+		throws Exception {
+
+		ServiceTrackerList<URLEncoder> urlEncoderInstances =
+			getServiceTrackerList(URLEncoder.class, portlet);
+
+		if (Validator.isNotNull(portlet.getURLEncoderClass())) {
+			URLEncoder urlEncoder = (URLEncoder)newInstance(
+				URLEncoder.class, portlet.getURLEncoderClass());
+
+			urlEncoderInstances.add(urlEncoder);
 		}
 
-		return (URLEncoder)newInstance(
-			URLEncoder.class, portlet.getURLEncoderClass());
+		return urlEncoderInstances;
 	}
 
 	protected UserNotificationHandler newUserNotificationHandlerInstance(

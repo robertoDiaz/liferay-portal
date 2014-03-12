@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.lar.StagedModelDataHandler;
@@ -48,6 +50,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@ProviderType
 public interface PortletBag extends Cloneable {
 
 	public Object clone();
@@ -58,17 +61,17 @@ public interface PortletBag extends Cloneable {
 
 	public List<AtomCollectionAdapter<?>> getAtomCollectionAdapterInstances();
 
-	public ConfigurationAction getConfigurationActionInstance();
+	public List<ConfigurationAction> getConfigurationActionInstances();
 
 	public ControlPanelEntry getControlPanelEntryInstance();
 
 	public List<CustomAttributesDisplay> getCustomAttributesDisplayInstances();
 
-	public FriendlyURLMapper getFriendlyURLMapperInstance();
+	public List<FriendlyURLMapper> getFriendlyURLMapperInstances();
 
 	public List<Indexer> getIndexerInstances();
 
-	public OpenSearch getOpenSearchInstance();
+	public List<OpenSearch> getOpenSearchInstances();
 
 	public PermissionPropagator getPermissionPropagatorInstance();
 
@@ -76,7 +79,7 @@ public interface PortletBag extends Cloneable {
 
 	public MessageListener getPopMessageListenerInstance();
 
-	public PortletDataHandler getPortletDataHandlerInstance();
+	public List<PortletDataHandler> getPortletDataHandlerInstances();
 
 	public Portlet getPortletInstance();
 
@@ -103,7 +106,7 @@ public interface PortletBag extends Cloneable {
 
 	public List<TrashHandler> getTrashHandlerInstances();
 
-	public URLEncoder getURLEncoderInstance();
+	public List<URLEncoder> getURLEncoderInstances();
 
 	public List<UserNotificationHandler>
 		getUserNotificationHandlerInstances();

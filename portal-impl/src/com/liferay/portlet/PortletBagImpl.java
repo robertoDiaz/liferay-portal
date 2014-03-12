@@ -59,11 +59,11 @@ public class PortletBagImpl implements PortletBag {
 	public PortletBagImpl(
 		String portletName, ServletContext servletContext,
 		Portlet portletInstance,
-		ConfigurationAction configurationActionInstance,
-		List<Indexer> indexerInstances, OpenSearch openSearchInstance,
-		FriendlyURLMapper friendlyURLMapperInstance,
-		URLEncoder urlEncoderInstance,
-		PortletDataHandler portletDataHandlerInstance,
+		List<ConfigurationAction> configurationActionInstances,
+		List<Indexer> indexerInstances, List<OpenSearch> openSearchInstances,
+		List<FriendlyURLMapper> friendlyURLMapperInstances,
+		List<URLEncoder> urlEncoderInstances,
+		List<PortletDataHandler> portletDataHandlerInstances,
 		List<StagedModelDataHandler<?>> stagedModelDataHandlerInstances,
 		TemplateHandler templateHandlerInstance,
 		PortletLayoutListener portletLayoutListenerInstance,
@@ -86,12 +86,12 @@ public class PortletBagImpl implements PortletBag {
 		_portletName = portletName;
 		_servletContext = servletContext;
 		_portletInstance = portletInstance;
-		_configurationActionInstance = configurationActionInstance;
+		_configurationActionInstances = configurationActionInstances;
 		_indexerInstances = indexerInstances;
-		_openSearchInstance = openSearchInstance;
-		_friendlyURLMapperInstance = friendlyURLMapperInstance;
-		_urlEncoderInstance = urlEncoderInstance;
-		_portletDataHandlerInstance = portletDataHandlerInstance;
+		_openSearchInstances = openSearchInstances;
+		_friendlyURLMapperInstances = friendlyURLMapperInstances;
+		_urlEncoderInstances = urlEncoderInstances;
+		_portletDataHandlerInstances = portletDataHandlerInstances;
 		_stagedModelDataHandlerInstances = stagedModelDataHandlerInstances;
 		_templateHandlerInstance = templateHandlerInstance;
 		_portletLayoutListenerInstance = portletLayoutListenerInstance;
@@ -118,9 +118,9 @@ public class PortletBagImpl implements PortletBag {
 	public Object clone() {
 		return new PortletBagImpl(
 			getPortletName(), getServletContext(), getPortletInstance(),
-			getConfigurationActionInstance(), getIndexerInstances(),
-			getOpenSearchInstance(), getFriendlyURLMapperInstance(),
-			getURLEncoderInstance(), getPortletDataHandlerInstance(),
+			getConfigurationActionInstances(), getIndexerInstances(),
+			getOpenSearchInstances(), getFriendlyURLMapperInstances(),
+			getURLEncoderInstances(), getPortletDataHandlerInstances(),
 			getStagedModelDataHandlerInstances(), getTemplateHandlerInstance(),
 			getPortletLayoutListenerInstance(), getPollerProcessorInstance(),
 			getPopMessageListenerInstance(),
@@ -138,10 +138,41 @@ public class PortletBagImpl implements PortletBag {
 
 	@Override
 	public void destroy() {
-		ServiceTrackerList<Indexer> serviceTrackerList =
+		ServiceTrackerList<ConfigurationAction>
+			configurationActionInstancesServiceTrackerList =
+				(ServiceTrackerList<ConfigurationAction>)
+					_configurationActionInstances;
+
+		configurationActionInstancesServiceTrackerList.close();
+
+		ServiceTrackerList<FriendlyURLMapper>
+			friendlyURLMapperInstancesServiceTrackerList =
+				(ServiceTrackerList<FriendlyURLMapper>)
+					_friendlyURLMapperInstances;
+
+		friendlyURLMapperInstancesServiceTrackerList.close();
+
+		ServiceTrackerList<Indexer> indexerInstancesServiceTrackerList =
 			(ServiceTrackerList<Indexer>)_indexerInstances;
 
-		serviceTrackerList.close();
+		indexerInstancesServiceTrackerList.close();
+
+		ServiceTrackerList<OpenSearch> openSearchInstancesServiceTrackerList =
+			(ServiceTrackerList<OpenSearch>)_openSearchInstances;
+
+		openSearchInstancesServiceTrackerList.close();
+
+		ServiceTrackerList<PortletDataHandler>
+			portletDataHandlerInstancesServiceTrackerList =
+				(ServiceTrackerList<PortletDataHandler>)
+					_portletDataHandlerInstances;
+
+		portletDataHandlerInstancesServiceTrackerList.close();
+
+		ServiceTrackerList<URLEncoder> urlEncoderInstancesServiceTrackerList =
+			(ServiceTrackerList<URLEncoder>)_urlEncoderInstances;
+
+		urlEncoderInstancesServiceTrackerList.close();
 	}
 
 	@Override
@@ -155,8 +186,8 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public ConfigurationAction getConfigurationActionInstance() {
-		return _configurationActionInstance;
+	public List<ConfigurationAction> getConfigurationActionInstances() {
+		return _configurationActionInstances;
 	}
 
 	@Override
@@ -170,8 +201,8 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public FriendlyURLMapper getFriendlyURLMapperInstance() {
-		return _friendlyURLMapperInstance;
+	public List<FriendlyURLMapper> getFriendlyURLMapperInstances() {
+		return _friendlyURLMapperInstances;
 	}
 
 	@Override
@@ -180,8 +211,8 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public OpenSearch getOpenSearchInstance() {
-		return _openSearchInstance;
+	public List<OpenSearch> getOpenSearchInstances() {
+		return _openSearchInstances;
 	}
 
 	@Override
@@ -200,8 +231,8 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public PortletDataHandler getPortletDataHandlerInstance() {
-		return _portletDataHandlerInstance;
+	public List<PortletDataHandler> getPortletDataHandlerInstances() {
+		return _portletDataHandlerInstances;
 	}
 
 	@Override
@@ -281,8 +312,8 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
-	public URLEncoder getURLEncoderInstance() {
-		return _urlEncoderInstance;
+	public List<URLEncoder> getURLEncoderInstances() {
+		return _urlEncoderInstances;
 	}
 
 	@Override
@@ -319,16 +350,16 @@ public class PortletBagImpl implements PortletBag {
 
 	private List<AssetRendererFactory> _assetRendererFactoryInstances;
 	private List<AtomCollectionAdapter<?>> _atomCollectionAdapterInstances;
-	private ConfigurationAction _configurationActionInstance;
+	private List<ConfigurationAction> _configurationActionInstances;
 	private ControlPanelEntry _controlPanelEntryInstance;
 	private List<CustomAttributesDisplay> _customAttributesDisplayInstances;
-	private FriendlyURLMapper _friendlyURLMapperInstance;
+	private List<FriendlyURLMapper> _friendlyURLMapperInstances;
 	private List<Indexer> _indexerInstances;
-	private OpenSearch _openSearchInstance;
+	private List<OpenSearch> _openSearchInstances;
 	private PermissionPropagator _permissionPropagatorInstance;
 	private PollerProcessor _pollerProcessorInstance;
 	private MessageListener _popMessageListenerInstance;
-	private PortletDataHandler _portletDataHandlerInstance;
+	private List<PortletDataHandler> _portletDataHandlerInstances;
 	private Portlet _portletInstance;
 	private PortletLayoutListener _portletLayoutListenerInstance;
 	private String _portletName;
@@ -340,7 +371,7 @@ public class PortletBagImpl implements PortletBag {
 	private List<StagedModelDataHandler<?>> _stagedModelDataHandlerInstances;
 	private TemplateHandler _templateHandlerInstance;
 	private List<TrashHandler> _trashHandlerInstances;
-	private URLEncoder _urlEncoderInstance;
+	private List<URLEncoder> _urlEncoderInstances;
 	private List<UserNotificationHandler>
 		_userNotificationHandlerInstances;
 	private WebDAVStorage _webDAVStorageInstance;
