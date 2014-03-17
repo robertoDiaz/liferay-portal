@@ -250,6 +250,8 @@ public class LocalizationImplTest {
 	private String _germanHello = "Hallo Welt";
 	private String _germanLanguageId = LocaleUtil.toLanguageId(
 		LocaleUtil.GERMANY);
+	private String _spanishLanguageId = LocaleUtil.toLanguageId(
+		LocaleUtil.SPAIN);
 	private String _xml;
 
 }
