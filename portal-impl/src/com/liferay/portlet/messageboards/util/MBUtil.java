@@ -274,16 +274,6 @@ public class MBUtil {
 		}
 	}
 
-	public static String formatMessageBodyToBBCode(
-		String msgBody, String pathThemeImages) {
-
-		msgBody = BBCodeTranslatorUtil.getHTML(msgBody);
-
-		return StringUtil.replace(
-			msgBody, THEME_IMAGES_PATH + EMOTICONS,
-			pathThemeImages + EMOTICONS);
-	}
-
 	public static String getAbsolutePath(
 			PortletRequest portletRequest, long mbCategoryId)
 		throws PortalException, SystemException {
@@ -318,6 +308,12 @@ public class MBUtil {
 		sb.append(mbCategory.getName());
 
 		return sb.toString();
+	}
+
+	public static String getBBCodeHTML(String msgBody, String pathThemeImages) {
+		return StringUtil.replace(
+			BBCodeTranslatorUtil.getHTML(msgBody),
+			THEME_IMAGES_PATH + EMOTICONS, pathThemeImages + EMOTICONS);
 	}
 
 	public static long getCategoryId(
