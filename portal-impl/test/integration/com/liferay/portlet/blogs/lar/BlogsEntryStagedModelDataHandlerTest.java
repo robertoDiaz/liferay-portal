@@ -50,7 +50,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 			Map<String, List<StagedModel>> dependentStagedModelsMap)
 		throws Exception {
 
-		return BlogsTestUtil.addEntry(TestPropsValues.getUserId(), group, true);
+		return BlogsTestUtil.addEntry(group, true);
 	}
 
 	@Override
