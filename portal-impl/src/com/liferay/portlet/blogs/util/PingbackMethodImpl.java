@@ -109,6 +109,10 @@ public class PingbackMethodImpl implements Method {
 		}
 	}
 
+	protected PingbackMethodImpl(Pingback pingback) {
+		_pingback = pingback;
+	}
+
 	protected Response createFault(int code, Throwable cause) {
 		return XmlRpcUtil.createFault(code, cause.getMessage());
 	}
