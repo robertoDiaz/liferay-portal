@@ -884,7 +884,7 @@ of reserved screen names.
 #### What changed?
 
 Previous to Liferay 7, several methods of `UserLocalService` and `UserService`
-could throw a `ReservedUserEmailAddressException` when a user set an email 
+could throw a `ReservedUserEmailAddressException` when a user set an email
 address that was not allowed. That exception has been deprecated and replaced
 with `UserEmailAddressException.MustNotUseCompanyMx`,
 `UserEmailAddressException.MustNotBePOP3User`, and
@@ -1018,8 +1018,8 @@ All operations that used the `Fields` class have been removed from the
 
 #### Who is affected?
 
-This affects developers who have written code that directly calls these 
-operations. 
+This affects developers who have written code that directly calls these
+operations.
 
 #### How should I update my code?
 
@@ -1028,7 +1028,7 @@ You should update your code to use the `DDMFormValues` class instead of the
 
 #### Why was this change made?
 
-This change has been made due to the deprecation of the `Fields` class. 
+This change has been made due to the deprecation of the `Fields` class.
 
 ---------------------------------------
 
@@ -1114,7 +1114,7 @@ called `resourceClassNameId`.
 
 #### Who is affected?
 
-This affects developers who have direct calls to the `DDMTemplateService` or 
+This affects developers who have direct calls to the `DDMTemplateService` or
 `DDMTemplateLocalService`.
 
 #### How should I update my code?
@@ -1271,7 +1271,7 @@ code.
 The API for adding tags, categories, and vocabularies now requires passing the
 `groupId` parameter. Previously, it had to be included in the `ServiceContext`
 parameter passed to the method.
- 
+
 #### Who is affected?
 
 This affects developers who have direct calls to the following methods:
@@ -1356,14 +1356,14 @@ the `ScreenNameValidator` interface.
 
 You should implement the new methods introduced in the interface.
 
-- `getDescription(Locale locale)`: returns a description of what the screen name 
+- `getDescription(Locale locale)`: returns a description of what the screen name
 validator validates.
 
 - `getJSValidation()`: returns the JavaScript input validator on the client side.
 
 #### Why was this change made?
 
-Previous to Liferay 7, validation for user screen name characters was hard-coded 
+Previous to Liferay 7, validation for user screen name characters was hard-coded
 in `UserLocalService`. A new property `users.screen.name.special.characters` has
 been added to provide configurability of special characters allowed in screen
 names.
@@ -1447,5 +1447,42 @@ your MVCPortlet:
 #### Why was this change made?
 
 This was done for backwards compatibility
+
+---------------------------------------
+
+### [Title]
+- **Date:** 2014-Jun-11
+- **JIRA Ticket:** LPS-47541
+
+#### What changed?
+The methods `getFoldersAndFileEntriesAndFileShortcuts()` and
+`getFileEntriesAndFileShortcuts()` in `Repository` returned a list containing
+elements of three different types:
+- `FileEntry`
+- `Folder`
+- `DLFileShortcut`
+
+This broke abstraction, as `DLFileShortcuts` is a class particular to Liferay
+repositories.
+
+A new interface `FileShortcut` was introduced so that repositories may
+implement it if appropriate. Also, all repository entries (FileEntry, Folder,
+FileVersion and FileShortcut) implement a new interface `RepositoryEntry`.
+
+#### Who is affected?
+
+Applications that use `DLAppService`, `DLAppLocalService` or `Repository`
+instances.
+
+#### How should I update my code?
+
+When receiving a raw `Object` returned by any of the DL services, you must check
+for a `FileShortcut` instead of a `DLFileShortcut`.
+
+#### Why was this change made?
+
+To make support for file shortcuts explicit in the repository API (right now
+it is implicit in the method names), and to offer a more consistent abstraction
+to consumer applications.
 
 ---------------------------------------
