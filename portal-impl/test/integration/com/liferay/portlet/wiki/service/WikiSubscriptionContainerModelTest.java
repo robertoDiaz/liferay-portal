@@ -25,8 +25,6 @@ import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.util.test.WikiTestUtil;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -42,18 +40,6 @@ import org.junit.runner.RunWith;
 @Sync
 public class WikiSubscriptionContainerModelTest
 	extends BaseSubscriptionContainerModelTestCase {
-
-	@Ignore
-	@Override
-	@Test
-	public void testSubscriptionContainerModelWhenInRootContainerModel() {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testSubscriptionContainerModelWhenInSubcontainerModel() {
-	}
 
 	@Override
 	protected long addBaseModel(long containerModelId) throws Exception {

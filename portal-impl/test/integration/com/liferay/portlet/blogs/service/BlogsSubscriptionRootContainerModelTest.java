@@ -24,8 +24,6 @@ import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -41,18 +39,6 @@ import org.junit.runner.RunWith;
 @Sync
 public class BlogsSubscriptionRootContainerModelTest
 	extends BaseSubscriptionRootContainerModelTestCase {
-
-	@Ignore
-	@Override
-	@Test
-	public void testSubscriptionRootContainerModelWhenInContainerModel() {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testSubscriptionRootContainerModelWhenInSubcontainerModel() {
-	}
 
 	@Override
 	protected long addBaseModel(long containerModelId) throws Exception {
