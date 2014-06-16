@@ -401,6 +401,8 @@ public abstract class DLAppTestUtil {
 
 		String description = StringPool.BLANK;
 
+		serviceContext.setRequest(null);
+
 		if (deleteExisting) {
 			try {
 				DLAppServiceUtil.deleteFolder(
