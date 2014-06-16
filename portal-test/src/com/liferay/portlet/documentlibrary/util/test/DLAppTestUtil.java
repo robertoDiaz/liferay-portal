@@ -229,6 +229,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext = (ServiceContext)serviceContext.clone();
 
+		serviceContext.setRequest(null);
 		serviceContext.setWorkflowAction(workflowAction);
 
 		return DLAppLocalServiceUtil.addFileEntry(
@@ -554,6 +555,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
+		serviceContext.setRequest(null);
 		serviceContext.setScopeGroupId(groupId);
 
 		if (workflowEnabled && !approved) {
@@ -594,6 +596,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
+		serviceContext.setRequest(null);
 		serviceContext.setScopeGroupId(groupId);
 
 		return DLAppServiceUtil.updateFileEntry(
