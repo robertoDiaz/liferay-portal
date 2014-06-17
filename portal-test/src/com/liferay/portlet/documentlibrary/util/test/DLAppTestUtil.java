@@ -171,6 +171,8 @@ public abstract class DLAppTestUtil {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(groupId);
 
+		serviceContext.setRequest(null);
+
 		if (fileEntryTypeId !=
 				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL) {
 
@@ -227,6 +229,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext = (ServiceContext)serviceContext.clone();
 
+		serviceContext.setRequest(null);
 		serviceContext.setWorkflowAction(workflowAction);
 
 		return DLAppLocalServiceUtil.addFileEntry(
@@ -398,6 +401,8 @@ public abstract class DLAppTestUtil {
 
 		String description = StringPool.BLANK;
 
+		serviceContext.setRequest(null);
+
 		if (deleteExisting) {
 			try {
 				DLAppServiceUtil.deleteFolder(
@@ -552,6 +557,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
+		serviceContext.setRequest(null);
 		serviceContext.setScopeGroupId(groupId);
 
 		if (workflowEnabled && !approved) {
@@ -592,6 +598,7 @@ public abstract class DLAppTestUtil {
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
+		serviceContext.setRequest(null);
 		serviceContext.setScopeGroupId(groupId);
 
 		return DLAppServiceUtil.updateFileEntry(
