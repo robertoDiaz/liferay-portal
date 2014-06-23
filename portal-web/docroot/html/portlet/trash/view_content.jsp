@@ -235,7 +235,7 @@
 
 								<c:if test="<%= !trashHandler.isBaseModel() %>">
 									<liferay-ui:search-container-column-text
-										name='<%= LanguageUtil.format(pageContext, "num-of-x", curTrashHandler.getTrashContainerModelName()) %>'
+										name='<%= LanguageUtil.format(request, "num-of-x", curTrashHandler.getTrashContainerModelName()) %>'
 										value="<%= String.valueOf(curContainerModelsCount) %>"
 									/>
 								</c:if>

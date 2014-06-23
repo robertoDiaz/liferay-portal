@@ -79,7 +79,7 @@
 
 		<!-- Resource -->
 
-		<column name="resourcePrimKey" type="long" filter-primary="true" />
+		<column name="resourcePrimKey" type="long" filter-primary="true" container-model="true" />
 
 		<!-- Group instance -->
 
@@ -303,7 +303,7 @@
 
 		<!-- PK fields -->
 
-		<column name="resourcePrimKey" type="long" primary="true" container-model="true" />
+		<column name="resourcePrimKey" type="long" primary="true" />
 
 		<!-- Other fields -->
 

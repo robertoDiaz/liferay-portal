@@ -620,9 +620,6 @@ public interface TrashHandler {
 
 	/**
 	 * Restores the model entity that is related to the model entity with the
-	 * class name and class PK. For example, {@link
-	 * com.liferay.portlet.wiki.trash.WikiPageTrashHandler#restoreRelatedTrashEntry(
-	 * String, long)} restores the attachment related to the wiki page with the
 	 * class name and class PK.
 	 *
 	 * @param  className the class name of the model entity with a related model

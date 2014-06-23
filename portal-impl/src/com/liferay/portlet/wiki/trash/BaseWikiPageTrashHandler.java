@@ -39,6 +39,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.trash.RestoreEntryException;
 import com.liferay.portlet.trash.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.wiki.NoSuchNodeException;
 import com.liferay.portlet.wiki.NoSuchPageException;
 import com.liferay.portlet.wiki.asset.WikiPageAssetRenderer;
 import com.liferay.portlet.wiki.model.WikiNode;
@@ -178,11 +179,7 @@ public abstract class BaseWikiPageTrashHandler extends BaseTrashHandler {
 			page.getNodeId(), true, start, end);
 
 		for (WikiPage curPage : pages) {
-			WikiPageResource pageResource =
-				WikiPageResourceLocalServiceUtil.getWikiPageResource(
-					curPage.getResourcePrimKey());
-
-			containerModels.add(pageResource);
+			containerModels.add(curPage);
 		}
 
 		return containerModels;
@@ -210,6 +207,14 @@ public abstract class BaseWikiPageTrashHandler extends BaseTrashHandler {
 	@Override
 	public ContainerModel getParentContainerModel(TrashedModel trashedModel) {
 		WikiPage page = (WikiPage)trashedModel;
+
+		if (Validator.isNotNull(page.getParentTitle())) {
+			try {
+				return page.getParentPage();
+			}
+			catch (Exception e) {
+			}
+		}
 
 		return page.getNode();
 	}
@@ -353,8 +358,14 @@ public abstract class BaseWikiPageTrashHandler extends BaseTrashHandler {
 		throws PortalException {
 
 		if (trashActionId.equals(TrashActionKeys.MOVE)) {
-			WikiNodePermission.check(
-				permissionChecker, classPK, ActionKeys.ADD_PAGE);
+			try {
+				return WikiNodePermission.contains(
+					permissionChecker, classPK, ActionKeys.ADD_PAGE);
+			}
+			catch (NoSuchNodeException nsne) {
+				return WikiPagePermission.contains(
+					permissionChecker, classPK, ActionKeys.DELETE);
+			}
 		}
 
 		return super.hasTrashPermission(
