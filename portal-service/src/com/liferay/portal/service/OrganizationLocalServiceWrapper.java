@@ -95,8 +95,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _organizationLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _organizationLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _organizationLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -375,7 +372,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getGroupOrganizations(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Organization> orderByComparator) {
 		return _organizationLocalService.getGroupOrganizations(groupId, start,
 			end, orderByComparator);
 	}
@@ -481,7 +478,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Organization> orderByComparator) {
 		return _organizationLocalService.getUserOrganizations(userId, start,
 			end, orderByComparator);
 	}
@@ -739,7 +736,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Organization> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organizationLocalService.getOrganizations(userId, start, end,
 			obc);
@@ -1148,7 +1145,8 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 		java.lang.String type, java.lang.Long regionId,
 		java.lang.Long countryId,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Organization> obc) {
 		return _organizationLocalService.search(companyId,
 			parentOrganizationId, keywords, type, regionId, countryId, params,
 			start, end, obc);
@@ -1264,7 +1262,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 		java.lang.Long countryId,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Organization> obc) {
 		return _organizationLocalService.search(companyId,
 			parentOrganizationId, name, type, street, city, zip, regionId,
 			countryId, params, andOperator, start, end, obc);

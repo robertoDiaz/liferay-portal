@@ -94,8 +94,7 @@ public class ShoppingItemLocalServiceWrapper implements ShoppingItemLocalService
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _shoppingItemLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -113,8 +112,7 @@ public class ShoppingItemLocalServiceWrapper implements ShoppingItemLocalService
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _shoppingItemLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -134,11 +132,10 @@ public class ShoppingItemLocalServiceWrapper implements ShoppingItemLocalService
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _shoppingItemLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -410,7 +407,7 @@ public class ShoppingItemLocalServiceWrapper implements ShoppingItemLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.shopping.model.ShoppingItem> getItems(
 		long groupId, long categoryId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.shopping.model.ShoppingItem> obc) {
 		return _shoppingItemLocalService.getItems(groupId, categoryId, start,
 			end, obc);
 	}
@@ -422,7 +419,8 @@ public class ShoppingItemLocalServiceWrapper implements ShoppingItemLocalService
 
 	@Override
 	public com.liferay.portlet.shopping.model.ShoppingItem[] getItemsPrevAndNext(
-		long itemId, com.liferay.portal.kernel.util.OrderByComparator obc)
+		long itemId,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.shopping.model.ShoppingItem> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _shoppingItemLocalService.getItemsPrevAndNext(itemId, obc);
 	}

@@ -79,6 +79,7 @@
 			<bean class="com.liferay.portal.captcha.CaptchaImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.comment.CommentManager" class="com.liferay.portal.comment.CommentManagerImpl" />
 	<bean class="com.liferay.portal.kernel.dao.jdbc.CurrentConnectionUtil">
 		<property name="currentConnection">
 			<bean class="com.liferay.portal.dao.jdbc.CurrentConnectionImpl" />
@@ -359,28 +360,8 @@
 	<bean id="com.liferay.portal.kernel.template.TemplateResourceLoaderUtil" class="com.liferay.portal.kernel.template.TemplateResourceLoaderUtil">
 		<property name="templateResourceLoaders">
 			<list>
-				<bean class="com.liferay.portal.template.DefaultTemplateResourceLoader">
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.kernel.template.TemplateConstants.LANG_TYPE_FTL" />
-					</constructor-arg>
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.util.PropsValues.FREEMARKER_ENGINE_TEMPLATE_PARSERS" />
-					</constructor-arg>
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.util.PropsValues.FREEMARKER_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL" />
-					</constructor-arg>
-				</bean>
-				<bean class="com.liferay.portal.template.DefaultTemplateResourceLoader">
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.kernel.template.TemplateConstants.LANG_TYPE_VM" />
-					</constructor-arg>
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.util.PropsValues.VELOCITY_ENGINE_RESOURCE_PARSERS" />
-					</constructor-arg>
-					<constructor-arg>
-						<util:constant static-field="com.liferay.portal.util.PropsValues.VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL" />
-					</constructor-arg>
-				</bean>
+				<bean class="com.liferay.portal.template.FreemarkerTemplateResourceLoader" />
+				<bean class="com.liferay.portal.template.VelocityTemplateResourceLoader" />
 			</list>
 		</property>
 	</bean>
@@ -471,11 +452,6 @@
 	<bean id="com.liferay.portal.kernel.util.MultiValueMapFactoryUtil" class="com.liferay.portal.kernel.util.MultiValueMapFactoryUtil">
 		<property name="multiValueMapFactory">
 			<bean class="com.liferay.portal.util.MultiValueMapFactoryImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil" class="com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil">
-		<property name="orderByComparatorFactory">
-			<bean class="com.liferay.portal.util.OrderByComparatorFactoryImpl" />
 		</property>
 	</bean>
 	<bean id="com.liferay.portal.kernel.util.PrefsPropsUtil" class="com.liferay.portal.kernel.util.PrefsPropsUtil">
@@ -607,11 +583,20 @@
 	<bean id="com.liferay.portal.security.auth.AuthTokenUtil" class="com.liferay.portal.security.auth.AuthTokenUtil" />
 	<bean id="com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin" class="com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.CASAutoLogin" class="com.liferay.portal.security.auth.CASAutoLogin" />
+	<bean id="com.liferay.portal.security.auth.DefaultEmailAddressGenerator" class="com.liferay.portal.security.auth.DefaultEmailAddressGenerator" />
+	<bean id="com.liferay.portal.security.auth.DefaultEmailAddressValidator" class="com.liferay.portal.security.auth.DefaultEmailAddressValidator" />
+	<bean id="com.liferay.portal.security.auth.DefaultFullNameGenerator" class="com.liferay.portal.security.auth.DefaultFullNameGenerator" />
+	<bean id="com.liferay.portal.security.auth.DefaultFullNameValidator" class="com.liferay.portal.security.auth.DefaultFullNameValidator" />
+	<bean id="com.liferay.portal.security.auth.DefaultScreenNameGenerator" class="com.liferay.portal.security.auth.DefaultScreenNameGenerator" />
+	<bean id="com.liferay.portal.security.auth.DefaultScreenNameValidator" class="com.liferay.portal.security.auth.DefaultScreenNameValidator" />
 	<bean id="com.liferay.portal.security.auth.EmailAddressGeneratorFactory" class="com.liferay.portal.security.auth.EmailAddressGeneratorFactory" />
 	<bean id="com.liferay.portal.security.auth.EmailAddressValidatorFactory" class="com.liferay.portal.security.auth.EmailAddressValidatorFactory" />
 	<bean id="com.liferay.portal.security.auth.FacebookAutoLogin" class="com.liferay.portal.security.auth.FacebookAutoLogin" />
+	<bean id="com.liferay.portal.security.auth.FamilyNameFirstFullNameGenerator" class="com.liferay.portal.security.auth.FamilyNameFirstFullNameGenerator" />
 	<bean id="com.liferay.portal.security.auth.FullNameGeneratorFactory" class="com.liferay.portal.security.auth.FullNameGeneratorFactory" />
 	<bean id="com.liferay.portal.security.auth.FullNameValidatorFactory" class="com.liferay.portal.security.auth.FullNameValidatorFactory" />
+	<bean id="com.liferay.portal.security.auth.LiberalEmailAddressValidator" class="com.liferay.portal.security.auth.LiberalEmailAddressValidator" />
+	<bean id="com.liferay.portal.security.auth.LiberalScreenNameValidator" class="com.liferay.portal.security.auth.LiberalScreenNameValidator" />
 	<bean id="com.liferay.portal.security.auth.NtlmAutoLogin" class="com.liferay.portal.security.auth.NtlmAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.OpenIdAutoLogin" class="com.liferay.portal.security.auth.OpenIdAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.OpenSSOAutoLogin" class="com.liferay.portal.security.auth.OpenSSOAutoLogin" />
@@ -936,6 +921,11 @@
 			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMFormJSONSerializerImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesJSONDeserializerUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesJSONDeserializerUtil">
+		<property name="DDMFormValuesJSONDeserializer">
+			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesJSONDeserializerImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMFormXSDDeserializerUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMFormXSDDeserializerUtil">
 		<property name="DDMFormXSDDeserializer">
 			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMFormXSDDeserializerImpl" />
@@ -1005,6 +995,7 @@
 			<bean class="com.liferay.portlet.layoutsadmin.util.SitemapImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portlet.messageboards.comment.MBCommentManagerImpl" class="com.liferay.portlet.messageboards.comment.MBCommentManagerImpl" />
 	<bean id="com.liferay.portlet.mobiledevicerules.service.permission.MDRPermissionUtil" class="com.liferay.portlet.mobiledevicerules.service.permission.MDRPermissionUtil">
 		<property name="MDRPermission">
 			<bean class="com.liferay.portlet.mobiledevicerules.service.permission.MDRPermissionImpl" />

@@ -96,8 +96,7 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -136,11 +134,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -305,7 +302,7 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getCompanyStatsUsers(
 		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsStatsUser> obc) {
 		return _blogsStatsUserLocalService.getCompanyStatsUsers(companyId,
 			start, end, obc);
 	}
@@ -332,7 +329,7 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsStatsUser> obc) {
 		return _blogsStatsUserLocalService.getGroupStatsUsers(groupId, start,
 			end, obc);
 	}
@@ -352,7 +349,7 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsStatsUser> obc) {
 		return _blogsStatsUserLocalService.getOrganizationStatsUsers(organizationId,
 			start, end, obc);
 	}

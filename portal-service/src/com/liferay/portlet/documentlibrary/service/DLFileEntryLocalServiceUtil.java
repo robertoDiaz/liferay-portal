@@ -97,8 +97,7 @@ public class DLFileEntryLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class DLFileEntryLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DLFileEntryLocalServiceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -595,14 +592,14 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long folderId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return getService()
 				   .getFileEntries(groupId, folderId, status, start, end, obc);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return getService().getFileEntries(groupId, folderId, start, end, obc);
 	}
 
@@ -610,7 +607,7 @@ public class DLFileEntryLocalServiceUtil {
 		long groupId, long userId,
 		java.util.List<java.lang.Long> repositoryIds,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return getService()
 				   .getFileEntries(groupId, userId, repositoryIds, folderIds,
@@ -620,7 +617,7 @@ public class DLFileEntryLocalServiceUtil {
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long userId, java.util.List<java.lang.Long> folderIds,
 		java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return getService()
 				   .getFileEntries(groupId, userId, folderIds, mimeTypes,
@@ -638,7 +635,7 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static int getFileEntriesCount(long groupId,
 		com.liferay.portal.kernel.util.DateRange dateRange, long repositoryId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition) {
 		return getService()
 				   .getFileEntriesCount(groupId, dateRange, repositoryId,
 			queryDefinition);
@@ -656,7 +653,7 @@ public class DLFileEntryLocalServiceUtil {
 	public static int getFileEntriesCount(long groupId, long userId,
 		java.util.List<java.lang.Long> repositoryIds,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return getService()
 				   .getFileEntriesCount(groupId, userId, repositoryIds,
@@ -665,7 +662,7 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static int getFileEntriesCount(long groupId, long userId,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return getService()
 				   .getFileEntriesCount(groupId, userId, folderIds, mimeTypes,
@@ -703,7 +700,7 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return getService().getGroupFileEntries(groupId, start, end, obc);
 	}
 
@@ -714,13 +711,13 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return getService().getGroupFileEntries(groupId, userId, start, end, obc);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, long userId, long rootFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return getService()
 				   .getGroupFileEntries(groupId, userId, rootFolderId, start,
 			end, obc);

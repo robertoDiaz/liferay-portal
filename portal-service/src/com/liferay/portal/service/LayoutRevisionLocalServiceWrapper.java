@@ -96,8 +96,7 @@ public class LayoutRevisionLocalServiceWrapper
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _layoutRevisionLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class LayoutRevisionLocalServiceWrapper
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _layoutRevisionLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -136,11 +134,10 @@ public class LayoutRevisionLocalServiceWrapper
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _layoutRevisionLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -345,7 +342,7 @@ public class LayoutRevisionLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.LayoutRevision> getChildLayoutRevisions(
 		long layoutSetBranchId, long parentLayoutRevision, long plid,
 		int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.LayoutRevision> orderByComparator) {
 		return _layoutRevisionLocalService.getChildLayoutRevisions(layoutSetBranchId,
 			parentLayoutRevision, plid, start, end, orderByComparator);
 	}
@@ -410,7 +407,7 @@ public class LayoutRevisionLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.model.LayoutRevision> getLayoutRevisions(
 		long layoutSetBranchId, long plid, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.LayoutRevision> orderByComparator) {
 		return _layoutRevisionLocalService.getLayoutRevisions(layoutSetBranchId,
 			plid, start, end, orderByComparator);
 	}
@@ -419,7 +416,7 @@ public class LayoutRevisionLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.LayoutRevision> getLayoutRevisions(
 		long layoutSetBranchId, long layoutBranchId, long plid, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.LayoutRevision> orderByComparator) {
 		return _layoutRevisionLocalService.getLayoutRevisions(layoutSetBranchId,
 			layoutBranchId, plid, start, end, orderByComparator);
 	}

@@ -93,8 +93,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
@@ -109,8 +108,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end);
 
@@ -127,11 +125,10 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator);
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
@@ -379,7 +376,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getCategoryMessages(
 		long groupId, long categoryId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc);
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCategoryMessagesCount(long groupId, long categoryId,
@@ -392,7 +389,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getCompanyMessages(
 		long companyId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc);
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCompanyMessagesCount(long companyId, int status);
@@ -427,7 +424,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getGroupMessages(
 		long groupId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc);
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getGroupMessages(
@@ -436,7 +433,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getGroupMessages(
 		long groupId, long userId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc);
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupMessagesCount(long groupId, int status);
@@ -495,17 +492,19 @@ public interface MBMessageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getUserDiscussionMessages(
 		long userId, long classNameId, long classPK, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc);
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getUserDiscussionMessages(
 		long userId, long[] classNameIds, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc);
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getUserDiscussionMessages(
 		long userId, java.lang.String className, long classPK, int status,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc);
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.messageboards.model.MBMessage> obc);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserDiscussionMessagesCount(long userId, long classNameId,

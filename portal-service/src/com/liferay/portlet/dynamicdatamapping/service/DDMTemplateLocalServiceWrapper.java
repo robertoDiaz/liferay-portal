@@ -95,8 +95,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _ddmTemplateLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _ddmTemplateLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _ddmTemplateLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -833,7 +830,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplatesByStructureClassNameId(
 		long groupId, long structureClassNameId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> orderByComparator) {
 		return _ddmTemplateLocalService.getTemplatesByStructureClassNameId(groupId,
 			structureClassNameId, start, end, orderByComparator);
 	}
@@ -934,7 +931,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 		long companyId, long groupId, long classNameId, long classPK,
 		java.lang.String keywords, java.lang.String type,
 		java.lang.String mode, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> orderByComparator) {
 		return _ddmTemplateLocalService.search(companyId, groupId, classNameId,
 			classPK, keywords, type, mode, start, end, orderByComparator);
 	}
@@ -986,7 +983,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 		java.lang.String name, java.lang.String description,
 		java.lang.String type, java.lang.String mode,
 		java.lang.String language, boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> orderByComparator) {
 		return _ddmTemplateLocalService.search(companyId, groupId, classNameId,
 			classPK, name, description, type, mode, language, andOperator,
 			start, end, orderByComparator);
@@ -1032,7 +1029,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 		long companyId, long[] groupIds, long[] classNameIds, long[] classPKs,
 		java.lang.String keywords, java.lang.String type,
 		java.lang.String mode, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> orderByComparator) {
 		return _ddmTemplateLocalService.search(companyId, groupIds,
 			classNameIds, classPKs, keywords, type, mode, start, end,
 			orderByComparator);
@@ -1085,7 +1082,7 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 		java.lang.String name, java.lang.String description,
 		java.lang.String type, java.lang.String mode,
 		java.lang.String language, boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> orderByComparator) {
 		return _ddmTemplateLocalService.search(companyId, groupIds,
 			classNameIds, classPKs, name, description, type, mode, language,
 			andOperator, start, end, orderByComparator);

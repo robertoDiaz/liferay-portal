@@ -97,8 +97,7 @@ public class BlogsEntryLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class BlogsEntryLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class BlogsEntryLocalServiceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -429,7 +426,8 @@ public class BlogsEntryLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getCompanyEntries(
 		long companyId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return getService()
 				   .getCompanyEntries(companyId, displayDate, status, start,
 			end, obc);
@@ -437,7 +435,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getCompanyEntries(
 		long companyId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getCompanyEntries(companyId, displayDate, queryDefinition);
 	}
@@ -455,7 +453,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static int getCompanyEntriesCount(long companyId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getCompanyEntriesCount(companyId, displayDate,
 			queryDefinition);
@@ -497,7 +495,8 @@ public class BlogsEntryLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return getService()
 				   .getGroupEntries(groupId, displayDate, status, start, end,
 			obc);
@@ -505,7 +504,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getGroupEntries(groupId, displayDate, queryDefinition);
 	}
@@ -527,13 +526,13 @@ public class BlogsEntryLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return getService().getGroupEntries(groupId, status, start, end, obc);
 	}
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService().getGroupEntries(groupId, queryDefinition);
 	}
 
@@ -549,7 +548,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static int getGroupEntriesCount(long groupId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getGroupEntriesCount(groupId, displayDate, queryDefinition);
 	}
@@ -564,7 +563,7 @@ public class BlogsEntryLocalServiceUtil {
 	}
 
 	public static int getGroupEntriesCount(long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService().getGroupEntriesCount(groupId, queryDefinition);
 	}
 
@@ -583,7 +582,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupsEntries(
 		long companyId, long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getGroupsEntries(companyId, groupId, displayDate,
 			queryDefinition);
@@ -609,7 +608,8 @@ public class BlogsEntryLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupUserEntries(
 		long groupId, long userId, java.util.Date displayDate, int status,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return getService()
 				   .getGroupUserEntries(groupId, userId, displayDate, status,
 			start, end, obc);
@@ -617,7 +617,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupUserEntries(
 		long groupId, long userId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getGroupUserEntries(groupId, userId, displayDate,
 			queryDefinition);
@@ -637,7 +637,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static int getGroupUserEntriesCount(long groupId, long userId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getGroupUserEntriesCount(groupId, userId, displayDate,
 			queryDefinition);
@@ -667,7 +667,8 @@ public class BlogsEntryLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getOrganizationEntries(
 		long organizationId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return getService()
 				   .getOrganizationEntries(organizationId, displayDate, status,
 			start, end, obc);
@@ -675,7 +676,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getOrganizationEntries(
 		long organizationId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getOrganizationEntries(organizationId, displayDate,
 			queryDefinition);
@@ -695,7 +696,7 @@ public class BlogsEntryLocalServiceUtil {
 
 	public static int getOrganizationEntriesCount(long organizationId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return getService()
 				   .getOrganizationEntriesCount(organizationId, displayDate,
 			queryDefinition);

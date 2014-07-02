@@ -97,8 +97,7 @@ public class GroupLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class GroupLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class GroupLocalServiceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -329,7 +326,7 @@ public class GroupLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portal.model.Group> getOrganizationGroups(
 		long organizationId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> orderByComparator) {
 		return getService()
 				   .getOrganizationGroups(organizationId, start, end,
 			orderByComparator);
@@ -414,7 +411,7 @@ public class GroupLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portal.model.Group> getRoleGroups(
 		long roleId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> orderByComparator) {
 		return getService().getRoleGroups(roleId, start, end, orderByComparator);
 	}
 
@@ -496,7 +493,7 @@ public class GroupLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portal.model.Group> getUserGroupGroups(
 		long userGroupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> orderByComparator) {
 		return getService()
 				   .getUserGroupGroups(userGroupId, start, end,
 			orderByComparator);
@@ -583,7 +580,7 @@ public class GroupLocalServiceUtil {
 	*/
 	public static java.util.List<com.liferay.portal.model.Group> getUserGroups(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> orderByComparator)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getUserGroups(userId, start, end, orderByComparator);
 	}
@@ -1149,7 +1146,7 @@ public class GroupLocalServiceUtil {
 	*/
 	public static java.util.List<com.liferay.portal.model.Group> getLayoutsGroups(
 		long companyId, long parentGroupId, boolean site, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .getLayoutsGroups(companyId, parentGroupId, site, start,
 			end, obc);
@@ -1625,7 +1622,8 @@ public class GroupLocalServiceUtil {
 	public static java.util.List<com.liferay.portal.model.Group> search(
 		long companyId, long parentGroupId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, parentGroupId, keywords, params, start,
 			end, obc);
@@ -1716,7 +1714,7 @@ public class GroupLocalServiceUtil {
 		java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, parentGroupId, name, description, params,
 			andOperator, start, end, obc);
@@ -1806,7 +1804,8 @@ public class GroupLocalServiceUtil {
 		long companyId, long[] classNameIds, long parentGroupId,
 		java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, classNameIds, parentGroupId, keywords,
 			params, start, end, obc);
@@ -1903,7 +1902,7 @@ public class GroupLocalServiceUtil {
 		java.lang.String name, java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, classNameIds, parentGroupId, name,
 			description, params, andOperator, start, end, obc);
@@ -1986,7 +1985,8 @@ public class GroupLocalServiceUtil {
 	public static java.util.List<com.liferay.portal.model.Group> search(
 		long companyId, long[] classNameIds, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, classNameIds, keywords, params, start,
 			end, obc);
@@ -2081,7 +2081,7 @@ public class GroupLocalServiceUtil {
 		java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, classNameIds, name, description, params,
 			andOperator, start, end, obc);
@@ -2157,7 +2157,8 @@ public class GroupLocalServiceUtil {
 	public static java.util.List<com.liferay.portal.model.Group> search(
 		long companyId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService().search(companyId, keywords, params, start, end, obc);
 	}
 
@@ -2242,7 +2243,7 @@ public class GroupLocalServiceUtil {
 		long companyId, java.lang.String name, java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
 		return getService()
 				   .search(companyId, name, description, params, andOperator,
 			start, end, obc);

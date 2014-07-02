@@ -93,8 +93,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _userGroupLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -112,8 +111,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _userGroupLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -133,11 +131,10 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _userGroupLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -358,7 +355,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	@Override
 	public java.util.List<com.liferay.portal.model.UserGroup> getGroupUserGroups(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.UserGroup> orderByComparator) {
 		return _userGroupLocalService.getGroupUserGroups(groupId, start, end,
 			orderByComparator);
 	}
@@ -458,7 +455,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	@Override
 	public java.util.List<com.liferay.portal.model.UserGroup> getTeamUserGroups(
 		long teamId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.UserGroup> orderByComparator) {
 		return _userGroupLocalService.getTeamUserGroups(teamId, start, end,
 			orderByComparator);
 	}
@@ -558,7 +555,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	@Override
 	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.UserGroup> orderByComparator) {
 		return _userGroupLocalService.getUserUserGroups(userId, start, end,
 			orderByComparator);
 	}
@@ -804,7 +801,8 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	public java.util.List<com.liferay.portal.model.UserGroup> search(
 		long companyId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.UserGroup> obc) {
 		return _userGroupLocalService.search(companyId, keywords, params,
 			start, end, obc);
 	}
@@ -883,7 +881,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 		long companyId, java.lang.String name, java.lang.String description,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.UserGroup> obc) {
 		return _userGroupLocalService.search(companyId, name, description,
 			params, andOperator, start, end, obc);
 	}

@@ -581,7 +581,7 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getFileEntries(
 		long repositoryId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -633,7 +633,8 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getFileEntries(
 		long repositoryId, long folderId, long fileEntryTypeId, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -888,7 +889,8 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.Folder> getFolders(
 		long repositoryId, long parentFolderId, boolean includeMountFolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.Folder> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -922,7 +924,7 @@ public interface DLAppService extends BaseService {
 	public java.util.List<com.liferay.portal.kernel.repository.model.Folder> getFolders(
 		long repositoryId, long parentFolderId, int status,
 		boolean includeMountFolders, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.Folder> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -977,7 +979,7 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.Folder> getFolders(
 		long repositoryId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.Folder> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -1044,14 +1046,14 @@ public interface DLAppService extends BaseService {
 	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long repositoryId, long folderId, int status,
 		boolean includeMountFolders, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long repositoryId, long folderId, int status,
 		java.lang.String[] mimeTypes, boolean includeMountFolders, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+		int end, com.liferay.portal.kernel.util.OrderByComparator<?> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -1201,7 +1203,7 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getGroupFileEntries(
 		long groupId, long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -1267,14 +1269,14 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getGroupFileEntries(
 		long groupId, long userId, long rootFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getGroupFileEntries(
 		long groupId, long userId, long rootFolderId,
 		java.lang.String[] mimeTypes, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -1393,7 +1395,7 @@ public interface DLAppService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.kernel.repository.model.Folder> getMountFolders(
 		long repositoryId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.Folder> obc)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**

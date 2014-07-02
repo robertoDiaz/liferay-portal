@@ -93,8 +93,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _wikiPageLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -112,8 +111,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _wikiPageLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -133,11 +131,10 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _wikiPageLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -432,6 +429,15 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
+	public void changeParentAndRestoreFromTrash(long userId, long nodeId,
+		java.lang.String title, java.lang.String newParentTitle,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_wikiPageLocalService.changeParentAndRestoreFromTrash(userId, nodeId,
+			title, newParentTitle, serviceContext);
+	}
+
+	@Override
 	public void copyPageAttachments(long userId, long templateNodeId,
 		java.lang.String templateTitle, long nodeId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -538,6 +544,34 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getChildren(
 		long nodeId, boolean head, java.lang.String parentTitle) {
 		return _wikiPageLocalService.getChildren(nodeId, head, parentTitle);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getChildren(
+		long nodeId, boolean head, java.lang.String parentTitle, int status) {
+		return _wikiPageLocalService.getChildren(nodeId, head, parentTitle,
+			status);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getChildren(
+		long nodeId, boolean head, java.lang.String parentTitle, int start,
+		int end) {
+		return _wikiPageLocalService.getChildren(nodeId, head, parentTitle,
+			start, end);
+	}
+
+	@Override
+	public int getChildrenCount(long nodeId, boolean head,
+		java.lang.String parentTitle) {
+		return _wikiPageLocalService.getChildrenCount(nodeId, head, parentTitle);
+	}
+
+	@Override
+	public int getChildrenCount(long nodeId, boolean head,
+		java.lang.String parentTitle, int status) {
+		return _wikiPageLocalService.getChildrenCount(nodeId, head,
+			parentTitle, status);
 	}
 
 	@Override
@@ -673,7 +707,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, boolean head, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.wiki.model.WikiPage> obc) {
 		return _wikiPageLocalService.getPages(nodeId, head, status, start, end,
 			obc);
 	}
@@ -681,7 +715,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, boolean head, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.wiki.model.WikiPage> obc) {
 		return _wikiPageLocalService.getPages(nodeId, head, start, end, obc);
 	}
 
@@ -694,7 +728,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.wiki.model.WikiPage> obc) {
 		return _wikiPageLocalService.getPages(nodeId, start, end, obc);
 	}
 
@@ -725,7 +759,7 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getPages(
 		long nodeId, java.lang.String title, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.wiki.model.WikiPage> obc) {
 		return _wikiPageLocalService.getPages(nodeId, title, start, end, obc);
 	}
 

@@ -79,6 +79,12 @@ public class JournalFolderServiceUtil {
 		getService().deleteFolder(folderId, includeTrashedEntries);
 	}
 
+	public static com.liferay.portlet.journal.model.JournalFolder fetchFolder(
+		long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchFolder(folderId);
+	}
+
 	public static com.liferay.portlet.journal.model.JournalFolder getFolder(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -119,7 +125,7 @@ public class JournalFolderServiceUtil {
 
 	public static java.util.List<java.lang.Object> getFoldersAndArticles(
 		long groupId, long folderId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return getService()
 				   .getFoldersAndArticles(groupId, folderId, status, start,
 			end, obc);
@@ -127,7 +133,7 @@ public class JournalFolderServiceUtil {
 
 	public static java.util.List<java.lang.Object> getFoldersAndArticles(
 		long groupId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return getService()
 				   .getFoldersAndArticles(groupId, folderId, start, end, obc);
 	}

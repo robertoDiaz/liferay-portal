@@ -95,8 +95,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _blogsEntryLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _blogsEntryLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _blogsEntryLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -463,7 +460,8 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getCompanyEntries(
 		long companyId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return _blogsEntryLocalService.getCompanyEntries(companyId,
 			displayDate, status, start, end, obc);
 	}
@@ -471,7 +469,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getCompanyEntries(
 		long companyId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getCompanyEntries(companyId,
 			displayDate, queryDefinition);
 	}
@@ -491,7 +489,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public int getCompanyEntriesCount(long companyId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getCompanyEntriesCount(companyId,
 			displayDate, queryDefinition);
 	}
@@ -536,7 +534,8 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return _blogsEntryLocalService.getGroupEntries(groupId, displayDate,
 			status, start, end, obc);
 	}
@@ -544,7 +543,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupEntries(groupId, displayDate,
 			queryDefinition);
 	}
@@ -569,7 +568,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return _blogsEntryLocalService.getGroupEntries(groupId, status, start,
 			end, obc);
 	}
@@ -577,7 +576,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupEntries(groupId, queryDefinition);
 	}
 
@@ -595,7 +594,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 
 	@Override
 	public int getGroupEntriesCount(long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupEntriesCount(groupId,
 			displayDate, queryDefinition);
 	}
@@ -612,7 +611,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 
 	@Override
 	public int getGroupEntriesCount(long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupEntriesCount(groupId,
 			queryDefinition);
 	}
@@ -633,7 +632,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupsEntries(
 		long companyId, long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupsEntries(companyId, groupId,
 			displayDate, queryDefinition);
 	}
@@ -659,7 +658,8 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupUserEntries(
 		long groupId, long userId, java.util.Date displayDate, int status,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return _blogsEntryLocalService.getGroupUserEntries(groupId, userId,
 			displayDate, status, start, end, obc);
 	}
@@ -667,7 +667,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupUserEntries(
 		long groupId, long userId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupUserEntries(groupId, userId,
 			displayDate, queryDefinition);
 	}
@@ -687,7 +687,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public int getGroupUserEntriesCount(long groupId, long userId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getGroupUserEntriesCount(groupId,
 			userId, displayDate, queryDefinition);
 	}
@@ -718,7 +718,8 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getOrganizationEntries(
 		long organizationId, java.util.Date displayDate, int status, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.blogs.model.BlogsEntry> obc) {
 		return _blogsEntryLocalService.getOrganizationEntries(organizationId,
 			displayDate, status, start, end, obc);
 	}
@@ -726,7 +727,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getOrganizationEntries(
 		long organizationId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getOrganizationEntries(organizationId,
 			displayDate, queryDefinition);
 	}
@@ -746,7 +747,7 @@ public class BlogsEntryLocalServiceWrapper implements BlogsEntryLocalService,
 	@Override
 	public int getOrganizationEntriesCount(long organizationId,
 		java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.blogs.model.BlogsEntry> queryDefinition) {
 		return _blogsEntryLocalService.getOrganizationEntriesCount(organizationId,
 			displayDate, queryDefinition);
 	}

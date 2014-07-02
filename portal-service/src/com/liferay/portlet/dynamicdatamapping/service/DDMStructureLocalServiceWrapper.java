@@ -95,8 +95,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _ddmStructureLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _ddmStructureLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _ddmStructureLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -406,7 +403,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getDLFileEntryTypeDDMStructures(
 		long fileEntryTypeId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.getDLFileEntryTypeDDMStructures(fileEntryTypeId,
 			start, end, orderByComparator);
 	}
@@ -520,7 +517,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getJournalFolderDDMStructures(
 		long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.getJournalFolderDDMStructures(folderId,
 			start, end, orderByComparator);
 	}
@@ -968,7 +965,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getClassStructures(
 		long companyId, long classNameId,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.getClassStructures(companyId,
 			classNameId, orderByComparator);
 	}
@@ -981,7 +978,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getClassStructures(
 		long classNameId,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.getClassStructures(classNameId,
 			orderByComparator);
 	}
@@ -1229,7 +1226,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructures(
 		long groupId, long classNameId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.getStructures(groupId, classNameId,
 			start, end, orderByComparator);
 	}
@@ -1368,7 +1365,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> search(
 		long companyId, long[] groupIds, long[] classNameIds,
 		java.lang.String keywords, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.search(companyId, groupIds,
 			classNameIds, keywords, start, end, orderByComparator);
 	}
@@ -1413,7 +1410,7 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 		java.lang.String name, java.lang.String description,
 		java.lang.String storageType, int type, boolean andOperator, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator) {
 		return _ddmStructureLocalService.search(companyId, groupIds,
 			classNameIds, name, description, storageType, type, andOperator,
 			start, end, orderByComparator);

@@ -96,8 +96,7 @@ public class PasswordPolicyLocalServiceWrapper
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _passwordPolicyLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class PasswordPolicyLocalServiceWrapper
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _passwordPolicyLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -136,11 +134,10 @@ public class PasswordPolicyLocalServiceWrapper
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _passwordPolicyLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -413,7 +410,7 @@ public class PasswordPolicyLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.model.PasswordPolicy> search(
 		long companyId, java.lang.String name, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.PasswordPolicy> obc) {
 		return _passwordPolicyLocalService.search(companyId, name, start, end,
 			obc);
 	}

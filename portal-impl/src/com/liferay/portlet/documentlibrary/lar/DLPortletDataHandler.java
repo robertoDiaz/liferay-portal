@@ -347,7 +347,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 				Map<Long, Long> folderIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-						Folder.class);
+						Folder.class + ".folderIdsAndRepositoryEntryIds");
 
 				rootFolderId = MapUtil.getLong(
 					folderIds, rootFolderId, rootFolderId);
@@ -495,7 +495,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 							portletDataContext.getScopeGroupId(),
 							portletDataContext.getDateRange(),
 							portletDataContext.getScopeGroupId(),
-							new QueryDefinition(
+							new QueryDefinition<DLFileEntry>(
 								WorkflowConstants.STATUS_APPROVED));
 
 					StagedModelType stagedModelType =

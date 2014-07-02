@@ -96,8 +96,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _layoutSetPrototypeLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _layoutSetPrototypeLocalService.dynamicQuery(dynamicQuery,
@@ -137,11 +135,10 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _layoutSetPrototypeLocalService.dynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -374,7 +371,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.model.LayoutSetPrototype> search(
 		long companyId, java.lang.Boolean active, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.LayoutSetPrototype> obc) {
 		return _layoutSetPrototypeLocalService.search(companyId, active, start,
 			end, obc);
 	}

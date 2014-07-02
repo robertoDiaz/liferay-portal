@@ -96,8 +96,7 @@ public class BackgroundTaskLocalServiceWrapper
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _backgroundTaskLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class BackgroundTaskLocalServiceWrapper
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _backgroundTaskLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -136,11 +134,10 @@ public class BackgroundTaskLocalServiceWrapper
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _backgroundTaskLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -348,7 +345,7 @@ public class BackgroundTaskLocalServiceWrapper
 	public com.liferay.portal.model.BackgroundTask fetchFirstBackgroundTask(
 		long groupId, java.lang.String taskExecutorClassName,
 		boolean completed,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.fetchFirstBackgroundTask(groupId,
 			taskExecutorClassName, completed, orderByComparator);
 	}
@@ -363,7 +360,7 @@ public class BackgroundTaskLocalServiceWrapper
 	@Override
 	public com.liferay.portal.model.BackgroundTask fetchFirstBackgroundTask(
 		java.lang.String taskExecutorClassName, int status,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.fetchFirstBackgroundTask(taskExecutorClassName,
 			status, orderByComparator);
 	}
@@ -392,7 +389,7 @@ public class BackgroundTaskLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.BackgroundTask> getBackgroundTasks(
 		long groupId, java.lang.String taskExecutorClassName, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.getBackgroundTasks(groupId,
 			taskExecutorClassName, start, end, orderByComparator);
 	}
@@ -401,7 +398,7 @@ public class BackgroundTaskLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.BackgroundTask> getBackgroundTasks(
 		long groupId, java.lang.String name,
 		java.lang.String taskExecutorClassName, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.getBackgroundTasks(groupId, name,
 			taskExecutorClassName, start, end, orderByComparator);
 	}
@@ -424,7 +421,7 @@ public class BackgroundTaskLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.BackgroundTask> getBackgroundTasks(
 		long groupId, java.lang.String[] taskExecutorClassNames, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.getBackgroundTasks(groupId,
 			taskExecutorClassNames, start, end, orderByComparator);
 	}
@@ -439,7 +436,7 @@ public class BackgroundTaskLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.model.BackgroundTask> getBackgroundTasks(
 		java.lang.String taskExecutorClassName, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.getBackgroundTasks(taskExecutorClassName,
 			status, start, end, orderByComparator);
 	}
@@ -455,7 +452,7 @@ public class BackgroundTaskLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.BackgroundTask> getBackgroundTasks(
 		java.lang.String[] taskExecutorClassNames, int status, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.BackgroundTask> orderByComparator) {
 		return _backgroundTaskLocalService.getBackgroundTasks(taskExecutorClassNames,
 			status, start, end, orderByComparator);
 	}

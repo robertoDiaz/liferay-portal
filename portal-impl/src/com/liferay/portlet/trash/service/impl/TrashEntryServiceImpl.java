@@ -204,7 +204,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 */
 	@Override
 	public TrashEntryList getEntries(
-			long groupId, int start, int end, OrderByComparator obc)
+			long groupId, int start, int end, OrderByComparator<TrashEntry> obc)
 		throws PrincipalException {
 
 		TrashEntryList trashEntriesList = new TrashEntryList();
@@ -306,6 +306,10 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 			className);
+
+		destinationContainerModelId =
+			trashHandler.getDestinationContainerModelId(
+				classPK, destinationContainerModelId);
 
 		if (!trashHandler.hasTrashPermission(
 				permissionChecker, serviceContext.getScopeGroupId(),

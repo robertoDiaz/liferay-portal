@@ -444,6 +444,70 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	}
 
 	@Override
+	public void changeParentAndRestoreFromTrash(
+			long userId, long nodeId, String title, String newParentTitle,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		WikiPage page = getPage(nodeId, title);
+
+		TrashEntry trashEntry = null;
+
+		WikiPage trashEntryPage = page.getParentPage();
+
+		while (trashEntry == null) {
+			trashEntry = trashEntryLocalService.fetchEntry(
+				WikiPage.class.getName(), trashEntryPage.getResourcePrimKey());
+
+			if (trashEntry == null) {
+				trashEntryPage = trashEntryPage.getParentPage();
+
+				if (trashEntryPage == null) {
+					throw new NoSuchPageException();
+				}
+			}
+		}
+
+		String originalTitle = TrashUtil.getOriginalTitle(page.getTitle());
+		String trashTitle = page.getTitle();
+
+		page.setTitle(originalTitle);
+		page.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+		wikiPagePersistence.update(page);
+
+		changeParent(
+			userId, nodeId, originalTitle, newParentTitle, serviceContext);
+
+		//TrashVersion
+
+		TrashVersion trashVersion = trashVersionLocalService.fetchVersion(
+			trashEntry.getEntryId(), WikiPage.class.getName(),
+			page.getPageId());
+
+		if (trashVersion != null) {
+			trashVersionLocalService.deleteTrashVersion(trashVersion);
+		}
+
+		// Index
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			WikiPage.class);
+
+		indexer.reindex(page);
+
+		// Child pages
+
+		restoreDependentChildPagesFromTrash(
+			page, originalTitle, trashTitle, trashEntry.getEntryId());
+
+		// RedirectPages pages
+
+		restoreDependentRedirectPagesFromTrash(
+			page, originalTitle, trashTitle, trashEntry.getEntryId());
+	}
+
+	@Override
 	public void copyPageAttachments(
 			long userId, long templateNodeId, String templateTitle, long nodeId,
 			String title)
@@ -729,7 +793,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		WikiPage page = null;
 
-		OrderByComparator orderByComparator = new PageVersionComparator();
+		OrderByComparator<WikiPage> orderByComparator =
+			new PageVersionComparator();
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			if (preferApproved) {
@@ -757,7 +822,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		WikiPage page = null;
 
-		OrderByComparator orderByComparator = new PageVersionComparator();
+		OrderByComparator<WikiPage> orderByComparator =
+			new PageVersionComparator();
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			if (preferApproved) {
@@ -785,7 +851,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		WikiPage page = null;
 
-		OrderByComparator orderByComparator = new PageVersionComparator();
+		OrderByComparator<WikiPage> orderByComparator =
+			new PageVersionComparator();
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			if (preferApproved) {
@@ -831,8 +898,39 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	public List<WikiPage> getChildren(
 		long nodeId, boolean head, String parentTitle) {
 
-		return wikiPagePersistence.findByN_H_P_S(
+		return getChildren(
 			nodeId, head, parentTitle, WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Override
+	public List<WikiPage> getChildren(
+		long nodeId, boolean head, String parentTitle, int status) {
+
+		return wikiPagePersistence.findByN_H_P_S(
+			nodeId, head, parentTitle, status);
+	}
+
+	@Override
+	public List<WikiPage> getChildren(
+		long nodeId, boolean head, String parentTitle, int start, int end) {
+
+		return wikiPagePersistence.findByN_H_P_S(
+			nodeId, head, parentTitle, WorkflowConstants.STATUS_APPROVED, start,
+			end);
+	}
+
+	@Override
+	public int getChildrenCount(long nodeId, boolean head, String parentTitle) {
+		return getChildrenCount(
+			nodeId, head, parentTitle, WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Override
+	public int getChildrenCount(
+		long nodeId, boolean head, String parentTitle, int status) {
+
+		return wikiPagePersistence.countByN_H_P_S(
+			nodeId, head, parentTitle, status);
 	}
 
 	@Override
@@ -1149,7 +1247,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	@Override
 	public List<WikiPage> getPages(
 		long nodeId, boolean head, int status, int start, int end,
-		OrderByComparator obc) {
+		OrderByComparator<WikiPage> obc) {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return wikiPagePersistence.findByN_H(nodeId, head, start, end, obc);
@@ -1162,7 +1260,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 	@Override
 	public List<WikiPage> getPages(
-		long nodeId, boolean head, int start, int end, OrderByComparator obc) {
+		long nodeId, boolean head, int start, int end,
+		OrderByComparator<WikiPage> obc) {
 
 		return getPages(
 			nodeId, head, WorkflowConstants.STATUS_APPROVED, start, end, obc);
@@ -1176,7 +1275,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 	@Override
 	public List<WikiPage> getPages(
-		long nodeId, int start, int end, OrderByComparator obc) {
+		long nodeId, int start, int end, OrderByComparator<WikiPage> obc) {
 
 		return wikiPagePersistence.findByNodeId(nodeId, start, end, obc);
 	}
@@ -1223,7 +1322,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 	@Override
 	public List<WikiPage> getPages(
-		long nodeId, String title, int start, int end, OrderByComparator obc) {
+		long nodeId, String title, int start, int end,
+		OrderByComparator<WikiPage> obc) {
 
 		return wikiPagePersistence.findByN_T(nodeId, title, start, end, obc);
 	}

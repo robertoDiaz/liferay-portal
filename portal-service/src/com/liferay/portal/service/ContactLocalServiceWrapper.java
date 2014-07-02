@@ -90,8 +90,7 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _contactLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -109,8 +108,7 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _contactLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -130,11 +128,10 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _contactLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -287,7 +284,7 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 	@Override
 	public java.util.List<com.liferay.portal.model.Contact> getContacts(
 		long classNameId, long classPK, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Contact> orderByComparator) {
 		return _contactLocalService.getContacts(classNameId, classPK, start,
 			end, orderByComparator);
 	}

@@ -97,8 +97,7 @@ public class DLFolderLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
@@ -115,8 +114,7 @@ public class DLFolderLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DLFolderLocalServiceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	@SuppressWarnings("rawtypes")
-	public static java.util.List dynamicQuery(
+	public static <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -365,7 +362,7 @@ public class DLFolderLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getDLFileEntryTypeDLFolders(
 		long fileEntryTypeId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> orderByComparator) {
 		return getService()
 				   .getDLFileEntryTypeDLFolders(fileEntryTypeId, start, end,
 			orderByComparator);
@@ -504,7 +501,7 @@ public class DLFolderLocalServiceUtil {
 
 	public static java.util.List<java.lang.Object> getFileEntriesAndFileShortcuts(
 		long groupId, long folderId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return getService()
 				   .getFileEntriesAndFileShortcuts(groupId, folderId,
 			queryDefinition);
@@ -525,7 +522,7 @@ public class DLFolderLocalServiceUtil {
 
 	public static int getFileEntriesAndFileShortcutsCount(long groupId,
 		long folderId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return getService()
 				   .getFileEntriesAndFileShortcutsCount(groupId, folderId,
 			queryDefinition);
@@ -565,7 +562,8 @@ public class DLFolderLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
 		long groupId, long parentFolderId, boolean includeMountfolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return getService()
 				   .getFolders(groupId, parentFolderId, includeMountfolders,
 			start, end, obc);
@@ -573,7 +571,7 @@ public class DLFolderLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return getService().getFolders(groupId, parentFolderId, start, end, obc);
 	}
 
@@ -585,7 +583,8 @@ public class DLFolderLocalServiceUtil {
 	@Deprecated
 	public static java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, int status, boolean includeMountFolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return getService()
 				   .getFoldersAndFileEntriesAndFileShortcuts(groupId, folderId,
 			status, includeMountFolders, start, end, obc);
@@ -600,7 +599,7 @@ public class DLFolderLocalServiceUtil {
 	public static java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, int status, java.lang.String[] mimeTypes,
 		boolean includeMountFolders, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return getService()
 				   .getFoldersAndFileEntriesAndFileShortcuts(groupId, folderId,
 			status, mimeTypes, includeMountFolders, start, end, obc);
@@ -609,7 +608,7 @@ public class DLFolderLocalServiceUtil {
 	public static java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, java.lang.String[] mimeTypes,
 		boolean includeMountFolders,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return getService()
 				   .getFoldersAndFileEntriesAndFileShortcuts(groupId, folderId,
 			mimeTypes, includeMountFolders, queryDefinition);
@@ -645,7 +644,7 @@ public class DLFolderLocalServiceUtil {
 	public static int getFoldersAndFileEntriesAndFileShortcutsCount(
 		long groupId, long folderId, java.lang.String[] mimeTypes,
 		boolean includeMountFolders,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return getService()
 				   .getFoldersAndFileEntriesAndFileShortcutsCount(groupId,
 			folderId, mimeTypes, includeMountFolders, queryDefinition);
@@ -676,7 +675,7 @@ public class DLFolderLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getMountFolders(
 		long groupId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return getService()
 				   .getMountFolders(groupId, parentFolderId, start, end, obc);
 	}

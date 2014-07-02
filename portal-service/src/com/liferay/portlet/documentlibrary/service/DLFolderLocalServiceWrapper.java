@@ -95,8 +95,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _dlFolderLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _dlFolderLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _dlFolderLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -402,7 +399,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getDLFileEntryTypeDLFolders(
 		long fileEntryTypeId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> orderByComparator) {
 		return _dlFolderLocalService.getDLFileEntryTypeDLFolders(fileEntryTypeId,
 			start, end, orderByComparator);
 	}
@@ -563,7 +560,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<java.lang.Object> getFileEntriesAndFileShortcuts(
 		long groupId, long folderId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return _dlFolderLocalService.getFileEntriesAndFileShortcuts(groupId,
 			folderId, queryDefinition);
 	}
@@ -583,7 +580,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 
 	@Override
 	public int getFileEntriesAndFileShortcutsCount(long groupId, long folderId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return _dlFolderLocalService.getFileEntriesAndFileShortcutsCount(groupId,
 			folderId, queryDefinition);
 	}
@@ -629,7 +626,8 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
 		long groupId, long parentFolderId, boolean includeMountfolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return _dlFolderLocalService.getFolders(groupId, parentFolderId,
 			includeMountfolders, start, end, obc);
 	}
@@ -637,7 +635,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return _dlFolderLocalService.getFolders(groupId, parentFolderId, start,
 			end, obc);
 	}
@@ -651,7 +649,8 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, int status, boolean includeMountFolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return _dlFolderLocalService.getFoldersAndFileEntriesAndFileShortcuts(groupId,
 			folderId, status, includeMountFolders, start, end, obc);
 	}
@@ -666,7 +665,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, int status, java.lang.String[] mimeTypes,
 		boolean includeMountFolders, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return _dlFolderLocalService.getFoldersAndFileEntriesAndFileShortcuts(groupId,
 			folderId, status, mimeTypes, includeMountFolders, start, end, obc);
 	}
@@ -675,7 +674,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, java.lang.String[] mimeTypes,
 		boolean includeMountFolders,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return _dlFolderLocalService.getFoldersAndFileEntriesAndFileShortcuts(groupId,
 			folderId, mimeTypes, includeMountFolders, queryDefinition);
 	}
@@ -711,7 +710,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	public int getFoldersAndFileEntriesAndFileShortcutsCount(long groupId,
 		long folderId, java.lang.String[] mimeTypes,
 		boolean includeMountFolders,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
 		return _dlFolderLocalService.getFoldersAndFileEntriesAndFileShortcutsCount(groupId,
 			folderId, mimeTypes, includeMountFolders, queryDefinition);
 	}
@@ -745,7 +744,7 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getMountFolders(
 		long groupId, long parentFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFolder> obc) {
 		return _dlFolderLocalService.getMountFolders(groupId, parentFolderId,
 			start, end, obc);
 	}

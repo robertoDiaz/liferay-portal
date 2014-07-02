@@ -76,6 +76,13 @@ public class JournalFolderServiceWrapper implements JournalFolderService,
 	}
 
 	@Override
+	public com.liferay.portlet.journal.model.JournalFolder fetchFolder(
+		long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalFolderService.fetchFolder(folderId);
+	}
+
+	@Override
 	public com.liferay.portlet.journal.model.JournalFolder getFolder(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -124,7 +131,7 @@ public class JournalFolderServiceWrapper implements JournalFolderService,
 	@Override
 	public java.util.List<java.lang.Object> getFoldersAndArticles(
 		long groupId, long folderId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return _journalFolderService.getFoldersAndArticles(groupId, folderId,
 			status, start, end, obc);
 	}
@@ -132,7 +139,7 @@ public class JournalFolderServiceWrapper implements JournalFolderService,
 	@Override
 	public java.util.List<java.lang.Object> getFoldersAndArticles(
 		long groupId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 		return _journalFolderService.getFoldersAndArticles(groupId, folderId,
 			start, end, obc);
 	}

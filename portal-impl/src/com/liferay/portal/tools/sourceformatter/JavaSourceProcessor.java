@@ -202,46 +202,29 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return false;
 	}
 
-	protected List<String> addParameterTypes(
-		String line, List<String> parameterTypes) {
+	protected String applyDiamondOperator(String content) {
+		Matcher matcher = _diamondOperatorPattern.matcher(content);
 
-		int x = line.indexOf(StringPool.OPEN_PARENTHESIS);
+		while (matcher.find()) {
+			String parameterType = matcher.group(5);
 
-		if (x != -1) {
-			line = line.substring(x + 1);
+			if (parameterType.contains("Object")) {
+				String constructorParameter = matcher.group(6);
 
-			if (Validator.isNull(line) ||
-				line.startsWith(StringPool.CLOSE_PARENTHESIS)) {
-
-				return parameterTypes;
+				if (Validator.isNotNull(constructorParameter)) {
+					continue;
+				}
 			}
+
+			String match = matcher.group();
+
+			String replacement = StringUtil.replaceFirst(
+				match, "<" + parameterType + ">", "<>");
+
+			return StringUtil.replace(content, match, replacement);
 		}
 
-		for (x = 0;;) {
-			x = line.indexOf(StringPool.SPACE);
-
-			if (x == -1) {
-				return parameterTypes;
-			}
-
-			String parameterType = line.substring(0, x);
-
-			if (parameterType.equals("throws")) {
-				return parameterTypes;
-			}
-
-			parameterTypes.add(parameterType);
-
-			int y = line.indexOf(StringPool.COMMA);
-			int z = line.indexOf(StringPool.CLOSE_PARENTHESIS);
-
-			if ((y == -1) || ((z != -1) && (z < y))) {
-				return parameterTypes;
-			}
-
-			line = line.substring(y + 1);
-			line = line.trim();
-		}
+		return content;
 	}
 
 	protected void checkAnnotationForMethod(
@@ -1094,7 +1077,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			fileNames = getPluginJavaFiles();
 		}
 
-		_fitOnSingleLineExceptions = getExclusions(
+		_fitOnSingleLineExclusions = getExclusions(
 			"fit.on.single.line.exludes");
 		_hibernateSQLQueryExclusions = getExclusions(
 			"hibernate.sql.query.excludes");
@@ -1403,6 +1386,31 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		newContent = fixSystemExceptions(newContent);
 
+		// LPS-47648
+
+		if (portalSource && fileName.contains("/test/integration/")) {
+			newContent = StringUtil.replace(
+				newContent, "FinderCacheUtil.clearCache();", StringPool.BLANK);
+		}
+
+		// LPS-47682
+
+		newContent = fixIncorrectParameterTypeForLanguageUtil(
+			newContent, false, fileName);
+
+		if (portalSource && fileName.contains("/portal-service/") &&
+			content.contains("import javax.servlet.jsp.")) {
+
+			processErrorMessage(
+				fileName,
+				"Never import javax.servlet.jsp.* from portal-service " +
+					fileName);
+		}
+
+		// LPS-48153
+
+		//newContent = applyDiamondOperator(newContent);
+
 		newContent = fixIncorrectEmptyLineBeforeCloseCurlyBrace(
 			newContent, fileName);
 
@@ -1473,9 +1481,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		int javaTermLineCount = -1;
 		int javaTermStartPosition = -1;
 		int javaTermType = -1;
-
-		boolean readParameterTypes = false;
-		List<String> parameterTypes = new ArrayList<String>();
 
 		int lastCommentOrAnnotationPos = -1;
 
@@ -1701,8 +1706,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 						if (Validator.isNotNull(javaTermName)) {
 							javaTerm = new JavaTerm(
-								javaTermName, javaTermType, parameterTypes,
-								javaTermContent, javaTermLineCount);
+								javaTermName, javaTermType, javaTermContent,
+								javaTermLineCount);
 
 							javaTerms.add(javaTerm);
 						}
@@ -1712,18 +1717,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					javaTermName = (String)tuple.getObject(0);
 					javaTermStartPosition = javaTermEndPosition;
 					javaTermType = (Integer)tuple.getObject(1);
-
-					if (Validator.isNotNull(javaTermName)) {
-						if (isInJavaTermTypeGroup(
-								javaTermType, TYPE_CONSTRUCTOR) ||
-							isInJavaTermTypeGroup(
-								javaTermType, TYPE_METHOD)) {
-
-							readParameterTypes = true;
-
-							parameterTypes = new ArrayList<String>();
-						}
-					}
 				}
 
 				lastCommentOrAnnotationPos = -1;
@@ -1731,27 +1724,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			else if (hasAnnotationCommentOrJavadoc(line)) {
 				if (lastCommentOrAnnotationPos == -1) {
 					lastCommentOrAnnotationPos = index;
-				}
-			}
-
-			if (readParameterTypes) {
-				parameterTypes = addParameterTypes(trimmedLine, parameterTypes);
-
-				String strippedLine = stripLine(
-					trimmedLine, CharPool.LESS_THAN, CharPool.GREATER_THAN);
-
-				if (strippedLine.contains(StringPool.COMMA) &&
-					!trimmedLine.endsWith(StringPool.COMMA) &&
-					!trimmedLine.endsWith(StringPool.OPEN_CURLY_BRACE) &&
-					!trimmedLine.endsWith(StringPool.CLOSE_PARENTHESIS) &&
-					!trimmedLine.endsWith(StringPool.SEMICOLON)) {
-
-					processErrorMessage(
-						fileName, "line break: " + fileName + " " + lineCount);
-				}
-
-				if (trimmedLine.contains(StringPool.CLOSE_PARENTHESIS)) {
-					readParameterTypes = false;
 				}
 			}
 
@@ -2123,7 +2095,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					}
 
 					if (!isExcluded(
-							_fitOnSingleLineExceptions, fileName, lineCount)) {
+							_fitOnSingleLineExclusions, fileName, lineCount)) {
 
 						combinedLines = getCombinedLines(
 							trimmedLine, previousLine, lineLeadingTabCount,
@@ -2253,7 +2225,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					javaTermStartPosition, javaTermEndPosition);
 
 				javaTerm = new JavaTerm(
-					javaTermName, javaTermType, parameterTypes, javaTermContent,
+					javaTermName, javaTermType, javaTermContent,
 					javaTermLineCount);
 
 				javaTerms.add(javaTerm);
@@ -2285,6 +2257,12 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		if (pos == -1) {
 			pos = line.indexOf(StringPool.OPEN_CURLY_BRACE);
 		}
+
+		if (pos != -1) {
+			line = line.substring(0, pos);
+		}
+
+		pos = line.indexOf(StringPool.LESS_THAN);
 
 		if (pos != -1) {
 			line = line.substring(0, pos);
@@ -3156,7 +3134,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private Pattern _catchExceptionPattern = Pattern.compile(
 		"\n(\t+)catch \\((.+Exception) (.+)\\) \\{\n");
 	private boolean _checkUnprocessedExceptions;
-	private List<String> _fitOnSingleLineExceptions;
+	private Pattern _diamondOperatorPattern = Pattern.compile(
+		"(return|=)\n?(\t+| )new ([A-Za-z]+)(Map|Set|List)<(.+)>" +
+			"\\(\n*\t*(.*)\\);\n");
+	private List<String> _fitOnSingleLineExclusions;
 	private List<String> _hibernateSQLQueryExclusions;
 	private Pattern _incorrectCloseCurlyBracePattern = Pattern.compile(
 		"\n(.+)\n\n(\t+)}\n");

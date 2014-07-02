@@ -95,8 +95,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	* @return the matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _dlFileEntryLocalService.dynamicQuery(dynamicQuery);
 	}
@@ -114,8 +113,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	* @return the range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end) {
 		return _dlFileEntryLocalService.dynamicQuery(dynamicQuery, start, end);
@@ -135,11 +133,10 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	* @return the ordered range of matching rows
 	*/
 	@Override
-	@SuppressWarnings("rawtypes")
-	public java.util.List dynamicQuery(
+	public <T> java.util.List<T> dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return _dlFileEntryLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -650,7 +647,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long folderId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return _dlFileEntryLocalService.getFileEntries(groupId, folderId,
 			status, start, end, obc);
 	}
@@ -658,7 +655,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return _dlFileEntryLocalService.getFileEntries(groupId, folderId,
 			start, end, obc);
 	}
@@ -668,7 +665,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		long groupId, long userId,
 		java.util.List<java.lang.Long> repositoryIds,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return _dlFileEntryLocalService.getFileEntries(groupId, userId,
 			repositoryIds, folderIds, mimeTypes, queryDefinition);
@@ -678,7 +675,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long groupId, long userId, java.util.List<java.lang.Long> folderIds,
 		java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return _dlFileEntryLocalService.getFileEntries(groupId, userId,
 			folderIds, mimeTypes, queryDefinition);
@@ -698,7 +695,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public int getFileEntriesCount(long groupId,
 		com.liferay.portal.kernel.util.DateRange dateRange, long repositoryId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition) {
 		return _dlFileEntryLocalService.getFileEntriesCount(groupId, dateRange,
 			repositoryId, queryDefinition);
 	}
@@ -718,7 +715,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	public int getFileEntriesCount(long groupId, long userId,
 		java.util.List<java.lang.Long> repositoryIds,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return _dlFileEntryLocalService.getFileEntriesCount(groupId, userId,
 			repositoryIds, folderIds, mimeTypes, queryDefinition);
@@ -727,7 +724,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public int getFileEntriesCount(long groupId, long userId,
 		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<com.liferay.portlet.documentlibrary.model.DLFileEntry> queryDefinition)
 		throws java.lang.Exception {
 		return _dlFileEntryLocalService.getFileEntriesCount(groupId, userId,
 			folderIds, mimeTypes, queryDefinition);
@@ -772,7 +769,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return _dlFileEntryLocalService.getGroupFileEntries(groupId, start,
 			end, obc);
 	}
@@ -787,7 +784,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return _dlFileEntryLocalService.getGroupFileEntries(groupId, userId,
 			start, end, obc);
 	}
@@ -795,7 +792,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getGroupFileEntries(
 		long groupId, long userId, long rootFolderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.documentlibrary.model.DLFileEntry> obc) {
 		return _dlFileEntryLocalService.getGroupFileEntries(groupId, userId,
 			rootFolderId, start, end, obc);
 	}
