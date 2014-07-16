@@ -18,8 +18,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.FallbackKeys;
 import com.liferay.portal.kernel.settings.ParameterMapSettings;
 import com.liferay.portal.kernel.settings.Settings;
-import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
+import com.liferay.portal.kernel.settings.SettingsUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -46,6 +46,9 @@ public class DLPortletInstanceSettings {
 	public static DLPortletInstanceSettings getInstance(
 			Layout layout, String portletId)
 		throws PortalException {
+
+		SettingsUtil.registerSettingsMetadata(
+			portletId, _getFallbackKeys(), _MULTI_VALUED_KEYS);
 
 		Settings settings = SettingsFactoryUtil.getPortletInstanceSettings(
 			layout, portletId);
@@ -182,19 +185,16 @@ public class DLPortletInstanceSettings {
 	};
 
 	static {
-		SettingsFactory settingsFactory =
-			SettingsFactoryUtil.getSettingsFactory();
-
-		settingsFactory.registerSettingsMetadata(
+		SettingsUtil.registerSettingsMetadata(
 			PortletKeys.DOCUMENT_LIBRARY, _getFallbackKeys(),
 			_MULTI_VALUED_KEYS);
-		settingsFactory.registerSettingsMetadata(
+		SettingsUtil.registerSettingsMetadata(
 			PortletKeys.DOCUMENT_LIBRARY_ADMIN, _getFallbackKeys(),
 			_MULTI_VALUED_KEYS);
-		settingsFactory.registerSettingsMetadata(
+		SettingsUtil.registerSettingsMetadata(
 			PortletKeys.DOCUMENT_LIBRARY_DISPLAY, _getFallbackKeys(),
 			_MULTI_VALUED_KEYS);
-		settingsFactory.registerSettingsMetadata(
+		SettingsUtil.registerSettingsMetadata(
 			PortletKeys.MEDIA_GALLERY_DISPLAY, _getFallbackKeys(),
 			_MULTI_VALUED_KEYS);
 	}
