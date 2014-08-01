@@ -551,7 +551,7 @@
 	<bean id="com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil" class="com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil">
 		<property name="portletFileRepository" ref="com.liferay.portal.portletfilerepository.PortletFileRepository" />
 	</bean>
-	<bean id="com.liferay.portal.repository.registry.RepositoryCatalog" class="com.liferay.portal.repository.registry.RepositoryCatalogImpl" init-method="loadBuiltinRegistryPlugins">
+	<bean id="com.liferay.portal.repository.registry.RepositoryCatalog" class="com.liferay.portal.repository.registry.RepositoryCatalogImpl" init-method="loadDefaultRepositoryRegistryPlugins">
 		<property name="classNameLocalService" ref="com.liferay.portal.service.ClassNameLocalService" />
 		<property name="legacyExternalRepositoryCreator">
 			<bean class="com.liferay.portal.repository.external.LegacyExternalRepositoryCreator" />
@@ -1003,6 +1003,11 @@
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil">
 		<property name="DDMXSD">
 			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMXSDImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil" class="com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil">
+		<property name="FieldsToDDMFormValuesConverter">
+			<bean class="com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterImpl" />
 		</property>
 	</bean>
 	<bean id="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionUtil" class="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionUtil">
