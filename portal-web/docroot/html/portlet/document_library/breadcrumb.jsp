@@ -23,6 +23,7 @@ DLUtil.addPortletBreadcrumbEntries(folder, request, liferayPortletResponse);
 %>
 
 <liferay-ui:breadcrumb
+	hiddenBreadcrumbs='<%= LanguageUtil.get(request, "documents-and-media") %>'
 	showCurrentGroup="<%= false %>"
 	showGuestGroup="<%= false %>"
 	showLayout="<%= false %>"

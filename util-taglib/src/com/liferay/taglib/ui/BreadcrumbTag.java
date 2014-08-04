@@ -49,6 +49,10 @@ public class BreadcrumbTag extends IncludeTag {
 		_displayStyle = displayStyle;
 	}
 
+	public void setHiddenBreadcrumbs(String hiddenBreadcrumbs) {
+		_hiddenBreadcrumbs = hiddenBreadcrumbs;
+	}
+
 	public void setShowCurrentGroup(boolean showCurrentGroup) {
 		_showCurrentGroup = showCurrentGroup;
 	}
@@ -67,6 +71,10 @@ public class BreadcrumbTag extends IncludeTag {
 
 	public void setShowPortletBreadcrumb(boolean showPortletBreadcrumb) {
 		_showPortletBreadcrumb = showPortletBreadcrumb;
+	}
+
+	public void setShowPortletDisplayName(boolean showPortletDisplayName) {
+		_showPortletDisplayName = showPortletDisplayName;
 	}
 
 	protected void buildGuestGroupBreadcrumb(
@@ -147,6 +155,17 @@ public class BreadcrumbTag extends IncludeTag {
 				}
 			}
 
+			if (Validator.isNotNull(_hiddenBreadcrumbs)) {
+				String[] hiddenBreadcrumbs = StringUtil.split(
+					_hiddenBreadcrumbs, StringPool.COMMA);
+
+				if (ArrayUtil.contains(
+						hiddenBreadcrumbs, breadcrumbEntry.getTitle())) {
+
+					continue;
+				}
+			}
+
 			sb.append("<li>");
 
 			if (Validator.isNotNull(breadcrumbEntry.getURL())) {
@@ -189,6 +208,7 @@ public class BreadcrumbTag extends IncludeTag {
 	@Override
 	protected void cleanUp() {
 		_displayStyle = _DISPLAY_STYLE;
+		_hiddenBreadcrumbs = null;
 		_showCurrentGroup = true;
 		_showGuestGroup = _SHOW_GUEST_GROUP;
 		_showLayout = true;
@@ -326,6 +346,8 @@ public class BreadcrumbTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:breadcrumb:displayStyle", displayStyle);
 		request.setAttribute(
+			"liferay-ui:breadcrumb:hiddenBreadcrumbs", _hiddenBreadcrumbs);
+		request.setAttribute(
 			"liferay-ui:breadcrumb:showCurrentGroup",
 			String.valueOf(_showCurrentGroup));
 		request.setAttribute(
@@ -358,10 +380,12 @@ public class BreadcrumbTag extends IncludeTag {
 	private static Log _log = LogFactoryUtil.getLog(BreadcrumbTag.class);
 
 	private String _displayStyle = _DISPLAY_STYLE;
+	private String _hiddenBreadcrumbs;
 	private boolean _showCurrentGroup = true;
 	private boolean _showGuestGroup = _SHOW_GUEST_GROUP;
 	private boolean _showLayout = true;
 	private Boolean _showParentGroups = null;
 	private boolean _showPortletBreadcrumb = true;
+	private boolean _showPortletDisplayName = true;
 
 }
