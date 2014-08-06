@@ -49,9 +49,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
 </portlet:actionURL>
 
-<liferay-ui:image-selector callback="updateImage">
-
-</liferay-ui:image-selector>
+<liferay-ui:image-selector callback='<%= renderResponse.getNamespace() + "updateImage" %>' />
 
 <aui:form action="<%= editEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />

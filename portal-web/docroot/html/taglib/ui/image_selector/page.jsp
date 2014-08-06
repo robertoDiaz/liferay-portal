@@ -124,7 +124,7 @@ debugger;
 								var fileEntryId = responseData.fileEntryId;
 
 								<%= callback %>(fileEntryId);
-		                    }
+							}
 						}
 					}
 				}
