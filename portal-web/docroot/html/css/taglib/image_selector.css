@@ -15,14 +15,14 @@
 		position: absolute;
 	}
 
-	.image-preview-wrapper {
+	.image-preview-wrapper, .image-view-wrapper {
 		height: 400px;
 		overflow: hidden;
 		position: relative;
 		width: 100%;
 
-		.image-preview-action-buttons {
-	    	bottom: 20px;
+		.image-preview-action-buttons, .image-view-action-button {
+			bottom: 20px;
 			position: absolute;
 			right: 30px;
 		}

@@ -20,8 +20,15 @@
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_image_selector_page") + StringPool.UNDERLINE;
 
 String callback = (String)request.getAttribute("liferay-ui:image-selector:callback");
+long imageId= Long.valueOf((String)request.getAttribute("liferay-ui:image-selector:imageId"));
 
 String currentImageURL = ParamUtil.getString(request, "currentLogoURL");
+
+if (imageId != 0) {
+	FileEntry image = DLAppLocalServiceUtil.getFileEntry(imageId);
+
+	currentImageURL = DLUtil.getPreviewURL(image, image.getLatestFileVersion(), themeDisplay, "&imagePreview=1");
+}
 
 String action = HttpUtil.addParameter(themeDisplay.getPathMain() + "/portal/image_selector", "p_auth", AuthTokenUtil.getToken(request));
 
@@ -30,7 +37,7 @@ long maxFileSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_
 
 <aui:form action="<%= action %>" cssClass="taglib-image-selector" enctype="multipart/form-data" method="post" name='<%= randomNamespace + "imageSelectorFM" %>' onSubmit="event.preventDefault();" useNamespace="<%= false %>">
 	<aui:input id="<%= randomNamespace + Constants.CMD %>" name="<%= Constants.CMD %>" type="hidden" />
-	<aui:input id='<%= randomNamespace + "fileEntryId" %>' name="fileEntryId" type="hidden" />
+	<aui:input id='<%= randomNamespace + "fileEntryId" %>' name="fileEntryId" type="hidden" value="<%= imageId %>" />
 	<aui:input id='<%= randomNamespace + "p_auth" %>' name="p_auth" type="hidden" value="<%= AuthTokenUtil.getToken(request) %>" />
 
 	<liferay-ui:error exception="<%= FileExtensionException.class %>">
@@ -55,12 +62,20 @@ long maxFileSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_
 		</div>
 
 		<div class="hide image-preview-wrapper" id='<%= randomNamespace + "imagePreviewWrapper" %>'>
-			<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id='<%= randomNamespace + "imagePreview" %>' src="<%= HtmlUtil.escape(currentImageURL) %>" />
+			<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id='<%= randomNamespace + "imagePreview" %>' src="<%= currentImageURL %>" />
 
 			<div class="image-preview-action-buttons">
 				<aui:button name='<%= randomNamespace + "apply" %>' type="submit" value="apply" />
 
 				<aui:button name='<%= randomNamespace + "cancel" %>' value="cancel" />
+			</div>
+		</div>
+
+		<div class="hide image-view-wrapper" id='<%= randomNamespace + "imageViewWrapper" %>'>
+			<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id='<%= randomNamespace + "imagePreview" %>' src="<%= currentImageURL %>" />
+
+			<div class="image-view-action-button">
+				<aui:button name='<%= randomNamespace + "change" %>' value="change-image" />
 			</div>
 		</div>
 	</aui:fieldset>
@@ -99,8 +114,6 @@ long maxFileSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_
 			var imagePreviewY = A.DOM.region(imagePreview).top;
 
 			var fileEntryIdNode = A.one('#<%= randomNamespace %>fileEntryId')
-
-debugger;
 
 			A.io.request(
 				'<%= action %>',
@@ -169,7 +182,7 @@ debugger;
 								var imageUploadWrapper = A.one('#<%= randomNamespace %>imageUploadWrapper');
 
 								imageUploadWrapper.hide();
-		                    }
+							}
 						}
 					}
 				}
@@ -194,7 +207,36 @@ debugger;
 		var imagePreviewWrapper = A.one('#<%= randomNamespace %>imagePreviewWrapper');
 
 		imagePreviewWrapper.hide();
+
+		var imageViewWrapper = A.one('#<%= randomNamespace %>imageViewWrapper');
+
+		imageViewWrapper.hide();
 	};
+
+	var showImageView = function() {
+		var imageUploadWrapper = A.one('#<%= randomNamespace %>imageUploadWrapper');
+
+		imageUploadWrapper.hide();
+
+		var imageViewWrapper = A.one('#<%= randomNamespace %>imageViewWrapper');
+
+		imageViewWrapper.show();
+	};
+
+	var changeButton = A.one('#<%= randomNamespace %>change');
+
+	changeButton.on(
+		'click',
+		function(event) {
+			showImageSelector();
+		}
+	);
+
+	var imageId = document.<%= randomNamespace + "imageSelectorFM " %>.<%= randomNamespace + "fileEntryId" %>.value;
+
+	if (imageId != 0) {
+		showImageView();
+	}
 
 	var dd = new A.DD.Drag({
 		node: '#<%= randomNamespace %>imagePreview'

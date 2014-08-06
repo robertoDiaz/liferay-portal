@@ -121,7 +121,7 @@ long maxFileSize = ParamUtil.getLong(request, "maxFileSize");
 
 							if (responseData.success) {
 								debugger;
-		                    }
+							}
 						}
 					}
 				}
@@ -165,7 +165,7 @@ long maxFileSize = ParamUtil.getLong(request, "maxFileSize");
 								var imageUploadWrapper = A.one('#<portlet:namespace />imageUploadWrapper');
 
 								imageUploadWrapper.hide();
-		                    }
+							}
 						}
 					}
 				}
