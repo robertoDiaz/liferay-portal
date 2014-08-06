@@ -2275,6 +2275,18 @@
 		<add-default-resource>true</add-default-resource>
 		<system>true</system>
 	</portlet>
+	<portlet>
+		<portlet-name>201</portlet-name>
+		<struts-path>image_selector</struts-path>
+		<use-default-template>false</use-default-template>
+		<private-request-attributes>false</private-request-attributes>
+		<private-session-attributes>false</private-session-attributes>
+		<render-weight>50</render-weight>
+		<header-portlet-css>/html/portlet/image_selector/css/main.css</header-portlet-css>
+		<css-class-wrapper>portlet-image-selector</css-class-wrapper>
+		<add-default-resource>true</add-default-resource>
+		<system>true</system>
+	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
 		<role-link>Administrator</role-link>
