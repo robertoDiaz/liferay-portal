@@ -1,0 +1,88 @@
+<%--
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+--%>
+
+<%
+String currentImageURL = StringPool.BLANK;
+
+if ((entry != null) && (entry.getCoverImageId() != 0)) {
+	FileEntry coverImage = PortletFileRepositoryUtil.getPortletFileEntry(entry.getCoverImageId());
+
+	currentImageURL = PortletFileRepositoryUtil.getPortletFileEntryURL(themeDisplay, coverImage, StringPool.BLANK);
+}
+%>
+
+<div class="image-upload-wrapper" id="<portlet:namespace/>imageUploadWrapper">
+	<aui:a href="javascript:;" id="imageUploadLink"><liferay-ui:message key="upload" /></aui:a>
+	<aui:input id='<%= renderResponse.getNamespace() + "imageUploadFile" %>' label="" name="file" onChange='<%= renderResponse.getNamespace() + "uploadImage();" %>' size="50" type="file" wrapperCssClass="image-upload-file">
+		<aui:validator name="acceptFiles">
+			'<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>'
+		</aui:validator>
+	</aui:input>
+</div>
+
+<div class="hide image-preview-wrapper" id="<portlet:namespace/>imagePreviewWrapper">
+	<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" src="<%= currentImageURL %>" />
+
+	<div class="image-preview-action-buttons">
+		<aui:button name="change" type="submit" value="change" />
+
+		<aui:button name="cancel" value="cancel" />
+	</div>
+</div>
+
+<div class="hide image-view-wrapper" id="<portlet:namespace/>imageViewWrapper">
+	<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" src="<%= currentImageURL %>" />
+
+	<div class="image-view-action-button">
+		<aui:button name="change" type="submit" value="change" />
+
+		<aui:button name="delete" value="delete" />
+	</div>
+</div>
+
+<aui:script use="aui-io,io-upload-iframe,json-parse">
+	var imageUploadLink = A.one('#<portlet:namespace />imageUploadLink')
+	var imageUploadFile = A.one('#<portlet:namespace />imageUploadFile')
+
+	debugger;
+
+	imageUploadLink.on(
+		'click',
+		function(event) {
+			imageUploadFile.simulate('click');
+		}
+	);
+
+	var cancelButton = A.one('#<portlet:namespace />cancel');
+
+	cancelButton.on(
+		'click',
+		function(event) {
+			showImageSelector();
+		}
+	);
+
+	var showImageSelector = function() {
+		var imageUploadWrapper = A.one('#<portlet:namespace />imageUploadWrapper');
+
+		imageUploadWrapper.show();
+
+		var imagePreviewWrapper = A.one('#<portlet:namespace />imagePreviewWrapper');
+
+		imagePreviewWrapper.hide();
+	};
+
+</aui:script>
