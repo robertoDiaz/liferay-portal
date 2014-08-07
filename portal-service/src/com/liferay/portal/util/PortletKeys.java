@@ -105,8 +105,6 @@ public class PortletKeys {
 
 	public static final String IFRAME = "48";
 
-	public static final String IMAGE_SELECTOR = "201";
-
 	public static final String IMAGE_UPLOADER = "195";
 
 	public static final String INVITATION = "100";

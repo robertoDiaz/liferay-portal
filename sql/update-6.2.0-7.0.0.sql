@@ -1,4 +1,3 @@
-alter table BlogsEntry add coverImageId LONG;
 alter table BlogsEntry add subtitle STRING null;
 
 create table ExportImportConfiguration (

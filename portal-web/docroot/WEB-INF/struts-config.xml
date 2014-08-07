@@ -37,8 +37,6 @@
 
 		<action path="/portal/flash" forward="/portal/flash.jsp" />
 
-		<action path="/portal/image_selector" type="com.liferay.portal.action.ImageSelectorAction" />
-
 		<action path="/portal/j_login" forward="/portal/j_login.jsp" />
 
 		<action path="/portal/j_login_error" forward="portal.j_login_error" />
@@ -846,12 +844,6 @@
 		<action path="/image_gallery_display/view_slide_show" type="com.liferay.portlet.imagegallerydisplay.action.ViewSlideShowAction">
 			<forward name="portlet.image_gallery_display.error" path="portlet.document_library.error" />
 			<forward name="portlet.image_gallery_display.view_slide_show" path="portlet.image_gallery_display.view_slide_show" />
-		</action>
-
-		<!-- Image Selector -->
-
-		<action path="/image_selector/view" type="com.liferay.portlet.imageselector.action.ViewAction">
-			<forward name="portlet.image_selector.view" path="portlet.image_selector.view" />
 		</action>
 
 		<!-- Image Uploader -->

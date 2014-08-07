@@ -1,5 +1,3 @@
-<%@ page
-	import="com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil" %>
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -46,21 +44,6 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="urlTitle" value="<%= entry.getUrlTitle() %>" />
 				</portlet:renderURL>
-
-				<%
-				long coverImageId = entry.getCoverImageId();
-
-				if (coverImageId != 0) {
-					FileEntry coverImage = DLAppLocalServiceUtil.getFileEntry(coverImageId);
-
-					String coverImageURL = DLUtil.getPreviewURL(coverImage, coverImage.getLatestFileVersion(), themeDisplay, "&imagePreview=1");
-				%>
-
-					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="preview" />" class="lfr-preview-cover-image" src="<%= coverImageURL %>" />
-
-				<%
-				}
-				%>
 
 				<c:if test='<%= !strutsAction.equals("/blogs/view_entry") %>'>
 					<div class="entry-title">

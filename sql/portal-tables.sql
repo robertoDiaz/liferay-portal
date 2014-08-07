@@ -241,7 +241,6 @@ create table BlogsEntry (
 	urlTitle VARCHAR(150) null,
 	description STRING null,
 	content TEXT null,
-	coverImageId LONG,
 	displayDate DATE null,
 	allowPingbacks BOOLEAN,
 	allowTrackbacks BOOLEAN,

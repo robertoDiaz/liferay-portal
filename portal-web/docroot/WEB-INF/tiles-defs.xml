@@ -708,14 +708,6 @@
 		<put name="portlet_content" value="/portlet/image_gallery_display/view_slide_show.jsp" />
 	</definition>
 
-	<!-- Image Selector -->
-
-	<definition name="portlet.image_selector" extends="portlet" />
-
-	<definition name="portlet.image_selector.view" extends="portlet.image_selector">
-		<put name="portlet_content" value="/portlet/image_selector/view.jsp" />
-	</definition>
-
 	<!-- Image Uploader -->
 
 	<definition name="portlet.image_uploader" extends="portlet" />

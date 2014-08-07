@@ -82,7 +82,7 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		throws PortalException {
 
 		return addEntry(
-			title, StringPool.BLANK, description, content, 0, displayDateMonth,
+			title, StringPool.BLANK, description, content, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			allowPingbacks, allowTrackbacks, trackbacks, smallImage,
 			smallImageURL, smallImageFileName, smallImageInputStream,
@@ -92,12 +92,11 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	@Override
 	public BlogsEntry addEntry(
 			String title, String subtitle, String description, String content,
-			long coverImageId, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			boolean allowPingbacks, boolean allowTrackbacks,
-			String[] trackbacks, boolean smallImage, String smallImageURL,
-			String smallImageFileName, InputStream smallImageInputStream,
-			ServiceContext serviceContext)
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, boolean allowPingbacks,
+			boolean allowTrackbacks, String[] trackbacks, boolean smallImage,
+			String smallImageURL, String smallImageFileName,
+			InputStream smallImageInputStream, ServiceContext serviceContext)
 		throws PortalException {
 
 		BlogsPermission.check(
@@ -105,7 +104,7 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			ActionKeys.ADD_ENTRY);
 
 		return blogsEntryLocalService.addEntry(
-			getUserId(), title, subtitle, description, content, coverImageId,
+			getUserId(), title, subtitle, description, content,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
 			smallImage, smallImageURL, smallImageFileName,
@@ -424,13 +423,6 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		blogsEntryLocalService.unsubscribe(getUserId(), groupId);
 	}
 
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #updateEntry(
-	 *             long, String, String, String, String, long, int, int, int,
-	 *             int, int, boolean, boolean, String[], boolean, String,
-	 *             String, InputStream, ServiceContext)}
-	 */
-	@Deprecated
 	@Override
 	public BlogsEntry updateEntry(
 			long entryId, String title, String description, String content,
@@ -442,7 +434,7 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		throws PortalException {
 
 		return updateEntry(
-			entryId, title, StringPool.BLANK, description, content, 0,
+			entryId, title, StringPool.BLANK, description, content,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
 			smallImage, smallImageURL, smallImageFileName,
@@ -452,12 +444,12 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	@Override
 	public BlogsEntry updateEntry(
 			long entryId, String title, String subtitle, String description,
-			String content, long coverImageId, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, boolean allowPingbacks,
-			boolean allowTrackbacks, String[] trackbacks, boolean smallImage,
-			String smallImageURL, String smallImageFileName,
-			InputStream smallImageInputStream, ServiceContext serviceContext)
+			String content, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			boolean allowPingbacks, boolean allowTrackbacks,
+			String[] trackbacks, boolean smallImage, String smallImageURL,
+			String smallImageFileName, InputStream smallImageInputStream,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		BlogsEntryPermission.check(
@@ -465,9 +457,9 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 
 		return blogsEntryLocalService.updateEntry(
 			getUserId(), entryId, title, subtitle, description, content,
-			coverImageId, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, allowPingbacks, allowTrackbacks,
-			trackbacks, smallImage, smallImageURL, smallImageFileName,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
+			smallImage, smallImageURL, smallImageFileName,
 			smallImageInputStream, serviceContext);
 	}
 

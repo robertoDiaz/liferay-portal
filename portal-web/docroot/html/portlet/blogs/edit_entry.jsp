@@ -49,8 +49,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
 </portlet:actionURL>
 
-<liferay-ui:image-selector callback='<%= renderResponse.getNamespace() + "updateImage" %>' imageId="<%= entry == null ? 0 : entry.getCoverImageId() %>" />
-
 <aui:form action="<%= editEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
@@ -60,7 +58,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<aui:input name="entryId" type="hidden" value="<%= entryId %>" />
 	<aui:input name="preview" type="hidden" value="<%= false %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
-	<aui:input name="coverImageId" type="hidden" />
 
 	<liferay-ui:error exception="<%= EntryContentException.class %>" message="please-enter-valid-content" />
 	<liferay-ui:error exception="<%= EntryTitleException.class %>" message="please-enter-a-valid-title" />
@@ -325,14 +322,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 		submitForm(document.<portlet:namespace />fm);
 	}
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />updateImage',
-		function(fileEntryId) {
-			document.<portlet:namespace />fm.<portlet:namespace />coverImageId.value = fileEntryId;
-		}
-	);
 
 	Liferay.provide(
 		window,
