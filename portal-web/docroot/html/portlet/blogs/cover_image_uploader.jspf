@@ -36,34 +36,36 @@ if ((entry != null) && (entry.getCoverImageId() != 0)) {
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="uploadCoverImage" />
 	<aui:input name="fileEntryId" type="hidden" value="<%= entry != null ? entry.getCoverImageId() : 0 %>" />
 
-	<div class="image-upload-wrapper" id="<portlet:namespace/>imageUploadWrapper">
-		<aui:a href="javascript:;" id="imageUploadLink"><liferay-ui:message key="upload" /></aui:a>
-		<aui:input id="imageUploadFile" label="" name="file" onChange='<%= renderResponse.getNamespace() + "uploadImage();" %>' size="50" type="file" wrapperCssClass="image-upload-file">
-			<aui:validator name="acceptFiles">
-				'<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>'
-			</aui:validator>
-		</aui:input>
-	</div>
-
-	<div class="hide image-preview-wrapper" id="<portlet:namespace/>imagePreviewWrapper">
-		<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" src="<%= currentImageURL %>" />
-
-		<div class="image-preview-action-buttons">
-			<aui:button cssClass="changeImage" name="change" type="submit" value="change-image" />
-
-			<aui:button name="cancel" value="cancel" />
+	<aui:fieldset cssClass="cover-image-selector">
+		<div class="image-upload-wrapper" id="<portlet:namespace/>imageUploadWrapper">
+			<aui:a href="javascript:;" id="imageUploadLink"><liferay-ui:message key="upload" /></aui:a>
+			<aui:input id="imageUploadFile" label="" name="file" onChange='<%= renderResponse.getNamespace() + "uploadImage();" %>' size="50" type="file" wrapperCssClass="image-upload-file">
+				<aui:validator name="acceptFiles">
+					'<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>'
+				</aui:validator>
+			</aui:input>
 		</div>
-	</div>
 
-	<div class="hide image-view-wrapper" id="<portlet:namespace/>imageViewWrapper">
-		<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" onChange='<%= "showImageView();" %>' src="<%= currentImageURL %>" />
+		<div class="hide cover-image-preview-wrapper" id="<portlet:namespace/>imagePreviewWrapper">
+			<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" src="<%= currentImageURL %>" />
 
-		<div class="image-view-action-button">
-			<aui:button cssClass="changeImage" name="change" type="submit" value="change-image" />
+			<div class="cover-image-preview-action-buttons">
+				<aui:button cssClass="change-image" name="change" type="submit" value="change-image" />
 
-			<aui:button name="cancel" value="delete" />
+				<aui:button name="cancel" value="cancel" />
+			</div>
 		</div>
-	</div>
+
+		<div class="hide cover-image-view-wrapper" id="<portlet:namespace/>imageViewWrapper">
+			<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" id="<portlet:namespace/>imagePreview" onChange='<%= "showImageView();" %>' src="<%= currentImageURL %>" />
+
+			<div class="cover-image-view-action-button">
+				<aui:button cssClass="change-image" name="change" type="submit" value="change-image" />
+
+				<aui:button name="cancel" value="delete" />
+			</div>
+		</div>
+	</aui:fieldset>
 </aui:form>
 
 <aui:script use="aui-io,io-upload-iframe,json-parse,dd-drag">
@@ -71,15 +73,6 @@ if ((entry != null) && (entry.getCoverImageId() != 0)) {
 	var imageUploadFile = A.one('#<portlet:namespace />imageUploadFile');
 
 	imageUploadLink.on(
-		'click',
-		function(event) {
-			imageUploadFile.simulate('click');
-		}
-	);
-
-	var changeButton = A.all('.changeImage');
-
-	changeButton.on(
 		'click',
 		function(event) {
 			imageUploadFile.simulate('click');
@@ -169,7 +162,7 @@ if ((entry != null) && (entry.getCoverImageId() != 0)) {
 		imageViewWrapper.show();
 	};
 
-	var changeButton = A.all('.changeImage');
+	var changeButton = A.all('.change-image');
 
 	changeButton.on(
 		'click',
