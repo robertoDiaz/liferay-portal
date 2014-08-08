@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
@@ -460,7 +461,6 @@ public class EditEntryAction extends PortletAction {
 		long entryId = ParamUtil.getLong(actionRequest, "entryId");
 
 		String title = ParamUtil.getString(actionRequest, "title");
-		long coverImageId = ParamUtil.getLong(actionRequest, "coverImageId");
 		String subtitle = ParamUtil.getString(actionRequest, "subtitle");
 		String description = ParamUtil.getString(actionRequest, "description");
 		String content = ParamUtil.getString(actionRequest, "content");
@@ -526,16 +526,19 @@ public class EditEntryAction extends PortletAction {
 			entry = null;
 			oldUrlTitle = StringPool.BLANK;
 
+			FileEntry coverImage = ActionUtil.saveCoverImage(actionRequest);
+
 			if (entryId <= 0) {
 
 				// Add entry
 
 				entry = BlogsEntryServiceUtil.addEntry(
-					title, subtitle, description, content, coverImageId,
-					displayDateMonth, displayDateDay, displayDateYear,
-					displayDateHour, displayDateMinute, allowPingbacks,
-					allowTrackbacks, trackbacks, smallImage, smallImageURL,
-					smallImageFileName, smallImageInputStream, serviceContext);
+					title, subtitle, description, content,
+					coverImage.getFileEntryId(), displayDateMonth,
+					displayDateDay, displayDateYear, displayDateHour,
+					displayDateMinute, allowPingbacks, allowTrackbacks,
+					trackbacks, smallImage, smallImageURL, smallImageFileName,
+					smallImageInputStream, serviceContext);
 
 				AssetPublisherUtil.addAndStoreSelection(
 					actionRequest, BlogsEntry.class.getName(),
@@ -551,11 +554,11 @@ public class EditEntryAction extends PortletAction {
 
 				entry = BlogsEntryServiceUtil.updateEntry(
 					entryId, title, subtitle, description, content,
-					coverImageId, displayDateMonth, displayDateDay,
-					displayDateYear, displayDateHour, displayDateMinute,
-					allowPingbacks, allowTrackbacks, trackbacks, smallImage,
-					smallImageURL, smallImageFileName, smallImageInputStream,
-					serviceContext);
+					coverImage.getFileEntryId(), displayDateMonth,
+					displayDateDay, displayDateYear, displayDateHour,
+					displayDateMinute, allowPingbacks, allowTrackbacks,
+					trackbacks, smallImage, smallImageURL, smallImageFileName,
+					smallImageInputStream, serviceContext);
 
 				if (!tempOldUrlTitle.equals(entry.getUrlTitle())) {
 					oldUrlTitle = tempOldUrlTitle;

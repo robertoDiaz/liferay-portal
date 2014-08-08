@@ -319,6 +319,8 @@
 
 		<!-- Blogs -->
 
+		<action path="/blogs/edit_cover" type="com.liferay.portlet.blogs.action.EditCoverAction" />
+
 		<action path="/blogs/edit_entry" type="com.liferay.portlet.blogs.action.EditEntryAction">
 			<forward name="portlet.blogs.edit_entry" path="portlet.blogs.edit_entry" />
 			<forward name="portlet.blogs.error" path="portlet.blogs.error" />
