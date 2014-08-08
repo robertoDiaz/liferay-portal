@@ -45,6 +45,8 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	/>
 </c:if>
 
+<%@ include file="/html/portlet/blogs/cover_image_uploader.jspf" %>
+
 <portlet:actionURL var="editEntryURL">
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
 </portlet:actionURL>
@@ -58,6 +60,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<aui:input name="entryId" type="hidden" value="<%= entryId %>" />
 	<aui:input name="preview" type="hidden" value="<%= false %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
+	<aui:input name="coverImageId" type="hidden" value="<%= entry != null ? entry.getCoverImageId() : 0 %>" />
 	<aui:input name="xPos" type="hidden" />
 	<aui:input name="yPos" type="hidden" />
 	<aui:input name="width" type="hidden" />
@@ -98,8 +101,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	</c:if>
 
 	<aui:fieldset>
-		<%@ include file="/html/portlet/blogs/cover_image_uploader.jspf" %>
-
 		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" name="title" />
 
 		<aui:input name="subtitle" />
@@ -309,27 +310,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		}
 	}
 
-	function <portlet:namespace />cropImage() {
-		var imagePreviewWrapper = document.querySelector('#<portlet:namespace />imagePreviewWrapper');
-
-		var imagePreviewWrapperWidth = A.DOM.region(imagePreviewWrapper).width;
-		var imagePreviewWrapperHeight = A.DOM.region(imagePreviewWrapper).height;
-		var imagePreviewWrapperX = A.DOM.region(imagePreviewWrapper).left;
-		var imagePreviewWrapperY = A.DOM.region(imagePreviewWrapper).top;
-
-		var imagePreview = document.querySelector('#<portlet:namespace />imagePreview');
-
-		var imagePreviewWidth = A.DOM.region(imagePreview).width;
-		var imagePreviewHeight = A.DOM.region(imagePreview).height;
-		var imagePreviewX = A.DOM.region(imagePreview).left;
-		var imagePreviewY = A.DOM.region(imagePreview).top;
-
-		document.<portlet:namespace />fm.<portlet:namespace />xPos.value = imagePreviewWrapperX - imagePreviewX;
-		document.<portlet:namespace />fm.<portlet:namespace />yPos.value = imagePreviewWrapperY - imagePreviewY;
-		document.<portlet:namespace />fm.<portlet:namespace />width.value = imagePreviewWrapperWidth;
-		document.<portlet:namespace />fm.<portlet:namespace />height.value = imagePreviewWrapperHeight;
-	}
-
 	function <portlet:namespace />getSuggestionsContent() {
 		return document.<portlet:namespace />fm.<portlet:namespace />title.value + ' ' + window.<portlet:namespace />editor.getHTML();
 	}
@@ -348,6 +328,29 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		}
 
 		submitForm(document.<portlet:namespace />fm);
+	}
+
+	function <portlet:namespace />cropImage() {
+		var A = AUI();
+
+		var imagePreviewWrapper = document.querySelector('#<portlet:namespace />imagePreviewWrapper');
+
+		var imagePreviewWrapperWidth = A.DOM.region(imagePreviewWrapper).width;
+		var imagePreviewWrapperHeight = A.DOM.region(imagePreviewWrapper).height;
+		var imagePreviewWrapperX = A.DOM.region(imagePreviewWrapper).left;
+		var imagePreviewWrapperY = A.DOM.region(imagePreviewWrapper).top;
+
+		var imagePreview = document.querySelector('#<portlet:namespace />imagePreview');
+
+		var imagePreviewWidth = A.DOM.region(imagePreview).width;
+		var imagePreviewHeight = A.DOM.region(imagePreview).height;
+		var imagePreviewX = A.DOM.region(imagePreview).left;
+		var imagePreviewY = A.DOM.region(imagePreview).top;
+
+		document.<portlet:namespace />fm.<portlet:namespace />xPos.value = imagePreviewWrapperX - imagePreviewX;
+		document.<portlet:namespace />fm.<portlet:namespace />yPos.value = imagePreviewWrapperY - imagePreviewY;
+		document.<portlet:namespace />fm.<portlet:namespace />width.value = imagePreviewWrapperWidth;
+		document.<portlet:namespace />fm.<portlet:namespace />height.value = imagePreviewWrapperHeight;
 	}
 
 	Liferay.provide(
