@@ -40,8 +40,6 @@
 		}
 	);
 
-	var REGEX_DASH = /-([a-z])/gi;
-
 	var STR_LEFT_SQUARE_BRACKET = '[';
 
 	var STR_RIGHT_SQUARE_BRACKET = ']';
@@ -64,41 +62,6 @@
 		MAP_HTML_CHARS_ESCAPED: MAP_HTML_CHARS_ESCAPED,
 
 		submitCountdown: 0,
-
-		actsAsAspect: function(object) {
-			object.yield = null;
-			object.rv = {};
-
-			object.before = function(method, f) {
-				var original = eval('this.' + method);
-
-				this[method] = function() {
-					f.apply(this, arguments);
-
-					return original.apply(this, arguments);
-				};
-			};
-
-			object.after = function(method, f) {
-				var original = eval('this.' + method);
-
-				this[method] = function() {
-					this.rv[method] = original.apply(this, arguments);
-
-					return f.apply(this, arguments);
-				};
-			};
-
-			object.around = function(method, f) {
-				var original = eval('this.' + method);
-
-				this[method] = function() {
-					this.yield = original;
-
-					return f.apply(this, arguments);
-				};
-			};
-		},
 
 		addInputCancel: function() {
 			A.use(
@@ -222,23 +185,6 @@
 					return finalUrl;
 				}
 			}
-		},
-
-		camelize: function(value, separator) {
-			var regex = REGEX_DASH;
-
-			if (separator) {
-				regex = new RegExp(separator + '([a-z])', 'gi');
-			}
-
-			value = value.replace(
-				regex,
-				function(match0, match1) {
-					return match1.toUpperCase();
-				}
-			);
-
-			return value;
 		},
 
 		checkTab: function(box) {
@@ -579,10 +525,6 @@
 			return viewable;
 		},
 
-		isEditorPresent: function(editorImpl) {
-			return Liferay.EDITORS && Liferay.EDITORS[editorImpl];
-		},
-
 		isPhone: function() {
 			var instance = this;
 
@@ -656,10 +598,6 @@
 
 		randomInt: function() {
 			return (Math.ceil(Math.random() * (new Date()).getTime()));
-		},
-
-		randomMinMax: function(min, max) {
-			return (Math.round(Math.random() * (max - min))) + min;
 		},
 
 		selectAndCopy: function(el) {
@@ -796,15 +734,6 @@
 
 		toNumber: function(value) {
 			return parseInt(value, 10) || 0;
-		},
-
-		uncamelize: function(value, separator) {
-			separator = separator || ' ';
-
-			value = value.replace(/([a-zA-Z][a-zA-Z])([A-Z])([a-z])/g, '$1' + separator + '$2$3');
-			value = value.replace(/([a-z])([A-Z])/g, '$1' + separator + '$2');
-
-			return value;
 		},
 
 		unescapeHTML: function(str, entities) {
@@ -1940,30 +1869,6 @@
 			}
 		},
 		['aui-base']
-	);
-
-	/**
-	 * OPTIONS
-	 *
-	 * Required
-	 * uri {string}: The url to open that sets the editor.
-	 */
-
-	Liferay.provide(
-		Util,
-		'switchEditor',
-		function(options) {
-			var uri = options.uri;
-
-			var windowName = Liferay.Util.getWindowName();
-
-			var dialog = Liferay.Util.getWindow(windowName);
-
-			if (dialog) {
-				dialog.iframe.set('uri', uri);
-			}
-		},
-		['aui-io']
 	);
 
 	Liferay.provide(
