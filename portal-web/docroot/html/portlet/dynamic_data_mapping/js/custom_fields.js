@@ -10,14 +10,16 @@ AUI.add(
 
 		var Lang = A.Lang;
 
+		var LString = Lang.String;
+
 		var booleanParse = A.DataType.Boolean.parse;
-		var camelize = Liferay.Util.camelize;
+		var camelize = Lang.String.camelize;
 		var instanceOf = A.instanceOf;
 		var isObject = Lang.isObject;
 		var isUndefined = Lang.isUndefined;
 		var isNull = Lang.isNull;
 		var isValue = Lang.isValue;
-		var trim = A.Lang.trim;
+		var trim = Lang.trim;
 
 		var STR_BLANK = '';
 
@@ -206,7 +208,7 @@ AUI.add(
 						}
 
 						linkNode.setAttribute('href', url);
-						linkNode.setContent(Liferay.Util.escapeHTML(title));
+						linkNode.setContent(LString.escapeHTML(title));
 					},
 
 					_uiSetValue: function(val) {
@@ -311,7 +313,7 @@ AUI.add(
 								var values = {
 									id: A.guid(),
 									label: index,
-									value: Liferay.Util.escapeHTML(JSON.stringify(item))
+									value: LString.escapeHTML(JSON.stringify(item))
 								};
 
 								var optionsArray = publicOptions;
