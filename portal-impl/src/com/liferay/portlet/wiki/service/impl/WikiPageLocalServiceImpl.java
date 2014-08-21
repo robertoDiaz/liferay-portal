@@ -2058,7 +2058,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 				WikiPage oldPage = getPage(resourcePrimKey, true);
 
-				doMovePage(
+				page = doMovePage(
 					userId, page.getNodeId(), oldPage.getTitle(),
 					page.getTitle(), serviceContext);
 			}
@@ -2080,9 +2080,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 							draftAssetEntry.getEntryId(),
 							AssetLinkConstants.TYPE_RELATED);
 
-					long[] assetLinkEntryIds = StringUtil.split(
-						ListUtil.toString(
-							assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
+					long[] assetLinkEntryIds = ListUtil.toLongArray(
+						assetLinks, AssetLink.ENTRY_ID2_ACCESSOR);
 
 					AssetEntry assetEntry = assetEntryLocalService.updateEntry(
 						userId, page.getGroupId(), page.getCreateDate(),
@@ -2228,7 +2227,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		PortletFileRepositoryUtil.deletePortletFileEntry(fileEntryId);
 	}
 
-	protected void doMovePage(
+	protected WikiPage doMovePage(
 			long userId, long nodeId, String title, String newTitle,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -2238,12 +2237,14 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		List<WikiPage> versionPages = wikiPagePersistence.findByN_T(
 			nodeId, title);
 
+		WikiPage page = versionPages.get(versionPages.size() - 1);
+
 		if (versionPages.isEmpty()) {
-			return;
+			return page;
 		}
 
-		for (WikiPage page : versionPages) {
-			page.setTitle(newTitle);
+		for (WikiPage versionPage : versionPages) {
+			versionPage.setTitle(newTitle);
 
 			if (Validator.isNotNull(page.getRedirectTitle())) {
 				page.setRedirectTitle(StringPool.BLANK);
@@ -2251,12 +2252,10 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 				page.setSummary(StringPool.BLANK);
 			}
 
-			wikiPagePersistence.update(page);
+			wikiPagePersistence.update(versionPage);
 		}
 
 		// Page resource
-
-		WikiPage page = versionPages.get(versionPages.size() - 1);
 
 		long resourcePrimKey = page.getResourcePrimKey();
 
@@ -2325,6 +2324,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			userId, page, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
+
+		return page;
 	}
 
 	protected String getDiffsURL(
@@ -2764,8 +2765,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		List<AssetLink> assetLinks = assetLinkLocalService.getLinks(
 			assetEntry.getEntryId());
 
-		long[] assetLinkEntryIds = StringUtil.split(
-			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
+		long[] assetLinkEntryIds = ListUtil.toLongArray(
+			assetLinks, AssetLink.ENTRY_ID2_ACCESSOR);
 
 		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
 
@@ -2886,7 +2887,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		page.setCompanyId(user.getCompanyId());
 		page.setUserId(user.getUserId());
 		page.setUserName(user.getFullName());
-		page.setCreateDate(serviceContext.getModifiedDate(now));
+		page.setCreateDate(oldPage.getCreateDate());
 		page.setModifiedDate(serviceContext.getModifiedDate(now));
 		page.setNodeId(oldPage.getNodeId());
 		page.setTitle(
