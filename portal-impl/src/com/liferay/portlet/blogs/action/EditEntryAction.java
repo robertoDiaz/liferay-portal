@@ -522,6 +522,8 @@ public class EditEntryAction extends PortletAction {
 			entry = null;
 			oldUrlTitle = StringPool.BLANK;
 
+			// FIX COVERIMAGE_ID IN EXISTING BLOG ENTRIES
+
 			long coverImageId = 0;
 
 			FileEntry coverImage = ActionUtil.saveCoverImage(actionRequest);
