@@ -541,34 +541,38 @@ public class WikiPageLocalServiceTest {
 	public void testRenameRenamedPage() throws Exception {
 		WikiTestUtil.addPage(
 			TestPropsValues.getUserId(), _group.getGroupId(), _node.getNodeId(),
-			"A", true);
+			"initialPage", true);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		WikiPageLocalServiceUtil.renamePage(
-			TestPropsValues.getUserId(), _node.getNodeId(), "A", "B", true,
-			serviceContext);
+			TestPropsValues.getUserId(), _node.getNodeId(), "initialPage",
+			"renamedPage", true, serviceContext);
 
 		WikiPageLocalServiceUtil.renamePage(
-			TestPropsValues.getUserId(), _node.getNodeId(), "A", "C", true,
-			serviceContext);
+			TestPropsValues.getUserId(), _node.getNodeId(), "initialPage",
+			"renamedRenamedPage", true, serviceContext);
 
-		WikiPage pageA = WikiPageLocalServiceUtil.getPage(
-			_node.getNodeId(), "A");
-		WikiPage pageB = WikiPageLocalServiceUtil.getPage(
-			_node.getNodeId(), "B");
-		WikiPage pageC = WikiPageLocalServiceUtil.getPage(
-			_node.getNodeId(), "C");
+		WikiPage redirectPage = WikiPageLocalServiceUtil.getPage(
+			_node.getNodeId(), "initialPage");
+		WikiPage renamedPage = WikiPageLocalServiceUtil.getPage(
+			_node.getNodeId(), "renamedPage");
+		WikiPage renamedRenamedPage = WikiPageLocalServiceUtil.getPage(
+			_node.getNodeId(), "renamedRenamedPage");
 
-		Assert.assertEquals(pageA.getRedirectTitle(), "C");
-		Assert.assertEquals(pageB.getRedirectTitle(), StringPool.BLANK);
-		Assert.assertEquals(pageC.getRedirectTitle(), StringPool.BLANK);
-		Assert.assertEquals(pageA.getSummary(), "Renamed as C");
-		Assert.assertEquals(pageB.getSummary(), "Summary");
-		Assert.assertEquals(pageC.getSummary(), StringPool.BLANK);
-		Assert.assertEquals(pageA.getContent(), "[[C]]");
-		Assert.assertEquals(pageC.getContent(), "[[B]]");
+		Assert.assertEquals(
+			redirectPage.getRedirectTitle(), "renamedRenamedPage");
+		Assert.assertEquals(renamedPage.getRedirectTitle(), StringPool.BLANK);
+		Assert.assertEquals(
+			renamedRenamedPage.getRedirectTitle(), StringPool.BLANK);
+		Assert.assertEquals(
+			redirectPage.getSummary(), "Renamed as renamedRenamedPage");
+		Assert.assertEquals(renamedPage.getSummary(), "Summary");
+		Assert.assertEquals(renamedRenamedPage.getSummary(), StringPool.BLANK);
+		Assert.assertEquals(
+			redirectPage.getContent(), "[[renamedRenamedPage]]");
+		Assert.assertEquals(renamedRenamedPage.getContent(), "[[renamedPage]]");
 	}
 
 	@Test
