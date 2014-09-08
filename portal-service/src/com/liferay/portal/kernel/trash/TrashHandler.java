@@ -190,8 +190,6 @@ public interface TrashHandler {
 
 	public String getContainerModelClassName(long classPK);
 
-	public long getContainerModelId(long classPK) throws PortalException;
-
 	/**
 	 * Returns the name of the container model (e.g. folder name).
 	 *
@@ -338,17 +336,29 @@ public interface TrashHandler {
 	public String getRestoreMessage(PortletRequest portletRequest, long classPK)
 		throws PortalException;
 
+	public String getRootContainerModelClassName(long classPK);
+
+	public long getRootContainerModelId(long classPK) throws PortalException;
+
 	/**
 	 * Returns the name of the root container (e.g. "home").
 	 *
 	 * @return the name of the root container
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getRootContainerModelName(long)}}
 	 */
+	@Deprecated
 	public String getRootContainerModelName();
+
+	public String getRootContainerModelName(long containerModelId)
+		throws PortalException;
 
 	public List<ContainerModel> getRootContainerModels(long groupId)
 		throws PortalException;
 
 	public int getRootContainerModelsCount(long groupId) throws PortalException;
+
+	public String getRootContainerModelType();
 
 	/**
 	 * Returns the name of the subcontainer model (e.g. for a folder the

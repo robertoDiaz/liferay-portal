@@ -63,6 +63,7 @@ import javax.portlet.PortletURL;
  * Implements trash handling for the wiki page entity.
  *
  * @author Eudaldo Alonso
+ * @author Roberto Díaz
  */
 public class WikiPageTrashHandler extends BaseTrashHandler {
 
@@ -149,7 +150,8 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 		return WikiNode.class.getName();
 	}
 
-	public long getContainerModelId(long classPK) throws PortalException {
+	@Override
+	public long getRootContainerModelId(long classPK) throws PortalException {
 		WikiPage page = WikiPageLocalServiceUtil.getLatestPage(
 			classPK, WorkflowConstants.STATUS_ANY, false);
 
@@ -338,10 +340,27 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public String getRootContainerModelName() {
+	public String getRootContainerModelClassName(long classPK) {
+		return WikiNode.class.getName();
+	}
+
+	@Override
+	public String getRootContainerModelName(long containerModelId)
+		throws PortalException {
+
+		WikiPage page = WikiPageLocalServiceUtil.getPage(containerModelId);
+
+		WikiNode node = page.getNode();
+
+		return node.getName();
+	}
+
+	@Override
+	public String getRootContainerModelType() {
 		return "wiki-node";
 	}
 
+	@Override
 	public List<ContainerModel> getRootContainerModels(long groupId)
 		throws PortalException {
 
@@ -357,6 +376,7 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 		return containerModels;
 	}
 
+	@Override
 	public int getRootContainerModelsCount(long groupId) {
 		return WikiNodeLocalServiceUtil.getNodesCount(groupId);
 	}
@@ -418,11 +438,6 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 			classPK, WorkflowConstants.STATUS_ANY, false);
 
 		return new WikiPageAssetRenderer(page);
-	}
-
-	@Override
-	public boolean hasRootContainerModel() {
-		return true;
 	}
 
 	@Override
@@ -488,8 +503,8 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 			containerModelId);
 
 		WikiPageLocalServiceUtil.movePageFromTrash(
-			userId, page.getNodeId(), page.getTitle(), parentPage.getTitle(),
-			serviceContext);
+			userId, page.getNodeId(), page.getTitle(), parentPage.getNodeId(),
+			parentPage.getTitle(), serviceContext);
 	}
 
 	@Override
@@ -500,23 +515,12 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 
 		WikiPage page = WikiPageLocalServiceUtil.getPage(classPK);
 
-		String parentPageTitle = StringPool.BLANK;
-		long newNodeId = 0;
-
-		WikiPage parentPage = WikiPageLocalServiceUtil.fetchPage(
+		WikiPage parentPage = WikiPageLocalServiceUtil.getPage(
 			containerModelId);
 
-		if (parentPage != null) {
-			parentPageTitle = parentPage.getTitle();
-			newNodeId = parentPage.getNodeId();
-		}
-		else {
-			newNodeId = containerModelId;
-		}
-
 		WikiPageLocalServiceUtil.movePageFromTrash(
-			userId, page.getNodeId(), page.getTitle(), newNodeId,
-			parentPageTitle, serviceContext);
+			userId, page.getNodeId(), page.getTitle(), parentPage.getNodeId(),
+			parentPage.getTitle(), serviceContext);
 	}
 
 	@Override

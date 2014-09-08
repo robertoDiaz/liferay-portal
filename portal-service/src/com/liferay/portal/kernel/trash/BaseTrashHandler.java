@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.model.SystemEventConstants;
@@ -130,7 +131,7 @@ public abstract class BaseTrashHandler implements TrashHandler {
 	}
 
 	@Override
-	public long getContainerModelId(long classPK) throws PortalException {
+	public long getRootContainerModelId(long classPK) throws PortalException {
 		return 0;
 	}
 
@@ -226,16 +227,35 @@ public abstract class BaseTrashHandler implements TrashHandler {
 	}
 
 	@Override
+	public String getRootContainerModelClassName(long classPK) {
+		return getContainerModelClassName(classPK);
+	}
+
+	@Override
 	public String getRootContainerModelName() {
 		return StringPool.BLANK;
 	}
 
+	@Override
+	public String getRootContainerModelType() {
+		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getRootContainerModelName(long containerModelId)
+		throws PortalException {
+
+		return StringPool.BLANK;
+	}
+
+	@Override
 	public List<ContainerModel> getRootContainerModels(long groupId)
 		throws PortalException {
 
 		return Collections.emptyList();
 	}
 
+	@Override
 	public int getRootContainerModelsCount(long groupId)
 		throws PortalException {
 
@@ -320,7 +340,7 @@ public abstract class BaseTrashHandler implements TrashHandler {
 
 	@Override
 	public boolean hasRootContainerModel() {
-		return false;
+		return Validator.isNotNull(getRootContainerModelType());
 	}
 
 	@Override
