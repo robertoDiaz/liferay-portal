@@ -65,7 +65,7 @@ import javax.portlet.PortletURL;
  * @author Eudaldo Alonso
  * @author Roberto Díaz
  */
-public class WikiPageTrashHandler extends BaseTrashHandler {
+public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 
 	@Override
 	public SystemEvent addDeletionSystemEvent(
@@ -116,137 +116,11 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public ContainerModel getContainerModel(long containerModelId)
-		throws PortalException {
-
-		return WikiPageLocalServiceUtil.getPage(containerModelId);
-	}
-
-	@Override
-	public String getContainerModelClassName(long classPK) {
-		WikiPage page = null;
-
-		try {
-			page = WikiPageLocalServiceUtil.getPage(classPK);
-		}
-		catch (Exception e) {
-			page = WikiPageLocalServiceUtil.fetchWikiPage(classPK);
-		}
-
-		try {
-			WikiPage parentPage = page.getParentPage();
-
-			while (parentPage != null) {
-				if (parentPage.isInTrashExplicitly()) {
-					return WikiPage.class.getName();
-				}
-
-				parentPage = parentPage.getParentPage();
-			}
-		}
-		catch (Exception e) {
-		}
-
-		return WikiNode.class.getName();
-	}
-
-	@Override
-	public long getRootContainerModelId(long classPK) throws PortalException {
-		WikiPage page = WikiPageLocalServiceUtil.getLatestPage(
-			classPK, WorkflowConstants.STATUS_ANY, false);
-
-		return page.getNodeId();
-	}
-
-	@Override
 	public String getContainerModelName() {
 		return "wiki-page";
 	}
 
-	@Override
-	public List<ContainerModel> getContainerModels(
-			long classPK, long containerModelId, int start, int end)
-		throws PortalException {
 
-		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
-
-		WikiPage page = null;
-
-		String parentTitle = StringPool.BLANK;
-
-		if (containerModelId > 0) {
-			try {
-				page = WikiPageLocalServiceUtil.getPage(containerModelId);
-
-				parentTitle = page.getTitle();
-			}
-			catch (NoSuchPageResourceException nspre) {
-				List<WikiPage> pages = WikiPageLocalServiceUtil.getPages(
-					containerModelId, start, end);
-
-				for (WikiPage curPage : pages) {
-					containerModels.add(curPage);
-				}
-
-				return containerModels;
-			}
-		}
-		else {
-			page = WikiPageLocalServiceUtil.getPage(classPK);
-		}
-
-		List<WikiPage> pages = WikiPageLocalServiceUtil.getChildren(
-			page.getNodeId(), true, parentTitle, start, end);
-
-		for (WikiPage curPage : pages) {
-			containerModels.add(curPage);
-		}
-
-		return containerModels;
-	}
-
-	@Override
-	public int getContainerModelsCount(long classPK, long containerModelId)
-		throws PortalException {
-
-		WikiPage page = null;
-
-		String parentTitle = StringPool.BLANK;
-
-		if (containerModelId > 0) {
-			try {
-				page = WikiPageLocalServiceUtil.getPage(containerModelId);
-
-				parentTitle = page.getTitle();
-			}
-			catch (NoSuchPageResourceException nspre) {
-				return WikiPageLocalServiceUtil.getPagesCount(containerModelId);
-			}
-		}
-		else {
-			page = WikiPageLocalServiceUtil.getPage(classPK);
-		}
-
-		return WikiPageLocalServiceUtil.getChildrenCount(
-			page.getNodeId(), true, parentTitle);
-	}
-
-	@Override
-	public long getDestinationContainerModelId(
-		long classPK, long destinationContainerModelId) {
-
-		if (destinationContainerModelId == 0) {
-			try {
-				WikiPage page = WikiPageLocalServiceUtil.getPage(classPK);
-
-				return page.getNodeId();
-			}
-			catch (Exception e) {
-			}
-		}
-
-		return destinationContainerModelId;
-	}
 
 	@Override
 	public ContainerModel getParentContainerModel(long classPK)
@@ -279,17 +153,6 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 		}
 
 		return page.getNode();
-	}
-
-	@Override
-	public List<ContainerModel> getParentContainerModels(long classPK)
-		throws PortalException {
-
-		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
-
-		containerModels.add(getParentContainerModel(classPK));
-
-		return containerModels;
 	}
 
 	@Override
@@ -337,48 +200,6 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 		WikiNode node = page.getNode();
 
 		return node.getName();
-	}
-
-	@Override
-	public String getRootContainerModelClassName(long classPK) {
-		return WikiNode.class.getName();
-	}
-
-	@Override
-	public String getRootContainerModelName(long containerModelId)
-		throws PortalException {
-
-		WikiPage page = WikiPageLocalServiceUtil.getPage(containerModelId);
-
-		WikiNode node = page.getNode();
-
-		return node.getName();
-	}
-
-	@Override
-	public String getRootContainerModelType() {
-		return "wiki-node";
-	}
-
-	@Override
-	public List<ContainerModel> getRootContainerModels(long groupId)
-		throws PortalException {
-
-		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
-
-		List<WikiNode> nodes = WikiNodeLocalServiceUtil.getNodes(
-			groupId, WorkflowConstants.STATUS_APPROVED);
-
-		for (WikiNode node : nodes) {
-			containerModels.add(node);
-		}
-
-		return containerModels;
-	}
-
-	@Override
-	public int getRootContainerModelsCount(long groupId) {
-		return WikiNodeLocalServiceUtil.getNodesCount(groupId);
 	}
 
 	@Override

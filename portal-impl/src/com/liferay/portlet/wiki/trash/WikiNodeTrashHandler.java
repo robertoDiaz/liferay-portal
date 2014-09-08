@@ -49,7 +49,7 @@ import javax.portlet.PortletURL;
  *
  * @author Eudaldo Alonso
  */
-public class WikiNodeTrashHandler extends BaseTrashHandler {
+public class WikiNodeTrashHandler extends BaseWikiTrashHandler {
 
 	@Override
 	public void checkRestorableEntry(
@@ -88,20 +88,6 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	@Override
 	public String getClassName() {
 		return WikiNode.class.getName();
-	}
-
-	@Override
-	public ContainerModel getContainerModel(long containerModelId)
-		throws PortalException {
-
-		return WikiNodeLocalServiceUtil.getNode(containerModelId);
-	}
-
-	@Override
-	public int getContainerModelsCount(long classPK, long containerModelId)
-		throws PortalException {
-
-		return WikiPageLocalServiceUtil.getPagesCount(containerModelId);
 	}
 
 	@Override
