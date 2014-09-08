@@ -16,7 +16,6 @@ package com.liferay.portlet.wiki.trash;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashActionKeys;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
@@ -40,12 +39,11 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.trash.RestoreEntryException;
 import com.liferay.portlet.trash.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
-import com.liferay.portlet.wiki.NoSuchPageResourceException;
+import com.liferay.portlet.trash.util.TrashUtil;
 import com.liferay.portlet.wiki.asset.WikiPageAssetRenderer;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.WikiPageResource;
-import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageResourceLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageServiceUtil;
@@ -116,11 +114,11 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 	}
 
 	@Override
-	public String getContainerModelName() {
-		return "wiki-page";
+	public String getContainerModelTitle(long classPK) throws PortalException {
+		WikiPage page = WikiPageLocalServiceUtil.getPage(classPK);
+
+		return TrashUtil.getOriginalTitle(page.getTitle());
 	}
-
-
 
 	@Override
 	public ContainerModel getParentContainerModel(long classPK)
@@ -153,6 +151,17 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 		}
 
 		return page.getNode();
+	}
+
+	@Override
+	public List<ContainerModel> getParentContainerModels(long classPK)
+		throws PortalException {
+
+		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
+
+		containerModels.add(getParentContainerModel(classPK));
+
+		return containerModels;
 	}
 
 	@Override
@@ -259,6 +268,11 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 			classPK, WorkflowConstants.STATUS_ANY, false);
 
 		return new WikiPageAssetRenderer(page);
+	}
+
+	@Override
+	public boolean hasRootContainerModel() {
+		return true;
 	}
 
 	@Override

@@ -17,10 +17,9 @@ package com.liferay.portlet.wiki.trash;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ContainerModel;
-import com.liferay.portal.model.TrashedModel;
+import com.liferay.portlet.trash.util.TrashUtil;
 import com.liferay.portlet.wiki.NoSuchPageResourceException;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
@@ -162,17 +161,6 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public List<ContainerModel> getParentContainerModels(long classPK)
-		throws PortalException {
-
-		List<ContainerModel> containerModels = new ArrayList<ContainerModel>();
-
-		containerModels.add(getParentContainerModel(classPK));
-
-		return containerModels;
-	}
-
-	@Override
 	public String getRootContainerModelClassName(long classPK) {
 		return WikiNode.class.getName();
 	}
@@ -192,7 +180,22 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public String getRootContainerModelName(long containerModelId)
+	public String getContainerModelName(long classPK) throws PortalException {
+		WikiPage page = WikiPageLocalServiceUtil.fetchPage(classPK);
+
+		if (page == null) {
+			WikiNodeLocalServiceUtil.getNode(classPK);
+
+			return "wiki-node";
+		}
+		else {
+			return "wiki-page";
+		}
+	}
+
+
+	@Override
+	public String getRootContainerModelTitle(long containerModelId)
 		throws PortalException {
 
 		WikiNode node = null;
@@ -206,7 +209,7 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 			node = page.getNode();
 		}
 
-		return node.getName();
+		return TrashUtil.getOriginalTitle(node.getName());
 	}
 
 	@Override
@@ -228,11 +231,6 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 		}
 
 		return containerModels;
-	}
-
-	@Override
-	public String getRootContainerModelType() {
-		return "wiki-node";
 	}
 
 }
