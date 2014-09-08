@@ -135,9 +135,24 @@ public abstract class BaseTrashHandler implements TrashHandler {
 		return 0;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getContainerModelName(long)}
+	 */
+	@Deprecated
 	@Override
 	public String getContainerModelName() {
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getContainerModelName(long classPK) throws PortalException {
+		return StringPool.BLANK;
+	}
+
+
+	public String getContainerModelTitle(long classPK) throws PortalException {
+		return getContainerModelName(classPK);
 	}
 
 	@Override
@@ -237,12 +252,7 @@ public abstract class BaseTrashHandler implements TrashHandler {
 	}
 
 	@Override
-	public String getRootContainerModelType() {
-		return StringPool.BLANK;
-	}
-
-	@Override
-	public String getRootContainerModelName(long containerModelId)
+	public String getRootContainerModelTitle(long containerModelId)
 		throws PortalException {
 
 		return StringPool.BLANK;
@@ -340,7 +350,7 @@ public abstract class BaseTrashHandler implements TrashHandler {
 
 	@Override
 	public boolean hasRootContainerModel() {
-		return Validator.isNotNull(getRootContainerModelType());
+		return false;
 	}
 
 	@Override
