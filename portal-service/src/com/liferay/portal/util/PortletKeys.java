@@ -97,8 +97,6 @@ public class PortletKeys {
 
 	public static final String HIGHEST_RATED_ASSETS = "194";
 
-	public static final String IFRAME = "48";
-
 	public static final String IMAGE_UPLOADER = "195";
 
 	public static final String INVITATION = "100";
@@ -165,10 +163,6 @@ public class PortletKeys {
 	public static final String PASSWORD_POLICIES_ADMIN = "129";
 
 	public static final String PLUGINS_ADMIN = "132";
-
-	public static final String POLLS = "25";
-
-	public static final String POLLS_DISPLAY = "59";
 
 	public static final String PORTAL = "90";
 

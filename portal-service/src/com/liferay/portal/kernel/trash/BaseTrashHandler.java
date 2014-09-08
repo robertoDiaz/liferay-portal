@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.model.SystemEventConstants;
@@ -130,8 +131,28 @@ public abstract class BaseTrashHandler implements TrashHandler {
 	}
 
 	@Override
+	public long getRootContainerModelId(long classPK) throws PortalException {
+		return 0;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getContainerModelName(long)}
+	 */
+	@Deprecated
+	@Override
 	public String getContainerModelName() {
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getContainerModelName(long classPK) throws PortalException {
+		return StringPool.BLANK;
+	}
+
+
+	public String getContainerModelTitle(long classPK) throws PortalException {
+		return getContainerModelName(classPK);
 	}
 
 	@Override
@@ -221,8 +242,34 @@ public abstract class BaseTrashHandler implements TrashHandler {
 	}
 
 	@Override
+	public String getRootContainerModelClassName(long classPK) {
+		return getContainerModelClassName(classPK);
+	}
+
+	@Override
 	public String getRootContainerModelName() {
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getRootContainerModelTitle(long containerModelId)
+		throws PortalException {
+
+		return StringPool.BLANK;
+	}
+
+	@Override
+	public List<ContainerModel> getRootContainerModels(long groupId)
+		throws PortalException {
+
+		return Collections.emptyList();
+	}
+
+	@Override
+	public int getRootContainerModelsCount(long groupId)
+		throws PortalException {
+
+		return 0;
 	}
 
 	@Override
@@ -299,6 +346,11 @@ public abstract class BaseTrashHandler implements TrashHandler {
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean hasRootContainerModel() {
+		return false;
 	}
 
 	@Override

@@ -207,6 +207,25 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return content;
 	}
 
+	protected void checkFinderCacheInterfaceMethod(
+		String fileName, String content) {
+
+		if (!fileName.endsWith("FinderImpl.java") ||
+			!content.contains("public static final FinderPath")) {
+
+			return;
+		}
+
+		Matcher matcher = _fetchByPrimaryKeysMethodPattern.matcher(content);
+
+		if (!matcher.find()) {
+			processErrorMessage(
+				fileName,
+				"LPS-49552: Missing override of BasePersistenceImpl." +
+					"fetchByPrimaryKeys(Set<Serializable>): " + fileName);
+		}
+	}
+
 	protected String checkIfClause(
 			String ifClause, String fileName, int lineCount)
 		throws IOException {
@@ -327,6 +346,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		String fileName, String packagePath, String className,
 		String content) {
 
+		if (!portalSource) {
+			return content;
+		}
+
 		ClassLibrary classLibrary = new ClassLibrary();
 
 		classLibrary.addClassLoader(JavaSourceProcessor.class.getClassLoader());
@@ -355,6 +378,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			Type type = javaField.getType();
 
 			String fieldTypeName = type.getFullyQualifiedName();
+
+			if (_immutableFieldTypes == null) {
+				_immutableFieldTypes = getImmutableFieldTypes();
+			}
 
 			if (!javaField.isPrivate() || !javaField.isFinal() ||
 				!_immutableFieldTypes.contains(fieldTypeName)) {
@@ -799,7 +826,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		}
 
 		if (portalSource &&
-			mainReleaseVersion.equals(MAIN_RELEASE_LATEST_VERSION) &&
+			!_allowUseServiceUtilInServiceImpl &&
 			!className.equals("BaseServiceImpl") &&
 			className.endsWith("ServiceImpl") &&
 			newContent.contains("ServiceUtil.")) {
@@ -972,6 +999,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		newContent = checkImmutableAndStaticableFieldTypes(
 			fileName, packagePath, className, newContent);
+
+		// LPS-49552
+
+		checkFinderCacheInterfaceMethod(fileName, newContent);
 
 		newContent = fixIncorrectEmptyLineBeforeCloseCurlyBrace(
 			newContent, fileName);
@@ -1163,6 +1194,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			fileNames = getPluginJavaFiles();
 		}
 
+		_addMissingDeprecationReleaseVersion = GetterUtil.getBoolean(
+			getProperty("add.missing.deprecation.release.version"));
+		_allowUseServiceUtilInServiceImpl = GetterUtil.getBoolean(
+			getProperty("allow.use.service.util.in.service.impl"));
 		_fitOnSingleLineExclusions = getPropertyList(
 			"fit.on.single.line.exludes");
 		_hibernateSQLQueryExclusions = getPropertyList(
@@ -1176,18 +1211,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			"test.annotations.excludes");
 		_upgradeServiceUtilExclusions = getPropertyList(
 			"upgrade.service.util.excludes");
-
-		_immutableFieldTypes = SetUtil.fromArray(
-			new String[] {
-				"boolean", "byte", "char", "double", "float", "int", "long",
-				"short", "java.lang.Boolean", "java.lang.Byte",
-				"java.lang.Character", "java.lang.Class", "java.lang.Double",
-				"java.lang.Float", "java.lang.Int", "java.lang.Long",
-				"java.lang.Number", "java.lang.Short", "java.lang.String",
-				"java.lang.reflect.Field", "java.lang.reflect.Method"
-			});
-
-		_immutableFieldTypes.addAll(getPropertyList("immutable.field.types"));
 
 		for (String fileName : fileNames) {
 			format(fileName);
@@ -1294,12 +1317,12 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			checkEmptyCollection(trimmedLine, fileName, lineCount);
 
 			if (trimmedLine.startsWith("* @deprecated") &&
-				mainReleaseVersion.equals(MAIN_RELEASE_LATEST_VERSION)) {
+				_addMissingDeprecationReleaseVersion) {
 
 				if (!trimmedLine.startsWith("* @deprecated As of ")) {
 					line = StringUtil.replace(
 						line, "* @deprecated",
-						"* @deprecated As of " + MAIN_RELEASE_LATEST_VERSION);
+						"* @deprecated As of " + getMainReleaseVersion());
 				}
 				else {
 					String version = trimmedLine.substring(20);
@@ -2165,6 +2188,22 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return null;
 	}
 
+	protected Set<String> getImmutableFieldTypes() {
+		Set<String> immutableFieldTypes = SetUtil.fromArray(
+			new String[] {
+				"boolean", "byte", "char", "double", "float", "int", "long",
+				"short", "java.lang.Boolean", "java.lang.Byte",
+				"java.lang.Character", "java.lang.Class", "java.lang.Double",
+				"java.lang.Float", "java.lang.Int", "java.lang.Long",
+				"java.lang.Number", "java.lang.Short", "java.lang.String",
+				"java.lang.reflect.Field", "java.lang.reflect.Method"
+			});
+
+		immutableFieldTypes.addAll(getPropertyList("immutable.field.types"));
+
+		return immutableFieldTypes;
+	}
+
 	protected List<String> getImportedExceptionClassNames(
 		JavaDocBuilder javaDocBuilder) {
 
@@ -2408,6 +2447,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private static Pattern _importsPattern = Pattern.compile(
 		"(^[ \t]*import\\s+.*;\n+)+", Pattern.MULTILINE);
 
+	private boolean _addMissingDeprecationReleaseVersion;
+	private boolean _allowUseServiceUtilInServiceImpl;
 	private Pattern _annotationPattern = Pattern.compile(
 		"\n(\t*)@(.+)\\(\n([\\s\\S]*?)\n(\t*)\\)");
 	private final Pattern _camelCasePattern = Pattern.compile(
@@ -2420,6 +2461,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private Pattern _diamondOperatorPattern = Pattern.compile(
 		"(return|=)\n?(\t+| )new ([A-Za-z]+)(Map|Set|List)<(.+)>" +
 			"\\(\n*\t*(.*)\\);\n");
+	private Pattern _fetchByPrimaryKeysMethodPattern = Pattern.compile(
+		"@Override\n\tpublic Map<(.+)> fetchByPrimaryKeys\\(");
 	private List<String> _fitOnSingleLineExclusions;
 	private List<String> _hibernateSQLQueryExclusions;
 	private Set<String> _immutableFieldTypes;

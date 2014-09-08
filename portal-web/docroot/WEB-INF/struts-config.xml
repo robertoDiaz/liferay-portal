@@ -778,14 +778,6 @@
 
 		<action path="/group_pages/view_layout_set_branches" forward="portlet.staging_bar.view_layout_set_branches" />
 
-		<!-- IFrame -->
-
-		<action path="/iframe/proxy" forward="/portlet/iframe/proxy.jsp" />
-
-		<action path="/iframe/view" type="com.liferay.portlet.iframe.action.ViewAction">
-			<forward name="portlet.iframe.view" path="portlet.iframe.view" />
-		</action>
-
 		<!-- Image Gallery Display -->
 
 		<action path="/image_gallery_display/edit_folder" type="com.liferay.portlet.documentlibrary.action.EditFolderAction">
@@ -1523,37 +1515,6 @@
 		</action>
 
 		<action path="/plugins_admin/view" forward="portlet.plugins_admin.view" />
-
-		<!-- Polls -->
-
-		<action path="/polls/edit_question" type="com.liferay.portlet.polls.action.EditQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.edit_question" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
-		</action>
-
-		<action path="/polls/view" forward="portlet.polls.view" />
-
-		<action path="/polls/view_chart" type="com.liferay.portlet.polls.action.ViewChartAction" />
-
-		<action path="/polls/view_question" type="com.liferay.portlet.polls.action.ViewQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.view_question" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
-		</action>
-
-		<!-- Polls Display -->
-
-		<action path="/polls_display/add_question_redirect" forward="portlet.polls_display.add_question_redirect" />
-
-		<action path="/polls_display/view" type="com.liferay.portlet.pollsdisplay.action.ViewAction">
-			<forward name="portlet.polls_display.error" path="portlet.polls_display.error" />
-			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
-		</action>
-
-		<action path="/polls_display/vote_question" type="com.liferay.portlet.polls.action.ViewQuestionAction" >
-			<forward name="portlet.polls.edit_question" path="portlet.polls_display.view" />
-			<forward name="portlet.polls.error" path="portlet.polls_display.error" />
-			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
-		</action>
 
 		<!-- Portal Settings -->
 

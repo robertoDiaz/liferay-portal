@@ -49,7 +49,7 @@ public abstract class BookmarksBaseTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public String getContainerModelName() {
+	public String getContainerModelName(long classPK) {
 		return "folder";
 	}
 
@@ -111,6 +111,11 @@ public abstract class BookmarksBaseTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public String getRootContainerModelName() {
+		return "folder";
+	}
+
+	@Override
+	public String getRootContainerModelTitle(long containerModelId) {
 		return "home";
 	}
 

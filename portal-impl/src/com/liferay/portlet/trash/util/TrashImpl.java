@@ -105,7 +105,8 @@ public class TrashImpl implements Trash {
 			className);
 
 		String rootContainerModelName = LanguageUtil.get(
-			themeDisplay.getLocale(), trashHandler.getRootContainerModelName());
+			themeDisplay.getLocale(),
+			trashHandler.getRootContainerModelTitle(classPK));
 
 		if (classPK == 0) {
 			PortalUtil.addPortletBreadcrumbEntry(
@@ -361,7 +362,12 @@ public class TrashImpl implements Trash {
 
 	@Override
 	public String getOriginalTitle(String title) {
-		return getOriginalTitle(title, StringPool.SLASH);
+		return getOriginalTitle(title, "title", StringPool.SLASH);
+	}
+
+	@Override
+	public String getOriginalTitle(String title, String paramName) {
+		return getOriginalTitle(title, paramName, StringPool.SLASH);
 	}
 
 	@Override
@@ -537,7 +543,9 @@ public class TrashImpl implements Trash {
 			request, trashRenderer.getTitle(themeDisplay.getLocale()), null);
 	}
 
-	protected String getOriginalTitle(String title, String prefix) {
+	protected String getOriginalTitle(
+		String title, String paramName, String prefix) {
+
 		if (!title.startsWith(prefix)) {
 			return title;
 		}
@@ -558,10 +566,10 @@ public class TrashImpl implements Trash {
 				TrashVersion trashVersion =
 					TrashVersionLocalServiceUtil.getTrashVersion(trashEntryId);
 
-				title = trashVersion.getTypeSettingsProperty("title");
+				title = trashVersion.getTypeSettingsProperty(paramName);
 			}
 			else {
-				title = trashEntry.getTypeSettingsProperty("title");
+				title = trashEntry.getTypeSettingsProperty(paramName);
 			}
 		}
 		catch (Exception e) {
