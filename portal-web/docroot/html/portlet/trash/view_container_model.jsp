@@ -23,7 +23,7 @@ String backURL = ParamUtil.getString(request, "backURL", redirect);
 String className = ParamUtil.getString(request, "className");
 long classPK = ParamUtil.getLong(request, "classPK");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectContainer");
-boolean hasRootContainerModel = ParamUtil.getBoolean(request, "hasRootContainerModel", false);
+boolean showRootContainerModel = ParamUtil.getBoolean(request, "showRootContainerModel", false);
 
 TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(className);
 
@@ -31,7 +31,7 @@ TrashRenderer trashRenderer = trashHandler.getTrashRenderer(classPK);
 
 ContainerModel containerModel = (ContainerModel)request.getAttribute(WebKeys.TRASH_CONTAINER_MODEL);
 
-String containerModelClassName = className;
+String containerModelClassName = trashHandler.getContainerModelClassName(classPK);
 long containerModelId = 0;
 
 if (containerModel != null) {
@@ -50,11 +50,11 @@ portletURL.setParameter("containerModelClassName", containerModelClassName);
 
 PortletURL containerURL = PortletURLUtil.clone(portletURL, renderResponse);
 
-TrashUtil.addContainerModelBreadcrumbEntries(request, containerModelClassName, containerModelId, portletURL);
+TrashUtil.addContainerModelBreadcrumbEntries(request, Validator.isNull(containerModelClassName) ? trashHandler.getContainerModelClassName(classPK) : containerModelClassName, containerModelId, portletURL);
 
-String containerModelName = trashHandler.getContainerModelName();
+String containerModelName = trashHandler.getContainerModelName(classPK);
 
-if (hasRootContainerModel) {
+if (showRootContainerModel) {
 	containerModelName = trashHandler.getRootContainerModelName();
 }
 %>
@@ -72,7 +72,7 @@ if (hasRootContainerModel) {
 
 	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
 
-	<c:if test="<%= !hasRootContainerModel %>">
+	<c:if test="<%= !showRootContainerModel %>">
 		<aui:button-row>
 
 			<%
@@ -84,7 +84,7 @@ if (hasRootContainerModel) {
 				data.put("redirect", redirect);
 			%>
 
-			<aui:button cssClass="selector-button" data="<%= data %>" value='<%= LanguageUtil.format(request, "choose-this-x", trashHandler.hasRootContainerModel() ? trashHandler.getRootContainerModelName() : containerModelName) %>' />
+			<aui:button cssClass="selector-button" data="<%= data %>" value='<%= LanguageUtil.format(request, "choose-this-x", showRootContainerModel ? trashHandler.getRootContainerModelName() : containerModelName) %>' />
 		</aui:button-row>
 
 		<br />
@@ -96,10 +96,10 @@ if (hasRootContainerModel) {
 
 	<liferay-ui:search-container
 		searchContainer="<%= new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, containerURL, null, null) %>"
-		total="<%= hasRootContainerModel ? trashHandler.getRootContainerModelsCount(scopeGroupId) : trashHandler.getContainerModelsCount(classPK, containerModelId) %>"
+		total="<%= showRootContainerModel ? trashHandler.getRootContainerModelsCount(scopeGroupId) : trashHandler.getContainerModelsCount(classPK, containerModelId) %>"
 	>
 		<liferay-ui:search-container-results
-			results="<%= hasRootContainerModel ? trashHandler.getRootContainerModels(scopeGroupId) : trashHandler.getContainerModels(classPK, containerModelId, searchContainer.getStart(), searchContainer.getEnd()) %>"
+			results="<%= showRootContainerModel ? trashHandler.getRootContainerModels(scopeGroupId) : trashHandler.getContainerModels(classPK, containerModelId, searchContainer.getStart(), searchContainer.getEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -140,7 +140,7 @@ if (hasRootContainerModel) {
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				name='<%= LanguageUtil.format(request, "num-of-x", trashHandler.getContainerModelName()) %>'
+				name='<%= LanguageUtil.format(request, "num-of-x", trashHandler.getContainerModelName(curContainerModelId)) %>'
 				value="<%= String.valueOf(containerTrashHandler.getContainerModelsCount(classPK, curContainerModelId)) %>"
 			/>
 
