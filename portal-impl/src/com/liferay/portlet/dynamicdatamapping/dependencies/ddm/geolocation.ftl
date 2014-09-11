@@ -23,13 +23,21 @@
 		<@aui.button onClick="window['${portletNamespace}${namespacedFieldName}SetGeolocation']();" value="geolocate" />
 	</@>
 
-	<p class="${coordinatesContainerCssClass}" id="${portletNamespace}${namespacedFieldName}CoordinatesContainer">
-		<strong><@liferay_ui.message key="location" />:</strong>
+	<div class="${coordinatesContainerCssClass}" id="${portletNamespace}${namespacedFieldName}CoordinatesContainer" style="padding: 15px;">
 
-		<span id="${portletNamespace}${namespacedFieldName}Coordinates">
-		    <@fmt.formatNumber value=latitude type="NUMBER" />, <@fmt.formatNumber value=longitude type="NUMBER" />
-		</span>
-	</p>
+		<p>
+			<span id="${portletNamespace}${namespacedFieldName}Location"></span>
+		</p>
+
+		<p>
+			<span id="${portletNamespace}${namespacedFieldName}Latitude" style="display: inline-block; margin-left: 50px"></span>
+			<span id="${portletNamespace}${namespacedFieldName}Longitude"></span>
+		</p>
+
+		<div id="${portletNamespace}${namespacedFieldName}map_canvas" style="border: 1px solid #ccc; width:100%; height:400px;"></div>
+	</div>
+
+	<script src="${themeDisplay.getProtocol()}://maps.googleapis.com/maps/api/js?v=3.exp" type="text/javascript"></script>
 
 	${fieldStructure.children}
 </@>
@@ -41,27 +49,59 @@
 		function(position) {
 			var A = AUI();
 
-			var coordinatesNode = A.one('#${portletNamespace}${namespacedFieldName}Coordinates');
 			var coordinatesContainerNode = A.one('#${portletNamespace}${namespacedFieldName}CoordinatesContainer');
+			var latitudeNode = A.one('#${portletNamespace}${namespacedFieldName}Latitude');
+			var longitudeNode = A.one('#${portletNamespace}${namespacedFieldName}Longitude');
+			var locationNode = A.one('#${portletNamespace}${namespacedFieldName}Location');
+			var mapCanvasNode = A.one('#${portletNamespace}${namespacedFieldName}map_canvas');
 
 			coordinatesContainerNode.show();
 
-			coordinatesNode.html('<@liferay_ui.message key="loading" />');
+			mapCanvasNode.html('<@liferay_ui.message key="loading" />');
 
 			Liferay.Util.getGeolocation(
 				function(latitude, longitude) {
-					var inputNode = A.one('#${portletNamespace}${namespacedFieldName}');
+					debugger;
+					var latLng = new google.maps.LatLng(latitude, longitude);
+					var geocoder = new google.maps.Geocoder();
 
-					inputNode.val(
-						A.JSON.stringify(
-							{
-								latitude: latitude,
-								longitude: longitude
+					var mapOptions = {
+						center: latLng,
+						zoom: 11,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+
+					var map = new google.maps.Map(document.getElementById('${portletNamespace}${namespacedFieldName}map_canvas'), mapOptions);
+
+					geocoder.geocode(
+						{'latLng': latLng},
+						function(results, status) {
+							if (status == google.maps.GeocoderStatus.OK) {
+								if (results[1]) {
+									var location = results[1].formatted_address
+
+									new google.maps.Marker(
+										{
+											position: latLng,
+											map: map,
+											title: location
+										}
+									);
+
+									locationNode.html('<strong><@liferay_ui.message key="location" />: </strong>' + location);
+
+									latitudeNode.html('<strong><@liferay_ui.message key="latitude" />: </strong>' + latitude);
+									longitudeNode.html('<strong><@liferay_ui.message key="longitude" />: </strong>' + longitude);
+								}
+								else {
+									alert('No results found');
+								}
 							}
-						)
+							else {
+								alert('Geocoder failed due to: ' + status);
+							}
+						}
 					);
-
-					coordinatesNode.html([latitude, longitude].join(', '));
 				}
 			);
 		},
