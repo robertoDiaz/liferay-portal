@@ -29,45 +29,35 @@
 </@>
 
 <@aui.script use="json, liferay-google-maps" >
-
 	var drawMap = function(latitude, longitude) {
-		var id = 'DDMGeolocalizationMap';
-
 		Liferay.GoogleMaps.register(
-			id,
+			'${portletNamespace}${namespacedFieldName}',
 			{
 				latitude: latitude,
 				longitude: longitude,
-				namespace: '${portletNamespace}${namespacedFieldName}'
-			}
-		);
+				namespace: '${portletNamespace}${namespacedFieldName}',
+				on: {
+					locationReady: function(event) {
+						var instance = this;
 
-		Liferay.on(
-			'${portletNamespace}${namespacedFieldName}googleMapsInitialized',
-			function() {
-				var googleMaps = Liferay.component(id);
-
-				googleMaps.on(
-					'locationReady',
-					function() {
 						var inputNode = A.one('#${portletNamespace}${namespacedFieldName}');
 						var locationNode = A.one('#${portletNamespace}${namespacedFieldName}Location');
 
 						inputNode.val(
 							A.JSON.stringify(
 								{
-									latitude: googleMaps.getLatitude(),
-									longitude: googleMaps.getLongitude()
+									latitude: instance.getLatitude(),
+									longitude: instance.getLongitude()
 								}
 							)
 						);
 
-						locationNode.html('<span class="glyphicon glyphicon-map-marker" style="margin-right: 5px;"></span>' + googleMaps.getFormattedLocation(1));
+						locationNode.html('<span class="glyphicon glyphicon-map-marker" style="margin-right: 5px;"></span>' + instance.getFormattedLocation(1));
 					}
-				);
+				}
 			}
 		);
-	}
+	};
 
 	<#if (fieldRawValue != "")>
 		drawMap(${latitude}, ${longitude});

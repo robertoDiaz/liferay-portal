@@ -87,14 +87,10 @@
 		<#assign apiKey = companyPortletPreferences.getValue("googleMapsAPIKey", "") />
 	</#if>
 
-
-	<@liferay_aui.script use="json, liferay-google-maps" >
-
+	<@liferay_aui.script use="json,liferay-google-maps">
 		var drawMap = function(latitude, longitude) {
-			var id = 'AssetGeolocalizationMap';
-
 			Liferay.GoogleMaps.register(
-				id,
+				'${renderResponse.getNamespace()}',
 				{
 					addSearchBox: 'false',
 					apiKey: '${apiKey}',

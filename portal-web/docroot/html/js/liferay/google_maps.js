@@ -3,6 +3,10 @@ AUI.add(
 	function(A) {
 		var Lang = A.Lang;
 
+		var GMAPS_API_URL = '{protocol}://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.onApiReady';
+
+		var API_KEY_GMAPS_API_URL = '{protocol}://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.onApiReady&apiKey={apiKey}';
+
 		var GoogleMaps = A.Component.create(
 			{
 				ATTRS: {
@@ -345,52 +349,60 @@ AUI.add(
 					}
 				},
 
-				register: function(id, config) {
-					var instance = this;
+				onApiReady: function() {
+					A.Object.each(GoogleMaps._registered, A.bind('_initializeMap', GoogleMaps));
 
-					GoogleMaps._id = id;
-					GoogleMaps._registered[id] = config;
-
-					var apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.initialize';
-
-					var apiKey = config.apikey;
-
-					if (apiKey) {
-						apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.&key=' + apiKey + 'exp&libraries=places&callback=Liferay.GoogleMaps.initialize'
-					}
-
-					A.Get.js(apiURL);
+					GoogleMaps._apiReady = true;
 				},
 
-				initialize: function() {
+				register: function(id, config) {
 					var instance = this;
-
-					var config = GoogleMaps._registered[GoogleMaps._id];
-					var id = GoogleMaps._id;
 
 					Liferay.component(
 						id,
 						function() {
 							var instances = instance._instances;
 
-							var googleMapsInstance = instances[id];
+							var googleMapInstance = instances[id];
 
-							if (!googleMapsInstance) {
-								googleMapsInstance = new GoogleMaps(config);
-
-								instances[id] = googleMapsInstance;
-
-								Liferay.fire(config.namespace + 'googleMapsInitialized');
+							if (googleMapInstance) {
+								googleMapInstance.destroy();
 							}
 
-							return googleMapsInstance;
+							googleMapInstance = new GoogleMaps(config);
+
+							instances[id] = googleMapInstance;
+
+							return googleMapInstance;
 						}
 					);
 
+					if (!GoogleMaps._apiReady) {
+						if (!GoogleMaps._apiTransaction) {
+							var apiURL = Lang.sub(
+								config.apiKey ? API_KEY_GMAPS_API_URL : GMAPS_API_URL,
+								{
+									protocol: themeDisplay.getProtocol(),
+									apiKey: config.apiKey
+								}
+							);
+
+							GoogleMaps._apiTransaction = A.Get.js(apiURL);
+						}
+
+						GoogleMaps._registered[id] = config;
+					}
+					else {
+						instance._initializeMap(id);
+					}
+				},
+
+				_initializeMap: function(config, id) {
 					Liferay.component(id).render();
 				},
 
-				_id : {},
+				_apiReady: false,
+				_apiTransaction: null,
 				_instances: {},
 				_registered: {}
 			}
