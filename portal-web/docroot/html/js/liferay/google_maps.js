@@ -16,6 +16,11 @@ AUI.add(
 						value: true
 					},
 
+					addSearchBox: {
+						validator: Lang.isBoolean,
+						value: true
+					},
+
 					draggableMarker: {
 						validator: Lang.isBoolean,
 						value: true
@@ -88,9 +93,7 @@ AUI.add(
 					_addCurrentPositionButton: function() {
 						var instance = this;
 
-						instance._homeControlDiv = A.Node.create('<div></div>');
-
-						instance._homeControlDiv.html('<div class="glyphicon glyphicon-screenshot" id="' + instance.get('namespace') + 'home-button" title="' + Liferay.Language.get('set-current-location') + '"></div>');
+						instance._homeControlDiv = A.Node.create('<div class="glyphicon glyphicon-screenshot" id="' + instance.get('namespace') + 'home-button" title="' + Liferay.Language.get('set-current-location') + '"></div>');
 
 						instance._homeControlDiv.setStyles(
 							{
@@ -174,6 +177,49 @@ AUI.add(
 						}
 					},
 
+					_addSearchBox: function () {
+						var instance = this;
+
+						instance._searchBox = A.Node.create('<input id="' + instance.get('namespace') + 'pac-input" class="controls" type="text" placeholder="Search Box"> ');
+
+						instance._searchBox.setStyles(
+							{
+								backgroundColor: '#fff',
+								fontFamily: 'Roboto',
+								fontSize: '15px',
+								fontWeight: '300',
+								marginTop: '5px',
+								padding: '0 11px 0 13px',
+								textOverflow: 'ellipsis',
+								width: '400px'
+							}
+						)
+
+						var searchBoxDOMNode = instance._searchBox.getDOMNode();
+
+						instance._map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBoxDOMNode);
+
+						var searchBox = new google.maps.places.SearchBox(searchBoxDOMNode);
+
+						google.maps.event.addListener(
+							searchBox,
+							'places_changed',
+							function () {
+								var places = searchBox.getPlaces();
+
+								if (places.length == 0) {
+									return;
+								}
+
+								for (var i = 0, place; place = places[i]; i++) {
+									instance._latLng = place.geometry.location;
+
+									instance._geocode();
+								}
+							}
+						);
+					},
+
 					_initMarker: function(point) {
 						var instance = this;
 
@@ -220,15 +266,17 @@ AUI.add(
 
 											if (instance._points) {
 												instance._addMarkers();
-
-												if (!instance._homeControlDiv) {
-													instance._addCurrentPositionButton();
-												}
 											}
 											else {
 												instance._addMarker();
+											}
 
+											if (!instance._homeControlDiv) {
 												instance._addCurrentPositionButton();
+											}
+
+											if (!instance._searchBox && instance.get('addSearchBox')) {
+												instance._addSearchBox();
 											}
 										}
 
@@ -303,12 +351,12 @@ AUI.add(
 					GoogleMaps._id = id;
 					GoogleMaps._registered[id] = config;
 
-					var apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.exp&callback=Liferay.GoogleMaps.initialize';
+					var apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.initialize';
 
 					var apiKey = config.apikey;
 
 					if (apiKey) {
-						apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.&key=' + apiKey + 'exp&callback=Liferay.GoogleMaps.initialize'
+						apiURL = themeDisplay.getProtocol() + '://maps.googleapis.com/maps/api/js?v=3.&key=' + apiKey + 'exp&libraries=places&callback=Liferay.GoogleMaps.initialize'
 					}
 
 					A.Get.js(apiURL);

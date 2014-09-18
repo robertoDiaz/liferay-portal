@@ -96,6 +96,7 @@
 			Liferay.GoogleMaps.register(
 				id,
 				{
+					addSearchBox: 'false',
 					apiKey: '${apiKey}',
 					draggableMarker: 'false',
 					latitude: latitude,
