@@ -358,8 +358,7 @@
 					'liferay-google-maps': {
 						path: 'google_maps.js',
 						requires: [
-							'aui-base',
-							'liferay-portlet-base'
+							'aui-base'
 						]
 					},
 					'liferay-history': {

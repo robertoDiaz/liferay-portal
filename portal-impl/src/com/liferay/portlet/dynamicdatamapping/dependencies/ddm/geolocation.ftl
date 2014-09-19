@@ -22,7 +22,7 @@
 			<span id="${portletNamespace}${namespacedFieldName}Location"></span>
 		</p>
 
-		<div id="${portletNamespace}${namespacedFieldName}map_canvas" ></div>
+		<div id="${portletNamespace}${namespacedFieldName}Map" ></div>
 	</div>
 
 	${fieldStructure.children}
@@ -33,9 +33,9 @@
 		Liferay.GoogleMaps.register(
 			'${portletNamespace}${namespacedFieldName}',
 			{
+				boundingBox: '#${portletNamespace}${namespacedFieldName}Map',
 				latitude: latitude,
 				longitude: longitude,
-				namespace: '${portletNamespace}${namespacedFieldName}',
 				on: {
 					locationReady: function(event) {
 						var instance = this;

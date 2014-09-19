@@ -55,7 +55,7 @@
 	</#list>
 </#list>
 
-<div class="map-canvas" id="${renderResponse.getNamespace()}map_canvas"></div>
+<div class="map-canvas" id="${renderResponse.getNamespace()}Map"></div>
 
 <#if mapsAPIProvider = "googleMaps" >
 	<style type="text/css">
@@ -94,10 +94,10 @@
 				{
 					addSearchBox: 'false',
 					apiKey: '${apiKey}',
+					boundingBox: '#${renderResponse.getNamespace()}Map',
 					draggableMarker: 'false',
 					latitude: latitude,
 					longitude: longitude,
-					namespace: '${renderResponse.getNamespace()}',
 					points: ${jsonArray},
 					zoom:8
 				}

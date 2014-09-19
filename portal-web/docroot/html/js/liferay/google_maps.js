@@ -7,6 +7,8 @@ AUI.add(
 
 		var API_KEY_GMAPS_API_URL = '{protocol}://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.onApiReady&apiKey={apiKey}';
 
+		var STR_BOUNDING_BOX = 'boundingBox';
+
 		var GoogleMaps = A.Component.create(
 			{
 				ATTRS: {
@@ -40,15 +42,6 @@ AUI.add(
 						value: 999
 					},
 
-					namespace: {
-						validator: Lang.isString
-					},
-
-					mapContainerId: {
-						validator: Lang.isString,
-						value: 'map_canvas'
-					},
-
 					points: {
 						validator: Lang.isArray
 					},
@@ -59,8 +52,6 @@ AUI.add(
 					}
 				},
 
-				AUGMENTS: [Liferay.PortletBase],
-
 				EXTENDS: A.Widget,
 
 				NAME: 'googlemaps',
@@ -69,9 +60,7 @@ AUI.add(
 					renderUI: function() {
 						var instance = this;
 
-						instance._mapContainer = instance.one('#' + instance.get('mapContainerId'));
-
-						instance._mapContainer.html('<p>' + Liferay.Language.get<('loading') + '</p>');
+						instance.get(STR_BOUNDING_BOX).html('<p>' + Liferay.Language.get<('loading') + '</p>');
 
 						instance._initMap();
 					},
@@ -313,7 +302,7 @@ AUI.add(
 							mapTypeId: google.maps.MapTypeId.ROADMAP
 						};
 
-						instance._mapContainer.setStyles(
+						instance.get(STR_BOUNDING_BOX).setStyles(
 							{
 								border: '1px solid #ccc',
 								height: '400px',
@@ -321,7 +310,7 @@ AUI.add(
 							}
 						);
 
-						instance._map = new google.maps.Map(instance._mapContainer.getDOMNode(), mapOptions);
+						instance._map = new google.maps.Map(instance.get(STR_BOUNDING_BOX).getDOMNode(), mapOptions);
 
 						instance._geocode();
 					},
@@ -412,6 +401,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base','liferay-portlet-base']
+		requires: ['aui-base']
 	}
 );
