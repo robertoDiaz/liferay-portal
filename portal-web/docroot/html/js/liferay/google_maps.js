@@ -1,6 +1,8 @@
 AUI.add(
 	'liferay-google-maps',
 	function(A) {
+		var AArray = A.Array;
+
 		var Lang = A.Lang;
 
 		var GMAPS_API_URL = '{protocol}://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&callback=Liferay.GoogleMaps.onApiReady';
@@ -9,41 +11,53 @@ AUI.add(
 
 		var STR_BOUNDING_BOX = 'boundingBox';
 
+		var STR_CLICK = 'click';
+
+		var STR_LATITUDE = 'latitude';
+
+		var STR_LONGITUDE = 'longitude';
+
+		var STR_STRINGS = 'strings';
+
+		var TPL_HOME_BUTTON = '<button class="btn btn-default home-button"><i class="glyphicon glyphicon-screenshot"></i></button>'
+
+		var TPL_SEARCHBOX = '<div class="col-md-6"><input class="search-input" placeholder="{placeholder}" type="text"></div>';
+
 		var GoogleMaps = A.Component.create(
 			{
 				ATTRS: {
-
 					apiKey: {
 						validator: Lang.isString
 					},
 
-					addCurrentPositionButton: {
+					homeButton: {
 						validator: Lang.isBoolean,
-						value: true
-					},
-
-					addSearchBox: {
-						validator: Lang.isBoolean,
-						value: true
-					},
-
-					draggableMarker: {
-						validator: Lang.isBoolean,
-						value: true
+						value: false
 					},
 
 					latitude: {
-						validator: Lang.isNumber,
-						value: 999
+						validator: Lang.isNumber
 					},
 
 					longitude: {
-						validator: Lang.isNumber,
-						value: 999
+						validator: Lang.isNumber
 					},
 
-					points: {
+					markers: {
 						validator: Lang.isArray
+					},
+
+					searchBox: {
+						validator: Lang.isBoolean,
+						value: false
+					},
+
+					strings: {
+						validator: Lang.isObject,
+						value: {
+							homeButtonTitle: Liferay.Language.get('set-current-location'),
+							searchBoxPlaceholder: Liferay.Language.get('search-box')
+						}
 					},
 
 					zoom: {
@@ -54,294 +68,278 @@ AUI.add(
 
 				EXTENDS: A.Widget,
 
-				NAME: 'googlemaps',
-
-				prototype: {
-					renderUI: function() {
-						var instance = this;
-
-						instance.get(STR_BOUNDING_BOX).html('<p>' + Liferay.Language.get<('loading') + '</p>');
-
-						instance._initMap();
-					},
-
-					getFormattedLocation: function(index) {
-						var instance = this;
-
-						return instance._location[index].formatted_address;
-					},
-
-					getLatitude: function() {
-						var instance = this;
-
-						return instance._latitude;
-					},
-
-					getLongitude: function() {
-						var instance = this;
-
-						return instance._longitude;
-					},
-
-					_addCurrentPositionButton: function() {
-						var instance = this;
-
-						instance._homeControlDiv = A.Node.create('<div class="glyphicon glyphicon-screenshot" id="' + instance.get('namespace') + 'home-button" title="' + Liferay.Language.get('set-current-location') + '"></div>');
-
-						instance._homeControlDiv.setStyles(
-							{
-								backgroundColor: 'white',
-								borderRadius: '2px',
-								boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
-								color: '#6a6a6a',
-								cursor: 'pointer',
-								fontSize: '19px',
-								margin: '5px'
-							}
-						);
-
-						var homeControlDivDOMNode = instance._homeControlDiv.getDOMNode();
-
-						homeControlDivDOMNode.index = 1;
-
-						instance._map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(homeControlDivDOMNode);
-
-						google.maps.event.addDomListener(
-							homeControlDivDOMNode,
-							'click',
-							function() {
-								instance._setCurrentLocation();
-							}
-						);
-					},
-
-					_addErrorMessage : function(message) {
-						alert(message);
-					},
-
-					_addMarker: function () {
-						var instance = this;
-
-						instance._marker = instance._initMarker();
-
-						google.maps.event.addListener(
-							instance._marker,
-							'dragend',
-							function () {
-								instance._latLng = instance._marker.getPosition()
-
-								instance._geocode();
-							}
-						);
-					},
-
-					_addMarkers: function (len) {
-						var instance = this;
-
-						instance._bounds = new google.maps.LatLngBounds();
-
-						var len = instance._points.length;
-
-						for (var i = 0; i < len; i++) {
-							var point = instance._points[i];
-
-							var marker = instance._initMarker(point);
-
-							instance._bounds.extend(marker.position);
-
-							instance._map.fitBounds(instance._bounds);
-							instance._map.panToBounds(instance._bounds);
-
-							(function (marker) {
-								var infoWindow = new google.maps.InfoWindow(
-									{
-										content: point.abstract || point.title
-									}
-								);
-
-								google.maps.event.addListener(
-									marker,
-									'click',
-									function () {
-										infoWindow.open(instance._map, marker);
-									}
-								);
-							})(marker);
-						}
-					},
-
-					_addSearchBox: function () {
-						var instance = this;
-
-						instance._searchBox = A.Node.create('<input id="' + instance.get('namespace') + 'pac-input" class="controls" type="text" placeholder="Search Box"> ');
-
-						instance._searchBox.setStyles(
-							{
-								backgroundColor: '#fff',
-								fontFamily: 'Roboto',
-								fontSize: '15px',
-								fontWeight: '300',
-								marginTop: '5px',
-								padding: '0 11px 0 13px',
-								textOverflow: 'ellipsis',
-								width: '400px'
-							}
-						)
-
-						var searchBoxDOMNode = instance._searchBox.getDOMNode();
-
-						instance._map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBoxDOMNode);
-
-						var searchBox = new google.maps.places.SearchBox(searchBoxDOMNode);
-
-						google.maps.event.addListener(
-							searchBox,
-							'places_changed',
-							function () {
-								var places = searchBox.getPlaces();
-
-								if (places.length == 0) {
-									return;
-								}
-
-								for (var i = 0, place; place = places[i]; i++) {
-									instance._latLng = place.geometry.location;
-
-									instance._geocode();
-								}
-							}
-						);
-					},
-
-					_initMarker: function(point) {
-						var instance = this;
-
-						if(!point) {
-							return new google.maps.Marker(
-								{
-									animation: google.maps.Animation.DROP,
-									draggable: instance.get('draggableMarker'),
-									position: instance._latLng,
-									map: instance._map,
-									title: instance._location[1].formatted_address
-								}
-							);
-						}
-						else {
-							return new google.maps.Marker(
-								{
-									icon: point.icon,
-									map: instance._map,
-									position: new google.maps.LatLng(point.latitude, point.longitude),
-									title: point.title
-								}
-							);
-						}
-					},
-
-					_geocode: function() {
-						var instance = this;
-
-						var geocoder = new google.maps.Geocoder();
-
-						geocoder.geocode(
-							{'latLng': instance._latLng},
-							function(results, status) {
-								if (status == google.maps.GeocoderStatus.OK) {
-									if (results[1]) {
-										instance._location = results;
-
-										if (instance._marker) {
-											instance._moveMarker();
-										}
-										else {
-											instance._points = instance.get('points');
-
-											if (instance._points) {
-												instance._addMarkers();
-											}
-											else {
-												instance._addMarker();
-											}
-
-											if (!instance._homeControlDiv) {
-												instance._addCurrentPositionButton();
-											}
-
-											if (!instance._searchBox && instance.get('addSearchBox')) {
-												instance._addSearchBox();
-											}
-										}
-
-										instance._map.setCenter(instance._latLng);
-
-										instance.fire('locationReady');
-									}
-									else {
-										instance._addErrorMessage('No results found');
-									}
-								}
-								else {
-									instance._addErrorMessage('Geocoder failed due to: ' + status);
-								}
-							}
-						);
-					},
-
-					_initMap: function() {
-						var instance = this;
-
-						instance._latitude = instance.get('latitude');
-						instance._longitude = instance.get('longitude');
-
-						instance._latLng = new google.maps.LatLng(instance._latitude, instance._longitude);
-
-						var mapOptions = {
-							center: instance._latLng,
-							zoom: instance.get('zoom'),
-							mapTypeId: google.maps.MapTypeId.ROADMAP
-						};
-
-						instance.get(STR_BOUNDING_BOX).setStyles(
-							{
-								border: '1px solid #ccc',
-								height: '400px',
-								width: '100%'
-							}
-						);
-
-						instance._map = new google.maps.Map(instance.get(STR_BOUNDING_BOX).getDOMNode(), mapOptions);
-
-						instance._geocode();
-					},
-
-					_moveMarker: function() {
-						var instance = this;
-
-						instance._latitude = instance._latLng.lat();
-						instance._longitude = instance._latLng.lng();
-
-						instance._marker.setPosition(instance._latLng)
-						instance._marker.setTitle(instance.getFormattedLocation(1));
-					},
-
-					_setCurrentLocation: function() {
-						var instance = this;
-
-						Liferay.Util.getGeolocation(
-							function(latitude, longitude) {
-								instance._latLng = new google.maps.LatLng(latitude, longitude);
-
-								instance._geocode();
-							}
-						);
-					}
-				},
+				NAME: 'lfr-google-maps',
 
 				onApiReady: function() {
 					A.Object.each(GoogleMaps._registered, A.bind('_initializeMap', GoogleMaps));
 
 					GoogleMaps._apiReady = true;
+				},
+
+				prototype: {
+					initializer: function() {
+						var instance = this;
+
+						var latitude = instance.get(STR_LATITUDE);
+						var longitude = instance.get(STR_LONGITUDE);
+
+						instance._map = new google.maps.Map(
+							instance.get(STR_BOUNDING_BOX).getDOMNode(),
+							{
+								center: {
+									lat: latitude,
+									lng: longitude
+								},
+								mapTypeId: google.maps.MapTypeId.ROADMAP,
+								zoom: instance.get('zoom')
+							}
+						);
+
+						if (instance.get('homeButton')) {
+							instance._createHomeButton();
+						}
+
+						if (instance.get('searchBox')) {
+							instance._createSearchBox();
+						}
+
+						instance._createMarkers();
+					},
+
+					bindUI: function() {
+						var instance = this;
+
+						var eventHandles = [];
+
+						var homeButton = instance._homeButton;
+
+						if (homeButton) {
+							eventHandles.push(
+								google.maps.event.addDomListener(homeButton.getDOMNode(), STR_CLICK, A.bind('_onHomeButtonClick', instance))
+							);
+						}
+
+						var searchBox = instance._searchBox;
+
+						if (searchBox) {
+							eventHandles.push(
+								google.maps.event.addListener(searchBox, 'place_changed', A.bind('_onPlaceChanged', instance, searchBox))
+							);
+						}
+
+						var mainMarker = instance._mainMarker;
+
+						if (mainMarker) {
+							eventHandles.push(
+								google.maps.event.addListener(mainMarker, 'dragend', A.bind('_onMainMarkerDragEnd', instance))
+							);
+						}
+
+						var markers = instance._markers;
+
+						if (markers) {
+							AArray.each(
+								markers,
+								function(item, index, collection) {
+									google.maps.event.addDomListener(item, STR_CLICK, A.bind('_onMarkerClick', instance, item))
+								}
+							);
+						}
+
+						instance.publish(
+							'locationUpdated',
+							{
+								defaultFn: A.bind('_defLocationUpdatedFn', instance)
+							}
+						);
+
+						instance._eventHandles = eventHandles;
+					},
+
+					destructor: function() {
+						var instance = this;
+
+						AArray.each(
+							instance._eventHandles,
+							function(item, index, collection) {
+								google.maps.event.removeListener(item);
+							}
+						);
+					},
+
+					_createHomeButton: function() {
+						var instance = this;
+
+						var homeButtonNode = A.Node.create(
+							Lang.sub(
+								TPL_HOME_BUTTON,
+								{
+									title: instance.get(STR_STRINGS).homeButtonTitle
+								}
+							)
+						);
+
+						instance._map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(homeButtonNode.getDOMNode());
+
+						instance._homeButton = homeButtonNode;
+					},
+
+					_createMarkers: function() {
+						var instance = this;
+
+						var map = instance._map;
+
+						var markers = instance.get('markers');
+
+						if (markers) {
+							var gmapsMarkers = [];
+
+							var bounds = new google.maps.LatLngBounds();
+
+							AArray.each(
+								markers,
+								function(item, index, position) {
+									var markerInfoWindow = new google.maps.InfoWindow(
+										{
+											content: item.abstract || item.title
+										}
+									);
+
+									var markerPosition = new google.maps.LatLng(item.latitude, item.longitude);
+
+									var marker = new google.maps.Marker(
+										{
+											abstract: item.abstract,
+											icon: item.icon,
+											infoWindow: markerInfoWindow,
+											map: map,
+											position: markerPosition,
+											title: item.title
+										}
+									);
+
+									bounds.extend(markerPosition);
+
+									gmapsMarkers.push(marker);
+								}
+							);
+
+							map.fitBounds(bounds);
+							map.panToBounds(bounds);
+
+							instance._markers = gmapsMarkers;
+						}
+						else {
+							instance._mainMarker = new google.maps.Marker(
+								{
+									draggable: true,
+									map: map
+								}
+							);
+
+							instance._geocode(instance.get(STR_LATITUDE), instance.get(STR_LONGITUDE));
+						}
+					},
+
+					_createSearchBox: function() {
+						var instance = this;
+
+						var searchBoxNode = A.Node.create(
+							A.Lang.sub(
+								TPL_SEARCHBOX,
+								{
+									placeholder: instance.get(STR_STRINGS).searchBoxPlaceholder
+								}
+							)
+						);
+
+						instance._map.controls[google.maps.ControlPosition.TOP_CENTER].push(searchBoxNode.getDOMNode());
+
+						instance._searchBox = new google.maps.places.Autocomplete(searchBoxNode.one('.search-input').getDOMNode());
+					},
+
+					_defLocationUpdatedFn: function(event) {
+						var instance = this;
+
+						var location = event.location.geometry.location;
+
+						instance._map.setCenter(location);
+
+						if (instance._mainMarker) {
+							instance._mainMarker.setPosition(location);
+						}
+					},
+
+					_geocode: function(latitude, longitude) {
+						var instance = this;
+
+						var geocoder = new google.maps.Geocoder();
+
+						geocoder.geocode(
+							{
+								location: {
+									lat: latitude,
+									lng: longitude
+								}
+							},
+							function(results, status) {
+								if (status == google.maps.GeocoderStatus.OK) {
+									instance.fire(
+										'locationUpdated',
+										{
+											location: results[0]
+										}
+									);
+								}
+								else {
+									instance.fire(
+										'locationError',
+										{
+											status: status
+										}
+									);
+								}
+							}
+						);
+					},
+
+					_onHomeButtonClick: function(event) {
+						var instance = this;
+
+						event.preventDefault();
+
+						if (!instance._geocodeFn) {
+							instance._geocodeFn = A.bind('_geocode', instance);
+						}
+
+						Liferay.Util.getGeolocation(instance._geocodeFn);
+					},
+
+					_onMainMarkerDragEnd: function(event) {
+						var instance = this;
+
+						var location = event.latLng;
+
+						instance._geocode(location.lat(), location.lng());
+					},
+
+					_onMarkerClick: function(marker) {
+						var instance = this;
+
+						marker.infoWindow.open(instance._map, marker);
+					},
+
+					_onPlaceChanged: function(searchBox) {
+						var instance = this;
+
+						var place = searchBox.getPlace();
+
+						if (A.Lang.isObject(place)) {
+							var location = place.geometry.location;
+
+							instance._geocode(location.lat(), location.lng());
+						}
+					}
 				},
 
 				register: function(id, config) {
@@ -371,8 +369,8 @@ AUI.add(
 							var apiURL = Lang.sub(
 								config.apiKey ? API_KEY_GMAPS_API_URL : GMAPS_API_URL,
 								{
-									protocol: themeDisplay.getProtocol(),
-									apiKey: config.apiKey
+									apiKey: config.apiKey,
+									protocol: themeDisplay.getProtocol()
 								}
 							);
 
@@ -386,12 +384,13 @@ AUI.add(
 					}
 				},
 
+				_apiReady: false,
+				_apiTransaction: null,
+
 				_initializeMap: function(config, id) {
 					Liferay.component(id).render();
 				},
 
-				_apiReady: false,
-				_apiTransaction: null,
 				_instances: {},
 				_registered: {}
 			}

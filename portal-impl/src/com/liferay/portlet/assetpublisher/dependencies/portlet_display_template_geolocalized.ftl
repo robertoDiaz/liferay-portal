@@ -92,23 +92,17 @@
 			Liferay.GoogleMaps.register(
 				'${renderResponse.getNamespace()}',
 				{
-					addSearchBox: 'false',
 					apiKey: '${apiKey}',
 					boundingBox: '#${renderResponse.getNamespace()}Map',
-					draggableMarker: 'false',
 					latitude: latitude,
 					longitude: longitude,
-					points: ${jsonArray},
+					markers: ${jsonArray},
 					zoom:8
 				}
 			);
 		}
 
-		Liferay.Util.getGeolocation(
-			function(latitude, longitude) {
-				drawMap(latitude, longitude);
-			}
-		);
+		Liferay.Util.getGeolocation(drawMap);
 	</@liferay_aui.script>
 </#if>
 

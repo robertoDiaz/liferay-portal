@@ -18,11 +18,8 @@
 	<@aui.input name=namespacedFieldName type="hidden" value=fieldRawValue />
 
 	<div id="${portletNamespace}${namespacedFieldName}CoordinatesContainer" style="padding: 15px;">
-		<p>
-			<span id="${portletNamespace}${namespacedFieldName}Location"></span>
-		</p>
-
-		<div id="${portletNamespace}${namespacedFieldName}Map" ></div>
+		<div class="glyphicon glyphicon-map-marker" id="${portletNamespace}${namespacedFieldName}Location"></div>
+		<div id="${portletNamespace}${namespacedFieldName}Map"></div>
 	</div>
 
 	${fieldStructure.children}
@@ -34,27 +31,33 @@
 			'${portletNamespace}${namespacedFieldName}',
 			{
 				boundingBox: '#${portletNamespace}${namespacedFieldName}Map',
+				homeButton: true,
 				latitude: latitude,
 				longitude: longitude,
 				on: {
-					locationReady: function(event) {
-						var instance = this;
-
+					locationError: function(event) {
+						console.log(event.status);
+					},
+					locationUpdated: function(event) {
 						var inputNode = A.one('#${portletNamespace}${namespacedFieldName}');
-						var locationNode = A.one('#${portletNamespace}${namespacedFieldName}Location');
+
+						var location = event.location.geometry.location;
 
 						inputNode.val(
 							A.JSON.stringify(
 								{
-									latitude: instance.getLatitude(),
-									longitude: instance.getLongitude()
+									latitude: location.lat(),
+									longitude: location.lng()
 								}
 							)
 						);
 
-						locationNode.html('<span class="glyphicon glyphicon-map-marker" style="margin-right: 5px;"></span>' + instance.getFormattedLocation(1));
+						var locationNode = A.one('#${portletNamespace}${namespacedFieldName}Location');
+
+						locationNode.html(event.location.formatted_address);
 					}
-				}
+				},
+				searchBox: true
 			}
 		);
 	};
@@ -62,10 +65,6 @@
 	<#if (fieldRawValue != "")>
 		drawMap(${latitude}, ${longitude});
 	<#else>
-		Liferay.Util.getGeolocation(
-			function(latitude, longitude) {
-				drawMap(latitude, longitude);
-			}
-		);
+		Liferay.Util.getGeolocation(drawMap);
 	</#if>
 </@>
