@@ -355,6 +355,12 @@
 							'plugin'
 						]
 					},
+					'liferay-google-maps': {
+						path: 'google_maps.js',
+						requires: [
+							'aui-base'
+						]
+					},
 					'liferay-history': {
 						path: 'history.js',
 						requires: [

@@ -55,7 +55,7 @@
 	</#list>
 </#list>
 
-<div class="map-canvas" id="${renderResponse.getNamespace()}mapCanvas"></div>
+<div class="map-canvas" id="${renderResponse.getNamespace()}Map"></div>
 
 <#if mapsAPIProvider = "googleMaps" >
 	<style type="text/css">
@@ -76,10 +76,6 @@
 			float: right;
 		}
 
-		#${renderResponse.getNamespace()}mapCanvas {
-			min-height: 400px;
-		}
-
 		#${renderResponse.getNamespace()}mapCanvas img {
 			max-width: none;
 		}
@@ -91,91 +87,22 @@
 		<#assign apiKey = companyPortletPreferences.getValue("googleMapsAPIKey", "") />
 	</#if>
 
-	<#if apiKey = "">
-		<script src="${themeDisplay.getProtocol()}://maps.googleapis.com/maps/api/js?sensor=true" type="text/javascript"></script>
-	<#else>
-		<script src="${themeDisplay.getProtocol()}://maps.googleapis.com/maps/api/js?key=${apiKey}&sensor=true" type="text/javascript"></script>
-	</#if>
-
-	<@liferay_aui.script>
-		(function() {
-			var putMarkers = function(map) {
-				var bounds;
-
-				var points = ${jsonArray};
-
-				var len = points.length;
-
-				if (len) {
-					bounds = new google.maps.LatLngBounds();
-
-					for (var i = 0; i < len; i++) {
-						var point = points[i];
-
-						var marker = new google.maps.Marker(
-							{
-								icon: point.icon,
-								map: map,
-								position: new google.maps.LatLng(point.latitude, point.longitude),
-								title: point.title
-							}
-						);
-
-						bounds.extend(marker.position);
-
-						(function(marker) {
-							var infoWindow = new google.maps.InfoWindow(
-								{
-									content: point.abstract || point.title
-								}
-							);
-
-							google.maps.event.addListener(
-								marker,
-								'click',
-								function() {
-									infoWindow.open(map, marker);
-								}
-							);
-						})(marker);
-					}
+	<@liferay_aui.script use="json,liferay-google-maps">
+		var drawMap = function(latitude, longitude) {
+			Liferay.GoogleMaps.register(
+				'${renderResponse.getNamespace()}',
+				{
+					apiKey: '${apiKey}',
+					boundingBox: '#${renderResponse.getNamespace()}Map',
+					latitude: latitude,
+					longitude: longitude,
+					markers: ${jsonArray},
+					zoom:8
 				}
-
-				return bounds;
-			};
-
-			var drawMap = function(mapOptions) {
-				var map = new google.maps.Map(document.getElementById('${renderResponse.getNamespace()}mapCanvas'), mapOptions);
-
-				var bounds = putMarkers(map);
-
-				if (bounds) {
-					map.fitBounds(bounds);
-					map.panToBounds(bounds);
-				}
-			};
-
-			var drawDefaultMap = function() {
-				drawMap(
-					{
-						center: new google.maps.LatLng(${defaultLatitude}, ${defaultLongitude}),
-						zoom: 8
-					}
-				);
-			};
-
-			Liferay.Util.getGeolocation(
-				function(latitude, longitude) {
-					drawMap(
-						{
-							center: new google.maps.LatLng(latitude, longitude),
-							zoom: 8
-						}
-					);
-				},
-				drawDefaultMap
 			);
-		})();
+		}
+
+		Liferay.Util.getGeolocation(drawMap);
 	</@liferay_aui.script>
 </#if>
 
