@@ -45,7 +45,7 @@ String contents = (String)request.getAttribute("liferay-ui:input-editor:contents
 String contentsLanguageId = (String)request.getAttribute("liferay-ui:input-editor:contentsLanguageId");
 String cssClasses = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:cssClasses"));
 String editorImpl = (String)request.getAttribute("liferay-ui:input-editor:editorImpl");
-String name = namespace + GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:name"));
+String name = namespace + GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:name")) + "Editor";
 String initMethod = (String)request.getAttribute("liferay-ui:input-editor:initMethod");
 boolean inlineEdit = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:inlineEdit"));
 
@@ -153,7 +153,15 @@ if (alloyEditorMode.equals("text")) {
 				<c:when test='<%= alloyEditorMode.equals("text") %>'>
 					var editorElement = CKEDITOR.instances['<%= name %>'].element.$;
 
-					return editorElement.childElementCount ? editorElement.children[0].innerText : '';
+					var text = '';
+
+					if (editorElement.childElementCount) {
+						var childElement = editorElement.children[0];
+
+						text = childElement.textContent || childElement.innerText;
+					}
+
+					return text;
 				</c:when>
 				<c:otherwise>
 					return window['<%= name %>'].getCkData();
@@ -166,31 +174,6 @@ if (alloyEditorMode.equals("text")) {
 		},
 
 		instanceReady: true,
-
-		<c:if test="<%= Validator.isNotNull(onBlurMethod) %>">
-			onBlurCallback: function() {
-				window['<%= HtmlUtil.escapeJS(onBlurMethod) %>'](CKEDITOR.instances['<%= name %>']);
-			},
-		</c:if>
-
-		<c:if test="<%= Validator.isNotNull(onChangeMethod) %>">
-			onChangeCallback: function() {
-				var ckEditor = CKEDITOR.instances['<%= name %>'];
-				var dirty = ckEditor.checkDirty();
-
-				if (dirty) {
-					window['<%= HtmlUtil.escapeJS(onChangeMethod) %>'](window['<%= name %>'].getText());
-
-					ckEditor.resetDirty();
-				}
-			},
-		</c:if>
-
-		<c:if test="<%= Validator.isNotNull(onFocusMethod) %>">
-			onFocusCallback: function() {
-				window['<%= HtmlUtil.escapeJS(onFocusMethod) %>'](CKEDITOR.instances['<%= name %>']);
-			},
-		</c:if>
 
 		setHTML: function(value) {
 			CKEDITOR.instances['<%= name %>'].setData(value);
@@ -210,9 +193,36 @@ if (alloyEditorMode.equals("text")) {
 		window['<%= name %>Config']();
 	}
 
-	<c:if test='<%= alloyEditorMode.equals("text") %>'>
-		var alloyEditor = CKEDITOR.instances['<%= name %>'];
+	var alloyEditor = CKEDITOR.instances['<%= name %>'];
 
+	<c:if test="<%= Validator.isNotNull(onChangeMethod) %>">
+		alloyEditor.on(
+			'change',
+			function(event) {
+				window['<%= HtmlUtil.escapeJS(onChangeMethod) %>'](window['<%= name %>'].getHTML());
+			}
+		);
+	</c:if>
+
+	<c:if test="<%= Validator.isNotNull(onBlurMethod) %>">
+		alloyEditor.on(
+			'blur',
+			function(event) {
+				window['<%= HtmlUtil.escapeJS(onBlurMethod) %>'](event.editor);
+			}
+		);
+	</c:if>
+
+	<c:if test="<%= Validator.isNotNull(onFocusMethod) %>">
+		alloyEditor.on(
+			'focus',
+			function(event) {
+				window['<%= HtmlUtil.escapeJS(onFocusMethod) %>'](event.editor);
+			}
+		);
+	</c:if>
+
+	<c:if test='<%= alloyEditorMode.equals("text") %>'>
 		alloyEditor.on(
 			'key',
 			function(event) {
