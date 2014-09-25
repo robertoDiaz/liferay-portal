@@ -5,6 +5,10 @@ AUI.add(
 
 		var STR_CLICK = 'click';
 
+		var STR_CHECKED = 'change';
+
+		var DEFAULT_CUSTOM_ABSTRACT_LENGTH = 200;
+
 		var Blogs = A.Component.create(
 			{
 				ATTRS: {
@@ -70,6 +74,22 @@ AUI.add(
 						(new A.EventHandle(instance._eventHandles)).detach();
 					},
 
+					setAbstractContent: function(content, lenght) {
+						var instance = this;
+
+						var splittedContentRadio = instance.one('.splitted-content');
+
+						if (splittedContentRadio.get('checked') == false) {
+							return;
+						}
+
+						if (lenght > 0 && content.length > lenght) {
+							return;
+						}
+
+						window[instance.ns('descriptionEditor')].setHTML(content);
+					},
+
 					_bindUI: function() {
 						var instance = this;
 
@@ -99,7 +119,42 @@ AUI.add(
 							);
 						}
 
+						var customAbstractOptions = instance.one('#entry-abstract-options');
+
+						if (customAbstractOptions) {
+							eventHandles.push(
+								customAbstractOptions.delegate(STR_CHECKED, instance._configureAbstract, '.abstract', instance)
+							);
+						}
+
 						instance._eventHandles = eventHandles;
+					},
+
+					_configureAbstract: function(event) {
+						var instance = this;
+
+						var target = event.target;
+
+						if (target.hasClass('custom')) {
+							var content = '';
+
+							if (instance._customAbstract) {
+								content = instance._customAbstract;
+							}
+
+							instance.setAbstractContent(content, 0, instance);
+						}
+						else {
+							instance._customAbstract = window[instance.ns('descriptionEditor')].getHTML();
+
+							var lenght = target.getAttribute('data-max-length');
+
+							if (!lenght) {
+								lenght = DEFAULT_CUSTOM_ABSTRACT_LENGTH;
+							}
+
+							instance.setAbstractContent(window[instance.ns('contentEditor')].getHTML(), lenght, instance);
+						}
 					},
 
 					_getPrincipalForm: function(formName) {
