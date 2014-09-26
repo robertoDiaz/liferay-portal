@@ -363,6 +363,12 @@
 							'aui-base'
 						]
 					},
+					'liferay-os-maps': {
+						path: 'osmaps.js',
+						requires: [
+							'aui-base'
+						]
+					},
 					'liferay-history': {
 						path: 'history.js',
 						requires: [

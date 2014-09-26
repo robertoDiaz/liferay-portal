@@ -1,5 +1,5 @@
 AUI.add(
-	'liferay-google-maps',
+	'liferay-os-maps',
 	function(A) {
 		var AArray = A.Array;
 
@@ -19,7 +19,7 @@ AUI.add(
 
 		var TPL_SEARCHBOX = '<div class="col-md-6"><input class="search-input" placeholder="{placeholder}" type="text"></div>';
 
-		var GoogleMaps = A.Component.create(
+		var OSMaps = A.Component.create(
 			{
 				ATTRS: {
 					homeButton: {
@@ -69,9 +69,19 @@ AUI.add(
 						var latitude = instance.get(STR_LATITUDE);
 						var longitude = instance.get(STR_LONGITUDE);
 
-						if (!latitude || !longitude) {
-							Liferay.Util.getGeolocation(A.bind(instance._createMap, instance));
-						}
+						instance._map = L.map(
+							instance.get(STR_BOUNDING_BOX).getDOMNode(),
+							{
+								center: {
+									lat: latitude,
+									lng: longitude
+								},
+								layers: [L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')],
+								zoom: instance.get('zoom') + 2
+							}
+						);
+
+						instance._createMarkers();
 					},
 
 					bindUI: function() {
@@ -80,7 +90,7 @@ AUI.add(
 						var eventHandles = [];
 
 						var homeButton = instance._homeButton;
-
+/*
 						if (homeButton) {
 							eventHandles.push(
 								google.maps.event.addDomListener(homeButton.getDOMNode(), STR_CLICK, A.bind('_onHomeButtonClick', instance))
@@ -94,15 +104,15 @@ AUI.add(
 								google.maps.event.addListener(searchBox, 'place_changed', A.bind('_onPlaceChanged', instance, searchBox))
 							);
 						}
-
+*/
 						var mainMarker = instance._mainMarker;
 
 						if (mainMarker) {
 							eventHandles.push(
-								google.maps.event.addListener(mainMarker, 'dragend', A.bind('_onMainMarkerDragEnd', instance))
+								mainMarker.on('dragend', A.bind('_onMainMarkerDragEnd', instance))
 							);
 						}
-
+/*
 						var markers = instance._markers;
 
 						if (markers) {
@@ -113,7 +123,7 @@ AUI.add(
 								}
 							);
 						}
-
+*/
 						instance.publish(
 							'locationUpdated',
 							{
@@ -150,35 +160,6 @@ AUI.add(
 						instance._map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(homeButtonNode.getDOMNode());
 
 						instance._homeButton = homeButtonNode;
-					},
-
-					_createMap: function(latitude, longitude) {
-						var instance = this;
-
-						instance.set(STR_LATITUDE, latitude);
-						instance.set(STR_LONGITUDE, longitude);
-
-						instance._map = new google.maps.Map(
-							instance.get(STR_BOUNDING_BOX).getDOMNode(),
-							{
-								center: {
-									lat: latitude,
-									lng: longitude
-								},
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								zoom: instance.get('zoom')
-							}
-						);
-
-						if (instance.get('homeButton')) {
-							instance._createHomeButton();
-						}
-
-						if (instance.get('searchBox')) {
-							instance._createSearchBox();
-						}
-
-						instance._createMarkers();
 					},
 
 					_createMarkers: function() {
@@ -227,12 +208,15 @@ AUI.add(
 							instance._markers = gmapsMarkers;
 						}
 						else {
-							instance._mainMarker = new google.maps.Marker(
+							instance._mainMarker = L.marker(
+								[
+									instance.get(STR_LATITUDE),
+									instance.get(STR_LONGITUDE)
+								],
 								{
-									draggable: true,
-									map: map
+									draggable: true
 								}
-							);
+							).addTo(map);
 
 							instance._geocode(instance.get(STR_LATITUDE), instance.get(STR_LONGITUDE));
 						}
@@ -260,10 +244,10 @@ AUI.add(
 
 						var location = event.location;
 
-						instance._map.setCenter(location);
+						instance._map.panTo(location);
 
 						if (instance._mainMarker) {
-							instance._mainMarker.setPosition(location);
+							instance._mainMarker.setLatLng(location);
 						}
 					},
 
@@ -323,9 +307,9 @@ AUI.add(
 					_onMainMarkerDragEnd: function(event) {
 						var instance = this;
 
-						var location = event.latLng;
+						var location = event.target.getLatLng();
 
-						instance._geocode(location.lat(), location.lng());
+						instance._geocode(location.lat, location.lng);
 					},
 
 					_onMarkerClick: function(marker) {
@@ -349,7 +333,7 @@ AUI.add(
 			}
 		);
 
-		Liferay.GoogleMaps = GoogleMaps;
+		Liferay.OSMaps = OSMaps;
 	},
 	'',
 	{

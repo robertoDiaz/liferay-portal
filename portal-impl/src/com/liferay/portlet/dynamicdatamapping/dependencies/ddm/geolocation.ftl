@@ -23,13 +23,11 @@
 		<@aui.button cssClass="geolocate-button" value="geolocate" />
 	</@>
 
-	<p class="${coordinatesContainerCssClass}" id="${portletNamespace}${namespacedFieldName}CoordinatesContainer">
-		<strong><@liferay_ui.message key="location" />:</strong>
+	<div id="${portletNamespace}${namespacedFieldName}CoordinatesContainer" style="padding: 15px;">
+		<div class="glyphicon glyphicon-map-marker" id="${portletNamespace}${namespacedFieldName}Location"></div>
 
-		<span id="${portletNamespace}${namespacedFieldName}Coordinates">
-		    <@fmt.formatNumber value=latitude type="NUMBER" />, <@fmt.formatNumber value=longitude type="NUMBER" />
-		</span>
-	</p>
+		<@liferay_ui["map"] name=namespacedFieldName />
+	</div>
 
 	${fieldStructure.children}
 </@>
