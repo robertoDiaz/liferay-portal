@@ -18,6 +18,7 @@ import com.liferay.portal.asset.LayoutRevisionAssetRendererFactory;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.portal.subscriptionsender.SubscriptionSenderRegistryUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.assetpublisher.util.AssetIndexer;
@@ -33,6 +34,7 @@ import com.liferay.portlet.directory.asset.UserAssetRendererFactory;
 import com.liferay.portlet.directory.workflow.UserWorkflowHandler;
 import com.liferay.portlet.documentlibrary.asset.DLFileEntryAssetRendererFactory;
 import com.liferay.portlet.documentlibrary.asset.DLFolderAssetRendererFactory;
+import com.liferay.portlet.documentlibrary.subscriptionsender.DLSubscriptionSender;
 import com.liferay.portlet.documentlibrary.trash.DLFileEntryTrashHandler;
 import com.liferay.portlet.documentlibrary.trash.DLFileShortcutTrashHandler;
 import com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler;
@@ -72,6 +74,8 @@ import com.liferay.portlet.wiki.workflow.WikiPageWorkflowHandler;
  * @author Roberto Díaz
  */
 public class PortalRegisterTestUtil {
+
+	private static boolean _subscriptionsSendersRegistered;
 
 	protected static void registerAssetRendererFactories() {
 		if (_assetRendererFactoriesRegistered) {
@@ -122,6 +126,16 @@ public class PortalRegisterTestUtil {
 		IndexerRegistryUtil.register(new WikiPageIndexer());
 
 		_indexersRegistered = true;
+	}
+
+	protected static void registerSubscriptionSenders() {
+		if (_subscriptionsSendersRegistered) {
+			return;
+		}
+
+		SubscriptionSenderRegistryUtil.register(new DLSubscriptionSender());
+
+		_subscriptionsSendersRegistered = true;
 	}
 
 	protected static void registerTrashHandlers() {
