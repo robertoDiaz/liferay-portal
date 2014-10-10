@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.capabilities.RepositoryEventTriggerCapability;
@@ -41,22 +39,21 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.subscriptionsender.SubscriptionSender;
+import com.liferay.portal.subscriptionsender.SubscriptionSenderConstants;
+import com.liferay.portal.subscriptionsender.SubscriptionSenderRegistryUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
-import com.liferay.portlet.documentlibrary.DLSettings;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -65,6 +62,7 @@ import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLAppHelperLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
 import com.liferay.portlet.documentlibrary.util.DLAppHelperThreadLocal;
+import com.liferay.portlet.documentlibrary.util.DLConstants;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
@@ -79,7 +77,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -1876,129 +1873,23 @@ public class DLAppHelperLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		if (!fileVersion.isApproved() || Validator.isNull(entryURL)) {
-			return;
-		}
+		SubscriptionSender subscriptionSender =
+			SubscriptionSenderRegistryUtil.getSubscriptionSender(
+				DLConstants.SERVICE_NAME);
 
-		DLSettings dlSettings = DLSettings.getInstance(
-			fileVersion.getGroupId());
+		Map<String, Object> subscriptionSenderContext = new HashMap<>();
 
-		if (serviceContext.isCommandAdd() &&
-			dlSettings.isEmailFileEntryAddedEnabled()) {
-		}
-		else if (serviceContext.isCommandUpdate() &&
-				 dlSettings.isEmailFileEntryUpdatedEnabled()) {
-		}
-		else {
-			return;
-		}
+		subscriptionSenderContext.put(
+			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_ENTRY_URL,
+			entryURL);
+		subscriptionSenderContext.put(
+			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_COMMAND,
+			serviceContext.getCommand());
 
-		String entryTitle = fileVersion.getTitle();
+		subscriptionSender.setSubscriptionSenderContext(
+			subscriptionSenderContext);
 
-		String fromName = dlSettings.getEmailFromName();
-		String fromAddress = dlSettings.getEmailFromAddress();
-
-		Map<Locale, String> localizedSubjectMap = null;
-		Map<Locale, String> localizedBodyMap = null;
-
-		if (serviceContext.isCommandUpdate()) {
-			localizedSubjectMap = dlSettings.getEmailFileEntryUpdatedSubject();
-			localizedBodyMap = dlSettings.getEmailFileEntryUpdatedBody();
-		}
-		else {
-			localizedSubjectMap = dlSettings.getEmailFileEntryAddedSubject();
-			localizedBodyMap = dlSettings.getEmailFileEntryAddedBody();
-		}
-
-		FileEntry fileEntry = fileVersion.getFileEntry();
-
-		Folder folder = null;
-
-		long folderId = fileEntry.getFolderId();
-
-		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			folder = dlAppLocalService.getFolder(folderId);
-		}
-
-		String folderName = LanguageUtil.get(
-			serviceContext.getLocale(), "home");
-
-		if (folder != null) {
-			folderName = folder.getName();
-		}
-
-		SubscriptionSender subscriptionSender = new SubscriptionSender();
-
-		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-
-		DLFileEntryType dlFileEntryType =
-			dlFileEntryTypeLocalService.getDLFileEntryType(
-				dlFileEntry.getFileEntryTypeId());
-
-		subscriptionSender.setClassPK(fileVersion.getFileEntryId());
-		subscriptionSender.setClassName(DLFileEntryConstants.getClassName());
-		subscriptionSender.setCompanyId(fileVersion.getCompanyId());
-		subscriptionSender.setContextAttributes(
-			"[$DOCUMENT_STATUS_BY_USER_NAME$]",
-			fileVersion.getStatusByUserName(), "[$DOCUMENT_TITLE$]", entryTitle,
-			"[$DOCUMENT_TYPE$]",
-			dlFileEntryType.getName(serviceContext.getLocale()),
-			"[$DOCUMENT_URL$]", entryURL, "[$FOLDER_NAME$]", folderName);
-		subscriptionSender.setContextUserPrefix("DOCUMENT");
-		subscriptionSender.setEntryTitle(entryTitle);
-		subscriptionSender.setEntryURL(entryURL);
-		subscriptionSender.setFrom(fromAddress, fromName);
-		subscriptionSender.setHtmlFormat(true);
-		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
-		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
-		subscriptionSender.setMailId(
-			"file_entry", fileVersion.getFileEntryId());
-
-		int notificationType =
-			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY;
-
-		if (serviceContext.isCommandUpdate()) {
-			notificationType =
-				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY;
-		}
-
-		subscriptionSender.setNotificationType(notificationType);
-
-		subscriptionSender.setPortletId(PortletKeys.DOCUMENT_LIBRARY);
-		subscriptionSender.setReplyToAddress(fromAddress);
-		subscriptionSender.setScopeGroupId(fileVersion.getGroupId());
-		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setUserId(fileVersion.getUserId());
-
-		subscriptionSender.addPersistedSubscribers(
-			Folder.class.getName(), fileVersion.getGroupId());
-
-		if (folder != null) {
-			subscriptionSender.addPersistedSubscribers(
-				Folder.class.getName(), folder.getFolderId());
-
-			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
-				subscriptionSender.addPersistedSubscribers(
-					Folder.class.getName(), ancestorFolderId);
-			}
-		}
-
-		if (dlFileEntryType.getFileEntryTypeId() ==
-				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
-
-			subscriptionSender.addPersistedSubscribers(
-				DLFileEntryType.class.getName(), fileVersion.getGroupId());
-		}
-		else {
-			subscriptionSender.addPersistedSubscribers(
-				DLFileEntryType.class.getName(),
-				dlFileEntryType.getFileEntryTypeId());
-		}
-
-		subscriptionSender.addPersistedSubscribers(
-			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
-
-		subscriptionSender.flushNotificationsAsync();
+		subscriptionSender.notify((BaseModel)fileVersion.getModel(), entryURL);
 	}
 
 	protected void registerDLProcessorCallback(

@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.EscapableObject;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlEscapableObject;
@@ -47,7 +48,6 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
@@ -236,8 +236,11 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
 		_initialized = true;
 
-		if ((groupId == 0) && (serviceContext != null)) {
-			setScopeGroupId(serviceContext.getScopeGroupId());
+		long scopeGroupId = (Long)subscriptionSenderContext.get(
+			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_SCOPE_GROUP_ID);
+
+		if ((groupId == 0) && (scopeGroupId != 0)) {
+			setScopeGroupId(scopeGroupId);
 		}
 
 		Company company = CompanyLocalServiceUtil.getCompany(companyId);
@@ -394,16 +397,18 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		this.scopeGroupId = scopeGroupId;
 	}
 
-	public void setServiceContext(ServiceContext serviceContext) {
-		this.serviceContext = serviceContext;
-	}
-
 	public void setSMTPAccount(SMTPAccount smtpAccount) {
 		this.smtpAccount = smtpAccount;
 	}
 
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+
+	public void setSubscriptionSenderContext(
+		Map<String, Object> subscriptionSenderContext) {
+
+		this.subscriptionSenderContext = subscriptionSenderContext;
 	}
 
 	public void setUniqueMailId(boolean uniqueMailId) {
@@ -438,6 +443,30 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		throws Exception {
 
 		return hasPermission(subscription, _className, _classPK, user);
+	}
+
+	protected boolean isCommandAdd() {
+		return (Validator.equals(command, Constants.ADD) ||
+			Validator.equals(command, Constants.ADD_DYNAMIC) ||
+			Validator.equals(command, Constants.ADD_MULTIPLE));
+	}
+
+	protected boolean isCommandUpdate() {
+		return Validator.equals(command, Constants.UPDATE);
+	}
+
+	protected boolean isSubmisionCommandEnabled(
+		boolean isEmailAddedEnabled, boolean isEmailUpdatedEnabled) {
+
+		if (isCommandAdd() && isEmailAddedEnabled) {
+		}
+		else if (isCommandUpdate() && isEmailUpdatedEnabled) {
+		}
+		else {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected void notifyPersistedSubscriber(Subscription subscription)
@@ -570,7 +599,8 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 				HtmlUtil.escape(to.getAddress()),
 				HtmlUtil.escape(
 					GetterUtil.getString(to.getPersonal(), to.getAddress()))
-			});
+			}
+		);
 
 		processedSubject = replaceContent(processedSubject, locale, false);
 
@@ -783,6 +813,7 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
 	protected String body;
 	protected boolean bulk;
+	protected String command;
 	protected long companyId;
 	protected List<FileAttachment> fileAttachments =
 		new ArrayList<FileAttachment>();
@@ -797,9 +828,9 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 	protected String portletId;
 	protected String replyToAddress;
 	protected long scopeGroupId;
-	protected ServiceContext serviceContext;
 	protected SMTPAccount smtpAccount;
 	protected String subject;
+	protected Map<String, Object> subscriptionSenderContext;
 	protected boolean uniqueMailId = true;
 	protected long userId;
 
