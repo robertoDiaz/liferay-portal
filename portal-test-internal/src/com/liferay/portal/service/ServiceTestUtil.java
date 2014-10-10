@@ -226,6 +226,10 @@ public class ServiceTestUtil {
 			_log.warn(e.getMessage(), e);
 		}
 
+		// SubscriptionSender
+
+		PortalRegisterTestUtil.registerSubscriptionSenders();
+
 		// Trash
 
 		PortalRegisterTestUtil.registerTrashHandlers();
