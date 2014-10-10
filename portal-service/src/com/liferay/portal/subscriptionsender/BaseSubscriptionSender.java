@@ -78,12 +78,10 @@ import javax.mail.internet.InternetAddress;
  */
 public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
-	@Override
 	public void addFileAttachment(File file) {
 		addFileAttachment(file, null);
 	}
 
-	@Override
 	public void addFileAttachment(File file, String fileName) {
 		if (file == null) {
 			return;
@@ -98,7 +96,6 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		fileAttachments.add(attachment);
 	}
 
-	@Override
 	public void addPersistedSubscribers(String className, long classPK) {
 		ObjectValuePair<String, Long> ovp = new ObjectValuePair<String, Long>(
 			className, classPK);
@@ -106,7 +103,6 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		_persistestedSubscribersOVPs.add(ovp);
 	}
 
-	@Override
 	public void addRuntimeSubscribers(String toAddress, String toName) {
 		ObjectValuePair<String, String> ovp =
 			new ObjectValuePair<String, String>(toAddress, toName);
@@ -114,7 +110,6 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		_runtimeSubscribersOVPs.add(ovp);
 	}
 
-	@Override
 	public void flushNotifications() throws Exception {
 		initialize();
 
@@ -206,7 +201,6 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		}
 	}
 
-	@Override
 	public void flushNotificationsAsync() {
 		TransactionCommitCallbackRegistryUtil.registerCallback(
 			new Callable<Void>() {
@@ -227,17 +221,14 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		);
 	}
 
-	@Override
 	public Object getContextAttribute(String key) {
 		return _context.get(key);
 	}
 
-	@Override
 	public String getMailId() {
 		return this.mailId;
 	}
 
-	@Override
 	public void initialize() throws Exception {
 		if (_initialized) {
 			return;
@@ -280,110 +271,90 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 			company.getMx(), _mailIdPopPortletPrefix, _mailIdIds);
 	}
 
-	@Override
 	public void setBody(String body) {
 		this.body = body;
 	}
 
-	@Override
 	public void setBulk(boolean bulk) {
 		this.bulk = bulk;
 	}
 
-	@Override
 	public void setClassName(String className) {
 		_className = className;
 	}
 
-	@Override
 	public void setClassPK(long classPK) {
 		_classPK = classPK;
 	}
 
-	@Override
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
 
-	@Override
 	public void setContextAttribute(String key, EscapableObject<String> value) {
 		_context.put(key, value);
 	}
 
-	@Override
 	public void setContextAttribute(String key, Object value) {
 		setContextAttribute(key, value, true);
 	}
 
-	@Override
 	public void setContextAttribute(String key, Object value, boolean escape) {
 		setContextAttribute(
 			key,
 			new HtmlEscapableObject<String>(String.valueOf(value), escape));
 	}
 
-	@Override
 	public void setContextAttributes(Object... values) {
 		for (int i = 0; i < values.length; i += 2) {
 			setContextAttribute(String.valueOf(values[i]), values[i + 1]);
 		}
 	}
 
-	@Override
 	public void setContextUserPrefix(String contextUserPrefix) {
 		_contextUserPrefix = contextUserPrefix;
 	}
 
-	@Override
 	public void setEntryTitle(String entryTitle) {
 		this._entryTitle = entryTitle;
 	}
 
-	@Override
 	public void setEntryURL(String entryURL) {
 		_entryURL = entryURL;
 	}
 
-	@Override
 	public void setFrom(String fromAddress, String fromName) {
 		this.fromAddress = fromAddress;
 		this.fromName = fromName;
 	}
 
-	@Override
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
 	}
 
-	@Override
 	public void setHtmlFormat(boolean htmlFormat) {
 		this.htmlFormat = htmlFormat;
 	}
 
-	@Override
 	public void setInReplyTo(String inReplyTo) {
 		this.inReplyTo = inReplyTo;
 	}
 
-	@Override
 	public void setLocalizedBodyMap(Map<Locale, String> localizedBodyMap) {
 		this.localizedBodyMap = localizedBodyMap;
 	}
 
-	@Override
 	public void setLocalizedSubjectMap(
 		Map<Locale, String> localizedSubjectMap) {
 
 		this.localizedSubjectMap = localizedSubjectMap;
 	}
 
-	@Override
 	public void setMailId(String popPortletPrefix, Object... ids) {
 		_mailIdPopPortletPrefix = popPortletPrefix;
 		_mailIdIds = ids;
 	}
 
-	@Override
 	public void setNotificationClassNameId(long notificationClassNameId) {
 		_notificationClassNameId = notificationClassNameId;
 	}
@@ -391,17 +362,14 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 	/**
 	 * @see com.liferay.portal.kernel.notifications.UserNotificationDefinition
 	 */
-	@Override
 	public void setNotificationType(int notificationType) {
 		_notificationType = notificationType;
 	}
 
-	@Override
 	public void setPortletId(String portletId) {
 		this.portletId = portletId;
 	}
 
-	@Override
 	public void setReplyToAddress(String replyToAddress) {
 		this.replyToAddress = replyToAddress;
 	}
@@ -409,7 +377,6 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 	/**
 	 * @see com.liferay.portal.kernel.search.BaseIndexer#getSiteGroupId(long)
 	 */
-	@Override
 	public void setScopeGroupId(long scopeGroupId) {
 		try {
 			Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
@@ -427,27 +394,22 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		this.scopeGroupId = scopeGroupId;
 	}
 
-	@Override
 	public void setServiceContext(ServiceContext serviceContext) {
 		this.serviceContext = serviceContext;
 	}
 
-	@Override
 	public void setSMTPAccount(SMTPAccount smtpAccount) {
 		this.smtpAccount = smtpAccount;
 	}
 
-	@Override
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
 
-	@Override
 	public void setUniqueMailId(boolean uniqueMailId) {
 		this.uniqueMailId = uniqueMailId;
 	}
 
-	@Override
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
