@@ -16,6 +16,7 @@ package com.liferay.portal.subscriptionsender;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.model.BaseModel;
+import com.liferay.portal.security.permission.PermissionChecker;
 
 import java.io.Serializable;
 
@@ -25,6 +26,11 @@ import java.util.Map;
  * @author Roberto Díaz
  */
 public interface SubscriptionSender extends Serializable {
+
+	public Boolean contains(
+			PermissionChecker permissionChecker, String className, long classPK,
+			String actionId)
+		throws PortalException;
 
 	public String getServiceName();
 

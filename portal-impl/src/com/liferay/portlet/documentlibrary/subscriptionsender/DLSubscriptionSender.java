@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModel;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.subscriptionsender.BaseSubscriptionSender;
 import com.liferay.portal.subscriptionsender.SubscriptionSenderConstants;
 import com.liferay.portal.util.PortletKeys;
@@ -41,6 +42,14 @@ import java.util.Map;
  * @author Roberto Díaz
  */
 public class DLSubscriptionSender extends BaseSubscriptionSender {
+
+	@Override
+	public Boolean contains(
+		PermissionChecker permissionChecker, String className, long classPK,
+		String actionId) throws PortalException {
+
+		return true;
+	}
 
 	@Override
 	public String getServiceName() {

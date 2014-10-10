@@ -16,6 +16,7 @@ package com.liferay.portal.subscriptionsender;
 
 import com.liferay.mail.model.FileAttachment;
 import com.liferay.mail.service.MailServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -44,6 +45,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Subscription;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserNotificationDeliveryConstants;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
@@ -51,7 +53,6 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
-import com.liferay.portal.service.permission.SubscriptionPermissionUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.File;
@@ -75,6 +76,7 @@ import javax.mail.internet.InternetAddress;
  * @author Mate Thurzo
  * @author Raymond Augé
  * @author Sergio González
+ * @author Roberto Díaz
  */
 public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
@@ -419,30 +421,42 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		this.userId = userId;
 	}
 
+	protected boolean contains(
+			PermissionChecker permissionChecker, String subscriptionClassName,
+			long subscriptionClassPK, String inferredClassName,
+			long inferredClassPK)
+		throws PortalException {
+
+		if (subscriptionClassName == null) {
+			return false;
+		}
+
+		if (Validator.isNotNull(inferredClassName)) {
+			Boolean hasPermission = contains(
+				permissionChecker, inferredClassName, inferredClassPK,
+				ActionKeys.VIEW);
+
+			if ((hasPermission == null) || !hasPermission) {
+				return false;
+			}
+		}
+
+		Boolean hasPermission = contains(
+			permissionChecker, subscriptionClassName, subscriptionClassPK,
+			ActionKeys.SUBSCRIBE);
+
+		if (hasPermission != null) {
+			return hasPermission;
+		}
+
+		return true;
+	}
+
 	protected void deleteSubscription(Subscription subscription)
 		throws Exception {
 
 		SubscriptionLocalServiceUtil.deleteSubscription(
 			subscription.getSubscriptionId());
-	}
-
-	protected boolean hasPermission(
-			Subscription subscription, String className, long classPK,
-			User user)
-		throws Exception {
-
-		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(user);
-
-		return SubscriptionPermissionUtil.contains(
-			permissionChecker, subscription.getClassName(),
-			subscription.getClassPK(), className, classPK);
-	}
-
-	protected boolean hasPermission(Subscription subscription, User user)
-		throws Exception {
-
-		return hasPermission(subscription, _className, _classPK, user);
 	}
 
 	protected boolean isCommandAdd() {
@@ -522,7 +536,13 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		}
 
 		try {
-			if (!hasPermission(subscription, className, classPK, user)) {
+			PermissionChecker permissionChecker =
+				PermissionCheckerFactoryUtil.create(user);
+
+			if (!contains(
+					permissionChecker, subscription.getClassName(),
+					subscription.getClassPK(), className, classPK)) {
+
 				if (_log.isDebugEnabled()) {
 					_log.debug("Skip unauthorized user " + user.getUserId());
 				}
