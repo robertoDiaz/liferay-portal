@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.util;
+package com.liferay.portal.subscriptionsender;
 
 import com.liferay.mail.model.FileAttachment;
 import com.liferay.mail.service.MailServiceUtil;
@@ -52,12 +52,12 @@ import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserNotificationEventLocalServiceUtil;
 import com.liferay.portal.service.permission.SubscriptionPermissionUtil;
+import com.liferay.portal.util.PortalUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,12 +76,14 @@ import javax.mail.internet.InternetAddress;
  * @author Raymond Augé
  * @author Sergio González
  */
-public class SubscriptionSender implements Serializable {
+public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
+	@Override
 	public void addFileAttachment(File file) {
 		addFileAttachment(file, null);
 	}
 
+	@Override
 	public void addFileAttachment(File file, String fileName) {
 		if (file == null) {
 			return;
@@ -96,6 +98,7 @@ public class SubscriptionSender implements Serializable {
 		fileAttachments.add(attachment);
 	}
 
+	@Override
 	public void addPersistedSubscribers(String className, long classPK) {
 		ObjectValuePair<String, Long> ovp = new ObjectValuePair<String, Long>(
 			className, classPK);
@@ -103,6 +106,7 @@ public class SubscriptionSender implements Serializable {
 		_persistestedSubscribersOVPs.add(ovp);
 	}
 
+	@Override
 	public void addRuntimeSubscribers(String toAddress, String toName) {
 		ObjectValuePair<String, String> ovp =
 			new ObjectValuePair<String, String>(toAddress, toName);
@@ -110,6 +114,7 @@ public class SubscriptionSender implements Serializable {
 		_runtimeSubscribersOVPs.add(ovp);
 	}
 
+	@Override
 	public void flushNotifications() throws Exception {
 		initialize();
 
@@ -201,6 +206,7 @@ public class SubscriptionSender implements Serializable {
 		}
 	}
 
+	@Override
 	public void flushNotificationsAsync() {
 		TransactionCommitCallbackRegistryUtil.registerCallback(
 			new Callable<Void>() {
@@ -213,7 +219,7 @@ public class SubscriptionSender implements Serializable {
 
 					MessageBusUtil.sendMessage(
 						DestinationNames.SUBSCRIPTION_SENDER,
-						SubscriptionSender.this);
+						BaseSubscriptionSender.this);
 
 					return null;
 				}
@@ -221,14 +227,17 @@ public class SubscriptionSender implements Serializable {
 		);
 	}
 
+	@Override
 	public Object getContextAttribute(String key) {
 		return _context.get(key);
 	}
 
+	@Override
 	public String getMailId() {
 		return this.mailId;
 	}
 
+	@Override
 	public void initialize() throws Exception {
 		if (_initialized) {
 			return;
@@ -271,90 +280,110 @@ public class SubscriptionSender implements Serializable {
 			company.getMx(), _mailIdPopPortletPrefix, _mailIdIds);
 	}
 
+	@Override
 	public void setBody(String body) {
 		this.body = body;
 	}
 
+	@Override
 	public void setBulk(boolean bulk) {
 		this.bulk = bulk;
 	}
 
+	@Override
 	public void setClassName(String className) {
 		_className = className;
 	}
 
+	@Override
 	public void setClassPK(long classPK) {
 		_classPK = classPK;
 	}
 
+	@Override
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
 
+	@Override
 	public void setContextAttribute(String key, EscapableObject<String> value) {
 		_context.put(key, value);
 	}
 
+	@Override
 	public void setContextAttribute(String key, Object value) {
 		setContextAttribute(key, value, true);
 	}
 
+	@Override
 	public void setContextAttribute(String key, Object value, boolean escape) {
 		setContextAttribute(
 			key,
 			new HtmlEscapableObject<String>(String.valueOf(value), escape));
 	}
 
+	@Override
 	public void setContextAttributes(Object... values) {
 		for (int i = 0; i < values.length; i += 2) {
 			setContextAttribute(String.valueOf(values[i]), values[i + 1]);
 		}
 	}
 
+	@Override
 	public void setContextUserPrefix(String contextUserPrefix) {
 		_contextUserPrefix = contextUserPrefix;
 	}
 
+	@Override
 	public void setEntryTitle(String entryTitle) {
 		this._entryTitle = entryTitle;
 	}
 
+	@Override
 	public void setEntryURL(String entryURL) {
 		_entryURL = entryURL;
 	}
 
+	@Override
 	public void setFrom(String fromAddress, String fromName) {
 		this.fromAddress = fromAddress;
 		this.fromName = fromName;
 	}
 
+	@Override
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
 	}
 
+	@Override
 	public void setHtmlFormat(boolean htmlFormat) {
 		this.htmlFormat = htmlFormat;
 	}
 
+	@Override
 	public void setInReplyTo(String inReplyTo) {
 		this.inReplyTo = inReplyTo;
 	}
 
+	@Override
 	public void setLocalizedBodyMap(Map<Locale, String> localizedBodyMap) {
 		this.localizedBodyMap = localizedBodyMap;
 	}
 
+	@Override
 	public void setLocalizedSubjectMap(
 		Map<Locale, String> localizedSubjectMap) {
 
 		this.localizedSubjectMap = localizedSubjectMap;
 	}
 
+	@Override
 	public void setMailId(String popPortletPrefix, Object... ids) {
 		_mailIdPopPortletPrefix = popPortletPrefix;
 		_mailIdIds = ids;
 	}
 
+	@Override
 	public void setNotificationClassNameId(long notificationClassNameId) {
 		_notificationClassNameId = notificationClassNameId;
 	}
@@ -362,14 +391,17 @@ public class SubscriptionSender implements Serializable {
 	/**
 	 * @see com.liferay.portal.kernel.notifications.UserNotificationDefinition
 	 */
+	@Override
 	public void setNotificationType(int notificationType) {
 		_notificationType = notificationType;
 	}
 
+	@Override
 	public void setPortletId(String portletId) {
 		this.portletId = portletId;
 	}
 
+	@Override
 	public void setReplyToAddress(String replyToAddress) {
 		this.replyToAddress = replyToAddress;
 	}
@@ -377,6 +409,7 @@ public class SubscriptionSender implements Serializable {
 	/**
 	 * @see com.liferay.portal.kernel.search.BaseIndexer#getSiteGroupId(long)
 	 */
+	@Override
 	public void setScopeGroupId(long scopeGroupId) {
 		try {
 			Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
@@ -394,22 +427,27 @@ public class SubscriptionSender implements Serializable {
 		this.scopeGroupId = scopeGroupId;
 	}
 
+	@Override
 	public void setServiceContext(ServiceContext serviceContext) {
 		this.serviceContext = serviceContext;
 	}
 
+	@Override
 	public void setSMTPAccount(SMTPAccount smtpAccount) {
 		this.smtpAccount = smtpAccount;
 	}
 
+	@Override
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
 
+	@Override
 	public void setUniqueMailId(boolean uniqueMailId) {
 		this.uniqueMailId = uniqueMailId;
 	}
 
+	@Override
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
@@ -550,31 +588,6 @@ public class SubscriptionSender implements Serializable {
 		else {
 			sendNotification(user);
 		}
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #notifyPersistedSubscriber(Subscription)}
-	 */
-	@Deprecated
-	protected void notifySubscriber(Subscription subscription)
-		throws Exception {
-
-		notifyPersistedSubscriber(subscription, null, 0);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #notifyPersistedSubscriber(Subscription)}
-	 */
-	@Deprecated
-	protected void notifySubscriber(
-			Subscription subscription, String inferredClassName,
-			long inferredClassPK)
-		throws Exception {
-
-		notifyPersistedSubscriber(
-			subscription, inferredClassName, inferredClassPK);
 	}
 
 	protected void processMailMessage(MailMessage mailMessage, Locale locale)
@@ -854,7 +867,8 @@ public class SubscriptionSender implements Serializable {
 		objectOutputStream.writeUTF(servletContextName);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SubscriptionSender.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		BaseSubscriptionSender.class);
 
 	private List<InternetAddress> _bulkAddresses;
 	private transient ClassLoader _classLoader;
