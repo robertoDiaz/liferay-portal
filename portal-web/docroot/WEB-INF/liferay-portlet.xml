@@ -226,6 +226,7 @@
 		<custom-attributes-display>com.liferay.portlet.documentlibrary.DLFileEntryCustomAttributesDisplay</custom-attributes-display>
 		<custom-attributes-display>com.liferay.portlet.documentlibrary.DLFolderCustomAttributesDisplay</custom-attributes-display>
 		<ddm-display>com.liferay.portlet.documentlibrary.ddm.DLDDMDisplay</ddm-display>
+		<subscription-sender>com.liferay.portlet.documentlibrary.subscriptionsender.DLSubscriptionSender</subscription-sender>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFileEntryTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFileShortcutTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler</trash-handler>
