@@ -75,10 +75,7 @@ import javax.mail.internet.InternetAddress;
  * @author Mate Thurzo
  * @author Raymond Augé
  * @author Sergio González
- * @deprecated As of 7.0.0, replaced by {@link
- *             com.liferay.portal.subscriptionsender.SubscriptionSender
  */
-@Deprecated
 public class SubscriptionSender implements Serializable {
 
 	public void addFileAttachment(File file) {
