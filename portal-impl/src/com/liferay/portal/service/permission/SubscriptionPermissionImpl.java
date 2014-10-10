@@ -32,7 +32,9 @@ import com.liferay.portlet.messageboards.service.permission.MBDiscussionPermissi
 /**
  * @author Mate Thurzo
  * @author Raymond Augé
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 public class SubscriptionPermissionImpl implements SubscriptionPermission {
 
 	/**

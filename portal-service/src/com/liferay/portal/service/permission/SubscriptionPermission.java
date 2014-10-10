@@ -22,7 +22,9 @@ import com.liferay.portal.security.permission.PermissionChecker;
  *
  * @author Mate Thurzo
  * @author Raymond Augé
+ * @deprecated As of 7.0.0, with no direct replacement
  */
+@Deprecated
 public interface SubscriptionPermission {
 
 	/**
