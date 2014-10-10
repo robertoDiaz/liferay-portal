@@ -61,6 +61,7 @@ import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
+import com.liferay.portal.subscriptionsender.SubscriptionSender;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.ControlPanelEntry;
@@ -133,6 +134,7 @@ public class PortletImpl extends PortletBaseImpl {
 		_stagedModelDataHandlerClasses = new ArrayList<String>();
 		_supportedLocales = new HashSet<String>();
 		_trashHandlerClasses = new ArrayList<String>();
+		_subscriptionSenderClasses = new ArrayList<String>();
 		_unlinkedRoles = new HashSet<String>();
 		_userNotificationHandlerClasses = new ArrayList<String>();
 		_windowStates = new HashMap<String, Set<String>>();
@@ -165,15 +167,17 @@ public class PortletImpl extends PortletBaseImpl {
 		String controlPanelClass, List<String> assetRendererFactoryClasses,
 		List<String> atomCollectionAdapterClasses,
 		List<String> customAttributesDisplayClasses, String ddmDisplayClass,
-		String permissionPropagatorClass, List<String> trashHandlerClasses,
-		List<String> workflowHandlerClasses, String defaultPreferences,
-		String preferencesValidator, boolean preferencesCompanyWide,
-		boolean preferencesUniquePerLayout, boolean preferencesOwnedByGroup,
-		boolean useDefaultTemplate, boolean showPortletAccessDenied,
-		boolean showPortletInactive, boolean actionURLRedirect,
-		boolean restoreCurrentView, boolean maximizeEdit, boolean maximizeHelp,
-		boolean popUpPrint, boolean layoutCacheable, boolean instanceable,
-		boolean remoteable, boolean scopeable, boolean singlePageApplication,
+		String permissionPropagatorClass,
+		List<String> subscriptionSenderHandlerClasses,
+		List<String> trashHandlerClasses, List<String> workflowHandlerClasses,
+		String defaultPreferences, String preferencesValidator,
+		boolean preferencesCompanyWide, boolean preferencesUniquePerLayout,
+		boolean preferencesOwnedByGroup, boolean useDefaultTemplate,
+		boolean showPortletAccessDenied, boolean showPortletInactive,
+		boolean actionURLRedirect, boolean restoreCurrentView,
+		boolean maximizeEdit, boolean maximizeHelp, boolean popUpPrint,
+		boolean layoutCacheable, boolean instanceable, boolean remoteable,
+		boolean scopeable, boolean singlePageApplication,
 		String userPrincipalStrategy, boolean privateRequestAttributes,
 		boolean privateSessionAttributes, Set<String> autopropagatedParameters,
 		boolean requiresNamespacedParameters, int actionTimeout,
@@ -244,6 +248,7 @@ public class PortletImpl extends PortletBaseImpl {
 		_customAttributesDisplayClasses = customAttributesDisplayClasses;
 		_ddmDisplayClass = ddmDisplayClass;
 		_permissionPropagatorClass = permissionPropagatorClass;
+		_subscriptionSenderClasses = subscriptionSenderHandlerClasses;
 		_trashHandlerClasses = trashHandlerClasses;
 		_workflowHandlerClasses = workflowHandlerClasses;
 		_defaultPreferences = defaultPreferences;
@@ -383,19 +388,19 @@ public class PortletImpl extends PortletBaseImpl {
 			getAtomCollectionAdapterClasses(),
 			getCustomAttributesDisplayClasses(), getDDMDisplayClass(),
 			getPermissionPropagatorClass(), getTrashHandlerClasses(),
-			getWorkflowHandlerClasses(), getDefaultPreferences(),
-			getPreferencesValidator(), isPreferencesCompanyWide(),
-			isPreferencesUniquePerLayout(), isPreferencesOwnedByGroup(),
-			isUseDefaultTemplate(), isShowPortletAccessDenied(),
-			isShowPortletInactive(), isActionURLRedirect(),
-			isRestoreCurrentView(), isMaximizeEdit(), isMaximizeHelp(),
-			isPopUpPrint(), isLayoutCacheable(), isInstanceable(),
-			isRemoteable(), isScopeable(), isSinglePageApplication(),
-			getUserPrincipalStrategy(), isPrivateRequestAttributes(),
-			isPrivateSessionAttributes(), getAutopropagatedParameters(),
-			isRequiresNamespacedParameters(), getActionTimeout(),
-			getRenderTimeout(), getRenderWeight(), isAjaxable(),
-			getHeaderPortalCss(), getHeaderPortletCss(),
+			getSubscriptionSenderClasses(), getWorkflowHandlerClasses(),
+			getDefaultPreferences(), getPreferencesValidator(),
+			isPreferencesCompanyWide(), isPreferencesUniquePerLayout(),
+			isPreferencesOwnedByGroup(), isUseDefaultTemplate(),
+			isShowPortletAccessDenied(), isShowPortletInactive(),
+			isActionURLRedirect(), isRestoreCurrentView(), isMaximizeEdit(),
+			isMaximizeHelp(), isPopUpPrint(), isLayoutCacheable(),
+			isInstanceable(), isRemoteable(), isScopeable(),
+			isSinglePageApplication(), getUserPrincipalStrategy(),
+			isPrivateRequestAttributes(), isPrivateSessionAttributes(),
+			getAutopropagatedParameters(), isRequiresNamespacedParameters(),
+			getActionTimeout(), getRenderTimeout(), getRenderWeight(),
+			isAjaxable(), getHeaderPortalCss(), getHeaderPortletCss(),
 			getHeaderPortalJavaScript(), getHeaderPortletJavaScript(),
 			getFooterPortalCss(), getFooterPortletCss(),
 			getFooterPortalJavaScript(), getFooterPortletJavaScript(),
@@ -1857,6 +1862,20 @@ public class PortletImpl extends PortletBaseImpl {
 	@Override
 	public String getStrutsPath() {
 		return _strutsPath;
+	}
+
+	public List<String> getSubscriptionSenderClasses() {
+		return _subscriptionSenderClasses;
+	}
+
+	public List<SubscriptionSender> getSubscriptionSenderInstances() {
+		if (_subscriptionSenderClasses.isEmpty()) {
+			return null;
+		}
+
+		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
+
+		return portletBag.getSubscriptionSenderInstances();
 	}
 
 	/**
@@ -3748,6 +3767,12 @@ public class PortletImpl extends PortletBaseImpl {
 		_strutsPath = strutsPath;
 	}
 
+	public void setSubscriptionSenderClasses(
+		List<String> subscriptionSenderClasses) {
+
+		_subscriptionSenderClasses = subscriptionSenderClasses;
+	}
+
 	/**
 	 * Sets the supported locales of the portlet.
 	 *
@@ -4434,6 +4459,8 @@ public class PortletImpl extends PortletBaseImpl {
 	 * The struts path of the portlet.
 	 */
 	private String _strutsPath;
+
+	private List<String> _subscriptionSenderClasses;
 
 	/**
 	 * The supported locales of the portlet.

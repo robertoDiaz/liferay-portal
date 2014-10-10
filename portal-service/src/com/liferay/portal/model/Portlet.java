@@ -981,6 +981,10 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*/
 	public java.lang.String getStrutsPath();
 
+	public java.util.List<java.lang.String> getSubscriptionSenderClasses();
+
+	public java.util.List<com.liferay.portal.subscriptionsender.SubscriptionSender> getSubscriptionSenderInstances();
+
 	/**
 	* Returns the supported locales of the portlet.
 	*
@@ -2211,6 +2215,9 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @param strutsPath the struts path of the portlet
 	*/
 	public void setStrutsPath(java.lang.String strutsPath);
+
+	public void setSubscriptionSenderClasses(
+		java.util.List<java.lang.String> subscriptionSenderClasses);
 
 	/**
 	* Sets the supported locales of the portlet.

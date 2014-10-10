@@ -1525,6 +1525,18 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("permission-propagator"),
 				portletModel.getPermissionPropagatorClass()));
 
+		List<String> subscriptionSenderHandlerClasses = new ArrayList<String>();
+
+		for (Element subscriptionSenderClassElement :
+				portletElement.elements("subscription-sender")) {
+
+			subscriptionSenderHandlerClasses.add(
+				subscriptionSenderClassElement.getText());
+		}
+
+		portletModel.setSubscriptionSenderClasses(
+			subscriptionSenderHandlerClasses);
+
 		List<String> trashHandlerClasses = new ArrayList<String>();
 
 		for (Element trashHandlerClassElement :

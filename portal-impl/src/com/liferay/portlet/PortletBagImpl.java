@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.portal.security.permission.PermissionPropagator;
+import com.liferay.portal.subscriptionsender.SubscriptionSender;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
@@ -85,6 +86,7 @@ public class PortletBagImpl implements PortletBag {
 		List<CustomAttributesDisplay> customAttributesDisplayInstances,
 		List<DDMDisplay> ddmDisplayInstances,
 		List<PermissionPropagator> permissionPropagatorInstances,
+		List<SubscriptionSender> subscriptionSenderInstances,
 		List<TrashHandler> trashHandlerInstances,
 		List<WorkflowHandler<?>> workflowHandlerInstances,
 		List<PreferencesValidator> preferencesValidatorInstances) {
@@ -117,6 +119,7 @@ public class PortletBagImpl implements PortletBag {
 		_customAttributesDisplayInstances = customAttributesDisplayInstances;
 		_ddmDisplayInstances = ddmDisplayInstances;
 		_permissionPropagatorInstances = permissionPropagatorInstances;
+		_subscriptionInstances = subscriptionSenderInstances;
 		_trashHandlerInstances = trashHandlerInstances;
 		_workflowHandlerInstances = workflowHandlerInstances;
 		_preferencesValidatorInstances = preferencesValidatorInstances;
@@ -140,7 +143,8 @@ public class PortletBagImpl implements PortletBag {
 			getAssetRendererFactoryInstances(),
 			getAtomCollectionAdapterInstances(),
 			getCustomAttributesDisplayInstances(), getDdmDisplayInstances(),
-			getPermissionPropagatorInstances(), getTrashHandlerInstances(),
+			getPermissionPropagatorInstances(),
+			getSubscriptionSenderInstances(), getTrashHandlerInstances(),
 			getWorkflowHandlerInstances(), getPreferencesValidatorInstances());
 	}
 
@@ -314,6 +318,11 @@ public class PortletBagImpl implements PortletBag {
 	}
 
 	@Override
+	public List<SubscriptionSender> getSubscriptionSenderInstances() {
+		return _subscriptionInstances;
+	}
+
+	@Override
 	public List<TemplateHandler> getTemplateHandlerInstances() {
 		return _templateHandlerInstances;
 	}
@@ -395,6 +404,7 @@ public class PortletBagImpl implements PortletBag {
 	private List<SocialActivityInterpreter> _socialActivityInterpreterInstances;
 	private List<SocialRequestInterpreter> _socialRequestInterpreterInstances;
 	private List<StagedModelDataHandler<?>> _stagedModelDataHandlerInstances;
+	private List<SubscriptionSender> _subscriptionInstances;
 	private List<TemplateHandler> _templateHandlerInstances;
 	private List<TrashHandler> _trashHandlerInstances;
 	private List<URLEncoder> _urlEncoderInstances;

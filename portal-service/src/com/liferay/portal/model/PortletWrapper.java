@@ -1464,6 +1464,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 		return _portlet.getStrutsPath();
 	}
 
+	@Override
+	public java.util.List<java.lang.String> getSubscriptionSenderClasses() {
+		return _portlet.getSubscriptionSenderClasses();
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.subscriptionsender.SubscriptionSender> getSubscriptionSenderInstances() {
+		return _portlet.getSubscriptionSenderInstances();
+	}
+
 	/**
 	* Returns the supported locales of the portlet.
 	*
@@ -3290,6 +3300,12 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setStrutsPath(java.lang.String strutsPath) {
 		_portlet.setStrutsPath(strutsPath);
+	}
+
+	@Override
+	public void setSubscriptionSenderClasses(
+		java.util.List<java.lang.String> subscriptionSenderClasses) {
+		_portlet.setSubscriptionSenderClasses(subscriptionSenderClasses);
 	}
 
 	/**

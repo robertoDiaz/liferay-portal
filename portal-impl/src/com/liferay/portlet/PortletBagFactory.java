@@ -63,6 +63,7 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.notifications.UserNotificationHandlerImpl;
 import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.subscriptionsender.SubscriptionSender;
 import com.liferay.portal.util.JavaFieldsParser;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -169,6 +170,9 @@ public class PortletBagFactory {
 		List<PermissionPropagator> permissionPropagatorInstances =
 			newPermissionPropagators(portlet);
 
+		List<SubscriptionSender> subscriptionSenderInstances =
+			newSubscriptionSenderInstances(portlet);
+
 		List<TrashHandler> trashHandlerInstances = newTrashHandlerInstances(
 			portlet);
 
@@ -217,8 +221,8 @@ public class PortletBagFactory {
 			controlPanelEntryInstances, assetRendererFactoryInstances,
 			atomCollectionAdapterInstances, customAttributesDisplayInstances,
 			ddmDisplayInstances, permissionPropagatorInstances,
-			trashHandlerInstances, workflowHandlerInstances,
-			preferencesValidatorInstances);
+			subscriptionSenderInstances, trashHandlerInstances,
+			workflowHandlerInstances, preferencesValidatorInstances);
 
 		PortletBagPool.put(portlet.getRootPortletId(), portletBag);
 
@@ -910,6 +914,26 @@ public class PortletBagFactory {
 		}
 
 		return stagedModelDataHandlerInstances;
+	}
+
+	protected List<SubscriptionSender> newSubscriptionSenderInstances(
+			Portlet portlet)
+		throws Exception {
+
+		ServiceTrackerList<SubscriptionSender> subscriptionSenderInstances =
+			getServiceTrackerList(SubscriptionSender.class, portlet);
+
+		for (String subscriptionSenderHandlerClass :
+				portlet.getSubscriptionSenderClasses()) {
+
+			SubscriptionSender subscriptionSenderInstance =
+				(SubscriptionSender)newInstance(
+					SubscriptionSender.class, subscriptionSenderHandlerClass);
+
+			subscriptionSenderInstances.add(subscriptionSenderInstance);
+		}
+
+		return subscriptionSenderInstances;
 	}
 
 	protected List<TemplateHandler> newTemplateHandlers(Portlet portlet)
