@@ -123,7 +123,7 @@ public class SubscriptionSenderRegistryUtil {
 				serviceReference);
 
 			_subscriptionSenders.put(
-				subscriptionSender.getClassName(), subscriptionSender);
+				subscriptionSender.getServiceName(), subscriptionSender);
 
 			return subscriptionSender;
 		}

@@ -14,18 +14,24 @@
 
 package com.liferay.portal.subscriptionsender;
 
-import com.liferay.alloy.tools.model.BaseModel;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.model.BaseModel;
 
 import java.io.Serializable;
+
+import java.util.Map;
 
 /**
  * @author Roberto Díaz
  */
-
 public interface SubscriptionSender extends Serializable {
 
-	public String getClassName();
+	public String getServiceName();
 
-	public void notify(BaseModel baseModel);
+	public void notify(BaseModel baseModel, String entryURL)
+		throws PortalException;
+
+	public void setSubscriptionSenderContext(
+		Map<String, Object> subscriptionSenderContext);
 
 }
