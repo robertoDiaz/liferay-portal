@@ -40,4 +40,7 @@ public interface SubscriptionSender extends Serializable {
 	public void setSubscriptionSenderContext(
 		Map<String, Object> subscriptionSenderContext);
 
+	public String getMailId();
+
+	public void flushNotifications() throws Exception;
 }

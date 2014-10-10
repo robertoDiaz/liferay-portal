@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.util.SubscriptionSender;
+import com.liferay.portal.subscriptionsender.SubscriptionSender;
 
 import org.apache.commons.lang.time.StopWatch;
 

@@ -112,7 +112,7 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		_runtimeSubscribersOVPs.add(ovp);
 	}
 
-	public void flushNotifications() throws Exception {
+	public final void flushNotifications() throws Exception {
 		initialize();
 
 		Thread currentThread = Thread.currentThread();
@@ -227,7 +227,7 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 		return _context.get(key);
 	}
 
-	public String getMailId() {
+	public final String getMailId() {
 		return this.mailId;
 	}
 

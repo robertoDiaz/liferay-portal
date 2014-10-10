@@ -143,7 +143,7 @@ public class SubscriptionSenderRegistryUtil {
 
 			registry.ungetService(serviceReference);
 
-			_subscriptionSenders.remove(subscriptionSender.getClassName());
+			_subscriptionSenders.remove(subscriptionSender.getServiceName());
 		}
 
 	}
