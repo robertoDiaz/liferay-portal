@@ -75,6 +75,9 @@ public class DLSubscriptionSender extends BaseSubscriptionSender {
 		DLSettings dlSettings = DLSettings.getInstance(
 			dlFileVersion.getGroupId());
 
+		command = (String)subscriptionSenderContext.get(
+			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_COMMAND);
+
 		if (!isSubmisionCommandEnabled(
 				dlSettings.isEmailFileEntryAddedEnabled(),
 				dlSettings.isEmailFileEntryUpdatedEnabled())) {
@@ -89,9 +92,6 @@ public class DLSubscriptionSender extends BaseSubscriptionSender {
 
 		Map<Locale, String> localizedSubjectMap = null;
 		Map<Locale, String> localizedBodyMap = null;
-
-		command = (String)subscriptionSenderContext.get(
-			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_COMMAND);
 
 		if (isCommandUpdate()) {
 			localizedSubjectMap = dlSettings.getEmailFileEntryUpdatedSubject();

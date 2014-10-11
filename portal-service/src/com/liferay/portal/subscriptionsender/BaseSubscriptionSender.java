@@ -200,7 +200,52 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
 				currentThread.setContextClassLoader(contextClassLoader);
 			}
+
+			_cleanUpFields();
 		}
+	}
+
+	private void _cleanUpFields() {
+		body = null;
+		bulk = false;
+		command = null;
+		companyId = 0;
+		fileAttachments = new ArrayList<>();
+		fromAddress = null;
+		fromName = null;
+		groupId = 0;
+		htmlFormat = false;
+		inReplyTo = null;
+		localizedBodyMap = new HashMap<>();
+		localizedSubjectMap = new HashMap<>();
+		mailId = null;
+		portletId = null;
+		replyToAddress = null;
+		scopeGroupId = 0;
+		smtpAccount = null;
+		subject = null;
+		subscriptionSenderContext = new HashMap<>();
+		uniqueMailId = true;
+		userId = 0;
+
+		_bulkAddresses = new ArrayList<>();
+		_classLoader = null;
+		_className = null;
+		_classPK = 0;
+		_context = new HashMap<>();
+		_contextUserPrefix = null;
+		_entryTitle = null;
+		_entryURL = null;
+		_initialized = false;
+		_mailIdIds = null;
+		_mailIdPopPortletPrefix = null;
+		_notificationClassNameId = 0;
+		_notificationType = 0;
+		_persistestedSubscribersOVPs =
+			new ArrayList<>();
+		_runtimeSubscribersOVPs =
+			new ArrayList<>();
+		_sentEmailAddresses = new HashSet<>();
 	}
 
 	public void flushNotificationsAsync() {
@@ -238,11 +283,11 @@ public abstract class BaseSubscriptionSender implements SubscriptionSender {
 
 		_initialized = true;
 
-		long scopeGroupId = (Long)subscriptionSenderContext.get(
+		Object scopeGroupId = subscriptionSenderContext.get(
 			SubscriptionSenderConstants.SUBSCRIPTION_SENDER_SCOPE_GROUP_ID);
 
-		if ((groupId == 0) && (scopeGroupId != 0)) {
-			setScopeGroupId(scopeGroupId);
+		if ((groupId == 0) && (scopeGroupId != null)) {
+			setScopeGroupId((Long)scopeGroupId);
 		}
 
 		Company company = CompanyLocalServiceUtil.getCompany(companyId);
