@@ -75,8 +75,6 @@ import com.liferay.portlet.wiki.workflow.WikiPageWorkflowHandler;
  */
 public class PortalRegisterTestUtil {
 
-	private static boolean _subscriptionsSendersRegistered;
-
 	protected static void registerAssetRendererFactories() {
 		if (_assetRendererFactoriesRegistered) {
 			return;
@@ -129,13 +127,13 @@ public class PortalRegisterTestUtil {
 	}
 
 	protected static void registerSubscriptionSenders() {
-		if (_subscriptionsSendersRegistered) {
+		if (_subscriptionSendersRegistered) {
 			return;
 		}
 
 		SubscriptionSenderRegistryUtil.register(new DLSubscriptionSender());
 
-		_subscriptionsSendersRegistered = true;
+		_subscriptionSendersRegistered = true;
 	}
 
 	protected static void registerTrashHandlers() {
@@ -193,6 +191,7 @@ public class PortalRegisterTestUtil {
 
 	private static boolean _assetRendererFactoriesRegistered;
 	private static boolean _indexersRegistered;
+	private static boolean _subscriptionSendersRegistered;
 	private static boolean _trashHandlersRegistered;
 	private static boolean _workflowHandlersRegistered;
 
