@@ -27,13 +27,12 @@ webdav-storage-token?, webdav-storage-class?, xml-rpc-method-class?,
 control-panel-entry-category?, control-panel-entry-weight?,
 control-panel-entry-class?, asset-renderer-factory*, atom-collection-adapter*,
 custom-attributes-display*, ddm-display?, permission-propagator?,
-subscription-sender*, trash-handler*, workflow-handler*,
-preferences-company-wide?, preferences-unique-per-layout?,
-preferences-owned-by-group?, use-default-template?, show-portlet-access-denied?,
-show-portlet-inactive?, action-url-redirect?, restore-current-view?,
-maximize-edit?, maximize-help?, pop-up-print?, layout-cacheable?,
-instanceable?, remoteable?, scopeable?, single-page-application?,
-user-principal-strategy?, private-request-attributes?
+trash-handler*, workflow-handler*, preferences-company-wide?,
+preferences-unique-per-layout?, preferences-owned-by-group?,
+use-default-template?, show-portlet-access-denied?, show-portlet-inactive?,
+action-url-redirect?, restore-current-view?, maximize-edit?, maximize-help?,
+pop-up-print?, layout-cacheable?, instanceable?, remoteable?, scopeable?,
+single-page-application?, user-principal-strategy?, private-request-attributes?,
 private-session-attributes?, autopropagated-parameters?,
 requires-namespaced-parameters?, action-timeout?,
 render-timeout?, render-weight?, ajaxable?, header-portal-css*,
@@ -452,10 +451,6 @@ com.liferay.portal.kernel.template.TemplateHandler and is called when displaying
 the portlet.
 -->
 <!ELEMENT template-handler (#PCDATA)>
-
-<!--
--->
-<!ELEMENT subscription-sender (#PCDATA)>
 
 <!--
 The trash-handler value must be a class that implements
