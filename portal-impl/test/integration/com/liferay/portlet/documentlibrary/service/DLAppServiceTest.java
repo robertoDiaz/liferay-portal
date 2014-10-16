@@ -319,19 +319,9 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 			@Override
 			protected void doRun() throws Exception {
 				try {
-					String title = "Test-" + _index + ".txt";
-
-					ServiceContext serviceContext =
-						ServiceContextTestUtil.getServiceContext(
-							group.getGroupId());
-
-					serviceContext.setWorkflowAction(
-						WorkflowConstants.ACTION_PUBLISH);
-
-					FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
-						group.getGroupId(), parentFolder.getFolderId(), title,
-						ContentTypes.TEXT_PLAIN, title, StringPool.BLANK,
-						StringPool.BLANK, CONTENT.getBytes(), serviceContext);
+					FileEntry fileEntry = DLAppTestUtil.addFileEntry(
+						group.getGroupId(), parentFolder.getFolderId(),
+						"Test-" + _index + ".txt");
 
 					_fileEntryIds[_index] = fileEntry.getFileEntryId();
 
