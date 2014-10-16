@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.template.TemplateResourceThreadLocal;
 import com.liferay.portal.util.PropsUtil;
@@ -32,6 +33,8 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.IOException;
+
+import java.lang.reflect.Method;
 
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -48,6 +51,14 @@ public class LiferayTemplateCache extends TemplateCache {
 		throws TemplateException {
 
 		_configuration = configuration;
+
+		try {
+			_normalizeNameMethod = ReflectionUtil.getDeclaredMethod(
+				TemplateCache.class, "normalizeName", String.class);
+		}
+		catch (Exception e) {
+			throw new TemplateException(e);
+		}
 
 		String cacheName = TemplateResource.class.getName();
 
@@ -117,6 +128,9 @@ public class LiferayTemplateCache extends TemplateCache {
 		}
 		else {
 			try {
+				templateId = (String)_normalizeNameMethod.invoke(
+					this, templateId);
+
 				templateResource =
 					TemplateResourceLoaderUtil.getTemplateResource(
 						TemplateConstants.LANG_TYPE_FTL, templateId);
@@ -150,8 +164,9 @@ public class LiferayTemplateCache extends TemplateCache {
 		return template;
 	}
 
-	private Configuration _configuration;
-	private PortalCache<TemplateResource, Object> _portalCache;
+	private final Configuration _configuration;
+	private final Method _normalizeNameMethod;
+	private final PortalCache<TemplateResource, Object> _portalCache;
 
 	private class TemplatePrivilegedExceptionAction
 		implements PrivilegedExceptionAction<Template> {
@@ -170,10 +185,10 @@ public class LiferayTemplateCache extends TemplateCache {
 			return doGetTemplate(_templateId, _locale, _encoding, _parse);
 		}
 
-		private String _encoding;
-		private Locale _locale;
-		private boolean _parse;
-		private String _templateId;
+		private final String _encoding;
+		private final Locale _locale;
+		private final boolean _parse;
+		private final String _templateId;
 
 	}
 

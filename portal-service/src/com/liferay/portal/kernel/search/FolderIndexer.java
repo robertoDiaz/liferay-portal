@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,21 +11,15 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portlet/dynamic_data_lists/init.jsp" %>
+package com.liferay.portal.kernel.search;
 
-<%
-String languageId = ParamUtil.getString(request, "languageId");
-%>
+/**
+ * @author Miguel Pastor
+ * @author Raymond Augé
+ */
+public interface FolderIndexer {
 
-<aui:script>
-	Liferay.Util.getOpener().<portlet:namespace />postProcessTranslation('<%= HtmlUtil.escapeJS(languageId) %>');
+	public String[] getFolderClassNames();
 
-	Liferay.fire(
-		'closeWindow',
-		{
-			id: '<%= HtmlUtil.escapeJS(renderResponse.getNamespace() + languageId) %>'
-		}
-	);
-</aui:script>
+}
