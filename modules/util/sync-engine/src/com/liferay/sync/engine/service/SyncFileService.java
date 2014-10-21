@@ -121,6 +121,8 @@ public class SyncFileService {
 
 		updateFileKeySyncFile(syncFile);
 
+		IODeltaUtil.checksums(syncFile);
+
 		return syncFile;
 	}
 
@@ -567,6 +569,8 @@ public class SyncFileService {
 			deltaFilePath = IODeltaUtil.delta(
 				filePath, IODeltaUtil.getChecksumsFilePath(syncFile),
 				deltaFilePath);
+
+			IODeltaUtil.checksums(syncFile);
 		}
 
 		syncFile.setChecksum(targetChecksum);
@@ -701,7 +705,7 @@ public class SyncFileService {
 		return name;
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncFileService.class);
 
 	private static SyncFilePersistence _syncFilePersistence =

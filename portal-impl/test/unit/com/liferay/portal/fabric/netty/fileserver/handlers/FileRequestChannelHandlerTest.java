@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -62,14 +61,14 @@ public class FileRequestChannelHandlerTest {
 		new CodeCoverageAssertor();
 
 	@After
-	public void tearDown() throws IOException {
+	public void tearDown() {
 		_embeddedChannel.finish();
 
 		FileServerTestUtil.cleanUp();
 	}
 
 	@Test
-	public void testFileNotFound() throws IOException {
+	public void testFileNotFound() {
 		Path path = FileServerTestUtil.createNotExistFile(
 			Paths.get("testNotExistFile"));
 

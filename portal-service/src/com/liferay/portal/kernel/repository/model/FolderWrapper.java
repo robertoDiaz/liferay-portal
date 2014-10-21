@@ -176,6 +176,11 @@ public class FolderWrapper implements Folder, ModelWrapper<Folder> {
 	}
 
 	@Override
+	public int getRestrictionType() {
+		return _folder.getRestrictionType();
+	}
+
+	@Override
 	public StagedModelType getStagedModelType() {
 		return _folder.getStagedModelType();
 	}
@@ -335,6 +340,6 @@ public class FolderWrapper implements Folder, ModelWrapper<Folder> {
 		return new FolderWrapper(_folder.toUnescapedModel());
 	}
 
-	private Folder _folder;
+	private final Folder _folder;
 
 }

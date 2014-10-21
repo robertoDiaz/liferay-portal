@@ -438,8 +438,6 @@ public class PropsValues {
 
 	public static final int CONTROL_PANEL_NAVIGATION_MAX_SITES = GetterUtil.getInteger(PropsUtil.get(PropsKeys.CONTROL_PANEL_NAVIGATION_MAX_SITES));
 
-	public static String[] CONVERT_PROCESSES = PropsUtil.getArray(PropsKeys.CONVERT_PROCESSES);
-
 	public static final int COUNTER_INCREMENT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.COUNTER_INCREMENT));
 
 	public static final String CUSTOM_SQL_FUNCTION_ISNOTNULL = PropsUtil.get(PropsKeys.CUSTOM_SQL_FUNCTION_ISNOTNULL);
@@ -869,8 +867,6 @@ public class PropsValues {
 	public static String[] JOURNAL_ARTICLE_FORM_ADD = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_ADD);
 
 	public static String[] JOURNAL_ARTICLE_FORM_DEFAULT_VALUES = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_DEFAULT_VALUES);
-
-	public static String[] JOURNAL_ARTICLE_FORM_TRANSLATE = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_TRANSLATE);
 
 	public static String[] JOURNAL_ARTICLE_FORM_UPDATE = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLE_FORM_UPDATE);
 

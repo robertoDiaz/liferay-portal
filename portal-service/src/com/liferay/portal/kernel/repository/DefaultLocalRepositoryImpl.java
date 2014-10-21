@@ -198,12 +198,25 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 
 	@Override
 	public Folder updateFolder(
+			long groupId, long folderId, long parentFolderId, String name,
+			String description, ServiceContext serviceContext)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #updateFolder(long, long,
+	 *             long, String, String, ServiceContext)}
+	 */
+	@Override
+	public Folder updateFolder(
 		long folderId, long parentFolderId, String name, String description,
 		ServiceContext serviceContext) {
 
 		throw new UnsupportedOperationException();
 	}
 
-	private Repository _repository;
+	private final Repository _repository;
 
 }

@@ -99,17 +99,18 @@ public class SyncAccountService {
 
 		// Sync file
 
-		Path dataFilePath = Files.createDirectories(
-			FileUtil.getFilePath(filePathName, ".data"));
+		Path filePath = Paths.get(filePathName);
+
+		Path dataFilePath = Files.createDirectories(filePath.resolve(".data"));
 
 		if (OSDetector.isWindows()) {
 			Files.setAttribute(dataFilePath, "dos:hidden", true);
 		}
 
 		SyncFileService.addSyncFile(
-			null, null, null, filePathName, null, filePathName, 0, 0,
-			SyncFile.STATE_SYNCED, syncAccount.getSyncAccountId(),
-			SyncFile.TYPE_SYSTEM);
+			null, null, null, filePathName, null,
+			String.valueOf(filePath.getFileName()), 0, 0, SyncFile.STATE_SYNCED,
+			syncAccount.getSyncAccountId(), SyncFile.TYPE_SYSTEM);
 
 		// Sync sites
 
@@ -380,11 +381,11 @@ public class SyncAccountService {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncAccountService.class);
 
 	private static Set<Long> _activeSyncAccountIds;
-	private static ScheduledExecutorService _scheduledExecutorService =
+	private static final ScheduledExecutorService _scheduledExecutorService =
 		Executors.newScheduledThreadPool(5);
 	private static SyncAccountPersistence _syncAccountPersistence =
 		getSyncAccountPersistence();
