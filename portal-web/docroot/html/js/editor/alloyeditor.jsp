@@ -288,15 +288,14 @@ if (alloyEditorMode.equals("text")) {
 							}
 
 							if (data.success) {
-								// Replace image here:
-								var image = A.one(alloyEditor.element.$).one('img');
+								var image = A.one(alloyEditor.element.$).one('[imageToken="'+data.image.imageToken+'"]').getDOMNode();
 
 								image.attr('src', data.image.url);
-								image.attr('data-paramName', data.image.fileEntryId);
+								image.setAttribute(data.image.attribute, data.image.fileEntryId);
 							}
 						},
 						uploaderror: function(event) {
-							debugger;
+							event.target.cancelUpload();
 						}
 					},
 					uploadURL: '<%= themeDisplay.getPathMain() + "/portal/image_selector?p_auth=" + AuthTokenUtil.getToken(request) %>'
@@ -304,23 +303,21 @@ if (alloyEditorMode.equals("text")) {
 			);
 
 		    editable.attachListener(
-		    	editable,
-		    	'drop',
+		    	editable.editor,
+		    	'imagedrop',
 		    	function(event) {
-		            var editor,
-		                nativeEvent;
+					var imageToken = new Date().getTime();
 
-		            nativeEvent = event.data.$;
+					var image = event.data.$;
+					image.setAttribute('imageToken', imageToken);
 
-                    var newfiles = nativeEvent.dataTransfer.files,
-                        parsedFiles = [];
+					var parsedFiles = [];
+					parsedFiles.push(new A.FileHTML5(image));
 
-                    A.each(newfiles, function (value) {
-                        parsedFiles.push(new A.FileHTML5(value));
-                    });
-
-		            uploader.uploadThese(parsedFiles);
-		    	},
+		            uploader.uploadThese(parsedFiles, null, {
+		            	'imageToken' : imageToken
+		            });
+				},
 		    	this,
 		    	{
 		    		editor: alloyEditor
