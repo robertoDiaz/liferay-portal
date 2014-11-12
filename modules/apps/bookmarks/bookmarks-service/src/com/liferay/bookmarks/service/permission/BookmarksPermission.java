@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	property = {
-		"model.class.name=com.liferay.bookmarks.model.BookmarksFolder"
+		"resource.name=com.liferay.bookmarks"
 	}
 )
 public class BookmarksPermission implements ResourcePermissionChecker {
