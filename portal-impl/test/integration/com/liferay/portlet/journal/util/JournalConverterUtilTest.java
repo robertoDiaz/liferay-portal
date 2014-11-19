@@ -32,7 +32,6 @@ import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.xml.XMLSchemaImpl;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
@@ -85,7 +84,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		long classNameId = PortalUtil.getClassNameId(JournalArticle.class);
 
-		String definition = readText("test-ddm-structure-all-fields.xml");
+		String definition = read("test-ddm-structure-all-fields.xml");
 
 		_ddmStructure = addStructure(
 			classNameId, null, "Test Structure", definition,
@@ -106,7 +105,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
+		String expectedContent = read(
 			"test-journal-content-boolean-repeatable-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
@@ -140,7 +139,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		fields.put(fieldsDisplayField);
 
 		String expectedContent = replaceLinksToLayoutsParameters(
-			readText("test-journal-content-link-to-page-field.xml"), layouts);
+			read("test-journal-content-link-to-page-field.xml"), layouts);
 
 		String actualContent = JournalConverterUtil.getContent(
 			_ddmStructure, fields);
@@ -161,8 +160,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
-			"test-journal-content-list-field.xml");
+		String expectedContent = read("test-journal-content-list-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
 			_ddmStructure, fields);
@@ -184,7 +182,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
+		String expectedContent = read(
 			"test-journal-content-multi-list-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
@@ -197,8 +195,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 	public void testGetContentFromNestedFields() throws Exception {
 		Fields fields = getNestedFields(_ddmStructure.getStructureId());
 
-		String expectedContent = readText(
-			"test-journal-content-nested-fields.xml");
+		String expectedContent = read("test-journal-content-nested-fields.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
 			_ddmStructure, fields);
@@ -219,7 +216,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
+		String expectedContent = read(
 			"test-journal-content-text-area-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
@@ -243,7 +240,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
+		String expectedContent = read(
 			"test-journal-content-text-box-repeatable-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
@@ -265,8 +262,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
-			"test-journal-content-text-field.xml");
+		String expectedContent = read("test-journal-content-text-field.xml");
 
 		String actualContent = JournalConverterUtil.getContent(
 			_ddmStructure, fields);
@@ -276,13 +272,13 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testGetDDMXSD() throws Exception {
-		String expectedXSD = readText("test-ddm-structure-all-fields.xml");
+		String expectedXSD = read("test-ddm-structure-all-fields.xml");
 
 		DDMForm expectedDDMForm = DDMFormXSDDeserializerUtil.deserialize(
 			expectedXSD);
 
 		String actualXSD = JournalConverterUtil.getDDMXSD(
-			readText("test-journal-structure-all-fields.xml"));
+			read("test-journal-structure-all-fields.xml"));
 
 		validateDDMXSD(actualXSD);
 
@@ -306,7 +302,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		expectedFields.put(fieldsDisplayField);
 
-		String content = readText(
+		String content = read(
 			"test-journal-content-boolean-repeatable-field.xml");
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
@@ -336,7 +332,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		expectedFields.put(fieldsDisplayField);
 
-		String content = readText("test-journal-content-doc-library-field.xml");
+		String content = read("test-journal-content-doc-library-field.xml");
 
 		XPath xPathSelector = SAXReaderUtil.createXPath("//dynamic-content");
 
@@ -393,8 +389,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		expectedFields.put(fieldsDisplayField);
 
 		String content = replaceLinksToLayoutsParameters(
-			readText("test-journal-content-link-to-page-field.xml"),
-			layoutsMap);
+			read("test-journal-content-link-to-page-field.xml"), layoutsMap);
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
 			_ddmStructure, content);
@@ -415,7 +410,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		expectedFields.put(fieldsDisplayField);
 
-		String content = readText("test-journal-content-list-field.xml");
+		String content = read("test-journal-content-list-field.xml");
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
 			_ddmStructure, content);
@@ -439,7 +434,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		expectedFields.put(fieldsDisplayField);
 
-		String content = readText("test-journal-content-multi-list-field.xml");
+		String content = read("test-journal-content-multi-list-field.xml");
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
 			_ddmStructure, content);
@@ -451,7 +446,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 	public void testGetFieldsFromContentWithNestedElements() throws Exception {
 		Fields expectedFields = getNestedFields(_ddmStructure.getStructureId());
 
-		String content = readText("test-journal-content-nested-fields.xml");
+		String content = read("test-journal-content-nested-fields.xml");
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
 			_ddmStructure, content);
@@ -461,13 +456,13 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testGetJournalXSD() throws Exception {
-		String expectedXSD = readText("test-journal-structure-all-fields.xml");
+		String expectedXSD = read("test-journal-structure-all-fields.xml");
 
 		Map<String, Map<String, String>> expectedMap =
 			JournalTestUtil.getXsdMap(expectedXSD);
 
 		String actualXSD = JournalConverterUtil.getJournalXSD(
-			readText("test-ddm-structure-all-fields.xml"));
+			read("test-ddm-structure-all-fields.xml"));
 
 		Map<String, Map<String, String>> actualMap = JournalTestUtil.getXsdMap(
 			actualXSD);
@@ -647,20 +642,16 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		layouts.put(
 			_PRIVATE_LAYOUT,
-			LayoutTestUtil.addLayout(
-				group.getGroupId(), RandomTestUtil.randomString(), true));
+			LayoutTestUtil.addLayout(group, true));
 		layouts.put(
 			_PRIVATE_USER_LAYOUT,
-			LayoutTestUtil.addLayout(
-				user.getGroupId(), RandomTestUtil.randomString(), true));
+			LayoutTestUtil.addLayout(user.getGroupId(), true));
 		layouts.put(
 			_PUBLIC_LAYOUT,
-			LayoutTestUtil.addLayout(
-				group.getGroupId(), RandomTestUtil.randomString(), false));
+			LayoutTestUtil.addLayout(group, false));
 		layouts.put(
 			_PUBLIC_USER_LAYOUT,
-			LayoutTestUtil.addLayout(
-				user.getGroupId(), RandomTestUtil.randomString(), false));
+			LayoutTestUtil.addLayout(user.getGroupId(), false));
 
 		return layouts;
 	}
@@ -861,7 +852,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 	}
 
 	@Override
-	protected String readText(String fileName) throws Exception {
+	protected String read(String fileName) throws Exception {
 		Class<?> clazz = getClass();
 
 		ClassLoader classLoader = clazz.getClassLoader();
