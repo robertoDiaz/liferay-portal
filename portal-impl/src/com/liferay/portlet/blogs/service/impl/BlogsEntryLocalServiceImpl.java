@@ -60,6 +60,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.LayoutURLUtil;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -290,6 +291,22 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 	}
 
 	@Override
+	public FileEntry addEntryAttachment(
+			long groupId, long userId, long entryId, String fileName, File file,
+			String mimeType)
+		throws PortalException {
+
+		BlogsEntry entry = getEntry(entryId);
+
+		Folder folder = entry.addAttachmentsFolder();
+
+		return PortletFileRepositoryUtil.addPortletFileEntry(
+			groupId, userId, BlogsEntry.class.getName(), entry.getEntryId(),
+			PortletKeys.BLOGS, folder.getFolderId(), file, fileName, mimeType,
+			true);
+	}
+
+	@Override
 	public void addEntryResources(
 			BlogsEntry entry, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -397,12 +414,12 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		imageLocalService.deleteImage(entry.getSmallImageId());
 
-		// Portlet file repository
+		// Attachments
 
-		long imagesFolderId = entry.getImagesFolderId();
+		long folderId = entry.getAttachmentsFolderId();
 
-		if (imagesFolderId != 0) {
-			PortletFileRepositoryUtil.deletePortletFolder(imagesFolderId);
+		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			PortletFileRepositoryUtil.deletePortletFolder(folderId);
 		}
 
 		// Subscriptions
@@ -1561,7 +1578,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return StringPool.BLANK;
 		}
 
-		String layoutURL = getLayoutURL(
+		String layoutURL = LayoutURLUtil.getLayoutURL(
 			entry.getGroupId(), PortletKeys.BLOGS, serviceContext);
 
 		if (Validator.isNotNull(layoutURL)) {
