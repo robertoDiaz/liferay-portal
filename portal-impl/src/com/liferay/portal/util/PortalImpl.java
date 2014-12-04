@@ -503,6 +503,13 @@ public class PortalImpl implements Portal {
 
 		_servletContextName =
 			PortalContextLoaderListener.getPortalServletContextName();
+
+		if (ArrayUtil.isEmpty(PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) ||
+			ArrayUtil.contains(
+				PropsValues.VIRTUAL_HOSTS_VALID_HOSTS, StringPool.STAR)) {
+
+			_validPortalDomainCheckDisabled = true;
+		}
 	}
 
 	@Override
@@ -820,7 +827,7 @@ public class PortalImpl implements Portal {
 			domain = domain.substring(0, pos);
 		}
 
-		if (isValidPortalDomain(domain)) {
+		if (!_validPortalDomainCheckDisabled && isValidPortalDomain(domain)) {
 			return url;
 		}
 
@@ -4678,6 +4685,10 @@ public class PortalImpl implements Portal {
 				scopeGroupId = doAsGroupId;
 			}
 
+			if (group.isInheritContent()) {
+				scopeGroupId = group.getParentGroupId();
+			}
+
 			if ((portletId != null) && (group != null) &&
 				(group.isStaged() || group.isStagingGroup())) {
 
@@ -5757,6 +5768,10 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getValidPortalDomain(long companyId, String domain) {
+		if (_validPortalDomainCheckDisabled) {
+			return domain;
+		}
+
 		for (String virtualHost : PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) {
 			if (StringUtil.equalsIgnoreCase(domain, virtualHost) ||
 				StringUtil.wildcardMatches(
@@ -8097,6 +8112,10 @@ public class PortalImpl implements Portal {
 	}
 
 	protected boolean isValidPortalDomain(long companyId, String domain) {
+		if (_validPortalDomainCheckDisabled) {
+			return true;
+		}
+
 		if (!Validator.isHostName(domain)) {
 			return false;
 		}
@@ -8334,5 +8353,6 @@ public class PortalImpl implements Portal {
 	private String[] _sortedSystemOrganizationRoles;
 	private String[] _sortedSystemRoles;
 	private String[] _sortedSystemSiteRoles;
+	private boolean _validPortalDomainCheckDisabled;
 
 }
