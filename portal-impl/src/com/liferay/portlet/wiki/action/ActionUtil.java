@@ -225,6 +225,15 @@ public class ActionUtil {
 			}
 		}
 
+		boolean followRedirect = ParamUtil.getBoolean(
+			request, "followRedirect", true);
+
+		if (Validator.isNotNull(page.getRedirectTitle()) && followRedirect) {
+			request.setAttribute(WebKeys.WIKI_ORIGINAL_PAGE, page);
+
+			page = page.getRedirectPage();
+		}
+
 		request.setAttribute(WebKeys.WIKI_PAGE, page);
 	}
 
