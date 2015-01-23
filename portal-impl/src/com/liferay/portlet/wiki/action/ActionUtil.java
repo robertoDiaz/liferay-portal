@@ -225,27 +225,23 @@ public class ActionUtil {
 			}
 		}
 
-		WikiPage originalPage = null;
-
 		boolean followRedirect = ParamUtil.getBoolean(
 			request, "followRedirect", true);
 
 		if (Validator.isNotNull(page.getRedirectTitle()) && followRedirect) {
 			WikiPage redirectPage = page.fetchRedirectPage();
 
+			request.setAttribute(WebKeys.WIKI_ORIGINAL_PAGE, page);
+
 			if (redirectPage == null) {
 				request.setAttribute(WebKeys.TITLE, page.getRedirectTitle());
-				request.setAttribute(WebKeys.WIKI_ORIGINAL_PAGE, page);
 
 				throw new NoSuchPageException();
 			}
-			else {
-				originalPage = page;
-				page = redirectPage;
-			}
+
+			page = redirectPage;
 		}
 
-		request.setAttribute(WebKeys.WIKI_ORIGINAL_PAGE, originalPage);
 		request.setAttribute(WebKeys.WIKI_PAGE, page);
 	}
 
