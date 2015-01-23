@@ -35,7 +35,11 @@
 
 	String title = ParamUtil.getString(request, "title");
 
-	title = GetterUtil.get(renderRequest.getAttribute(WebKeys.TITLE), title);
+	WikiPage originalPage = (WikiPage)renderRequest.getAttribute(WebKeys.WIKI_ORIGINAL_PAGE);
+
+	if (originalPage != null) {
+		title = originalPage.getRedirectTitle();
+	}
 
 	boolean hasDraftPage = false;
 
@@ -97,7 +101,6 @@
 
 			<%
 			WikiNode node = (WikiNode)request.getAttribute(WebKeys.WIKI_NODE);
-			WikiPage originalPage = (WikiPage)renderRequest.getAttribute(WebKeys.WIKI_ORIGINAL_PAGE);
 			%>
 
 			<div class="page-redirect-link">

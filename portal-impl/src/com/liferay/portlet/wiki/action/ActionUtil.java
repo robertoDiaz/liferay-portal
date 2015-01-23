@@ -229,17 +229,9 @@ public class ActionUtil {
 			request, "followRedirect", true);
 
 		if (Validator.isNotNull(page.getRedirectTitle()) && followRedirect) {
-			WikiPage redirectPage = page.fetchRedirectPage();
-
 			request.setAttribute(WebKeys.WIKI_ORIGINAL_PAGE, page);
 
-			if (redirectPage == null) {
-				request.setAttribute(WebKeys.TITLE, page.getRedirectTitle());
-
-				throw new NoSuchPageException();
-			}
-
-			page = redirectPage;
+			page = page.getRedirectPage();
 		}
 
 		request.setAttribute(WebKeys.WIKI_PAGE, page);
