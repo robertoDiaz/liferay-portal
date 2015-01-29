@@ -286,6 +286,10 @@ public class VerifyProperties extends VerifyProcess {
 		// Asset
 
 		new String[] {
+			"asset.browser.search.with.database", "search.with.database",
+			"com.liferay.asset.browser.web"
+		},
+		new String[] {
 			"asset.categories.navigation.display.templates.config",
 			"display.templates.config",
 			"com.liferay.asset.categories.navigation.web"
@@ -348,6 +352,43 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"bookmarks.subfolders.visible", "subfolders.visible",
 			"com.liferay.bookmarks.service"
+		},
+
+		// FreeMarker Engine
+
+		new String[] {
+			"freemarker.engine.localized.lookup", "localized.lookup",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.macro.library", "macro.library",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.resource.modification.check.interval",
+			"resource.modification.check",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.restricted.classes", "restricted.classes",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.restricted.packages", "restricted.packages",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.template.exception.handler",
+			"template.exception.handler",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"freemarker.engine.template.parsers", "template.parsers",
+			"com.liferay.portal.template.freemarker"
+		},
+		new String[] {
+			"journal.template.freemarker.restricted.variables",
+			"restricted.variables", "com.liferay.portal.template.freemarker"
 		},
 
 		// Journal
@@ -501,7 +542,7 @@ public class VerifyProperties extends VerifyProcess {
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
-		"commons.pool.enabled", "convert.processes",
+		"commons.pool.enabled", "convert.processes", "discussion.thread.view",
 		"dl.file.entry.read.count.enabled",
 		"dynamic.data.lists.template.language.parser[ftl]",
 		"dynamic.data.lists.template.language.parser[vm]",
@@ -714,12 +755,24 @@ public class VerifyProperties extends VerifyProcess {
 			"journal.error.template.xsl", "journal.error.template[xsl]"
 		},
 		new String[] {
-			"journal.template.freemarker.restricted.variables",
-			"freemarker.engine.restricted.variables"
-		},
-		new String[] {
 			"journal.template.velocity.restricted.variables",
 			"velocity.engine.restricted.variables"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.lowercase",
+			"passwords.passwordpolicytoolkit.validator.charset.lowercase"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.numbers",
+			"passwords.passwordpolicytoolkit.validator.charset.numbers"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.symbols",
+			"passwords.passwordpolicytoolkit.validator.charset.symbols"
+		},
+		new String[] {
+			"passwords.passwordpolicytoolkit.charset.uppercase",
+			"passwords.passwordpolicytoolkit.validator.charset.uppercase"
 		},
 		new String[] {
 			"portal.instance.http.port", "portal.instance.http.socket.address"
