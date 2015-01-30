@@ -17,6 +17,7 @@ package com.liferay.portlet.ratings.context;
 import com.liferay.portlet.ratings.RatingsType;
 import com.liferay.portlet.ratings.definition.PortletRatingsDefinitionUtil;
 import com.liferay.portlet.ratings.definition.PortletRatingsDefinitionValues;
+import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,14 +44,13 @@ public class PortletRatingsDefinitionDisplayContext {
 		Map<String, Map<String, RatingsType>> portletRatingsDefinitionMap =
 			new HashMap<>();
 
-		Map<String, PortletRatingsDefinitionValues>
-			portletRatingsDefinitionValuesMap =
-				PortletRatingsDefinitionUtil.
-					getPortletRatingsDefinitionValuesMap();
+		ServiceTrackerMap<String, PortletRatingsDefinitionValues>
+			serviceTrackerMap =
+				PortletRatingsDefinitionUtil.getServiceTrackerMap();
 
-		for (String className : portletRatingsDefinitionValuesMap.keySet()) {
+		for (String className : serviceTrackerMap.keySet()) {
 			PortletRatingsDefinitionValues portletRatingsDefinitionValues =
-				portletRatingsDefinitionValuesMap.get(className);
+				serviceTrackerMap.getService(className);
 
 			String portletId = portletRatingsDefinitionValues.getPortletId();
 

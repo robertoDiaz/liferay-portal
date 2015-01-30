@@ -52,18 +52,10 @@ public class PortletRatingsDefinitionUtil {
 		return portletRatingsDefinitionValues.getDefaultRatingsType();
 	}
 
-	public static Map<String, PortletRatingsDefinitionValues>
-		getPortletRatingsDefinitionValuesMap() {
+	public static ServiceTrackerMap<String, PortletRatingsDefinitionValues>
+		getServiceTrackerMap() {
 
-		Map<String, PortletRatingsDefinitionValues>
-			portletRatingsDefinitionValuesMap = new HashMap<>();
-
-		for (String className : _serviceTrackerMap.keySet()) {
-			portletRatingsDefinitionValuesMap.put(
-				className, _serviceTrackerMap.getService(className));
-		}
-
-		return Collections.unmodifiableMap(portletRatingsDefinitionValuesMap);
+		return _serviceTrackerMap;
 	}
 
 	private static final
