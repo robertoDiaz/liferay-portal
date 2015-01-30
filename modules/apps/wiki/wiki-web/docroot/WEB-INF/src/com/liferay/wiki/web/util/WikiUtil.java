@@ -41,7 +41,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class WikiUtil {
 
@@ -77,8 +77,12 @@ public class WikiUtil {
 			"[$PAGE_USER_NAME$]",
 			LanguageUtil.get(
 				themeDisplay.getLocale(), "the-user-who-added-the-page"));
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(request));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
