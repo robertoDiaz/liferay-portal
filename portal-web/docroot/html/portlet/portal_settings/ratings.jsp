@@ -17,6 +17,9 @@
 <%@ include file="/html/portlet/portal_settings/init.jsp" %>
 
 <%
+PortletPreferences companyPortletPreferences = PrefsPropsUtil.getPreferences(company.getCompanyId());
+
+CompanyPortletRatingsDefinitionDisplayContext companyPortletRatingsDefinitionDisplayContext = new CompanyPortletRatingsDefinitionDisplayContext(companyPortletPreferences, request);
 %>
 
 <liferay-ui:error-marker key="errorSection" value="ratings" />
@@ -32,7 +35,7 @@
 <aui:fieldset>
 
 	<%
-	Map<String, Map<String, RatingsType>> portletRatingsDefinitionMap = portletRatingsDefinitionDisplayContext.getCompanyPortletRatingsDefinitionMap();
+	Map<String, Map<String, RatingsType>> portletRatingsDefinitionMap = companyPortletRatingsDefinitionDisplayContext.getCompanyPortletRatingsDefinitionMap();
 
 	for (String portletId : portletRatingsDefinitionMap.keySet()) {
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
