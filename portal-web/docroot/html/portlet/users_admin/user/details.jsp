@@ -18,6 +18,11 @@
 
 <%
 User selUser = (User)request.getAttribute("user.selUser");
+
+if (selUser == null) {
+	selUser = PortalUtil.getSelectedUser(request);
+}
+
 Contact selContact = (Contact)request.getAttribute("user.selContact");
 
 Calendar birthday = CalendarFactoryUtil.getCalendar();
@@ -28,6 +33,24 @@ birthday.set(Calendar.YEAR, 1970);
 
 if (selContact != null) {
 	birthday.setTime(selContact.getBirthday());
+}
+
+Locale userLocale = null;
+
+String languageId = request.getParameter("languageId");
+
+if (Validator.isNotNull(languageId)) {
+	userLocale = LocaleUtil.fromLanguageId(languageId);
+}
+else {
+	if (selUser != null) {
+		userLocale = selUser.getLocale();
+	}
+	else {
+		User defaultUser = company.getDefaultUser();
+
+		userLocale = LocaleUtil.fromLanguageId(defaultUser.getLanguageId());
+	}
 }
 %>
 
@@ -81,7 +104,7 @@ if (selContact != null) {
 			UserScreenNameException.MustBeAlphaNumeric usn = (UserScreenNameException.MustBeAlphaNumeric)errorException;
 			%>
 
-			<liferay-ui:message arguments="<%= StringUtil.merge(usn.validSpecialChars, StringPool.SPACE) %>" key="please-enter-a-valid-alphanumeric-screen-name" translateArguments="<%= false %>" />
+			<liferay-ui:message arguments="<%= usn.getValidSpecialCharsAsString() %>" key="please-enter-a-valid-alphanumeric-screen-name" translateArguments="<%= false %>" />
 		</liferay-ui:error>
 
 		<liferay-ui:error exception="<%= UserScreenNameException.MustNotBeDuplicate.class %>" focusField="screenName" message="the-screen-name-you-requested-is-already-taken" />
@@ -137,6 +160,8 @@ if (selContact != null) {
 			</c:otherwise>
 		</c:choose>
 
+		<%@ include file="/html/portlet/users_admin/user/details_language.jspf" %>
+
 		<%@ include file="/html/portlet/users_admin/user/details_user_name.jspf" %>
 	</aui:fieldset>
 
@@ -162,8 +187,8 @@ if (selContact != null) {
 		</div>
 
 		<c:if test="<%= selUser != null %>">
-			<liferay-ui:error exception="<%= ReservedUserIdException.class %>" message="the-user-id-you-requested-is-reserved" />
 			<liferay-ui:error exception="<%= UserIdException.class %>" message="please-enter-a-valid-user-id" />
+			<liferay-ui:error exception="<%= UserIdException.MustNotBeReserved.class %>" message="the-user-id-you-requested-is-reserved" />
 
 			<aui:input name="userId" type="resource" value="<%= String.valueOf(selUser.getUserId()) %>" />
 		</c:if>
