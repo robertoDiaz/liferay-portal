@@ -626,6 +626,8 @@
 
 	<macrodef name="prepare-additional-bundles">
 		<sequential>
+			<get-testcase-property property.name="app.server.bundles.size" />
+
 			<if>
 				<isset property="app.server.bundles.size" />
 				<then>
@@ -691,6 +693,8 @@
 					<var name="app.server.bundle.index" unset="true" />
 				</then>
 			</if>
+
+			<get-testcase-property property.name="databases.size" />
 
 			<if>
 				<isset property="databases.size" />
@@ -822,9 +826,17 @@
 
 					<property name="app.server.dir" refid="app.server.dir" />
 
-					<loadresource property="patching.tool.version">
-						<url url="${test.fix.pack.base.url}/patching-tool/LATEST.txt" />
-					</loadresource>
+					<mirrors-get
+						dest="${basedir}"
+						src="${test.fix.pack.base.url}/patching-tool/LATEST.txt"
+					/>
+
+					<loadfile
+						property="patching.tool.version"
+						srcFile="LATEST.txt"
+					/>
+
+					<delete file="${basedir}/LATEST.txt" />
 
 					<property name="test.build.patching.tool.zip.url" value="${test.fix.pack.base.url}/patching-tool/patching-tool-${patching.tool.version}.zip" />
 
@@ -895,6 +907,8 @@
 				token="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;"
 				value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;0&quot;&gt;"
 			/>
+
+			<get-testcase-property property.name="app.server.bundles.size" />
 
 			<if>
 				<isset property="app.server.bundles.size" />
@@ -1197,6 +1211,8 @@
 						</then>
 					</if>
 
+					<delete dir="${liferay.home}/osgi/state" />
+
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
 						<then>
@@ -1319,6 +1335,8 @@
 	</macrodef>
 
 	<target name="build-sql-file">
+		<get-testcase-property property.name="portal.version" />
+
 		<if>
 			<isset property="portal.version" />
 			<then>
@@ -1368,6 +1386,8 @@
 				<equals arg1="${database.type}" arg2="hsql" />
 			</not>
 			<then>
+				<get-testcase-property property.name="databases.size" />
+
 				<if>
 					<and>
 						<isset property="databases.size" />
@@ -2974,6 +2994,43 @@ module.framework.properties.osgi.console=11312</echo>
 		<move file="extraapps.zip" todir="${jenkins.shared.user.content.dir}/jobs/${top.level.job.name}/builds/${top.level.build.number}/downloads" />
 	</target>
 
+	<target name="prepare-lcs-bundle">
+		<chmod perm="a+x">
+			<fileset dir="${app.server.parent.dir}/patching-tool">
+				<include name="*.sh" />
+			</fileset>
+		</chmod>
+
+		<execute dir="${app.server.parent.dir}/patching-tool">
+			patching-tool${file.suffix.bat} auto-discovery
+			patching-tool${file.suffix.bat} setup
+		</execute>
+
+		<replace file="${app.server.dir}/bin/setenv${file.suffix.bat}">
+			<replacetoken><![CDATA[-XX:MaxPermSize=256m]]></replacetoken>
+			<replacevalue><![CDATA[-XX:MaxPermSize=256m -javaagent:../../patching-tool/lib/patching-tool-agent.jar]]></replacevalue>
+		</replace>
+
+		<echo file="${lp.plugins.dir}/portlets/lcs-portlet/docroot/WEB-INF/src/portlet-ext.properties">#QA AWS
+
+osb.lcs.gateway.web.host.name=${osb.lcs.gateway.web.host.name}
+osb.lcs.gateway.web.host.port=${osb.lcs.gateway.web.host.port}
+
+osb.lcs.portlet.host.name=${osb.lcs.portlet.host.name}
+osb.lcs.portlet.host.port=${osb.lcs.portlet.host.port}
+
+osb.lcs.portlet.oauth.consumer.key=${osb.lcs.portlet.oauth.consumer.key}
+osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</echo>
+
+		<property name="plugins.includes" value="lcs-portlet" />
+
+		<ant dir="${lp.plugins.dir}" target="clean" />
+
+		<ant dir="${lp.plugins.dir}" target="compile" />
+
+		<ant antfile="build-test-plugins.xml" target="deploy-simple-server-plugins" />
+	</target>
+
 	<target name="prepare-portal-properties">
 		<execute>
 			<![CDATA[git checkout -- portal-impl/src/portal.properties]]>
@@ -4155,7 +4212,6 @@ if (ppstate.equals("normal")) {
 					directoryScanner.setBasedir(project.getBaseDir());
 					directoryScanner.setExcludes(
 						new String[] {
-							"modules/apps/asset/asset-publisher-test/test/integration/**/*Test.java",
 							"modules/apps/bookmarks/bookmarks-test/test/integration/**/*Test.java",
 							"modules/apps/social/social-networking-test/test/integration/**/*Test.java",
 							"modules/apps/wiki/wiki-test/test/integration/**/*Test.java",
@@ -4581,12 +4637,16 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="check-inet-address" />
 
+		<get-testcase-property property.name="database.jndi.enabled" />
+
 		<if>
 			<equals arg1="${database.jndi.enabled}" arg2="true" />
 			<then>
 				<prepare-database-jndi />
 			</then>
 		</if>
+
+		<get-testcase-property property.name="mobile.device.enabled" />
 
 		<if>
 			<equals arg1="${mobile.device.enabled}" arg2="true" />
@@ -4598,6 +4658,8 @@ if (ppstate.equals("normal")) {
 				<antcall target="start-appium" />
 			</then>
 		</if>
+
+		<get-testcase-property property.name="web.xml.timeout" />
 
 		<if>
 			<isset property="web.xml.timeout" />
@@ -4611,6 +4673,8 @@ if (ppstate.equals("normal")) {
 		</if>
 
 		<antcall target="clean-up-java-processes" inheritAll="false" />
+
+		<get-testcase-property property.name="portal.version" />
 
 		<if>
 			<isset property="portal.version" />
@@ -4644,10 +4708,14 @@ if (ppstate.equals("normal")) {
 			</then>
 		</if>
 
+		<get-testcase-property property.name="solr.enabled" />
+
 		<if>
 			<equals arg1="${solr.enabled}" arg2="true" />
 			<then>
 				<ant antfile="build-test-solr.xml" target="prepare-solr-web-properties" />
+
+				<ant antfile="build-test-solr.xml" target="start-solr" />
 			</then>
 		</if>
 
@@ -4657,6 +4725,8 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="deploy-extra-apps" />
 
+		<get-testcase-property property.name="app.server.bundles.size" />
+
 		<if>
 			<isset property="app.server.bundles.size" />
 			<then>
@@ -4664,12 +4734,16 @@ if (ppstate.equals("normal")) {
 			</then>
 		</if>
 
+		<get-testcase-property property.name="cluster.enabled" />
+
 		<if>
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
 				<prepare-test-cluster-properties />
 			</then>
 		</if>
+
+		<get-testcase-property property.name="hook.plugins.includes" />
 
 		<if>
 			<and>
@@ -4702,6 +4776,8 @@ if (ppstate.equals("normal")) {
 		<antcall target="copy-sikuli-temp-files" />
 
 		<start-app-server />
+
+		<get-testcase-property property.name="app.server.bundles.size" />
 
 		<if>
 			<isset property="app.server.bundles.size" />
@@ -4803,6 +4879,8 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="run-selenium-test" />
 
+		<get-testcase-property property.name="sharepoint.enabled" />
+
 		<if>
 			<equals arg1="${sharepoint.enabled}" arg2="true" />
 			<then>
@@ -4828,6 +4906,8 @@ if (ppstate.equals("normal")) {
 
 		<stop-app-server />
 
+		<get-testcase-property property.name="app.server.bundles.size" />
+
 		<if>
 			<isset property="app.server.bundles.size" />
 			<then>
@@ -4850,6 +4930,8 @@ if (ppstate.equals("normal")) {
 				<var name="app.server.bundle.index" unset="true" />
 			</then>
 		</if>
+
+		<get-testcase-property property.name="mobile.device.enabled" />
 
 		<if>
 			<equals arg1="${mobile.device.enabled}" arg2="true" />
