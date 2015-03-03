@@ -72,7 +72,7 @@ import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
-import com.liferay.portlet.blogs.BlogsSettings;
+import com.liferay.portlet.blogs.BlogsGroupServiceSettings;
 import com.liferay.portlet.blogs.EntryContentException;
 import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
@@ -150,7 +150,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		return addEntry(
 			userId, title, StringPool.BLANK, StringPool.BLANK, content,
-			displayDate, true, true, new String[0], null, null, serviceContext);
+			displayDate, true, true, new String[0], null, StringPool.BLANK,
+			null, serviceContext);
 	}
 
 	@Override
@@ -163,13 +164,14 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		return addEntry(
 			userId, title, StringPool.BLANK, StringPool.BLANK, content, now,
-			true, true, new String[0], null, null, serviceContext);
+			true, true, new String[0], null, StringPool.BLANK, null,
+			serviceContext);
 	}
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #addEntry(long, String,
 	 *             String, String, String, int, int, int, int, int, boolean,
-	 *             boolean, String[], ImageSelector, ImageSelector,
+	 *             boolean, String[], ImageSelector, String, ImageSelector,
 	 *             ServiceContext)}
 	 */
 	@Deprecated
@@ -203,7 +205,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			userId, title, StringPool.BLANK, description, content,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-			coverImageImageSelector, smallImageImageSelector, serviceContext);
+			coverImageImageSelector, StringPool.BLANK, smallImageImageSelector,
+			serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -212,7 +215,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			long userId, String title, String subtitle, String description,
 			String content, Date displayDate, boolean allowPingbacks,
 			boolean allowTrackbacks, String[] trackbacks,
-			ImageSelector coverImageImageSelector,
+			ImageSelector coverImageImageSelector, String coverImageCaption,
 			ImageSelector smallImageImageSelector,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -321,6 +324,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		entry.setCoverImageFileEntryId(coverImageFileEntryId);
 		entry.setCoverImageURL(coverImageURL);
+		entry.setCoverImageCaption(coverImageCaption);
 		entry.setSmallImage(smallImage);
 		entry.setSmallImageFileEntryId(smallImageFileEntryId);
 		entry.setSmallImageURL(smallImageURL);
@@ -360,7 +364,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			boolean allowPingbacks, boolean allowTrackbacks,
 			String[] trackbacks, ImageSelector coverImageImageSelector,
-			ImageSelector smallImageImageSelector,
+			String coverImageCaption, ImageSelector smallImageImageSelector,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -374,7 +378,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		return addEntry(
 			userId, title, subtitle, description, content, displayDate,
 			allowPingbacks, allowTrackbacks, trackbacks,
-			coverImageImageSelector, smallImageImageSelector, serviceContext);
+			coverImageImageSelector, coverImageCaption, smallImageImageSelector,
+			serviceContext);
 	}
 
 	@Override
@@ -1156,14 +1161,14 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			userId, entryId, title, entry.getSubtitle(), entry.getDescription(),
 			content, entry.getDisplayDate(), entry.getAllowPingbacks(),
 			entry.getAllowTrackbacks(), StringUtil.split(entry.getTrackbacks()),
-			null, null, serviceContext);
+			null, StringPool.BLANK, null, serviceContext);
 	}
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
 	 *             String, String, String, String, int, int, int, int, int,
-	 *             boolean, boolean, String[], ImageSelector, ImageSelector,
-	 *             ServiceContext)}
+	 *             boolean, boolean, String[], ImageSelector, String,
+	 *             ImageSelector, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -1202,7 +1207,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			userId, entryId, title, StringPool.BLANK, description, content,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-			coverImageImageSelector, smallImageImageSelector, serviceContext);
+			coverImageImageSelector, StringPool.BLANK, smallImageImageSelector,
+			serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1212,7 +1218,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			String description, String content, Date displayDate,
 			boolean allowPingbacks, boolean allowTrackbacks,
 			String[] trackbacks, ImageSelector coverImageImageSelector,
-			ImageSelector smallImageImageSelector,
+			String coverImageCaption, ImageSelector smallImageImageSelector,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1338,6 +1344,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		entry.setCoverImageFileEntryId(coverImageFileEntryId);
 		entry.setCoverImageURL(coverImageURL);
+		entry.setCoverImageCaption(coverImageCaption);
 		entry.setSmallImage(smallImage);
 		entry.setSmallImageFileEntryId(smallImageFileEntryId);
 		entry.setSmallImageURL(smallImageURL);
@@ -1375,7 +1382,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		}
 
 		if ((coverImageImageSelector != null) &&
-			(coverImageImageSelector.getImageId() != 0)) {
+			(coverImageImageSelector.getImageId() != 0) &&
+			(coverImageImageSelector.getImageId() !=
+				entry.getCoverImageFileEntryId())) {
 
 			PortletFileRepositoryUtil.deletePortletFileEntry(
 				coverImageImageSelector.getImageId());
@@ -1396,7 +1405,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			int displayDateDay, int displayDateYear, int displayDateHour,
 			int displayDateMinute, boolean allowPingbacks,
 			boolean allowTrackbacks, String[] trackbacks,
-			ImageSelector coverImageImageSelector,
+			ImageSelector coverImageImageSelector, String coverImageCaption,
 			ImageSelector smallImageImageSelector,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -1411,7 +1420,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		return updateEntry(
 			userId, entryId, title, subtitle, description, content, displayDate,
 			allowPingbacks, allowTrackbacks, trackbacks,
-			coverImageImageSelector, smallImageImageSelector, serviceContext);
+			coverImageImageSelector, coverImageCaption, smallImageImageSelector,
+			serviceContext);
 	}
 
 	@Override
@@ -1802,17 +1812,17 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return;
 		}
 
-		BlogsSettings blogsSettings = BlogsSettings.getInstance(
-			entry.getGroupId());
+		BlogsGroupServiceSettings blogsGroupServiceSettings =
+			BlogsGroupServiceSettings.getInstance(entry.getGroupId());
 
 		boolean sendEmailEntryUpdated = GetterUtil.getBoolean(
 			serviceContext.getAttribute("sendEmailEntryUpdated"));
 
 		if (serviceContext.isCommandAdd() &&
-			blogsSettings.isEmailEntryAddedEnabled()) {
+			blogsGroupServiceSettings.isEmailEntryAddedEnabled()) {
 		}
 		else if (sendEmailEntryUpdated && serviceContext.isCommandUpdate() &&
-				 blogsSettings.isEmailEntryUpdatedEnabled()) {
+				 blogsGroupServiceSettings.isEmailEntryUpdatedEnabled()) {
 		}
 		else {
 			return;
@@ -1822,21 +1832,23 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		String entryTitle = entry.getTitle();
 
-		String fromName = blogsSettings.getEmailFromName();
-		String fromAddress = blogsSettings.getEmailFromAddress();
+		String fromName = blogsGroupServiceSettings.getEmailFromName();
+		String fromAddress = blogsGroupServiceSettings.getEmailFromAddress();
 
 		LocalizedValuesMap subjectLocalizedValuesMap = null;
 		LocalizedValuesMap bodyLocalizedValuesMap = null;
 
 		if (serviceContext.isCommandUpdate()) {
 			subjectLocalizedValuesMap =
-				blogsSettings.getEmailEntryUpdatedSubject();
-			bodyLocalizedValuesMap = blogsSettings.getEmailEntryUpdatedBody();
+				blogsGroupServiceSettings.getEmailEntryUpdatedSubject();
+			bodyLocalizedValuesMap =
+				blogsGroupServiceSettings.getEmailEntryUpdatedBody();
 		}
 		else {
 			subjectLocalizedValuesMap =
-				blogsSettings.getEmailEntryAddedSubject();
-			bodyLocalizedValuesMap = blogsSettings.getEmailEntryAddedBody();
+				blogsGroupServiceSettings.getEmailEntryAddedSubject();
+			bodyLocalizedValuesMap =
+				blogsGroupServiceSettings.getEmailEntryAddedBody();
 		}
 
 		SubscriptionSender subscriptionSender =
