@@ -51,6 +51,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
@@ -91,40 +92,44 @@ public abstract class BaseTestCase {
 
 		SyncAccountService.update(syncAccount);
 
-		PowerMockito.mockStatic(SyncEngine.class);
-
-		Mockito.when(
-			SyncEngine.isRunning()
-		).thenReturn(
-			true
+		PowerMockito.stub(
+			PowerMockito.method(SyncEngine.class, "getExecutorService")
+		).toReturn(
+			Executors.newCachedThreadPool()
 		);
 
-		Mockito.when(
-			SyncEngine.getExecutorService()
-		).thenReturn(
-			Executors.newCachedThreadPool()
+		PowerMockito.stub(
+			PowerMockito.method(SyncEngine.class, "isRunning")
+		).toReturn(
+			true
 		);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		Path filePath = Paths.get(filePathName);
+		try {
+			Path filePath = Paths.get(filePathName);
 
-		FileUtils.deleteDirectory(filePath.toFile());
+			FileUtils.deleteDirectory(filePath.toFile());
 
-		syncAccount = SyncAccountService.fetchSyncAccount(
-			syncAccount.getSyncAccountId());
-
-		if (syncAccount != null) {
-			SyncAccountService.deleteSyncAccount(
+			syncAccount = SyncAccountService.fetchSyncAccount(
 				syncAccount.getSyncAccountId());
+
+			if (syncAccount != null) {
+				SyncAccountService.deleteSyncAccount(
+					syncAccount.getSyncAccountId());
+			}
 		}
+		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
+		}
+		finally {
+			Path databaseFilePath = FileUtil.getFilePath(
+				PropsValues.SYNC_CONFIGURATION_DIRECTORY,
+				PropsValues.SYNC_DATABASE_NAME + ".h2.db");
 
-		Path databaseFilePath = FileUtil.getFilePath(
-			PropsValues.SYNC_CONFIGURATION_DIRECTORY,
-			PropsValues.SYNC_DATABASE_NAME + ".h2.db");
-
-		Files.deleteIfExists(databaseFilePath);
+			Files.deleteIfExists(databaseFilePath);
+		}
 	}
 
 	protected final InputStream getInputStream(String fileName) {
@@ -142,7 +147,7 @@ public abstract class BaseTestCase {
 		Mockito.when(
 			closeableHttpClient.execute(
 				Mockito.any(HttpHost.class), Mockito.any(HttpRequest.class),
-				Mockito.any(ResponseHandler.class),
+				Matchers.<ResponseHandler<Void>>any(),
 				Mockito.any(HttpContext.class))
 		).thenCallRealMethod();
 
