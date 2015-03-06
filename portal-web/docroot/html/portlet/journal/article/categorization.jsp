@@ -23,7 +23,7 @@ JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_AR
 
 DDMStructure ddmStructure = (DDMStructure)request.getAttribute("edit_article.jsp-structure");
 
-boolean structureChanged =GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
+boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
 %>
 
 <liferay-ui:error-marker key="errorSection" value="categorization" />

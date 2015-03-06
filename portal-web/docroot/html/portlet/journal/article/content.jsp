@@ -49,7 +49,7 @@ if (ddmFields != null) {
 	availableLocales = availableLocalesSet.toArray(new Locale[availableLocalesSet.size()]);
 }
 
-boolean structureChanged =GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
+boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
 %>
 
 <liferay-ui:error-marker key="errorSection" value="content" />

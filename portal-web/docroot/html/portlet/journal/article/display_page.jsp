@@ -68,7 +68,7 @@ boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_arti
 		<h3><liferay-ui:message key="display-page" /><liferay-ui:icon-help message="default-display-page-help" /></h3>
 
 		<div id="<portlet:namespace />pagesContainer">
-			<aui:input id="pagesContainerInput" structureChanged="<%= true %>" name="layoutUuid" type="hidden" value="<%= layoutUuid %>" />
+			<aui:input id="pagesContainerInput" name="layoutUuid" structureChanged="<%= true %>" type="hidden" value="<%= layoutUuid %>" />
 
 			<div class="display-page-item-container <%= Validator.isNull(layoutBreadcrumb) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemContainer">
 				<span class="display-page-item">
