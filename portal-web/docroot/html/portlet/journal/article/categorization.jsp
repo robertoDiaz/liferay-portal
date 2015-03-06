@@ -23,7 +23,7 @@ JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_AR
 
 DDMStructure ddmStructure = (DDMStructure)request.getAttribute("edit_article.jsp-structure");
 
-boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
+boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changeStructure"));
 %>
 
 <liferay-ui:error-marker key="errorSection" value="categorization" />
@@ -54,9 +54,9 @@ boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_arti
 	}
 	%>
 
-	<aui:input classPK="<%= classPK %>" classTypePK="<%= ddmStructure.getStructureId() %>" ignoreRequestValue="<%= structureChanged %>" name="categories" type="assetCategories" />
+	<aui:input classPK="<%= classPK %>" classTypePK="<%= ddmStructure.getStructureId() %>" ignoreRequestValue="<%= changeStructure %>" name="categories" type="assetCategories" />
 
-	<aui:input classPK="<%= classPK %>" ignoreRequestValue="<%= structureChanged %>" name="tags" type="assetTags" />
+	<aui:input classPK="<%= classPK %>" ignoreRequestValue="<%= changeStructure %>" name="tags" type="assetTags" />
 </aui:fieldset>
 
 <aui:script>

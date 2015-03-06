@@ -23,7 +23,7 @@ long groupId = BeanParamUtil.getLong(article, request, "groupId", scopeGroupId);
 
 Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
-boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changedStructure"));
+boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_article.jsp-changeStructure"));
 %>
 
 <c:choose>
@@ -37,7 +37,7 @@ boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_arti
 		<%
 		String layoutUuid = BeanParamUtil.getString(article, request, "layoutUuid");
 
-		if (structureChanged && (article != null)) {
+		if (changeStructure && (article != null)) {
 			layoutUuid = article.getLayoutUuid();
 		}
 
@@ -68,7 +68,7 @@ boolean structureChanged = GetterUtil.getBoolean(request.getAttribute("edit_arti
 		<h3><liferay-ui:message key="display-page" /><liferay-ui:icon-help message="default-display-page-help" /></h3>
 
 		<div id="<portlet:namespace />pagesContainer">
-			<aui:input id="pagesContainerInput" name="layoutUuid" structureChanged="<%= true %>" type="hidden" value="<%= layoutUuid %>" />
+			<aui:input changeStructure="<%= true %>" id="pagesContainerInput" name="layoutUuid" type="hidden" value="<%= layoutUuid %>" />
 
 			<div class="display-page-item-container <%= Validator.isNull(layoutBreadcrumb) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemContainer">
 				<span class="display-page-item">

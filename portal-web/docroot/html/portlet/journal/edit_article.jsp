@@ -19,6 +19,8 @@
 <%
 String tabs2 = ParamUtil.getString(request, "tabs2");
 
+String cmd = ParamUtil.getString(request, Constants.CMD);
+
 String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL");
@@ -101,15 +103,14 @@ else if ((article != null) && (article.getId() > 0)) {
 
 String[][] categorySections = {mainSections};
 
-String cmd = ParamUtil.getString(request, Constants.CMD);
-
-request.setAttribute("edit_article.jsp-changedStructure", cmd.equals(Constants.CHANGE_STRUCTURE));
 request.setAttribute("edit_article.jsp-redirect", redirect);
 
 request.setAttribute("edit_article.jsp-structure", ddmStructure);
 request.setAttribute("edit_article.jsp-template", ddmTemplate);
 
 request.setAttribute("edit_article.jsp-defaultLanguageId", defaultLanguageId);
+
+request.setAttribute("edit_article.jsp-changeStructure", cmd.equals(Constants.CHANGE_STRUCTURE));
 %>
 
 <div class="article-form <%= ((article != null) && !article.isNew()) ? "article-form-edit" : "article-form-add" %>">
