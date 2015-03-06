@@ -11,6 +11,8 @@ AUI.add(
 
 		var STR_DESCRIPTION_INPUT_LOCALIZED = 'descriptionInputLocalized';
 
+		var STR_CHANGE_STRUCTURE = 'change_structure';
+
 		var STR_SELECT_STRUCTURE = 'selectStructure';
 
 		var STR_SELECT_TEMPLATE = 'selectTemplate';
@@ -238,6 +240,8 @@ AUI.add(
 								if (confirm(strings.selectStructure) && (ddmStructureId.val() != event.ddmstructureid)) {
 									ddmStructureId.val(event.ddmstructureid);
 
+									instance.one('#cmd').val(STR_CHANGE_STRUCTURE);
+
 									instance.one('#ddmStructureKey').val(event.ddmstructurekey);
 
 									instance.one('#ddmTemplateKey').val('');
@@ -267,7 +271,7 @@ AUI.add(
 								groupId: ddm.groupId,
 								refererPortletName: ddm.refererPortletName,
 								showAncestorScopes: true,
-								sourceClassNameId: ddm.sourceClassNameId,
+								resourceClassNameId: ddm.resourceClassNameId,
 								struts_action: '/dynamic_data_mapping/select_template',
 								templateId: ddm.templateId,
 								title: strings.templates

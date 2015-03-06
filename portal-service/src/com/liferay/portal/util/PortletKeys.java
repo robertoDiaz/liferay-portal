@@ -60,7 +60,7 @@ public class PortletKeys {
 	public static final String DOCUMENT_LIBRARY_DISPLAY = "110";
 
 	public static final String DOCUMENT_SELECTOR =
-		"200_WAR_documentselectorweb";
+		"com_liferay_document_selector_web_portlet_DocumentSelectorPortlet";
 
 	public static final String DYNAMIC_DATA_LIST_DISPLAY = "169";
 
@@ -172,8 +172,6 @@ public class PortletKeys {
 
 	public static final String ROLES_ADMIN = "128";
 
-	public static final String SEARCH = "3";
-
 	public static final String SHOPPING = "34";
 
 	public static final String SITE_MEMBERS_DIRECTORY = "187";
@@ -199,8 +197,6 @@ public class PortletKeys {
 	public static final String STAGING_BAR = "170";
 
 	public static final String STOCKS = "12";
-
-	public static final String TAGS_COMPILER = "103";
 
 	public static final String TRANSLATOR = "26";
 

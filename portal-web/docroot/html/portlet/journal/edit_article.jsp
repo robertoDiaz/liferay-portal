@@ -19,6 +19,8 @@
 <%
 String tabs2 = ParamUtil.getString(request, "tabs2");
 
+String cmd = ParamUtil.getString(request, Constants.CMD);
+
 String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL");
@@ -107,6 +109,8 @@ request.setAttribute("edit_article.jsp-structure", ddmStructure);
 request.setAttribute("edit_article.jsp-template", ddmTemplate);
 
 request.setAttribute("edit_article.jsp-defaultLanguageId", defaultLanguageId);
+
+request.setAttribute("edit_article.jsp-changeStructure", cmd.equals(Constants.CHANGE_STRUCTURE));
 %>
 
 <div class="article-form <%= ((article != null) && !article.isNew()) ? "article-form-edit" : "article-form-add" %>">
