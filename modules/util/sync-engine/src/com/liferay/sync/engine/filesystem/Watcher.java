@@ -282,6 +282,11 @@ public abstract class Watcher implements Runnable {
 			syncAccount.getFilePathName());
 
 		if (Files.notExists(syncAccountFilePath)) {
+			if (_logger.isTraceEnabled()) {
+				_logger.trace(
+					"Missing sync account file path {}", missingFilePath);
+			}
+
 			syncAccount.setActive(false);
 			syncAccount.setUiEvent(
 				SyncAccount.UI_EVENT_SYNC_ACCOUNT_FOLDER_MISSING);
@@ -293,6 +298,11 @@ public abstract class Watcher implements Runnable {
 				missingFilePath.toString(), syncAccount.getSyncAccountId());
 
 			if ((syncSite != null) && Files.notExists(missingFilePath)) {
+				if (_logger.isTraceEnabled()) {
+					_logger.trace(
+						"Missing sync site file path {}", missingFilePath);
+				}
+
 				syncSite.setActive(false);
 				syncSite.setUiEvent(SyncSite.UI_EVENT_SYNC_SITE_FOLDER_MISSING);
 
@@ -303,6 +313,8 @@ public abstract class Watcher implements Runnable {
 
 	protected void processWatchEvent(String eventType, Path filePath)
 		throws IOException {
+
+		_watcherEventsLogger.trace("{}: {}", eventType, filePath);
 
 		if (!OSDetector.isLinux() &&
 			filePath.startsWith(_baseFilePath.resolve(".data"))) {
@@ -352,6 +364,8 @@ public abstract class Watcher implements Runnable {
 			fireWatchEventListener(SyncWatchEvent.EVENT_TYPE_MODIFY, filePath);
 		}
 		else if (eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_FROM)) {
+			processMissingFilePath(getBaseFilePath());
+
 			fireWatchEventListener(
 				SyncWatchEvent.EVENT_TYPE_RENAME_FROM, filePath);
 		}
@@ -377,6 +391,9 @@ public abstract class Watcher implements Runnable {
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		Watcher.class);
+
+	private static final Logger _watcherEventsLogger = LoggerFactory.getLogger(
+		"WATCHER_EVENTS_LOGGER");
 
 	private final Path _baseFilePath;
 	private final ConcurrentNavigableMap<Long, String> _createdFilePathNames =

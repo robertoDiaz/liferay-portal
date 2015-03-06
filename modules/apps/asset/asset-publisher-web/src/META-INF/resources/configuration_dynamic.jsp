@@ -113,7 +113,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 					for (AssetRendererFactory assetRendererFactory : assetRendererFactories) {
 						ClassTypeReader classTypeReader = assetRendererFactory.getClassTypeReader();
 
-						List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(PortalUtil.getSharedContentSiteGroupIds(company.getCompanyId(), scopeGroupId, user.getUserId()), locale);
+						List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(assetPublisherDisplayContext.getReferencedModelsGroupIds(), locale);
 
 						if (classTypes.isEmpty()) {
 							continue;
@@ -189,7 +189,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 
 										<span class="asset-subtypefields hide" id="<portlet:namespace /><%= classType.getClassTypeId() %>_<%= className %>Options">
 											<liferay-portlet:renderURL portletName="<%= AssetPublisherPortletKeys.ASSET_PUBLISHER %>" var="selectStructureFieldURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-												<portlet:param name="mvcPath" value="/html/portlet/asset_publisher/select_structure_field.jsp" />
+												<portlet:param name="mvcPath" value="/select_structure_field.jsp" />
 												<portlet:param name="portletResource" value="<%= assetPublisherDisplayContext.getPortletResource() %>" />
 												<portlet:param name="className" value="<%= assetRendererFactory.getClassName() %>" />
 												<portlet:param name="classTypeId" value="<%= String.valueOf(classType.getClassTypeId()) %>" />
@@ -297,7 +297,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 							String categoryIds = ParamUtil.getString(request, "queryCategoryIds" + queryLogicIndex, queryValues);
 
 							if (Validator.isNotNull(tagNames) || Validator.isNotNull(categoryIds) || (queryLogicIndexes.length == 1)) {
-								request.setAttribute("configuration.jsp-categorizableGroupIds", _getCategorizableGroupIds(assetPublisherDisplayContext.getGroupIds()));
+								request.setAttribute("configuration.jsp-categorizableGroupIds", assetPublisherDisplayContext.getReferencedModelsGroupIds());
 								request.setAttribute("configuration.jsp-index", String.valueOf(index));
 								request.setAttribute("configuration.jsp-queryLogicIndex", String.valueOf(queryLogicIndex));
 
@@ -572,7 +572,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 		<%
 		ClassTypeReader classTypeReader = curRendererFactory.getClassTypeReader();
 
-		List<ClassType> assetAvailableClassTypes = classTypeReader.getAvailableClassTypes(PortalUtil.getSharedContentSiteGroupIds(company.getCompanyId(), scopeGroupId, user.getUserId()), locale);
+		List<ClassType> assetAvailableClassTypes = classTypeReader.getAvailableClassTypes(assetPublisherDisplayContext.getReferencedModelsGroupIds(), locale);
 
 		if (assetAvailableClassTypes.isEmpty()) {
 			continue;
@@ -765,22 +765,6 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 </aui:script>
 
 <%!
-private long[] _getCategorizableGroupIds(long[] groupIds) throws Exception {
-	Set<Long> categorizableGroupIds = new HashSet<Long>(groupIds.length);
-
-	for (long groupId : groupIds) {
-		Group group = GroupLocalServiceUtil.getGroup(groupId);
-
-		if (group.isLayout()) {
-			groupId = group.getParentGroupId();
-		}
-
-		categorizableGroupIds.add(groupId);
-	}
-
-	return ArrayUtil.toLongArray(categorizableGroupIds);
-}
-
 private String _getSectionId(String name) {
 	return TextFormatter.format(name, TextFormatter.M);
 }
