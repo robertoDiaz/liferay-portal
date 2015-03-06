@@ -349,7 +349,7 @@ public class VerifyProperties extends VerifyProcess {
 		},
 		new String[] {
 			"asset.tags.navigation.display.templates.config",
-			"display.templates.config", "com.liferay.asset.tags.web"
+			"display.templates.config", "com.liferay.asset.tags.navigation.web"
 		},
 
 		// Bookmarks
@@ -424,10 +424,10 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.sso.cas"
 		},
 		new String[] {
-			"login.url", "login.url", "com.liferay.portal.sso.cas"
+			"cas.login.url", "login.url", "com.liferay.portal.sso.cas"
 		},
 		new String[] {
-			"logout.on.session.expiration", "logout.on.session.expiration",
+			"cas.logout.on.session.expiration", "logout.on.session.expiration",
 			"com.liferay.portal.sso.cas"
 		},
 		new String[] {
@@ -523,6 +523,23 @@ public class VerifyProperties extends VerifyProcess {
 
 		// LDAP
 
+		new String[] {
+			"ldap.auth.enabled", "enabled",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.method", "method",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.password.encryption.algorithm",
+			"passwordEncryptionAlgorithm",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.required", "required",
+			"com.liferay.portal.authenticator.ldap"
+		},
 		new String[] {
 			"ldap.export.enabled", "export.enabled", "com.liferay.portal.ldap"
 		},
@@ -647,6 +664,47 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.sso.ntlm"
 		},
 
+		// OpenSSO
+
+		new String[] {
+			"open.sso.auth.enabled", "enabled", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.email.address.attr", "email.address.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.first.name.attr", "first.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.last.name.attr", "last.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.import.from.ldap", "import.from.ldap",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.login.url", "login.url", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.on.session.expiration",
+			"logout.on.session.expiration", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.url", "logout.url",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.screen.name.attr", "screen.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.service.url", "service.url",
+			"com.liferay.portal.sso.opensso"
+		},
+
 		// Polls
 
 		new String[] {
@@ -659,6 +717,13 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"rss.display.templates.config", "display.templates.config",
 			"com.liferay.rss.web"
+		},
+
+		// Search
+
+		new String[] {
+			"search.facet.configuration", "facet.configuration",
+			"com.liferay.search.web"
 		},
 
 		// Site Map
@@ -993,6 +1058,10 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"passwords.passwordpolicytoolkit.charset.uppercase",
 			"passwords.passwordpolicytoolkit.validator.charset.uppercase"
+		},
+		new String[] {
+			"permissions.inline.sql.resource.block.query.threshhold",
+			"permissions.inline.sql.resource.block.query.threshold"
 		},
 		new String[] {
 			"portal.instance.http.port", "portal.instance.http.socket.address"
