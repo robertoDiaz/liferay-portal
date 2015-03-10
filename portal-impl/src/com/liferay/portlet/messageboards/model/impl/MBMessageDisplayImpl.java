@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.model.impl;
 
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageDisplay;
@@ -21,6 +23,8 @@ import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.model.MBThreadConstants;
 import com.liferay.portlet.messageboards.model.MBTreeWalker;
 import com.liferay.portlet.messageboards.service.MBMessageLocalService;
+
+import java.util.Comparator;
 
 /**
  * @author Brian Wing Shun Chan
@@ -32,7 +36,8 @@ public class MBMessageDisplayImpl implements MBMessageDisplay {
 		MBMessage message, MBMessage parentMessage, MBCategory category,
 		MBThread thread, MBThread previousThread, MBThread nextThread,
 		int status, String threadView,
-		MBMessageLocalService messageLocalService) {
+		MBMessageLocalService messageLocalService,
+		Comparator<MBMessage> comparator) {
 
 		_message = message;
 		_parentMessage = parentMessage;
@@ -41,7 +46,7 @@ public class MBMessageDisplayImpl implements MBMessageDisplay {
 
 		if (!threadView.equals(MBThreadConstants.THREAD_VIEW_FLAT)) {
 			_treeWalker = new MBTreeWalkerImpl(
-				message.getThreadId(), status, messageLocalService);
+				message.getThreadId(), status, messageLocalService, comparator);
 		}
 		else {
 			_treeWalker = null;
@@ -50,6 +55,22 @@ public class MBMessageDisplayImpl implements MBMessageDisplay {
 		_previousThread = previousThread;
 		_nextThread = nextThread;
 		_threadView = threadView;
+
+		boolean messageLimit = false;
+
+		if (message.isDiscussion() &&
+			(PropsValues.DISCUSSION_COMMENTS_LIMIT > 0)) {
+
+			int count = messageLocalService.getDiscussionMessagesCount(
+				message.getClassName(), message.getClassPK(),
+				WorkflowConstants.STATUS_APPROVED);
+
+			if (count >= PropsValues.DISCUSSION_COMMENTS_LIMIT) {
+				messageLimit = true;
+			}
+		}
+
+		_messageLimit = messageLimit;
 	}
 
 	@Override
@@ -92,8 +113,14 @@ public class MBMessageDisplayImpl implements MBMessageDisplay {
 		return _treeWalker;
 	}
 
+	@Override
+	public boolean isMessageLimit() {
+		return _messageLimit;
+	}
+
 	private final MBCategory _category;
 	private final MBMessage _message;
+	private final boolean _messageLimit;
 	private final MBThread _nextThread;
 	private final MBMessage _parentMessage;
 	private final MBThread _previousThread;

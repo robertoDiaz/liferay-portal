@@ -124,7 +124,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 				JSONObject editorOptionsJSONObject = JSONFactoryUtil.createJSONObject();
 
-				editorOptionsJSONObject.put("showSource", Boolean.FALSE);
 				editorOptionsJSONObject.put("textMode", Boolean.TRUE);
 
 				data.put("editorOptions", editorOptionsJSONObject);
@@ -144,13 +143,13 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					</div>
 
 					<div class="entry-title">
-						<h2><liferay-ui:input-editor contents="<%= title %>" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="titleEditor" placeholder="title" /></h2>
+						<h2><liferay-ui:input-editor contents="<%= title %>" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="titleEditor" placeholder="title" showSource="<%= false %>" /></h2>
 					</div>
 
 					<aui:input name="title" type="hidden" />
 
 					<div class="entry-subtitle">
-						<liferay-ui:input-editor contents="<%= subtitle %>" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="subtitleEditor" placeholder="subtitle" />
+						<liferay-ui:input-editor contents="<%= subtitle %>" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="subtitleEditor" placeholder="subtitle" showSource="<%= false %>" />
 					</div>
 
 					<aui:input name="subtitle" type="hidden" />
@@ -166,7 +165,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 						data.put("uploadURL", uploadEditorImageURL);
 						%>
 
-						<liferay-ui:input-editor contents="<%= content %>" data="<%= contentEditorDta %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="contentEditor" onChangeMethod="OnChangeEditor" placeholder="content" />
+						<liferay-ui:input-editor contents="<%= content %>" data="<%= contentEditorDta %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="contentEditor" onChangeMethod="OnChangeEditor" placeholder="content" showSource="<%= true %>" />
 					</div>
 
 					<aui:input name="content" type="hidden" />
@@ -215,14 +214,14 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 							</div>
 
 							<div class="entry-description">
-								<liferay-ui:input-editor contents="<%= description %>" cssClass='<%= customAbstract ? StringPool.BLANK : "readonly" %>' data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="descriptionEditor" onInitMethod="OnDescriptionEditorInit" placeholder="description" />
+								<liferay-ui:input-editor contents="<%= description %>" cssClass='<%= customAbstract ? StringPool.BLANK : "readonly" %>' data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="descriptionEditor" onInitMethod="OnDescriptionEditorInit" placeholder="description" showSource="<%= false %>" />
 							</div>
 
 							<aui:input name="description" type="hidden" />
 						</aui:fieldset>
 					</div>
 
-					<c:if test="<%= (entry != null) && blogsSettings.isEmailEntryUpdatedEnabled() %>">
+					<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
 						<div class="email-entry-updated-wrapper">
 							<h3><liferay-ui:message key="email-notifications" /></h3>
 
@@ -420,7 +419,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		</c:if>
 	}
 
-	<c:if test="<%= (entry != null) && blogsSettings.isEmailEntryUpdatedEnabled() %>">
+	<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
 		Liferay.Util.toggleBoxes('<portlet:namespace />sendEmailEntryUpdated', '<portlet:namespace />emailEntryUpdatedCommentWrapper');
 	</c:if>
 </aui:script>
