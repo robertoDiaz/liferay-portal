@@ -601,6 +601,8 @@ public interface PropsKeys {
 
 	public static final String DISCUSSION_EMAIL_SUBJECT = "discussion.email.subject";
 
+	public static final String DISCUSSION_MAX_COMMENTS = "discussion.max.comments";
+
 	public static final String DISCUSSION_SUBSCRIBE_BY_DEFAULT = "discussion.subscribe.by.default";
 
 	public static final String DL_ACTIONS_VISIBLE = "dl.actions.visible";
@@ -1963,7 +1965,7 @@ public interface PropsKeys {
 
 	public static final String PERMISSIONS_INLINE_SQL_CHECK_ENABLED = "permissions.inline.sql.check.enabled";
 
-	public static final String PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD = "permissions.inline.sql.resource.block.query.threshhold";
+	public static final String PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD = "permissions.inline.sql.resource.block.query.threshold";
 
 	public static final String PERMISSIONS_OBJECT_BLOCKING_CACHE = "permissions.object.blocking.cache";
 
@@ -2233,8 +2235,6 @@ public interface PropsKeys {
 
 	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA = "search.container.show.pagination.top.delta";
 
-	public static final String SEARCH_FACET_CONFIGURATION = "search.facet.configuration";
-
 	public static final String SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES = "service.builder.service.read.only.prefixes";
 
 	public static final String SERVLET_SERVICE_EVENTS_POST = "servlet.service.events.post";
@@ -2495,8 +2495,6 @@ public interface PropsKeys {
 
 	public static final String STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = "staging.live.group.remote.staging.enabled";
 
-	public static final String STAGING_PUBLISH_BUTTON_EXPORT_IMPORT_CONFIGURATION_DISPLAY_COUNT = "staging.publish.button.export.import.configuration.display.count";
-
 	public static final String STAGING_REMOTE_TRANSFER_BUFFER_SIZE = "staging.remote.transfer.buffer.size";
 
 	public static final String STRIP_CSS_SASS_ENABLED = "strip.css.sass.enabled";
@@ -2520,8 +2518,6 @@ public interface PropsKeys {
 	public static final String SYSTEM_SITE_ROLES = "system.site.roles";
 
 	public static final String TABLE_MAPPER_CACHELESS_MAPPING_TABLE_NAMES = "table.mapper.cacheless.mapping.table.names";
-
-	public static final String TAGS_COMPILER_ENABLED = "tags.compiler.enabled";
 
 	public static final String TCK_URL = "tck.url";
 

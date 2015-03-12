@@ -59,15 +59,17 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 	@Override
 	public void processResponse(String response) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
+		if (_syncDLObjectUpdate == null) {
+			ObjectMapper objectMapper = new ObjectMapper();
 
-		SyncDLObjectUpdate syncDLObjectUpdate = objectMapper.readValue(
-			response, new TypeReference<SyncDLObjectUpdate>() {});
+			_syncDLObjectUpdate = objectMapper.readValue(
+				response, new TypeReference<SyncDLObjectUpdate>() {});
+		}
 
 		boolean firedProcessingState = false;
 		long start = System.currentTimeMillis();
 
-		for (SyncFile targetSyncFile : syncDLObjectUpdate.getSyncDLObjects()) {
+		for (SyncFile targetSyncFile : _syncDLObjectUpdate.getSyncDLObjects()) {
 			processSyncFile(targetSyncFile);
 
 			if (!firedProcessingState &&
@@ -90,7 +92,14 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			SyncSite syncSite = SyncSiteService.fetchSyncSite(
 				(Long)getParameterValue("repositoryId"), getSyncAccountId());
 
-			syncSite.setRemoteSyncTime(syncDLObjectUpdate.getLastAccessTime());
+			if ((syncSite == null) ||
+				((Long)getParameterValue("lastAccessTime")
+					!= syncSite.getRemoteSyncTime())) {
+
+				return;
+			}
+
+			syncSite.setRemoteSyncTime(_syncDLObjectUpdate.getLastAccessTime());
 
 			SyncSiteService.update(syncSite);
 		}
@@ -147,6 +156,12 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			return;
 		}
 
+		if (sourceSyncFile.isFile()) {
+			FileUtil.deleteFile(sourceFilePath);
+
+			return;
+		}
+
 		final Watcher watcher = WatcherRegistry.getWatcher(getSyncAccountId());
 
 		Files.walkFileTree(
@@ -158,7 +173,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						Path filePath, IOException ioe)
 					throws IOException {
 
-					Files.deleteIfExists(filePath);
+					FileUtil.deleteFile(filePath);
 
 					return FileVisitResult.CONTINUE;
 				}
@@ -179,7 +194,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						Path filePath, BasicFileAttributes basicFileAttributes)
 					throws IOException {
 
-					Files.deleteIfExists(filePath);
+					FileUtil.deleteFile(filePath);
 
 					return FileVisitResult.CONTINUE;
 				}
@@ -216,6 +231,28 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		return FileUtil.isIgnoredFilePath(FileUtil.getFilePath(filePathName));
 	}
 
+	@Override
+	protected void logResponse(String response) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			_syncDLObjectUpdate = objectMapper.readValue(
+				response, new TypeReference<SyncDLObjectUpdate>() {});
+
+			List<SyncFile> syncFiles = _syncDLObjectUpdate.getSyncDLObjects();
+
+			if (!syncFiles.isEmpty()) {
+				super.logResponse(response);
+			}
+			else {
+				super.logResponse("");
+			}
+		}
+		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
+		}
+	}
+
 	protected void moveFile(
 			SyncFile sourceSyncFile, SyncFile targetSyncFile,
 			String targetFilePathName)
@@ -228,7 +265,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			targetFilePath, targetSyncFile.getParentFolderId(), sourceSyncFile);
 
 		if (Files.exists(sourceFilePath)) {
-			Files.move(sourceFilePath, targetFilePath);
+			FileUtil.moveFile(sourceFilePath, targetFilePath);
 
 			sourceSyncFile.setState(SyncFile.STATE_SYNCED);
 		}
@@ -449,6 +486,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		GetSyncDLObjectUpdateHandler.class);
+
+	private static SyncDLObjectUpdate _syncDLObjectUpdate;
 
 	private final Map<Long, List<SyncFile>> _dependentSyncFilesMap =
 		new HashMap<>();
