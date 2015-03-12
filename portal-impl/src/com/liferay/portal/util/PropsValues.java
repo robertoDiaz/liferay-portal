@@ -490,6 +490,8 @@ public class PropsValues {
 
 	public static final String DISCUSSION_COMMENTS_FORMAT = PropsUtil.get(PropsKeys.DISCUSSION_COMMENTS_FORMAT);
 
+	public static final int DISCUSSION_MAX_COMMENTS = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DISCUSSION_MAX_COMMENTS));
+
 	public static final boolean DISCUSSION_SUBSCRIBE_BY_DEFAULT = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DISCUSSION_SUBSCRIBE_BY_DEFAULT));
 
 	public static final String[] DL_CHAR_BLACKLIST = PropsUtil.getArray(PropsKeys.DL_CHAR_BLACKLIST);
@@ -1370,7 +1372,7 @@ public class PropsValues {
 
 	public static final boolean PERMISSIONS_INLINE_SQL_CHECK_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_CHECK_ENABLED));
 
-	public static final int PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD));
+	public static final int PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD = GetterUtil.getInteger(PropsUtil.get(PropsKeys.PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD));
 
 	public static final boolean PERMISSIONS_OBJECT_BLOCKING_CACHE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PERMISSIONS_OBJECT_BLOCKING_CACHE));
 
@@ -1592,8 +1594,6 @@ public class PropsValues {
 
 	public static final int SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA = GetterUtil.getInteger(PropsUtil.get(PropsKeys.SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA), 10);
 
-	public static final String SEARCH_FACET_CONFIGURATION = PropsUtil.get(PropsKeys.SEARCH_FACET_CONFIGURATION);
-
 	public static final String[] SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES = PropsUtil.getArray(PropsKeys.SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES);
 
 	public static final String[] SERVLET_SERVICE_EVENTS_POST = PropsUtil.getArray(PropsKeys.SERVLET_SERVICE_EVENTS_POST);
@@ -1732,8 +1732,6 @@ public class PropsValues {
 
 	public static boolean STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED));
 
-	public static final int STAGING_PUBLISH_BUTTON_EXPORT_IMPORT_CONFIGURATION_DISPLAY_COUNT = GetterUtil.getInteger(PropsUtil.get(PropsKeys.STAGING_PUBLISH_BUTTON_EXPORT_IMPORT_CONFIGURATION_DISPLAY_COUNT));
-
 	public static final int STAGING_REMOTE_TRANSFER_BUFFER_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.STAGING_REMOTE_TRANSFER_BUFFER_SIZE));
 
 	public static boolean STRIP_CSS_SASS_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.STRIP_CSS_SASS_ENABLED));
@@ -1747,8 +1745,6 @@ public class PropsValues {
 	public static final String STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP = PropsUtil.get(PropsKeys.STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP);
 
 	public static final String STRUTS_PORTLET_REQUEST_PROCESSOR = PropsUtil.get(PropsKeys.STRUTS_PORTLET_REQUEST_PROCESSOR);
-
-	public static final boolean TAGS_COMPILER_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TAGS_COMPILER_ENABLED));
 
 	public static final boolean TCK_URL = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.TCK_URL));
 

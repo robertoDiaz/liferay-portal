@@ -15,6 +15,8 @@
 package com.liferay.poshi.runner;
 
 import com.liferay.poshi.runner.util.FileUtil;
+import com.liferay.poshi.runner.util.OSDetector;
+import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.ArrayList;
@@ -167,7 +169,13 @@ public class PoshiRunnerContext {
 
 			if (locatorKey.equals("EXTEND_ACTION_PATH")) {
 				for (String extendFilePath : _filePathsArray) {
-					if (extendFilePath.endsWith("/" + locator + ".path")) {
+					String expectedExtendedPath = "/" + locator + ".path";
+
+					if (OSDetector.isWindows()) {
+						expectedExtendedPath = "\\" + locator + ".path";
+					}
+
+					if (extendFilePath.endsWith(expectedExtendedPath)) {
 						extendFilePath = _BASE_DIR + "/" + extendFilePath;
 
 						_readPathFile(extendFilePath, className);
@@ -199,6 +207,10 @@ public class PoshiRunnerContext {
 
 		for (String filePath : _filePathsArray) {
 			filePath = _BASE_DIR + "/" + filePath;
+
+			if (OSDetector.isWindows()) {
+				filePath = filePath.replace("/", "\\");
+			}
 
 			String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
 				filePath);
@@ -280,8 +292,13 @@ public class PoshiRunnerContext {
 		};
 
 		for (String fileName : fileNames) {
-			String content = FileUtil.read(
-				"src/com/liferay/poshi/runner/selenium/" + fileName);
+			String filePath = "src/com/liferay/poshi/runner/selenium/";
+
+			if (OSDetector.isWindows()) {
+				filePath = filePath.replace("/", "\\");
+			}
+
+			String content = FileUtil.read(filePath + fileName);
 
 			Matcher matcher = _pattern.matcher(content);
 
@@ -311,8 +328,7 @@ public class PoshiRunnerContext {
 	}
 
 	private static final String _BASE_DIR =
-		PoshiRunnerGetterUtil.getCanonicalPath(
-			"../../../portal-web/test/functional/com/liferay/portalweb/");
+		PoshiRunnerGetterUtil.getCanonicalPath(PropsValues.TEST_BASE_DIR_NAME);
 
 	private static final Map<String, String> _actionExtendClassName =
 		new HashMap<>();
