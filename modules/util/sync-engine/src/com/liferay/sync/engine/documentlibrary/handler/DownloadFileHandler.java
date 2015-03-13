@@ -106,7 +106,9 @@ public class DownloadFileHandler extends BaseHandler {
 			(Boolean)getParameterValue("patch")) {
 
 			if (_logger.isDebugEnabled()) {
-				_logger.debug("Handling exception {}", exception);
+				_logger.debug(
+					"Handling exception {} file path {}", exception,
+					syncFile.getFilePathName());
 			}
 
 			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
@@ -116,10 +118,14 @@ public class DownloadFileHandler extends BaseHandler {
 
 		if (exception.equals(
 				"com.liferay.portlet.documentlibrary." +
-					"NoSuchFileEntryException")) {
+					"NoSuchFileEntryException") ||
+			exception.equals(
+				"com.liferay.portlet.documentlibrary.NoSuchFileException")) {
 
 			if (_logger.isDebugEnabled()) {
-				_logger.debug("Handling exception {}", exception);
+				_logger.debug(
+					"Handling exception {} file path {}", exception,
+					syncFile.getFilePathName());
 			}
 
 			SyncFileService.deleteSyncFile(syncFile, false);
@@ -180,9 +186,7 @@ public class DownloadFileHandler extends BaseHandler {
 
 			FileUtil.setModifiedTime(tempFilePath, syncFile.getModifiedTime());
 
-			Files.move(
-				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
-				StandardCopyOption.REPLACE_EXISTING);
+			FileUtil.moveFile(tempFilePath, filePath);
 
 			syncFile.setState(SyncFile.STATE_SYNCED);
 
