@@ -14,11 +14,12 @@ Export-Package:\
 	junit.*,\
 	org.hamcrest.*,\
 	org.junit.*,\
+	org.junit.runner.*,\
+	org.springframework.mock.web,\
 	org.springframework.mock.web.portlet
 Import-Package: *;resolution:=optional
 Include-Resource:\
 	classes,\
-	@${project.dir}/../lib/development/dumbster.jar,\
 	@${project.dir}/../lib/development/hamcrest-core.jar,\
 	@${project.dir}/../lib/development/junit.jar,\
 	@${project.dir}/../lib/development/spring-test.jar,\
