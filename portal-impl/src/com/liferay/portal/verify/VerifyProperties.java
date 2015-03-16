@@ -349,7 +349,7 @@ public class VerifyProperties extends VerifyProcess {
 		},
 		new String[] {
 			"asset.tags.navigation.display.templates.config",
-			"display.templates.config", "com.liferay.asset.tags.web"
+			"display.templates.config", "com.liferay.asset.tags.navigation.web"
 		},
 
 		// Bookmarks
@@ -424,10 +424,10 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.sso.cas"
 		},
 		new String[] {
-			"login.url", "login.url", "com.liferay.portal.sso.cas"
+			"cas.login.url", "login.url", "com.liferay.portal.sso.cas"
 		},
 		new String[] {
-			"logout.on.session.expiration", "logout.on.session.expiration",
+			"cas.logout.on.session.expiration", "logout.on.session.expiration",
 			"com.liferay.portal.sso.cas"
 		},
 		new String[] {
@@ -524,6 +524,23 @@ public class VerifyProperties extends VerifyProcess {
 		// LDAP
 
 		new String[] {
+			"ldap.auth.enabled", "enabled",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.method", "method",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.password.encryption.algorithm",
+			"passwordEncryptionAlgorithm",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
+			"ldap.auth.required", "required",
+			"com.liferay.portal.authenticator.ldap"
+		},
+		new String[] {
 			"ldap.export.enabled", "export.enabled", "com.liferay.portal.ldap"
 		},
 		new String[] {
@@ -592,6 +609,33 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.ldap"
 		},
 
+		// Monitoring
+
+		new String[] {
+			"monitoring.portal.request", "monitor.portal.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.action.request",
+			"monitor.portlet.action.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.event.request", "monitor.portlet.event.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.render.request",
+			"monitor.portlet.render.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.resource.request",
+			"monitor.portlet.resource.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.show.per.request.data.sample",
+			"show.per.request.data.sample", "com.liferay.portal.monitoring"
+		},
+
 		// Navigation
 
 		new String[] {
@@ -647,6 +691,47 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.sso.ntlm"
 		},
 
+		// OpenSSO
+
+		new String[] {
+			"open.sso.auth.enabled", "enabled", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.email.address.attr", "email.address.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.first.name.attr", "first.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.last.name.attr", "last.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.import.from.ldap", "import.from.ldap",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.login.url", "login.url", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.on.session.expiration",
+			"logout.on.session.expiration", "com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.logout.url", "logout.url",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.screen.name.attr", "screen.name.attr",
+			"com.liferay.portal.sso.opensso"
+		},
+		new String[] {
+			"open.sso.service.url", "service.url",
+			"com.liferay.portal.sso.opensso"
+		},
+
 		// Polls
 
 		new String[] {
@@ -661,11 +746,25 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.rss.web"
 		},
 
+		// Search
+
+		new String[] {
+			"search.facet.configuration", "facet.configuration",
+			"com.liferay.search.web"
+		},
+
 		// Site Map
 
 		new String[] {
 			"sitemap.display.templates.config", "display.templates.config",
 			"com.liferay.site.map.web"
+		},
+
+		// Tags Compiler
+
+		new String[] {
+			"tags.compiler.enabled", "enabled",
+			"com.liferay.asset.tags.compiler.web"
 		},
 
 		// Translator
@@ -756,6 +855,7 @@ public class VerifyProperties extends VerifyProcess {
 		"asset.publisher.filter.unlistable.entries",
 		"asset.tag.permissions.enabled", "asset.tag.properties.default",
 		"asset.tag.properties.enabled", "auth.max.failures.limit",
+		"breadcrumb.display.style.options",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
@@ -763,6 +863,7 @@ public class VerifyProperties extends VerifyProcess {
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
+		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
 		"commons.pool.enabled", "convert.processes", "discussion.thread.view",
 		"dl.file.entry.read.count.enabled",
@@ -848,7 +949,14 @@ public class VerifyProperties extends VerifyProcess {
 			"amazon.license.3", "amazon.access.key.id"
 		},
 		new String[] {
+			"breadcrumb.display.style.default",
+			"breadcrumb.ddm.template.key.default"
+		},
+		new String[] {
 			"cdn.host", "cdn.host.http"
+		},
+		new String[] {
+			"cluster.executor.debug.enabled", "cluster.link.debug.enabled"
 		},
 		new String[] {
 			"com.liferay.portal.servlet.filters.compression.CompressionFilter",
@@ -995,6 +1103,10 @@ public class VerifyProperties extends VerifyProcess {
 			"passwords.passwordpolicytoolkit.validator.charset.uppercase"
 		},
 		new String[] {
+			"permissions.inline.sql.resource.block.query.threshhold",
+			"permissions.inline.sql.resource.block.query.threshold"
+		},
+		new String[] {
 			"portal.instance.http.port", "portal.instance.http.socket.address"
 		},
 		new String[] {
@@ -1020,7 +1132,7 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.kernel.util.StringBundler.unsafe.create." +
 				"threshold",
 			"com.liferay.portal.kernel.util.StringBundler.threadlocal.buffer." +
-				"limit",
+				"limit"
 		}
 	};
 
