@@ -30,6 +30,9 @@ import com.liferay.portlet.asset.util.AssetUtil;
 import javax.portlet.PortletURL;
 
 /**
+ * Provides utility methods to be used from Asset Publisher display templates.
+ * This class is injected in the context of Asset Publisher display templates.
+ *
  * @author Juan Fernández
  */
 public class AssetPublisherHelper {
@@ -50,8 +53,7 @@ public class AssetPublisherHelper {
 		PortletURL viewFullContentURL =
 			liferayPortletResponse.createRenderURL();
 
-		viewFullContentURL.setParameter(
-			"mvcPath", "/html/portlet/asset_publisher/view_content.jsp");
+		viewFullContentURL.setParameter("mvcPath", "/view_content.jsp");
 		viewFullContentURL.setParameter(
 			"assetEntryId", String.valueOf(assetEntry.getEntryId()));
 
