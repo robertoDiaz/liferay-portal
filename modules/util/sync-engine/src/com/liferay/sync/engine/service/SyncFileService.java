@@ -20,10 +20,9 @@ import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncFileModelListener;
 import com.liferay.sync.engine.service.persistence.SyncFilePersistence;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
-
-import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -123,7 +122,7 @@ public class SyncFileService {
 
 		_syncFilePersistence.create(syncFile);
 
-		FileUtil.writeFileKey(
+		FileKeyUtil.writeFileKey(
 			Paths.get(filePathName), String.valueOf(syncFile.getSyncFileId()));
 
 		IODeltaUtil.checksums(syncFile);
@@ -191,7 +190,7 @@ public class SyncFileService {
 
 			// Sync files
 
-			if (!syncFile.isFolder() || (syncFile.getTypePK() == 0)) {
+			if (!syncFile.isFolder()) {
 				return;
 			}
 
@@ -492,6 +491,20 @@ public class SyncFileService {
 		return syncFile;
 	}
 
+	public static void renameSyncFiles(
+		String sourceFilePathName, String targetFilePathName) {
+
+		try {
+			_syncFilePersistence.renameByFilePathName(
+				sourceFilePathName, targetFilePathName);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+		}
+	}
+
 	public static SyncFile resyncFolder(SyncFile syncFile) throws Exception {
 		setStatuses(syncFile, SyncFile.STATE_SYNCED, SyncFile.UI_EVENT_NONE);
 
@@ -557,7 +570,7 @@ public class SyncFileService {
 
 		// Local sync file
 
-		FileUtil.writeFileKey(
+		FileKeyUtil.writeFileKey(
 			filePath, String.valueOf(syncFile.getSyncFileId()));
 
 		Path deltaFilePath = null;
@@ -637,20 +650,8 @@ public class SyncFileService {
 
 		// Sync files
 
-		if (syncFile.isFile() || (syncFile.getTypePK() == 0)) {
-			return syncFile;
-		}
-
-		try {
-			_syncFilePersistence.renameByFilePathName(
-				sourceFilePathName, targetFilePathName);
-		}
-		catch (SQLException sqle) {
-			if (_logger.isDebugEnabled()) {
-				_logger.debug(sqle.getMessage(), sqle);
-			}
-
-			return null;
+		if (syncFile.isFolder()) {
+			renameSyncFiles(sourceFilePathName, targetFilePathName);
 		}
 
 		return syncFile;
@@ -666,12 +667,7 @@ public class SyncFileService {
 
 				@Override
 				public void run() {
-					try {
-						Files.deleteIfExists(filePath);
-					}
-					catch (IOException ioe) {
-						_logger.error(ioe.getMessage(), ioe);
-					}
+					FileUtil.deleteFile(filePath);
 				}
 
 			};

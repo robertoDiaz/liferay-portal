@@ -18,6 +18,7 @@ import com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfigurat
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.web.util.AssetPublisherUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
@@ -45,7 +47,6 @@ import com.liferay.portlet.asset.model.ClassTypeReader;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.asset.util.AssetUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
-import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil;
 import com.liferay.util.RSSUtil;
 
 import java.util.Locale;
@@ -421,23 +422,27 @@ public class AssetPublisherDisplayContext {
 		return _paginationType;
 	}
 
-	public Long getPortletDisplayDDMTemplateId() {
-		if (_portletDisplayDDMTemplateId == null) {
-			_portletDisplayDDMTemplateId =
-				PortletDisplayTemplateUtil.
-					getPortletDisplayTemplateDDMTemplateId(
-						getDisplayStyleGroupId(), getDisplayStyle());
-		}
-
-		return _portletDisplayDDMTemplateId;
-	}
-
 	public String getPortletResource() {
 		if (_portletResource == null) {
 			_portletResource = ParamUtil.getString(_request, "portletResource");
 		}
 
 		return _portletResource;
+	}
+
+	public long[] getReferencedModelsGroupIds() throws PortalException {
+
+		// Referenced models are asset subtypes, tags or categories that
+		// are used to filter assets and can belong to a different scope of
+		// the asset they are associated to
+
+		if (_referencedModelsGroupIds == null) {
+			_referencedModelsGroupIds =
+				PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					getGroupIds(), true);
+		}
+
+		return _referencedModelsGroupIds;
 	}
 
 	public String getRootPortletId() {
@@ -1069,9 +1074,9 @@ public class AssetPublisherDisplayContext {
 	private String _orderByType1;
 	private String _orderByType2;
 	private String _paginationType;
-	private Long _portletDisplayDDMTemplateId;
 	private final PortletPreferences _portletPreferences;
 	private String _portletResource;
+	private long[] _referencedModelsGroupIds;
 	private final HttpServletRequest _request;
 	private String _rootPortletId;
 	private Integer _rssDelta;

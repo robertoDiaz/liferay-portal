@@ -63,7 +63,15 @@ IPGeocoder ipGeocoder = (IPGeocoder)request.getAttribute(SocialNetworkingWebKeys
 	</c:otherwise>
 </c:choose>
 
-<script src="http://maps.googleapis.com/maps/api/js?key=<%= PortletProps.get("map.google.maps.api.key") %>&language=<%= themeDisplay.getLanguageId() %>&sensor=false" type="text/javascript"></script>
+<%
+String apiKey = GetterUtil.getString(group.getLiveParentTypeSettingsProperty("googleMapsAPIKey"));
+
+if (Validator.isNull(apiKey)) {
+	PortletPreferences companyPortletPreferences = PrefsPropsUtil.getPreferences(themeDisplay.getCompanyId());
+
+	apiKey = GetterUtil.getString(companyPortletPreferences.getValue("googleMapsAPIKey", null));
+}
+%>
 
 <aui:script>
 	function <portlet:namespace />initMap() {
@@ -169,6 +177,18 @@ IPGeocoder ipGeocoder = (IPGeocoder)request.getAttribute(SocialNetworkingWebKeys
 		%>
 
 	}
+</aui:script>
 
-	google.maps.event.addDomListener(window, 'load', <portlet:namespace />initMap);
+<aui:script use="aui-base">
+	A.on(
+		'load',
+		function() {
+			var script = document.createElement('script');
+
+			script.type = 'text/javascript';
+			script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&language=<%= themeDisplay.getLanguageId() %>&sensor=false&callback=<portlet:namespace />initMap';
+
+			document.body.appendChild(script);
+		}
+	);
 </aui:script>
