@@ -101,6 +101,8 @@ featureCollectionJSONObject.put("type", "FeatureCollection");
 
 JSONArray featureJSONArray = JSONFactoryUtil.createJSONArray();
 
+boolean hasPoints = false;
+
 for (int i = 0; i < users.size(); i++) {
 	User mapUser = users.get(i);
 
@@ -116,6 +118,8 @@ for (int i = 0; i < users.size(); i++) {
 	if (ipInfo == null) {
 		continue;
 	}
+
+	hasPoints = true;
 
 	JSONObject featureJSONObject = JSONFactoryUtil.createJSONObject();
 	featureJSONObject.put("type", "Feature");
@@ -158,7 +162,7 @@ if (userProfileMap) {
 
 boolean maximized = windowState.equals(WindowState.MAXIMIZED);
 
-int zoom =  0;
+int zoom = 0;
 
 if (maximized) {
 	zoom = 2;
@@ -170,17 +174,13 @@ if (maximized) {
 %>
 
 <c:choose>
-	<c:when test="<%= maximized %>">
-		<div id="<portlet:namespace />map" style="height: 600px; overflow: hidden width: 900px;">
-
+	<c:when test="<%= hasPoints %>">
+		<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.PAN, MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points= "<%= featureCollectionJSONObject.toString() %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
 	</c:when>
 	<c:otherwise>
-		<div id="<portlet:namespace />map" style="height: 190px; overflow: hidden width: 190px;">
+		<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.PAN, MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
 	</c:otherwise>
 </c:choose>
-
-	<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points="<%= featureCollectionJSONObject.toString() %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>"/>
-</div>
 
 <c:if test="<%= !maximized %>">
 	<div style="padding-top: 5px;">
