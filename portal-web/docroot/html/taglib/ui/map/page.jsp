@@ -86,8 +86,6 @@ name = namespace + name;
 <aui:script use='<%= "liferay-map-" + StringUtil.toLowerCase(provider) %>'>
 	var MapControls = Liferay.MapBase.CONTROLS;
 
-	debugger;
-
 	var mapConfig = {
 		boundingBox: '#<%= name %>Map',
 
