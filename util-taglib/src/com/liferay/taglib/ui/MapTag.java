@@ -51,6 +51,10 @@ public class MapTag extends IncludeTag {
 		_provider = provider;
 	}
 
+	public void setZoom(int zoom) {
+		_zoom = zoom;
+	}
+
 	@Override
 	protected void cleanUp() {
 		_apiKey = null;
@@ -60,6 +64,7 @@ public class MapTag extends IncludeTag {
 		_name = null;
 		_points = null;
 		_provider = null;
+		_zoom = 0;
 	}
 
 	@Override
@@ -76,6 +81,7 @@ public class MapTag extends IncludeTag {
 		request.setAttribute("liferay-ui:map:name", _name);
 		request.setAttribute("liferay-ui:map:points", _points);
 		request.setAttribute("liferay-ui:map:provider", _provider);
+		request.setAttribute("liferay-ui:map:zoom", _zoom);
 	}
 
 	private static final String _PAGE = "/html/taglib/ui/map/page.jsp";
@@ -87,5 +93,6 @@ public class MapTag extends IncludeTag {
 	private String _name;
 	private String _points;
 	private String _provider;
+	private int _zoom;
 
 }

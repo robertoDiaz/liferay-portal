@@ -26,6 +26,7 @@ double longitude = (Double)request.getAttribute("liferay-ui:map:longitude");
 String name = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:name"));
 String points = GetterUtil.getString(request.getAttribute("liferay-ui:map:points"));
 String provider = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:provider"));
+int zoom = (Integer)request.getAttribute("liferay-ui:map:zoom");
 
 if (Validator.isNull(provider)) {
 	Group group = layout.getGroup();
@@ -103,6 +104,10 @@ name = namespace + name;
 					lng: <%= longitude %>
 				}
 			}
+		</c:if>
+
+		<c:if test="<%= zoom != 0 %>">
+			,zoom: <%= zoom %>
 		</c:if>
 	};
 
