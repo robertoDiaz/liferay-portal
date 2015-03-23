@@ -95,13 +95,7 @@ else if (userProfileMap) {
 	users.add(user2);
 }
 
-JSONObject featureCollectionJSONObject = JSONFactoryUtil.createJSONObject();
-
-featureCollectionJSONObject.put("type", "FeatureCollection");
-
-JSONArray featureJSONArray = JSONFactoryUtil.createJSONArray();
-
-boolean hasPoints = false;
+List<Point> points = new ArrayList<>();
 
 for (int i = 0; i < users.size(); i++) {
 	User mapUser = users.get(i);
@@ -119,34 +113,12 @@ for (int i = 0; i < users.size(); i++) {
 		continue;
 	}
 
-	hasPoints = true;
+	Point.Tooltip tooltip = new Point.Tooltip(mapUser.getFullName(), StringPool.BLANK);
 
-	JSONObject featureJSONObject = JSONFactoryUtil.createJSONObject();
-	featureJSONObject.put("type", "Feature");
+	Point point = new Point(latitude, longitude, tooltip);
 
-	JSONObject geometryJSONObject = JSONFactoryUtil.createJSONObject();
-
-	geometryJSONObject.put("type", "Point");
-
-	JSONArray coordinatesJSONArray = JSONFactoryUtil.createJSONArray();
-
-	coordinatesJSONArray.put(longitude);
-	coordinatesJSONArray.put(latitude);
-
-	geometryJSONObject.put("coordinates", coordinatesJSONArray);
-
-	featureJSONObject.put("geometry", geometryJSONObject);
-
-	JSONObject propertiesJSONObject = JSONFactoryUtil.createJSONObject();
-
-	propertiesJSONObject.put("title", mapUser.getFullName());
-
-	featureJSONObject.put("properties", propertiesJSONObject);
-
-	featureJSONArray.put(featureJSONObject);
+	points.add(point);
 }
-
-featureCollectionJSONObject.put("features", featureJSONArray);
 
 double latitude = 0.0;
 double longitude = 0.0;
@@ -173,10 +145,10 @@ if (maximized) {
 }
 %>
 
-<div class="<%= maximized ? "maximized-map" : "default-map"%>">
+<div class="<%= maximized ? "maximized-map" : "default-map" %>">
 	<c:choose>
-		<c:when test="<%= hasPoints %>">
-			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points= "<%= featureCollectionJSONObject.toString() %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
+		<c:when test="<%= !points.isEmpty() %>">
+			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points= "<%= points.toArray() %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
 		</c:when>
 		<c:otherwise>
 			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />

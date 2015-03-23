@@ -1,4 +1,3 @@
-
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -26,7 +25,7 @@ boolean geolocation = GetterUtil.getBoolean(request.getAttribute("liferay-ui:map
 double latitude = (Double)request.getAttribute("liferay-ui:map:latitude");
 double longitude = (Double)request.getAttribute("liferay-ui:map:longitude");
 String name = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:name"));
-String points = GetterUtil.getString(request.getAttribute("liferay-ui:map:points"));
+String pointsData = GetterUtil.getString(request.getAttribute("liferay-ui:map:pointsData"));
 String provider = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:provider"));
 
 boolean showControls = false;
@@ -103,8 +102,8 @@ name = namespace + name;
 			</c:choose>
 		</c:if>
 
-		<c:if test="<%= Validator.isNotNull(points) %>">
-			data: <%= points %>,
+		<c:if test="<%= Validator.isNotNull(pointsData) %>">
+			data: <%= pointsData %>,
 		</c:if>
 
 		geolocation: <%= geolocation %>

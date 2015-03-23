@@ -14,6 +14,12 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.geolocation.Point;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +54,7 @@ public class MapTag extends IncludeTag {
 		_name = name;
 	}
 
-	public void setPoints(String points) {
+	public void setPoints(Point[] points) {
 		_points = points;
 	}
 
@@ -86,9 +92,68 @@ public class MapTag extends IncludeTag {
 		request.setAttribute("liferay-ui:map:latitude", _latitude);
 		request.setAttribute("liferay-ui:map:longitude", _longitude);
 		request.setAttribute("liferay-ui:map:name", _name);
-		request.setAttribute("liferay-ui:map:points", _points);
+
+		if (ArrayUtil.isNotEmpty(_points)) {
+			request.setAttribute("liferay-ui:map:pointsData", _getPointsData());
+		}
+
 		request.setAttribute("liferay-ui:map:provider", _provider);
 		request.setAttribute("liferay-ui:map:zoom", _zoom);
+	}
+
+	private String _getPointsData() {
+		JSONObject featureCollectionJSONObject =
+			JSONFactoryUtil.createJSONObject();
+
+		featureCollectionJSONObject.put("type", "FeatureCollection");
+
+		JSONArray featureJSONArray = JSONFactoryUtil.createJSONArray();
+
+		for (Point point : _points) {
+			JSONObject featureJSONObject = JSONFactoryUtil.createJSONObject();
+
+			featureJSONObject.put("type", "Feature");
+
+			JSONObject geometryJSONObject = JSONFactoryUtil.createJSONObject();
+
+			geometryJSONObject.put("type", "Point");
+
+			JSONArray coordinatesJSONArray = JSONFactoryUtil.createJSONArray();
+
+			coordinatesJSONArray.put(point.getLongitude());
+			coordinatesJSONArray.put(point.getLatitude());
+
+			geometryJSONObject.put("coordinates", coordinatesJSONArray);
+
+			featureJSONObject.put("geometry", geometryJSONObject);
+
+			Point.Tooltip tooltip = point.getTooltip();
+
+			if (tooltip != null) {
+				JSONObject propertiesJSONObject =
+					JSONFactoryUtil.createJSONObject();
+
+				String title = tooltip.getTitle();
+
+				if (Validator.isNotNull(title)) {
+					propertiesJSONObject.put("title", title);
+				}
+
+				String content = tooltip.getContent();
+
+				if (Validator.isNotNull(content)) {
+					propertiesJSONObject.put("abstract", content);
+				}
+
+				featureJSONObject.put("properties", propertiesJSONObject);
+			}
+
+			featureJSONArray.put(featureJSONObject);
+		}
+
+		featureCollectionJSONObject.put("features", featureJSONArray);
+
+		return featureCollectionJSONObject.toString();
 	}
 
 	private static final String _PAGE = "/html/taglib/ui/map/page.jsp";
@@ -99,7 +164,7 @@ public class MapTag extends IncludeTag {
 	private double _latitude;
 	private double _longitude;
 	private String _name;
-	private String _points;
+	private Point[] _points;
 	private String _provider;
 	private int _zoom;
 
