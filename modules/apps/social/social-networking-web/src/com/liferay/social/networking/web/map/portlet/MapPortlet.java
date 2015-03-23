@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.friendly-url-mapping=map",
 		"com.liferay.portlet.friendly-url-routes=com/liferay/social/networking/web/map/portlet/route/map-friendly-url-routes.xml",
 		"com.liferay.portlet.css-class-wrapper=social-networking-portlet-map",
+		"com.liferay.portlet.header-portlet-css=/map/css/main.css",
 		"javax.portlet.display-name=Map",
 		"javax.portlet.init-param.view-template=/map/view.jsp",
 		"javax.portlet.expiration-cache=0",
