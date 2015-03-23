@@ -20,11 +20,16 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Chema Balsas
+ * @author Roberto Díaz
  */
 public class MapTag extends IncludeTag {
 
 	public void setApiKey(String apiKey) {
 		_apiKey = apiKey;
+	}
+
+	public void setControls(String controls) {
+		_controls = controls;
 	}
 
 	public void setGeolocation(boolean geolocation) {
@@ -58,6 +63,7 @@ public class MapTag extends IncludeTag {
 	@Override
 	protected void cleanUp() {
 		_apiKey = null;
+		_controls = null;
 		_geolocation = false;
 		_latitude = 0;
 		_longitude = 0;
@@ -75,6 +81,7 @@ public class MapTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute("liferay-ui:map:apiKey", _apiKey);
+		request.setAttribute("liferay-ui:map:controls", _controls);
 		request.setAttribute("liferay-ui:map:geolocation", _geolocation);
 		request.setAttribute("liferay-ui:map:latitude", _latitude);
 		request.setAttribute("liferay-ui:map:longitude", _longitude);
@@ -87,6 +94,7 @@ public class MapTag extends IncludeTag {
 	private static final String _PAGE = "/html/taglib/ui/map/page.jsp";
 
 	private String _apiKey;
+	private String _controls;
 	private boolean _geolocation;
 	private double _latitude;
 	private double _longitude;

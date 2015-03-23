@@ -1,3 +1,4 @@
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -20,12 +21,20 @@
 String protocol = HttpUtil.getProtocol(request);
 
 String apiKey = GetterUtil.getString(request.getAttribute("liferay-ui:map:apiKey"));
+String controls = GetterUtil.getString(request.getAttribute("liferay-ui:map:controls"));
 boolean geolocation = GetterUtil.getBoolean(request.getAttribute("liferay-ui:map:geolocation"));
 double latitude = (Double)request.getAttribute("liferay-ui:map:latitude");
 double longitude = (Double)request.getAttribute("liferay-ui:map:longitude");
 String name = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:name"));
 String points = GetterUtil.getString(request.getAttribute("liferay-ui:map:points"));
 String provider = GetterUtil.getString((String)request.getAttribute("liferay-ui:map:provider"));
+
+boolean showControls = false;
+
+if (geolocation || Validator.isNotNull(controls)) {
+	showControls = true;
+}
+
 int zoom = (Integer)request.getAttribute("liferay-ui:map:zoom");
 
 if (Validator.isNull(provider)) {
@@ -77,11 +86,16 @@ name = namespace + name;
 <aui:script use='<%= "liferay-map-" + StringUtil.toLowerCase(provider) %>'>
 	var MapControls = Liferay.MapBase.CONTROLS;
 
+	debugger;
+
 	var mapConfig = {
 		boundingBox: '#<%= name %>Map',
 
-		<c:if test="<%= geolocation %>">
+		<c:if test="<%= showControls %>">
 			<c:choose>
+				<c:when test="<%= Validator.isNotNull(controls) %>">
+					controls: [<%= controls %>],
+				</c:when>
 				<c:when test="<%= BrowserSnifferUtil.isMobile(request) %>">
 					controls: [MapControls.HOME, MapControls.SEARCH],
 				</c:when>
