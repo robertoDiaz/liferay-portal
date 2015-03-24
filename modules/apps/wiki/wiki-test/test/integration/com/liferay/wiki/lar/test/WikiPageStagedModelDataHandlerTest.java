@@ -34,7 +34,6 @@ import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.wiki.attachments.test.WikiAttachmentsTest;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
@@ -111,7 +110,7 @@ public class WikiPageStagedModelDataHandlerTest
 
 		WikiTestUtil.addWikiAttachment(
 			TestPropsValues.getUserId(), node.getNodeId(), page.getTitle(),
-			WikiAttachmentsTest.class);
+			WikiPageStagedModelDataHandlerTest.class);
 
 		List<FileEntry> attachmentsFileEntries =
 			page.getAttachmentsFileEntries();
