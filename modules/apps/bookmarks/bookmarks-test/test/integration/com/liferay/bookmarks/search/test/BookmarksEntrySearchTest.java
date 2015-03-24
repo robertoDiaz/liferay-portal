@@ -12,41 +12,57 @@
  * details.
  */
 
-package com.liferay.bookmarks.search;
+package com.liferay.bookmarks.search.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
-import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
+import com.liferay.bookmarks.service.BookmarksEntryServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
 import com.liferay.bookmarks.util.test.BookmarksTestUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.search.test.BaseSearchTestCase;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
- * @author Eudaldo Alonso
+ * @author Manuel de la Peña
  */
+@RunWith(Arquillian.class)
 @Sync
-public class BookmarksFolderSearchTest extends BaseSearchTestCase {
+public class BookmarksEntrySearchTest extends BaseSearchTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			new LiferayIntegrationTestRule(),
 			SynchronousDestinationTestRule.INSTANCE);
+
+	@Before
+	public void setUp() throws Exception {
+		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
+		super.setUp();
+	}
 
 	@Ignore()
 	@Override
@@ -87,18 +103,6 @@ public class BookmarksFolderSearchTest extends BaseSearchTestCase {
 	@Ignore()
 	@Override
 	@Test
-	public void testSearchMyEntries() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
-	public void testSearchRecentEntries() throws Exception {
-	}
-
-	@Ignore()
-	@Override
-	@Test
 	public void testSearchStatus() throws Exception {
 	}
 
@@ -120,25 +124,25 @@ public class BookmarksFolderSearchTest extends BaseSearchTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		BookmarksFolder parentFolder = (BookmarksFolder)parentBaseModel;
+		BookmarksFolder folder = (BookmarksFolder)parentBaseModel;
 
 		long folderId = BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 
-		if (parentFolder != null) {
-			folderId = parentFolder.getFolderId();
+		if (folder != null) {
+			folderId = folder.getFolderId();
 		}
 
-		return BookmarksTestUtil.addFolder(folderId, keywords, serviceContext);
+		return BookmarksTestUtil.addEntry(folderId, true, serviceContext);
 	}
 
 	@Override
 	protected void deleteBaseModel(long primaryKey) throws Exception {
-		BookmarksFolderServiceUtil.deleteFolder(primaryKey);
+		BookmarksEntryServiceUtil.deleteEntry(primaryKey);
 	}
 
 	@Override
 	protected Class<?> getBaseModelClass() {
-		return BookmarksFolder.class;
+		return BookmarksEntry.class;
 	}
 
 	@Override
@@ -157,13 +161,40 @@ public class BookmarksFolderSearchTest extends BaseSearchTestCase {
 		throws Exception {
 
 		return BookmarksTestUtil.addFolder(
-			BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			RandomTestUtil.randomString(), serviceContext);
+			group.getGroupId(), RandomTestUtil.randomString());
+	}
+
+	@Override
+	protected String getParentBaseModelClassName() {
+		return BookmarksFolder.class.getName();
 	}
 
 	@Override
 	protected String getSearchKeywords() {
-		return "Title";
+		return "Entry";
+	}
+
+	@Override
+	protected void moveBaseModelToTrash(long primaryKey) throws Exception {
+		BookmarksEntryServiceUtil.moveEntryToTrash(primaryKey);
+	}
+
+	@Override
+	protected void moveParentBaseModelToTrash(long primaryKey)
+		throws Exception {
+
+		BookmarksFolderServiceUtil.moveFolderToTrash(primaryKey);
+	}
+
+	@Override
+	protected long searchGroupEntriesCount(long groupId, long creatorUserId)
+		throws Exception {
+
+		Hits hits = BookmarksEntryServiceUtil.search(
+			groupId, creatorUserId, WorkflowConstants.STATUS_APPROVED,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		return hits.getLength();
 	}
 
 	@Override
@@ -172,11 +203,11 @@ public class BookmarksFolderSearchTest extends BaseSearchTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		BookmarksFolder folder = (BookmarksFolder)baseModel;
+		BookmarksEntry entry = (BookmarksEntry)baseModel;
 
-		folder.setName(keywords);
+		entry.setName(keywords);
 
-		return BookmarksFolderLocalServiceUtil.updateBookmarksFolder(folder);
+		return BookmarksTestUtil.updateEntry(entry, keywords);
 	}
 
 }

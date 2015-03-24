@@ -12,44 +12,42 @@
  * details.
  */
 
-package com.liferay.bookmarks.subscription;
+package com.liferay.bookmarks.subscription.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.bookmarks.constants.BookmarksConstants;
+import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.bookmarks.util.test.BookmarksTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
-import com.liferay.portlet.subscriptions.test.BaseSubscriptionBaseModelTestCase;
+import com.liferay.portlet.subscriptions.test.BaseSubscriptionLocalizedContentTestCase;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
 
 /**
  * @author Roberto Díaz
  */
+@RunWith(Arquillian.class)
 @Sync
-public class BookmarksSubscriptionBaseModelTest
-	extends BaseSubscriptionBaseModelTestCase {
+public class BookmarksSubscriptionLocalizedContentTest
+	extends BaseSubscriptionLocalizedContentTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousMailTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), SynchronousMailTestRule.INSTANCE);
 
 	@Override
 	protected long addBaseModel(long userId, long containerModelId)
@@ -71,39 +69,31 @@ public class BookmarksSubscriptionBaseModelTest
 	}
 
 	@Override
-	protected long addContainerModel(long userId, long containerModelId)
+	protected void addSubscriptionContainerModel(long containerModelId)
 		throws Exception {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), userId);
-
-		_folder = BookmarksFolderLocalServiceUtil.addFolder(
-			userId, containerModelId, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), serviceContext);
-
-		return _folder.getFolderId();
+		BookmarksFolderLocalServiceUtil.subscribeFolder(
+			user.getUserId(), group.getGroupId(), containerModelId);
 	}
 
 	@Override
-	protected void addSubscriptionBaseModel(long baseModelId) throws Exception {
-		BookmarksEntryLocalServiceUtil.subscribeEntry(
-			user.getUserId(), baseModelId);
+	protected String getPortletId() {
+		return BookmarksPortletKeys.BOOKMARKS;
 	}
 
 	@Override
-	protected void removeContainerModelResourceViewPermission()
-		throws Exception {
+	protected String getServiceName() {
+		return BookmarksConstants.SERVICE_NAME;
+	}
 
-		RoleTestUtil.removeResourcePermission(
-			RoleConstants.GUEST, BookmarksFolder.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(_folder.getFolderId()), ActionKeys.VIEW);
+	@Override
+	protected String getSubscriptionAddedBodyPreferenceName() {
+		return "emailEntryAddedBody";
+	}
 
-		RoleTestUtil.removeResourcePermission(
-			RoleConstants.SITE_MEMBER, BookmarksFolder.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(_folder.getFolderId()), ActionKeys.VIEW);
+	@Override
+	protected String getSubscriptionUpdatedBodyPreferenceName() {
+		return "emailEntryUpdatedBody";
 	}
 
 	@Override
@@ -125,7 +115,5 @@ public class BookmarksSubscriptionBaseModelTest
 			RandomTestUtil.randomString(), entry.getUrl(),
 			entry.getDescription(), serviceContext);
 	}
-
-	private BookmarksFolder _folder;
 
 }
