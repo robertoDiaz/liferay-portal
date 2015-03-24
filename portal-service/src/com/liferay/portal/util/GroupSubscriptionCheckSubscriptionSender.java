@@ -20,7 +20,7 @@ import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.Subscription;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.ResourcePermissionCheckerUtil;
+import com.liferay.portal.security.permission.ResourcePermissionUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 
@@ -51,7 +51,7 @@ public class GroupSubscriptionCheckSubscriptionSender
 				return true;
 			}
 
-			return ResourcePermissionCheckerUtil.containsResourcePermission(
+			return ResourcePermissionUtil.containsResourcePermission(
 				permissionChecker, _resourceName, subscription.getClassPK(),
 				ActionKeys.SUBSCRIBE);
 		}

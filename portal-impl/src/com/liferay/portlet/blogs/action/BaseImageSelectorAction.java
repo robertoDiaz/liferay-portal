@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.ResourcePermissionCheckerUtil;
+import com.liferay.portal.security.permission.ResourcePermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portlet.blogs.CoverImageNameException;
@@ -49,7 +49,7 @@ public abstract class BaseImageSelectorAction
 		throws PortalException {
 
 		boolean containsResourcePermission =
-			ResourcePermissionCheckerUtil.containsResourcePermission(
+			ResourcePermissionUtil.containsResourcePermission(
 				permissionChecker, BlogsPermission.RESOURCE_NAME, groupId,
 				ActionKeys.ADD_ENTRY);
 

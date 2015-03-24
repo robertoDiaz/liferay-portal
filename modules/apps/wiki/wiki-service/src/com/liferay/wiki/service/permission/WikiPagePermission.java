@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.wiki.constants.WikiPortletKeys;
@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Component;
 		"model.class.name=com.liferay.wiki.model.WikiPage"
 	}
 )
-public class WikiPagePermission implements BaseModelPermissionChecker {
+public class WikiPagePermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, long resourcePrimKey,

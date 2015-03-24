@@ -20,7 +20,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -33,7 +33,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 	property = {"model.class.name=com.liferay.portal.model.Group"}
 )
 public class GroupPermissionImpl
-	implements BaseModelPermissionChecker, GroupPermission {
+	implements BaseModelPermission, GroupPermission {
 
 	@Override
 	public void check(

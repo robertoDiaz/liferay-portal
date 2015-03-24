@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
-import com.liferay.portal.security.permission.BaseModelPermissionCheckerUtil;
+import com.liferay.portal.security.permission.BaseModelPermission;
+import com.liferay.portal.security.permission.BaseModelPermissionUtil;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -44,7 +44,7 @@ import java.util.List;
 		"model.class.name=com.liferay.portlet.messageboards.model.MBDiscussion"
 	}
 )
-public class MBDiscussionPermission implements BaseModelPermissionChecker {
+public class MBDiscussionPermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, long companyId, long groupId,
@@ -141,9 +141,8 @@ public class MBDiscussionPermission implements BaseModelPermissionChecker {
 			return true;
 		}
 
-		hasPermission =
-			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
-				permissionChecker, groupId, className, classPK, actionId);
+		hasPermission = BaseModelPermissionUtil.containsBaseModelPermission(
+			permissionChecker, groupId, className, classPK, actionId);
 
 		if (hasPermission != null) {
 			return hasPermission.booleanValue();

@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.shopping.model.ShoppingCategory;
@@ -34,7 +34,7 @@ import com.liferay.portlet.shopping.service.ShoppingItemLocalServiceUtil;
 		"model.class.name=com.liferay.portlet.shopping.model.ShoppingItem"
 	}
 )
-public class ShoppingItemPermission implements BaseModelPermissionChecker {
+public class ShoppingItemPermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, long itemId, String actionId)
