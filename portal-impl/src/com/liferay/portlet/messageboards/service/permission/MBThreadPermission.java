@@ -15,7 +15,7 @@
 package com.liferay.portlet.messageboards.service.permission;
 
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 
 /**
  * @author Brian Wing Shun Chan
@@ -26,5 +26,5 @@ import com.liferay.portal.security.permission.BaseModelPermissionChecker;
 	}
 )
 public class MBThreadPermission extends MBMessagePermission
-	implements BaseModelPermissionChecker {
+	implements BaseModelPermission {
 }

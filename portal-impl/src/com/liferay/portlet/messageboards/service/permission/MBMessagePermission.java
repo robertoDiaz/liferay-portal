@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
@@ -42,7 +42,7 @@ import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 		"model.class.name=com.liferay.portlet.messageboards.model.MBMessage"
 	}
 )
-public class MBMessagePermission implements BaseModelPermissionChecker {
+public class MBMessagePermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, long messageId,

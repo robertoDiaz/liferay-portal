@@ -17,7 +17,7 @@ package com.liferay.portal.security.permission;
 /**
  * @author Miguel Pastor
  */
-public interface ResourcePermissionChecker {
+public interface ResourcePermission {
 
 	public Boolean checkResource(
 		PermissionChecker permissionChecker, long classPK, String actionId);

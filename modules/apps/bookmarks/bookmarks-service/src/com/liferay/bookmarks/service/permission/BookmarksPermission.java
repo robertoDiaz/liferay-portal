@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.BaseResourcePermission;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.ResourcePermissionChecker;
+import com.liferay.portal.security.permission.ResourcePermission;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	property = {"resource.name=com.liferay.bookmarks"},
-	service = ResourcePermissionChecker.class
+	service = ResourcePermission.class
 )
 public class BookmarksPermission extends BaseResourcePermission {
 

@@ -28,7 +28,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -50,7 +50,7 @@ import java.util.List;
 	property = {"model.class.name=com.liferay.portal.model.Layout"}
 )
 public class LayoutPermissionImpl
-	implements BaseModelPermissionChecker, LayoutPermission {
+	implements BaseModelPermission, LayoutPermission {
 
 	@Override
 	public void check(

@@ -26,7 +26,7 @@ import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
@@ -42,8 +42,7 @@ import java.util.List;
 @OSGiBeanProperties(
 	property = {"model.class.name=com.liferay.portal.model.User"}
 )
-public class UserPermissionImpl
-	implements BaseModelPermissionChecker, UserPermission {
+public class UserPermissionImpl implements BaseModelPermission, UserPermission {
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #check(PermissionChecker,

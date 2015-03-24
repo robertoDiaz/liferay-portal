@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PropsValues;
 
@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Component;
 		"model.class.name=com.liferay.bookmarks.model.BookmarksEntry"
 	}
 )
-public class BookmarksEntryPermission implements BaseModelPermissionChecker {
+public class BookmarksEntryPermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, BookmarksEntry entry,

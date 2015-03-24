@@ -20,32 +20,33 @@ import com.liferay.registry.collections.ServiceTrackerMap;
 /**
  * @author Roberto Díaz
  */
-public class ResourcePermissionCheckerUtil {
+public class BaseModelPermissionUtil {
 
-	public static Boolean containsResourcePermission(
-		PermissionChecker permissionChecker, String className, long classPK,
-		String actionId) {
+	public static Boolean containsBaseModelPermission(
+		PermissionChecker permissionChecker, long groupId, String className,
+		long classPK, String actionId) {
 
-		ResourcePermissionChecker resourcePermissionChecker =
-			_serviceTrackerMap.getService(className);
+		BaseModelPermission baseModelPermission = _serviceTrackerMap.getService(
+			className);
 
-		if (resourcePermissionChecker == null) {
+		if (baseModelPermission == null) {
 			return null;
 		}
 
-		Boolean resource = resourcePermissionChecker.checkResource(
-			permissionChecker, classPK, actionId);
-
-		if (resource != null) {
-			return resource.booleanValue();
+		try {
+			baseModelPermission.checkBaseModel(
+				permissionChecker, groupId, classPK, actionId);
+		}
+		catch (Exception e) {
+			return false;
 		}
 
-		return null;
+		return true;
 	}
 
-	private static final ServiceTrackerMap<String, ResourcePermissionChecker>
+	private static final ServiceTrackerMap<String, BaseModelPermission>
 		_serviceTrackerMap = ServiceTrackerCollections.singleValueMap(
-			ResourcePermissionChecker.class, "resource.name");
+			BaseModelPermission.class, "model.class.name");
 
 	static {
 		_serviceTrackerMap.open();

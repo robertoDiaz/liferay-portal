@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 /**
  * @author Miguel Pastor
  */
-public interface BaseModelPermissionChecker {
+public interface BaseModelPermission {
 
 	public void checkBaseModel(
 			PermissionChecker permissionChecker, long groupId, long primaryKey,

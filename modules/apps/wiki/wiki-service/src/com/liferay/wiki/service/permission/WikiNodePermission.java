@@ -17,7 +17,7 @@ package com.liferay.wiki.service.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.BaseModelPermissionChecker;
+import com.liferay.portal.security.permission.BaseModelPermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.model.WikiNode;
@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 		"model.class.name=com.liferay.wiki.model.WikiNode"
 	}
 )
-public class WikiNodePermission implements BaseModelPermissionChecker {
+public class WikiNodePermission implements BaseModelPermission {
 
 	public static void check(
 			PermissionChecker permissionChecker, long nodeId, String actionId)

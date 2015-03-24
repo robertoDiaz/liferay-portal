@@ -26,8 +26,7 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 /**
  * @author Preston Crary
  */
-public abstract class BaseResourcePermission
-	implements ResourcePermissionChecker {
+public abstract class BaseResourcePermission implements ResourcePermission {
 
 	public static boolean contains(
 		PermissionChecker permissionChecker, String name, String portletId,
