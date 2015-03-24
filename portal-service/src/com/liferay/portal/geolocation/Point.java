@@ -20,14 +20,20 @@ package com.liferay.portal.geolocation;
 public class Point {
 
 	public Point(double latitude, double longitude) {
-		_latitude = latitude;
-		_longitude = longitude;
+		this(latitude, longitude, null, null);
 	}
 
 	public Point(double latitude, double longitude, Tooltip tooltip) {
-		this(latitude, longitude);
+		this(latitude, longitude, tooltip, null);
+	}
 
+	public Point(
+		double latitude, double longitude, Tooltip tooltip, String icon) {
+
+		_latitude = latitude;
+		_longitude = longitude;
 		_tooltip = tooltip;
+		_icon = icon;
 	}
 
 	public double getLatitude() {
@@ -40,6 +46,10 @@ public class Point {
 
 	public Tooltip getTooltip() {
 		return _tooltip;
+	}
+
+	public String getIcon() {
+		return _icon;
 	}
 
 	public static class Tooltip {
@@ -62,6 +72,7 @@ public class Point {
 
 	}
 
+	private final String _icon;
 	private final double _latitude;
 	private final double _longitude;
 	private final Tooltip _tooltip;

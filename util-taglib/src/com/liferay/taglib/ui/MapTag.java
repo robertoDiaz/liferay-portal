@@ -129,10 +129,10 @@ public class MapTag extends IncludeTag {
 
 			Point.Tooltip tooltip = point.getTooltip();
 
-			if (tooltip != null) {
-				JSONObject propertiesJSONObject =
-					JSONFactoryUtil.createJSONObject();
+			JSONObject propertiesJSONObject =
+				JSONFactoryUtil.createJSONObject();
 
+			if (tooltip != null) {
 				String title = tooltip.getTitle();
 
 				if (Validator.isNotNull(title)) {
@@ -146,6 +146,12 @@ public class MapTag extends IncludeTag {
 				}
 
 				featureJSONObject.put("properties", propertiesJSONObject);
+			}
+
+			String icon = point.getIcon();
+
+			if (Validator.isNotNull(icon)) {
+				propertiesJSONObject.put("icon", icon);
 			}
 
 			featureJSONArray.put(featureJSONObject);

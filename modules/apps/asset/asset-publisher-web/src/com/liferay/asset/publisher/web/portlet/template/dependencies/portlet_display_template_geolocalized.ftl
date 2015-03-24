@@ -15,11 +15,7 @@
 	<#assign mapsAPIProvider = companyPortletPreferences.getValue("mapsAPIProvider", "Google") />
 </#if>
 
-<#assign featureCollectionJSONObject = jsonFactoryUtil.createJSONObject() />
-
-<@liferay.silently featureCollectionJSONObject.put("type", "FeatureCollection") />
-
-<#assign featureJSONArray = jsonFactoryUtil.createJSONArray() />
+<#assign points = geolocationUtil.createPointsArray />
 
 <#list entries as entry>
 	<#assign assetRenderer = entry.getAssetRenderer() />
@@ -39,33 +35,11 @@
 	</#list>
 
 	<#list coordinatesJSONObjects as coordinatesJSONObject>
-		<#assign featureJSONObject = jsonFactoryUtil.createJSONObject() />
-
-		<@liferay.silently featureJSONObject.put("type", "Feature") />
-
-		<#assign geometryJSONObject = jsonFactoryUtil.createJSONObject() />
-
-		<@liferay.silently geometryJSONObject.put("type", "Point") />
-
-		<#assign coordinatesJSONArray = jsonFactoryUtil.createJSONArray() />
-
-		<@liferay.silently coordinatesJSONArray.put(coordinatesJSONObject.getDouble("longitude")) />
-
-		<@liferay.silently coordinatesJSONArray.put(coordinatesJSONObject.getDouble("latitude")) />
-
-		<@liferay.silently geometryJSONObject.put("coordinates", coordinatesJSONArray) />
-
-		<@liferay.silently featureJSONObject.put("geometry", geometryJSONObject) />
-
-		<#assign propertiesJSONObject = jsonFactoryUtil.createJSONObject() />
-
-		<@liferay.silently propertiesJSONObject.put("title", assetRenderer.getTitle(locale)) />
-
 		<#assign entryAbstract>
 			<@getAbstract asset = entry />
 		</#assign>
 
-		<@liferay.silently propertiesJSONObject.put("abstract", entryAbstract) />
+		<#assign tooltip = geolocationUtil.createTooltip(assetRenderer.getTitle(locale), entryAbstract) />
 
 		<#if mapsAPIProvider = "Google">
 			<#assign
@@ -78,19 +52,16 @@
 			/>
 
 			<#if images?keys?seq_contains(entry.getClassName())>
-				<@liferay.silently propertiesJSONObject.put("icon", images[entry.getClassName()]) />
+				<#assign points = points + geolocationUtil.createPoint(coordinatesJSONObject.getDouble("latitude"), coordinatesJSONObject.getDouble("longitude"), tooltip, images[entry.getClassName()]) />
 			<#else>
-				<@liferay.silently propertiesJSONObject.put("icon", images["default"]) />
+				<#assign points = points +geolocationUtil.createPoint(coordinatesJSONObject.getDouble("latitude"), coordinatesJSONObject.getDouble("longitude"), tooltip, images["default"]) />
 			</#if>
+		<#else>
+			<#assign points = points + geolocationUtil.createPoint(coordinatesJSONObject.getDouble("latitude"), coordinatesJSONObject.getDouble("longitude"), tooltip) />
 		</#if>
-
-		<@liferay.silently featureJSONObject.put("properties", propertiesJSONObject) />
-
-		<@liferay.silently featureJSONArray.put(featureJSONObject) />
 	</#list>
 </#list>
 
-<@liferay.silently featureCollectionJSONObject.put("features", featureJSONArray) />
 
 <style type="text/css">
 	.asset-entry-abstract {
@@ -125,7 +96,7 @@
 	<#assign apiKey = companyPortletPreferences.getValue("googleMapsAPIKey", "") />
 </#if>
 
-<@liferay_ui["map"] apiKey="${apiKey}" name='Map' points="${featureCollectionJSONObject}" />
+<@liferay_ui["map"] apiKey="${apiKey}" name='Map' points="${points.toArray}" />
 
 <@liferay_aui.script use="liferay-map-base">
 	var map = Liferay.component('<@liferay_portlet.namespace />Map');

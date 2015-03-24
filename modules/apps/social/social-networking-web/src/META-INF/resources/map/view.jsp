@@ -95,7 +95,7 @@ else if (userProfileMap) {
 	users.add(user2);
 }
 
-List<Point> points = new ArrayList<>();
+List<Point> points = new ArrayList<Point>();
 
 for (int i = 0; i < users.size(); i++) {
 	User mapUser = users.get(i);
@@ -148,7 +148,7 @@ if (maximized) {
 <div class="<%= maximized ? "maximized-map" : "default-map" %>">
 	<c:choose>
 		<c:when test="<%= !points.isEmpty() %>">
-			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points= "<%= points.toArray() %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
+			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" points= "<%= points.toArray(new Point[points.size()]) %>" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />
 		</c:when>
 		<c:otherwise>
 			<liferay-ui:map apiKey="<%= groupGoogleMapsAPIKey %>" controls="MapControls.TYPE, MapControls.ZOOM" latitude="<%= latitude %>" longitude="<%= longitude %>" name="map" provider="<%= groupMapsAPIProvider %>" zoom="<%= zoom %>" />

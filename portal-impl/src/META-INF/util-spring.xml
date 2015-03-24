@@ -373,6 +373,11 @@
 			<bean class="com.liferay.portal.util.FriendlyURLNormalizerImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.util.GeolocationUtil" class="com.liferay.portal.kernel.util.GeolocationUtil">
+		<property name="geolocation">
+			<bean class="com.liferay.portal.util.GeolocationImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.util.HashCodeFactoryUtil" class="com.liferay.portal.kernel.util.HashCodeFactoryUtil">
 		<property name="hashCodeFactory">
 			<bean class="com.liferay.portal.util.HashCodeFactoryImpl" />

@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.ArrayUtil_IW;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil_IW;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.GeolocationUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GetterUtil_IW;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -510,6 +511,12 @@ public class TemplateContextHelper {
 		// Getter util
 
 		variables.put("getterUtil", GetterUtil_IW.getInstance());
+
+		// Geolocation util
+
+
+
+		variables.put("geolocationUtil", GeolocationUtil.getGeolocation());
 
 		// Html util
 
