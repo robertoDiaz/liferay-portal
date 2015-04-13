@@ -25,7 +25,9 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.document.selector.web.search.FileEntryDisplayTerms" %><%@
+<%@ page import="com.liferay.document.selector.ItemSelectorViewRenderer" %><%@
+page import="com.liferay.document.selector.web.portlet.ItemSelectorViewRenderers" %><%@
+page import="com.liferay.document.selector.web.search.FileEntryDisplayTerms" %><%@
 page import="com.liferay.document.selector.web.search.FileEntrySearch" %><%@
 page import="com.liferay.document.selector.web.util.DocumentSelectorUtil" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
@@ -35,7 +37,10 @@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.log.Log" %><%@
 page import="com.liferay.portal.kernel.log.LogFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
+page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse" %><%@
 page import="com.liferay.portal.kernel.repository.model.Folder" %><%@
+page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
+page import="com.liferay.portal.kernel.repository.model.FileVersion" %><%@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
