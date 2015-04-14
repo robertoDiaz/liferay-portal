@@ -21,7 +21,8 @@
 
 	<div class="image-info hide">
 		<liferay-ui:tabs
-			names="file info,versions"
+			names="File info,versions"
+			param="<%= String.valueOf(fileEntry.getFileEntryId()) %>"
 			refresh="<%= false %>"
 		>
 

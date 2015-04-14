@@ -73,6 +73,8 @@ AUI.add(
 							'.' + CSS_FOOTER_CONTROL,
 							instance
 						);
+
+						Liferay.after('showTab', instance._syncImageInfoUI, instance);
 					},
 
 					renderUI: function() {
