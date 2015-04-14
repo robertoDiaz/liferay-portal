@@ -120,18 +120,13 @@ else {
 		<portlet:param name="struts_action" value="/blogs/cover_image_selector" />
 	</portlet:actionURL>
 
-	<c:choose>
-	<c:when test='<%= !displayStyle.equals("icon") %>'>
-	<div class="drop-zone">
-		</c:when>
-
-		<c:otherwise>
-		<div class="col-md-3 preview-content drop-zone">
-			</c:otherwise>
-			</c:choose>
-
-			<liferay-ui:image-selector draggableImage="vertical" fileEntryId="<%= 0 %>" maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.BLOGS_IMAGE_COVER_MAX_SIZE) %>" paramName="blogImageFileEntry" uploadURL="<%= coverImageSelectorURL %>" validExtensions='<%= StringUtil.merge(imageExtensions, ", ") %>' />
-		</div>
+	<%
+		String dropContainerClass = displayStyle.equals("icon") ? "drop-zone preview-content" : "drop-zone";
+		Integer dropContainerWidth = displayStyle.equals("icon") ? 33 : 100;
+	%>
+	<aui:col cssClass="<%= dropContainerClass %>" width="<%= dropContainerWidth %>">
+		<liferay-ui:image-selector draggableImage="vertical" fileEntryId="<%= 0 %>" maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.BLOGS_IMAGE_COVER_MAX_SIZE) %>" paramName="blogImageFileEntry" uploadURL="<%= coverImageSelectorURL %>" validExtensions='<%= StringUtil.merge(imageExtensions, ", ") %>' />
+	</aui:col>
 
 	<c:choose>
 		<c:when test='<%= !displayStyle.equals("list") %>'>
@@ -169,20 +164,21 @@ else {
 
 	<liferay-ui:search-paginator searchContainer="<%= dlSearchContainer %>" />
 </div>
-<div id="<%= tabId %>ImageViewerPreview" class="lfr-image-viewer"></div>
+<div class="lfr-image-viewer" id="<%= tabId %>ImageViewerPreview"></div>
 
 <aui:script use="liferay-image-viewer">
-	var viewer = new Liferay.ImageViewer(
+	var viewer = new A.LiferayImageViewer(
 		{
 			btnCloseCaption:'<%= tabName %>',
 			captionFromTitle: true,
 			centered: true,
 			circular: true,
+			height: '75%',
+			infoTemplate: '{current} of {total}',
 			links: '#<%= tabId %>ImageSelectorContainer a.image-preview',
 			playing: false,
 			preloadAllImages: false,
 			preloadNeighborImages: true,
-			infoTemplate: '{current} of {total}',
 			showPlayer: false,
 			zIndex: 1
 		}

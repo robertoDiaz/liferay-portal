@@ -1,16 +1,22 @@
+/* TODO separate structure + skin */
+
 .lfr-image-viewer {
+	.image-viewer-base {
+		outline: none;
+	}
+
 	.image-viewer-mask {
 		opacity: 1;
 	}
 
 	.image-viewer-base-image-container {
 		.image-viewer-base-image-info {
-			width: 0;
-			float: right;
 			color: #FFF;
+			float: right;
 			opacity: 0;
 			text-align: left;
-			transition: width .8s, opacity .1s ease-out .7s;
+			transition: width 0.8s, opacity 0.1s ease-out 0.7s;
+			width: 0;
 
 			dt {
 				color: #FFF;
@@ -22,25 +28,27 @@
 			}
 
 			&.show-info {
-				width: 33%;
 				opacity: 1;
+				width: 33%;
 			}
 		}
 	}
 
 	.image-viewer-footer-content {
-		padding: 0 20px;
-		position: relative;
-		text-align: center;
+		bottom: 15px;
 		color: #FFF;
+		padding: 0 20px;
+		position: fixed;
+		text-align: center;
+		width: 100%;
 
 		.image-viewer-caption {
 			position: absolute;
 		}
 
 		.image-viewer-footer-control {
-			margin: 0 10px;
 			color: #777;
+			margin: 0 10px;
 		}
 
 		.image-viewer-thumbnails {
@@ -57,14 +65,19 @@
 }
 
 /* TODO */
+
 .image-viewer-close {
 	left: 20px;
 
-	h4, span {
+	h4 {
+		color: #FFF;
 		float: left;
+		text-shadow: none;
 	}
+
 	span {
-		margin-top: 5px;
+		float: left;
 		margin-right: 10px;
+		margin-top: 5px;
 	}
 }

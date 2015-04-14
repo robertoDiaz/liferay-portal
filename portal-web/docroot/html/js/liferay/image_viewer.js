@@ -12,7 +12,7 @@ AUI.add(
 			CSS_IMAGE_INFO = A.getClassName('image', 'viewer', 'base', 'image', 'info'),
 			CSS_LOADING_ICON = A.getClassName('image', 'viewer', 'base', 'loading', 'icon');
 
-		var LfrImageViewer = A.Component.create(
+		var LiferayImageViewer = A.Component.create(
 			{
 				ATTRS: {
 					btnCloseCaption: {
@@ -53,12 +53,14 @@ AUI.add(
 
 						instance.TPL_CONTROL_LEFT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_LEFT +'"><span class="glyphicon glyphicon-chevron-left"></span></a>';
 						instance.TPL_CONTROL_RIGHT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_RIGHT +'"><span class="glyphicon glyphicon-chevron-right"></span></a>';
+
+						Liferay.fire('imageselector:toggleButton', {disabled: true});
 					},
 
 					bindUI: function() {
 						var instance = this;
 
-						LfrImageViewer.superclass.bindUI.apply(instance, arguments);
+						LiferayImageViewer.superclass.bindUI.apply(instance, arguments);
 
 						instance._footerButtons.delegate(
 							'click',
@@ -115,6 +117,8 @@ AUI.add(
 						instance._syncCaptionUI();
 						instance._syncInfoUI();
 						instance._syncImageInfoUI();
+
+						Liferay.fire('imageselector:toggleButton', {disabled: false});
 					},
 
 					_syncImageInfoUI: function() {
@@ -164,7 +168,7 @@ AUI.add(
 			}
 		);
 
-		Liferay.ImageViewer = LfrImageViewer;
+		A.LiferayImageViewer = LiferayImageViewer;
 	},
 	'',
 	{
