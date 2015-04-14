@@ -49,6 +49,8 @@ public class DocumentSelectorUtil {
 		String tabs1Names = ParamUtil.getString(request, "tabs1Names");
 
 		if (Validator.isNotNull(tabs1Names)) {
+			tabs1Names += ",blog_images"; // TODO pruebas
+
 			return StringUtil.split(tabs1Names);
 		}
 
