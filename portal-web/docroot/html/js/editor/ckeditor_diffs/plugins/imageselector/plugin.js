@@ -13,38 +13,24 @@
 					{
 						canUndo: false,
 						exec: function(editor) {
-							var dialog;
+							AUI().use(
+								'liferay-item-selector-dialog',
+								function(A) {
+									var opener = new A.LiferayItemSelectorDialog(
+										{
+											title: 'Image selector',
+											url: editor.config.filebrowserImageBrowseUrl
+										}
+									);
 
-							Liferay.Util.openWindow(
-								{
-									constraint: true,
-									dialog: {
-										destroyOnHide: true,
-										'toolbars.footer': [
-											{
-												label: 'Add',
-												cssClass: 'btn-primary',
-												on: {
-													click: function() {
-														console.log('DONE');
-													}
-												}
-											},
-											{
-												label: 'cancel',
-												on: {
-													click: function() {
-														imageSelectorDialog.hide();
-													}
-												}
-											}
-										]
-									},
-									title: 'Image Selector',
-									uri: editor.config.filebrowserImageBrowseUrl
-								},
-								function(dialog) {
-									imageSelectorDialog = dialog;
+									opener.on(
+										'addImage',
+										function(event) {
+											var el = CKEDITOR.dom.element.createFromHtml('<img src="' + event.src + '">');
+
+											editor.insertElement(el);
+										}
+									);
 								}
 							);
 						}
@@ -57,8 +43,7 @@
 						{
 							command: pluginName,
 							icon: themeDisplay.getPathJavaScript() + '/editor/ckeditor/plugins/imageselector/assets/image.png',
-							label: editor.lang.image.linkTab,
-							title: editor.lang.image.linkTab
+							label: editor.lang.image.linkTab
 						}
 					);
 				}

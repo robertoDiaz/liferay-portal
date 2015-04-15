@@ -3,14 +3,36 @@ AUI.add(
 	function(A) {
 		var Lang = A.Lang;
 
-		var CSS_FOOTER_BUTTONS = A.getClassName('image', 'viewer', 'footer', 'buttons'),
-			CSS_FOOTER_CONTROL = A.getClassName('image', 'viewer', 'footer', 'control'),
-			CSS_FOOTER_CONTROL_LEFT = A.getClassName('image', 'viewer', 'footer', 'control', 'left'),
-			CSS_FOOTER_CONTROL_RIGHT = A.getClassName('image', 'viewer', 'footer', 'control', 'rigth'),
-			CSS_IMAGE_CONTAINER = A.getClassName('image', 'viewer', 'base', 'image', 'container'),
-			CSS_IMAGE_CURRENT_CONTAINER = A.getClassName('image', 'viewer', 'base', 'current', 'image'),
-			CSS_IMAGE_INFO = A.getClassName('image', 'viewer', 'base', 'image', 'info'),
-			CSS_LOADING_ICON = A.getClassName('image', 'viewer', 'base', 'loading', 'icon');
+		var CSS_FOOTER_BUTTONS = A.getClassName('image', 'viewer', 'footer', 'buttons');
+
+		var CSS_FOOTER_CONTROL = A.getClassName('image', 'viewer', 'footer', 'control');
+
+		var	CSS_FOOTER_CONTROL_LEFT = A.getClassName('image', 'viewer', 'footer', 'control', 'left');
+
+		var CSS_FOOTER_CONTROL_RIGHT = A.getClassName('image', 'viewer', 'footer', 'control', 'rigth');
+
+		var CSS_IMAGE_CONTAINER = A.getClassName('image', 'viewer', 'base', 'image', 'container');
+
+		var	CSS_IMAGE_CURRENT_CONTAINER = A.getClassName('image', 'viewer', 'base', 'current', 'image');
+
+		var	CSS_IMAGE_INFO = A.getClassName('image', 'viewer', 'base', 'image', 'info');
+
+		var	CSS_LOADING_ICON = A.getClassName('image', 'viewer', 'base', 'loading', 'icon');
+
+		var EVENT_CURRENT_IMAGE = 'itemSelectorDialog:currentImage';
+
+		var EVENT_TOGGLE_BUTTON = 'itemSelectorDialog:toggleButton';
+
+		var TPL_CLOSE = '<button class="close image-viewer-base-control image-viewer-close" type="button"><span class="glyphicon glyphicon-chevron-left"></span><h4>{0}</h4></button>';
+
+		var TPL_CONTROL_LEFT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_LEFT + '"><span class="glyphicon glyphicon-chevron-left"></span></a>';
+
+		var TPL_CONTROL_RIGHT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_RIGHT + '"><span class="glyphicon glyphicon-chevron-right"></span></a>';
+
+		var TPL_FOOTER_BUTTONS = '<div class="' + CSS_FOOTER_BUTTONS + '"><span class="glyphicon glyphicon-info-sign"></span></div>';
+
+		var TPL_IMAGE_CONTAINER = '<div class="' + CSS_IMAGE_CONTAINER + '"> <div class="' + CSS_IMAGE_INFO + '"></div>' +
+			'<span class="glyphicon glyphicon-time ' + CSS_LOADING_ICON + '"></span></div>';
 
 		var LiferayImageViewer = A.Component.create(
 			{
@@ -18,16 +40,6 @@ AUI.add(
 					btnCloseCaption: {
 						validator: Lang.isString,
 						value: ''
-					},
-
-					TPL_CLOSE : {
-						validator: Lang.isString,
-						value: '<button class="close image-viewer-base-control image-viewer-close" type="button"><span class="glyphicon glyphicon-chevron-left"></span><h4>{0}</h4></button>'
-					},
-
-					TPL_FOOTER_BUTTONS: {
-						validator: Lang.isString,
-						value: '<div class="' + CSS_FOOTER_BUTTONS + '"><span class="glyphicon glyphicon-info-sign"></span></div>'
 					}
 				},
 
@@ -41,42 +53,7 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						var btnCloseTemplate = Lang.sub(instance.get('TPL_CLOSE'), [instance.get('btnCloseCaption')]);
-
-						instance.TPL_CLOSE = btnCloseTemplate || instance.TPL_CLOSE;
-
-						instance.TPL_FOOTER_BUTTONS = instance.get('TPL_FOOTER_BUTTONS') || instance.TPL_FOOTER_BUTTONS;
-
-						//OTRA forma de hacer esto?
-						instance.TPL_IMAGE_CONTAINER = '<div class="' + CSS_IMAGE_CONTAINER + '"> <div class="' + CSS_IMAGE_INFO + '"></div>' +
-						'<span class="glyphicon glyphicon-time ' + CSS_LOADING_ICON + '"></span></div>';
-
-						instance.TPL_CONTROL_LEFT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_LEFT +'"><span class="glyphicon glyphicon-chevron-left"></span></a>';
-						instance.TPL_CONTROL_RIGHT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_RIGHT +'"><span class="glyphicon glyphicon-chevron-right"></span></a>';
-
-						Liferay.fire('imageselector:toggleButton', {disabled: true});
-					},
-
-					bindUI: function() {
-						var instance = this;
-
-						LiferayImageViewer.superclass.bindUI.apply(instance, arguments);
-
-						instance._footerButtons.delegate(
-							'click',
-							instance._onInfoClick,
-							'.glyphicon-info-sign',
-							instance
-						);
-
-						instance.footerNode.delegate(
-							'click',
-							instance._onControlsClick,
-							'.' + CSS_FOOTER_CONTROL,
-							instance
-						);
-
-						Liferay.after('showTab', instance._syncImageInfoUI, instance);
+						instance.TPL_IMAGE_CONTAINER = TPL_IMAGE_CONTAINER;
 					},
 
 					renderUI: function() {
@@ -85,6 +62,37 @@ AUI.add(
 						A.ImageViewer.superclass.renderUI.apply(instance, arguments);
 
 						instance._renderFooter();
+
+						instance._fire(
+							EVENT_TOGGLE_BUTTON,
+							{
+								disabled: true
+							}
+						);
+					},
+
+					bindUI: function() {
+						var instance = this;
+
+						LiferayImageViewer.superclass.bindUI.apply(instance, arguments);
+
+						instance._eventHandles = [
+							instance.footerNode.delegate('click', instance._onControlsClick, '.' + CSS_FOOTER_CONTROL, instance),
+							instance._footerButtons.delegate('click', instance._onInfoClick, '.glyphicon-info-sign', instance),
+							Liferay.after('showTab', instance._syncImageInfoUI, instance),
+							A.after(this._toggleAddButton, this, '_uiSetVisible')
+						];
+
+					},
+
+					destructor: function() {
+						var instance = this;
+
+						(new A.EventHandle(instance._eventHandles)).detach();
+					},
+
+					_fire: function(event, details) {
+						Liferay.Util.getOpener().Liferay.fire(event, details);
 					},
 
 					_onControlsClick: function(event) {
@@ -104,9 +112,40 @@ AUI.add(
 					_onInfoClick: function(event) {
 						var instance = this;
 
-						event.preventDefault();
-
 						instance.get('contentBox').all('.' + CSS_IMAGE_CONTAINER + ' .' + CSS_IMAGE_INFO).toggleClass('show-info');
+					},
+
+					_renderControls: function() {
+						var instance = this;
+						var body = A.one('body');
+
+						var btnCloseTemplate = Lang.sub(TPL_CLOSE, [instance.get('btnCloseCaption')]);
+
+						instance._closeEl = A.Node.create(btnCloseTemplate);
+						body.append(instance._closeEl);
+					},
+
+					_renderFooter: function() {
+						var instance = this;
+
+						var container = A.Node.create(instance.TPL_FOOTER_CONTENT);
+
+						instance.setStdModContent('footer', container);
+
+						instance._captionEl = A.Node.create(instance.TPL_CAPTION);
+						instance._captionEl.selectable();
+						container.append(instance._captionEl);
+
+						container.append(A.Node.create(TPL_CONTROL_LEFT));
+
+						instance._infoEl = A.Node.create(instance.TPL_INFO);
+						instance._infoEl.selectable();
+						container.append(instance._infoEl);
+
+						container.append(A.Node.create(TPL_CONTROL_RIGHT));
+
+						instance._footerButtons = A.Node.create(TPL_FOOTER_BUTTONS);
+						container.append(instance._footerButtons);
 					},
 
 					_showCurrentImage: function() {
@@ -118,7 +157,14 @@ AUI.add(
 						instance._syncInfoUI();
 						instance._syncImageInfoUI();
 
-						Liferay.fire('imageselector:toggleButton', {disabled: false});
+						var currentImageSrc = instance._getCurrentImage().get('src');
+
+						instance._fire(
+							EVENT_CURRENT_IMAGE,
+							{
+								src: currentImageSrc
+							}
+						);
 					},
 
 					_syncImageInfoUI: function() {
@@ -135,34 +181,15 @@ AUI.add(
 						}
 					},
 
-					_renderControls: function() {
-						var body = A.one('body');
-
-						this._closeEl = A.Node.create(this.TPL_CLOSE);
-						body.append(this._closeEl);
-					},
-
-					_renderFooter: function() {
+					_toggleAddButton: function() {
 						var instance = this;
 
-						var container = A.Node.create(instance.TPL_FOOTER_CONTENT);
-
-						instance.setStdModContent('footer', container);
-
-						instance._captionEl = A.Node.create(instance.TPL_CAPTION);
-						instance._captionEl.selectable();
-						container.append(instance._captionEl);
-
-						container.append(A.Node.create(instance.TPL_CONTROL_LEFT));
-
-						instance._infoEl = A.Node.create(instance.TPL_INFO);
-						instance._infoEl.selectable();
-						container.append(instance._infoEl);
-
-						container.append(A.Node.create(instance.TPL_CONTROL_RIGHT));
-
-						instance._footerButtons = A.Node.create(instance.TPL_FOOTER_BUTTONS);
-						container.append(instance._footerButtons);
+						instance._fire(
+							EVENT_TOGGLE_BUTTON,
+							{
+								disabled: !instance.get('visible')
+							}
+						);
 					}
 				}
 			}

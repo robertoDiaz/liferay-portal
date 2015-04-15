@@ -498,6 +498,9 @@
 							'sortable'
 						]
 					},
+					'liferay-item-selector-dialog': {
+						path: 'item_selector_dialog.js'
+					},
 					'liferay-language': {
 						path: 'language.js'
 					},
