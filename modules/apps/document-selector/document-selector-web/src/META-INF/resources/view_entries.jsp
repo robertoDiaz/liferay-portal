@@ -122,10 +122,19 @@ else {
 
 	<%
 		String dropContainerClass = displayStyle.equals("icon") ? "drop-zone preview-content" : "drop-zone";
-		Integer dropContainerWidth = displayStyle.equals("icon") ? 33 : 100;
+		Integer dropContainerWidth = displayStyle.equals("icon") ? 25 : 100;
 	%>
 	<aui:col cssClass="<%= dropContainerClass %>" width="<%= dropContainerWidth %>">
-		<liferay-ui:image-selector draggableImage="vertical" fileEntryId="<%= 0 %>" maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.BLOGS_IMAGE_COVER_MAX_SIZE) %>" paramName="blogImageFileEntry" uploadURL="<%= coverImageSelectorURL %>" validExtensions='<%= StringUtil.merge(imageExtensions, ", ") %>' />
+		<div class="drop-zone">
+			<a class="browse-image btn btn-primary" href="javascript:;" id="<%= tabId %>selectFile"><liferay-ui:message key="select-file" />
+			</a>
+
+			<input type="file" style="visibility: hidden; width: 0; height: 0" id="<%= tabId %>inputFile"/>
+
+			<a id="<%= tabId %>image" href=""></a>
+
+			<p>Upload an image by dropping it right here or by pressing this plus icon</p>
+		</div>
 	</aui:col>
 
 	<c:choose>
@@ -165,8 +174,9 @@ else {
 	<liferay-ui:search-paginator searchContainer="<%= dlSearchContainer %>" />
 </div>
 <div class="lfr-image-viewer" id="<%= tabId %>ImageViewerPreview"></div>
+<div class="lfr-image-viewer" id="<%= tabId %>LocalImagePreview"></div>
 
-<aui:script use="liferay-image-viewer">
+<aui:script sandbox="<%= true %>" use="liferay-image-viewer">
 	var viewer = new A.LiferayImageViewer(
 		{
 			btnCloseCaption:'<%= tabName %>',
@@ -183,4 +193,51 @@ else {
 			zIndex: 1
 		}
 	).render('#<%= tabId %>ImageViewerPreview');
+
+	//--------------------------------------------
+
+	var selectFileNode = $('#<%= tabId %>selectFile');
+	var fileInputNode = $('#<%= tabId %>inputFile');
+
+	selectFileNode.on('click', function(){
+		fileInputNode.click();
+	});
+
+	fileInputNode.on('change', function(evt) {
+		var file = evt.target.files[0];
+
+		var reader = new FileReader();
+
+		reader.onload = function(event) {
+			var imageSrc = event.target.result;
+
+			var imageLinkNode = $('#<%= tabId %>image');
+			imageLinkNode.attr('href', imageSrc);
+			imageLinkNode.attr('title', file.name);
+
+			//TODO pintar capa de info
+
+			var customViewer = new A.LiferayImageViewer(
+				{
+					btnCloseCaption:'<%= tabName %>',
+					captionFromTitle: true,
+					centered: true,
+					height: '75%',
+					infoTemplate: '',
+					links: '#<%= tabId %>image',
+					playing: false,
+					preloadAllImages: true,
+					renderControls: false,
+					showPlayer: false,
+					zIndex: 1
+				}
+			).render('#<%= tabId %>LocalImagePreview');
+
+			customViewer.show();
+
+		};
+
+		reader.readAsDataURL(file);
+	});
+
 </aui:script>

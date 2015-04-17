@@ -23,7 +23,7 @@ AUI.add(
 
 		var EVENT_TOGGLE_BUTTON = 'itemSelectorDialog:toggleButton';
 
-		var TPL_CLOSE = '<button class="close image-viewer-base-control image-viewer-close" type="button"><span class="glyphicon glyphicon-chevron-left"></span><h4>{0}</h4></button>';
+		var TPL_CLOSE = '<button class="close image-viewer-base-control image-viewer-close lfr-image-viewer" type="button"><span class="glyphicon glyphicon-chevron-left"></span><h4>{0}</h4></button>';
 
 		var TPL_CONTROL_LEFT = '<a href="#" class="' + CSS_FOOTER_CONTROL + ' ' + CSS_FOOTER_CONTROL_LEFT + '"><span class="glyphicon glyphicon-chevron-left"></span></a>';
 
@@ -40,6 +40,11 @@ AUI.add(
 					btnCloseCaption: {
 						validator: Lang.isString,
 						value: ''
+					},
+
+					renderControls: {
+						validator: Lang.isBoolean,
+						value: true
 					}
 				},
 
@@ -136,13 +141,19 @@ AUI.add(
 						instance._captionEl.selectable();
 						container.append(instance._captionEl);
 
-						container.append(A.Node.create(TPL_CONTROL_LEFT));
+						var renderControls = instance.get('renderControls');
+
+						if (renderControls) {
+							container.append(A.Node.create(TPL_CONTROL_LEFT));
+						}
 
 						instance._infoEl = A.Node.create(instance.TPL_INFO);
 						instance._infoEl.selectable();
 						container.append(instance._infoEl);
 
-						container.append(A.Node.create(TPL_CONTROL_RIGHT));
+						if (renderControls) {
+							container.append(A.Node.create(TPL_CONTROL_RIGHT));
+						}
 
 						instance._footerButtons = A.Node.create(TPL_FOOTER_BUTTONS);
 						container.append(instance._footerButtons);

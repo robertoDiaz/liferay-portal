@@ -14,7 +14,7 @@
  */
 --%>
 
-<aui:col cssClass="preview-content" width="<%= 33 %>">
+<aui:col cssClass="preview-content" width="<%= 25 %>">
 	<a class="image-preview" href="<%= DLUtil.getImagePreviewURL(fileEntry, themeDisplay) %>" title="<%= imageTitle %>">
 		<img align="left" src="<%= DLUtil.getPreviewURL(fileEntry, fileEntry.getLatestFileVersion(), themeDisplay, "&imageThumbnail=2") %>" />
 	</a>

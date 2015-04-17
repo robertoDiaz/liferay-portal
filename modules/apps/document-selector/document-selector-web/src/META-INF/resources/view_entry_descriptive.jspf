@@ -24,7 +24,7 @@
 				<%= imageTitle %>
 			</a>
 		</p>
-		<p>
+		<div>
 			<small>
 				<dl>
 					<dt><liferay-ui:message key="status" />:</dt>
@@ -35,6 +35,6 @@
 
 				</dl>
 			</small>
-		</p>
+		</div>
 	</div>
 </div>
