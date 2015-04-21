@@ -132,6 +132,23 @@ public class RepositoryServiceImpl extends RepositoryServiceBaseImpl {
 	}
 
 	@Override
+	public com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+			long folderId, long fileEntryId, long fileVersionId,
+			long fileShortcutId)
+		throws PortalException {
+
+		com.liferay.portal.kernel.repository.Repository repositoryImpl =
+			repositoryLocalService.getRepositoryImpl(
+				folderId, fileEntryId, fileVersionId);
+
+		checkRepository(
+			repositoryImpl.getRepositoryId(), folderId, fileEntryId,
+			fileVersionId);
+
+		return repositoryImpl;
+	}
+
+	@Override
 	public String[] getSupportedConfigurations(long classNameId) {
 		try {
 			ClassName className = classNameLocalService.getClassName(
