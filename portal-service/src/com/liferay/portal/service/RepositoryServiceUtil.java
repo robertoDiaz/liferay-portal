@@ -98,6 +98,14 @@ public class RepositoryServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+		long folderId, long fileEntryId, long fileVersionId, long fileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getRepositoryImpl(folderId, fileEntryId, fileVersionId,
+			fileShortcutId);
+	}
+
+	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRepositoryImpl(repositoryId);

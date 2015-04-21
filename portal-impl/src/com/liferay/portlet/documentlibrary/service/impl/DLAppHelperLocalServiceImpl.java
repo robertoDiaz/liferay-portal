@@ -977,10 +977,12 @@ public class DLAppHelperLocalServiceImpl
 
 	@Override
 	public void restoreFileShortcutFromTrash(
-			long userId, DLFileShortcut dlFileShortcut)
+			long userId, FileShortcut fileShortcut)
 		throws PortalException {
 
 		// File shortcut
+
+		DLFileShortcut dlFileShortcut = (DLFileShortcut)fileShortcut.getModel();
 
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			DLFileShortcutConstants.getClassName(), dlFileShortcut.getFileShortcutId());

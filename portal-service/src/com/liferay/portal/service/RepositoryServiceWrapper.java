@@ -95,6 +95,14 @@ public class RepositoryServiceWrapper implements RepositoryService,
 
 	@Override
 	public com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+		long folderId, long fileEntryId, long fileVersionId, long fileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _repositoryService.getRepositoryImpl(folderId, fileEntryId,
+			fileVersionId, fileShortcutId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _repositoryService.getRepositoryImpl(repositoryId);
