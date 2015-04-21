@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Document;
@@ -108,11 +109,11 @@ public class DLImpl implements DL {
 
 	@Override
 	public void addPortletBreadcrumbEntries(
-			DLFileShortcut dlFileShortcut, HttpServletRequest request,
+			FileShortcut fileShortcut, HttpServletRequest request,
 			RenderResponse renderResponse)
 		throws Exception {
 
-		Folder folder = dlFileShortcut.getFolder();
+		Folder folder = fileShortcut.getFolder();
 
 		if (folder.getFolderId() !=
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -120,15 +121,15 @@ public class DLImpl implements DL {
 			addPortletBreadcrumbEntries(folder, request, renderResponse);
 		}
 
-		DLFileShortcut unescapedDLFileShortcut =
-			dlFileShortcut.toUnescapedModel();
+		FileShortcut unescapedDLFileShortcut =
+			fileShortcut.toUnescapedModel();
 
 		PortletURL portletURL = renderResponse.createRenderURL();
 
 		portletURL.setParameter(
 			"struts_action", "/document_library/view_file_entry");
 		portletURL.setParameter(
-			"fileEntryId", String.valueOf(dlFileShortcut.getToFileEntryId()));
+			"fileEntryId", String.valueOf(fileShortcut.getToFileEntryId()));
 
 		PortalUtil.addPortletBreadcrumbEntry(
 			request, unescapedDLFileShortcut.getToTitle(),
