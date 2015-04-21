@@ -34,6 +34,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -429,8 +430,8 @@ public class CapabilityRepository
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
+	public ArrayList<Object> getFileEntriesAndFileShortcuts(
+		long folderId, int status, int start, int end)
 		throws PortalException {
 
 		return getRepository().getFileEntriesAndFileShortcuts(

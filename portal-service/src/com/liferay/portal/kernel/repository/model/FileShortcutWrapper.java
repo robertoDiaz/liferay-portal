@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.repository.model;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.model.ModelWrapper;
@@ -37,6 +38,13 @@ public class FileShortcutWrapper
 	@Override
 	public Object clone() {
 		return new FileShortcutWrapper((FileShortcut)_fileShortcut.clone());
+	}
+
+	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
 	}
 
 	@Override

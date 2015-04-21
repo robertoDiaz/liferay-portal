@@ -59,6 +59,7 @@ import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -423,8 +424,8 @@ public class LiferayRepository
 	}
 
 	@Override
-	public List<RepositoryEntry> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
+	public ArrayList<Object> getFileEntriesAndFileShortcuts(
+		long folderId, int status, int start, int end)
 		throws PortalException {
 
 		List<Object> dlFileEntriesAndFileShortcuts =

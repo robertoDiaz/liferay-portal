@@ -30,6 +30,7 @@ import com.liferay.portal.service.ServiceContext;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
