@@ -31,6 +31,7 @@ import com.liferay.portal.service.ServiceContext;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -315,8 +316,8 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
+	public ArrayList<Object> getFileEntriesAndFileShortcuts(
+		long folderId, int status, int start, int end)
 		throws PortalException {
 
 		return _repository.getFileEntriesAndFileShortcuts(

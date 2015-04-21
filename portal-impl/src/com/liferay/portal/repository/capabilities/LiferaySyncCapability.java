@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.repository.event.RepositoryEventType;
 import com.liferay.portal.kernel.repository.event.TrashRepositoryEventType;
 import com.liferay.portal.kernel.repository.event.WorkflowRepositoryEventType;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
@@ -317,6 +318,10 @@ public class LiferaySyncCapability
 		@Override
 		public void execute(Folder folder) {
 			registerDLSyncEventCallback(DLSyncConstants.EVENT_DELETE, folder);
+		}
+
+		@Override
+		public void execute(FileShortcut shortcut) throws PortalException {
 		}
 
 	}

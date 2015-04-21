@@ -27,4 +27,6 @@ public interface RepositoryModelOperation {
 
 	public void execute(Folder folder) throws PortalException;
 
+	public void execute(FileShortcut shortcut) throws PortalException;
+
 }

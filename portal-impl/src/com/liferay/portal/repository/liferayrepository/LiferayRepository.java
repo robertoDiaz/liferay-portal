@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -58,6 +59,7 @@ import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -422,15 +424,15 @@ public class LiferayRepository
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
+	public ArrayList<Object> getFileEntriesAndFileShortcuts(
+		long folderId, int status, int start, int end)
 		throws PortalException {
 
 		List<Object> dlFileEntriesAndFileShortcuts =
 			dlFolderService.getFileEntriesAndFileShortcuts(
 				getGroupId(), toFolderId(folderId), status, start, end);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFileEntriesAndFileShortcuts);
 	}
 
@@ -551,7 +553,7 @@ public class LiferayRepository
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, boolean includeMountFolders, int start,
 			int end, OrderByComparator<?> obc)
 		throws PortalException {
@@ -561,12 +563,12 @@ public class LiferayRepository
 				getGroupId(), toFolderId(folderId), status, includeMountFolders,
 				start, end, obc);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFoldersAndFileEntriesAndFileShortcuts);
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, String[] mimeTypes,
 			boolean includeMountFolders, int start, int end,
 			OrderByComparator<?> obc)
@@ -577,7 +579,7 @@ public class LiferayRepository
 				getGroupId(), toFolderId(folderId), status, mimeTypes,
 				includeMountFolders, start, end, obc);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFoldersAndFileEntriesAndFileShortcuts);
 	}
 
