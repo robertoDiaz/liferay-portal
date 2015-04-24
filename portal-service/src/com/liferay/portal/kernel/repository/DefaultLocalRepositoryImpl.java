@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.repository;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -62,6 +63,15 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 		long userId, long folderId, String sourceFileName, String mimeType,
 		String title, String description, String changeLog, InputStream is,
 		long size, ServiceContext serviceContext) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public FileShortcut addFileShortcut(
+			long userId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
 
 		throw new UnsupportedOperationException();
 	}
@@ -139,6 +149,13 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 	@Override
 	public FileEntry getFileEntryByUuid(String uuid) throws PortalException {
 		return _repository.getFileEntryByUuid(uuid);
+	}
+
+	@Override
+	public FileShortcut getFileShortcut(long dlFileShortcutId)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -236,6 +253,15 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 		String title, String description, String changeLog,
 		boolean majorVersion, InputStream is, long size,
 		ServiceContext serviceContext) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public FileShortcut updateFileShortcut(
+			long userId, long fileShortcutId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
 
 		throw new UnsupportedOperationException();
 	}
