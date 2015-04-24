@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
+import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileShortcutPermission;
@@ -154,13 +155,13 @@ public class LiferayFileShortcut extends LiferayModel implements FileShortcut {
 	}
 
 	@Override
-	public long getToFileEntryId() {
-		return _dlFileShortcut.getToFileEntryId();
+	public int getStatus() {
+		return _dlFileShortcut.getStatus();
 	}
 
 	@Override
-	public int getStatus() {
-		return _dlFileShortcut.getStatus();
+	public long getToFileEntryId() {
+		return _dlFileShortcut.getToFileEntryId();
 	}
 
 	@Override
@@ -171,6 +172,11 @@ public class LiferayFileShortcut extends LiferayModel implements FileShortcut {
 	@Override
 	public TrashEntry getTrashEntry() throws PortalException {
 		return _dlFileShortcut.getTrashEntry();
+	}
+
+	@Override
+	public TrashHandler getTrashHandler() {
+		return _dlFileShortcut.getTrashHandler();
 	}
 
 	@Override

@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.repository.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.model.ModelWrapper;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -155,6 +156,11 @@ public class FileShortcutWrapper
 	@Override
 	public TrashEntry getTrashEntry() throws PortalException {
 		return _fileShortcut.getTrashEntry();
+	}
+
+	@Override
+	public TrashHandler getTrashHandler() {
+		return _fileShortcut.getTrashHandler();
 	}
 
 	@Override
