@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -45,6 +46,8 @@ import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryService;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService;
+import com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalService;
+import com.liferay.portlet.documentlibrary.service.DLFileShortcutService;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionService;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalService;
@@ -74,6 +77,8 @@ public class LiferayRepository
 		DLFileEntryLocalService dlFileEntryLocalService,
 		DLFileEntryService dlFileEntryService,
 		DLFileEntryTypeLocalService dlFileEntryTypeLocalService,
+		DLFileShortcutLocalService dlFileShortcutLocalService,
+		DLFileShortcutService dlFileShortcutService,
 		DLFileVersionLocalService dlFileVersionLocalService,
 		DLFileVersionService dlFileVersionService,
 		DLFolderLocalService dlFolderLocalService,
@@ -84,7 +89,8 @@ public class LiferayRepository
 		super(
 			repositoryLocalService, repositoryService, dlAppHelperLocalService,
 			dlFileEntryLocalService, dlFileEntryService,
-			dlFileEntryTypeLocalService, dlFileVersionLocalService,
+			dlFileEntryTypeLocalService, dlFileShortcutLocalService,
+			dlFileShortcutService, dlFileVersionLocalService,
 			dlFileVersionService, dlFolderLocalService, dlFolderService,
 			resourceLocalService, groupId, repositoryId, dlFolderId);
 	}
@@ -422,7 +428,7 @@ public class LiferayRepository
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFileEntriesAndFileShortcuts(
 			long folderId, int status, int start, int end)
 		throws PortalException {
 
@@ -430,7 +436,7 @@ public class LiferayRepository
 			dlFolderService.getFileEntriesAndFileShortcuts(
 				getGroupId(), toFolderId(folderId), status, start, end);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFileEntriesAndFileShortcuts);
 	}
 
@@ -551,7 +557,7 @@ public class LiferayRepository
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, boolean includeMountFolders, int start,
 			int end, OrderByComparator<?> obc)
 		throws PortalException {
@@ -561,12 +567,12 @@ public class LiferayRepository
 				getGroupId(), toFolderId(folderId), status, includeMountFolders,
 				start, end, obc);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFoldersAndFileEntriesAndFileShortcuts);
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+	public List<RepositoryEntry> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, String[] mimeTypes,
 			boolean includeMountFolders, int start, int end,
 			OrderByComparator<?> obc)
@@ -577,7 +583,7 @@ public class LiferayRepository
 				getGroupId(), toFolderId(folderId), status, mimeTypes,
 				includeMountFolders, start, end, obc);
 
-		return RepositoryModelUtil.toFileEntriesAndFolders(
+		return RepositoryModelUtil.toFileEntriesFileShortcutsAndFolders(
 			dlFoldersAndFileEntriesAndFileShortcuts);
 	}
 

@@ -310,12 +310,45 @@ public class RepositoryServiceHttp {
 		}
 	}
 
+	public static com.liferay.portal.kernel.repository.Repository getRepositoryImpl(
+		HttpPrincipal httpPrincipal, long folderId, long fileEntryId,
+		long fileVersionId, long fileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
+					"getRepositoryImpl", _getRepositoryImplParameterTypes8);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					folderId, fileEntryId, fileVersionId, fileShortcutId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (com.liferay.portal.kernel.repository.Repository)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static java.lang.String[] getSupportedConfigurations(
 		HttpPrincipal httpPrincipal, long classNameId) {
 		try {
 			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
 					"getSupportedConfigurations",
-					_getSupportedConfigurationsParameterTypes8);
+					_getSupportedConfigurationsParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					classNameId);
@@ -344,7 +377,7 @@ public class RepositoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
 					"getSupportedParameters",
-					_getSupportedParametersParameterTypes9);
+					_getSupportedParametersParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					classNameId, configuration);
@@ -373,7 +406,7 @@ public class RepositoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
 					"getSupportedParameters",
-					_getSupportedParametersParameterTypes10);
+					_getSupportedParametersParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					className, configuration);
@@ -402,7 +435,7 @@ public class RepositoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
 					"getTypeSettingsProperties",
-					_getTypeSettingsPropertiesParameterTypes11);
+					_getTypeSettingsPropertiesParameterTypes12);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					repositoryId);
@@ -434,7 +467,7 @@ public class RepositoryServiceHttp {
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(RepositoryServiceUtil.class,
-					"updateRepository", _updateRepositoryParameterTypes12);
+					"updateRepository", _updateRepositoryParameterTypes13);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					repositoryId, name, description);
@@ -485,19 +518,22 @@ public class RepositoryServiceHttp {
 	private static final Class<?>[] _getRepositoryImplParameterTypes7 = new Class[] {
 			long.class, long.class, long.class
 		};
-	private static final Class<?>[] _getSupportedConfigurationsParameterTypes8 = new Class[] {
-			long.class
+	private static final Class<?>[] _getRepositoryImplParameterTypes8 = new Class[] {
+			long.class, long.class, long.class, long.class
 		};
-	private static final Class<?>[] _getSupportedParametersParameterTypes9 = new Class[] {
-			long.class, java.lang.String.class
+	private static final Class<?>[] _getSupportedConfigurationsParameterTypes9 = new Class[] {
+			long.class
 		};
 	private static final Class<?>[] _getSupportedParametersParameterTypes10 = new Class[] {
+			long.class, java.lang.String.class
+		};
+	private static final Class<?>[] _getSupportedParametersParameterTypes11 = new Class[] {
 			java.lang.String.class, java.lang.String.class
 		};
-	private static final Class<?>[] _getTypeSettingsPropertiesParameterTypes11 = new Class[] {
+	private static final Class<?>[] _getTypeSettingsPropertiesParameterTypes12 = new Class[] {
 			long.class
 		};
-	private static final Class<?>[] _updateRepositoryParameterTypes12 = new Class[] {
+	private static final Class<?>[] _updateRepositoryParameterTypes13 = new Class[] {
 			long.class, java.lang.String.class, java.lang.String.class
 		};
 }

@@ -47,7 +47,7 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 
 	@Override
 	public String getModelClassName() {
-		return DLFileShortcut.class.getName();
+		return DLFileShortcutConstants.getClassName();
 	}
 
 	@Override
