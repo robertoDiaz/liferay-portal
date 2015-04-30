@@ -25,6 +25,8 @@ public class WikiWebKeys {
 
 	public static final String WIKI_PAGE = "WIKI_PAGE";
 
+	public static final String WIKI_REDIRECT_PAGE = "WIKI_REDIRECT_PAGE";
+
 	public static final String WIKI_TREE_WALKER_DEPTH =
 		"WIKI_TREE_WALKER_DEPTH";
 
