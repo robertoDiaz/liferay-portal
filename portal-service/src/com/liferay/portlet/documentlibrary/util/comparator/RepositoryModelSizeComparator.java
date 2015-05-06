@@ -109,7 +109,7 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 			return dlFileEntry.getSize();
 		}
 		else if ((obj instanceof DLFileShortcut) ||
-				 (obj instanceof DLFileShortcut)) {
+				 (obj instanceof FileShortcut)) {
 
 			return getFileShortcutSize(obj);
 		}
