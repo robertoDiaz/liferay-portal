@@ -182,7 +182,7 @@ public interface DLAppService extends BaseService {
 	* @throws PortalException if the parent folder or file entry could not be
 	found, or if the file shortcut's information was invalid
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut addFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut addFileShortcut(
 		long repositoryId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
@@ -635,60 +635,6 @@ public interface DLAppService extends BaseService {
 		throws PortalException;
 
 	/**
-	* Returns a range of all the file entries and shortcuts in the folder.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the folder
-	* @param status the workflow status
-	* @param start the lower bound of the range of results
-	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of file entries and shortcuts in the folder
-	* @throws PortalException if the folder could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<java.lang.Object> getFileEntriesAndFileShortcuts(
-		long repositoryId, long folderId, int status, int start, int end)
-		throws PortalException;
-
-	/**
-	* Returns the number of file entries and shortcuts in the folder.
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the folder
-	* @param status the workflow status
-	* @return the number of file entries and shortcuts in the folder
-	* @throws PortalException if the folder ould not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFileEntriesAndFileShortcutsCount(long repositoryId,
-		long folderId, int status) throws PortalException;
-
-	/**
-	* Returns the number of file entries and shortcuts in the folder.
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the folder
-	* @param status the workflow status
-	* @param mimeTypes allowed media types
-	* @return the number of file entries and shortcuts in the folder
-	* @throws PortalException if the folder ould not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFileEntriesAndFileShortcutsCount(long repositoryId,
-		long folderId, int status, java.lang.String[] mimeTypes)
-		throws PortalException;
-
-	/**
 	* Returns the number of file entries in the folder.
 	*
 	* @param repositoryId the primary key of the file entry's repository
@@ -764,7 +710,7 @@ public interface DLAppService extends BaseService {
 	* @throws PortalException if the file shortcut could not be found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut getFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut getFileShortcut(
 		long fileShortcutId) throws PortalException;
 
 	/**
@@ -979,104 +925,6 @@ public interface DLAppService extends BaseService {
 		long repositoryId, long parentFolderId, int status,
 		boolean includeMountFolders, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.Folder> obc)
-		throws PortalException;
-
-	/**
-	* Returns a range of all the immediate subfolders, file entries, and file
-	* shortcuts in the parent folder.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the parent folder
-	* @param status the workflow status
-	* @param includeMountFolders whether to include mount folders for
-	third-party repositories
-	* @param start the lower bound of the range of results
-	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders, file entries, and file
-	shortcuts in the parent folder ordered by comparator
-	<code>obc</code>
-	* @throws PortalException if the parent folder could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
-		long repositoryId, long folderId, int status,
-		boolean includeMountFolders, int start, int end)
-		throws PortalException;
-
-	/**
-	* Returns an ordered range of all the immediate subfolders, file entries,
-	* and file shortcuts in the parent folder.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the parent folder
-	* @param status the workflow status
-	* @param includeMountFolders whether to include mount folders for
-	third-party repositories
-	* @param start the lower bound of the range of results
-	* @param end the upper bound of the range of results (not inclusive)
-	* @param obc the comparator to order the results (optionally
-	<code>null</code>)
-	* @return the range of immediate subfolders, file entries, and file
-	shortcuts in the parent folder ordered by comparator
-	<code>obc</code>
-	* @throws PortalException if the parent folder could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
-		long repositoryId, long folderId, int status,
-		boolean includeMountFolders, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<?> obc)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<java.lang.Object> getFoldersAndFileEntriesAndFileShortcuts(
-		long repositoryId, long folderId, int status,
-		java.lang.String[] mimeTypes, boolean includeMountFolders, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator<?> obc)
-		throws PortalException;
-
-	/**
-	* Returns the number of immediate subfolders, file entries, and file
-	* shortcuts in the parent folder.
-	*
-	* @param repositoryId the primary key of the repository
-	* @param folderId the primary key of the parent folder
-	* @param status the workflow status
-	* @param includeMountFolders whether to include mount folders for
-	third-party repositories
-	* @return the number of immediate subfolders, file entries, and file
-	shortcuts in the parent folder
-	* @throws PortalException if the folder could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-		long repositoryId, long folderId, int status,
-		boolean includeMountFolders) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-		long repositoryId, long folderId, int status,
-		java.lang.String[] mimeTypes, boolean includeMountFolders)
 		throws PortalException;
 
 	/**
@@ -1409,6 +1257,155 @@ public interface DLAppService extends BaseService {
 		throws PortalException;
 
 	/**
+	* Returns a range of all the immediate subfolders, file entries, and file
+	* shortcuts in the parent folder.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the parent folder
+	* @param status the workflow status
+	* @param includeMountFolders whether to include mount folders for
+	third-party repositories
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @return the range of immediate subfolders, file entries, and file
+	shortcuts in the parent folder ordered by comparator
+	<code>obc</code>
+	* @throws PortalException if the parent folder could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.kernel.repository.model.RepositoryEntry> getRepositoryEntries(
+		long repositoryId, long folderId, int status,
+		boolean includeMountFolders, int start, int end)
+		throws PortalException;
+
+	/**
+	* Returns an ordered range of all the immediate subfolders, file entries,
+	* and file shortcuts in the parent folder.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the parent folder
+	* @param status the workflow status
+	* @param includeMountFolders whether to include mount folders for
+	third-party repositories
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @param obc the comparator to order the results (optionally
+	<code>null</code>)
+	* @return the range of immediate subfolders, file entries, and file
+	shortcuts in the parent folder ordered by comparator
+	<code>obc</code>
+	* @throws PortalException if the parent folder could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.kernel.repository.model.RepositoryEntry> getRepositoryEntries(
+		long repositoryId, long folderId, int status,
+		boolean includeMountFolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.kernel.repository.model.RepositoryEntry> getRepositoryEntries(
+		long repositoryId, long folderId, int status,
+		java.lang.String[] mimeTypes, boolean includeMountFolders, int start,
+		int end, com.liferay.portal.kernel.util.OrderByComparator<?> obc)
+		throws PortalException;
+
+	/**
+	* Returns a range of all the file entries and shortcuts in the folder.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the folder
+	* @param status the workflow status
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @return the range of file entries and shortcuts in the folder
+	* @throws PortalException if the folder could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.kernel.repository.model.RepositoryEntry> getRepositoryEntries(
+		long repositoryId, long folderId, int status, int start, int end)
+		throws PortalException;
+
+	/**
+	* Returns the number of file entries and shortcuts in the folder.
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the folder
+	* @param status the workflow status
+	* @return the number of file entries and shortcuts in the folder
+	* @throws PortalException if the folder ould not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRepositoryEntriesCount(long repositoryId, long folderId,
+		int status) throws PortalException;
+
+	/**
+	* Returns the number of immediate subfolders, file entries, and file
+	* shortcuts in the parent folder.
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the parent folder
+	* @param status the workflow status
+	* @param includeMountFolders whether to include mount folders for
+	third-party repositories
+	* @return the number of immediate subfolders, file entries, and file
+	shortcuts in the parent folder
+	* @throws PortalException if the folder could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRepositoryEntriesCount(long repositoryId, long folderId,
+		int status, boolean includeMountFolders) throws PortalException;
+
+	/**
+	* Returns the number of file entries and shortcuts in the folder.
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the folder
+	* @param status the workflow status
+	* @param mimeTypes allowed media types
+	* @return the number of file entries and shortcuts in the folder
+	* @throws PortalException if the folder ould not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRepositoryEntriesCount(long repositoryId, long folderId,
+		int status, java.lang.String[] mimeTypes) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRepositoryEntriesCount(long repositoryId, long folderId,
+		int status, java.lang.String[] mimeTypes, boolean includeMountFolders)
+		throws PortalException;
+
+	/**
 	* Returns all the descendant folders of the folder with the primary key.
 	*
 	* @param repositoryId the primary key of the repository
@@ -1552,7 +1549,7 @@ public interface DLAppService extends BaseService {
 	* @throws PortalException if the file entry or the new folder could not be
 	found
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutFromTrash(
+	public com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutFromTrash(
 		long fileShortcutId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
@@ -1564,7 +1561,7 @@ public interface DLAppService extends BaseService {
 	* @return the file shortcut
 	* @throws PortalException if the file shortcut could not be found
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+	public com.liferay.portal.kernel.repository.model.FileShortcut moveFileShortcutToTrash(
 		long fileShortcutId) throws PortalException;
 
 	/**
@@ -1950,7 +1947,7 @@ public interface DLAppService extends BaseService {
 	* @throws PortalException if the file shortcut, folder, or file entry could
 	not be found
 	*/
-	public com.liferay.portlet.documentlibrary.model.DLFileShortcut updateFileShortcut(
+	public com.liferay.portal.kernel.repository.model.FileShortcut updateFileShortcut(
 		long fileShortcutId, long folderId, long toFileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;

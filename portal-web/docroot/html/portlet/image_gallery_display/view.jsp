@@ -113,7 +113,7 @@ List fileEntries = DLAppServiceUtil.getGroupFileEntries(scopeGroupId, 0, folderI
 			<%
 			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
-			long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcut.class.getName())};
+			long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcutConstants.getClassName())};
 
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery(classNameIds, searchContainer);
 
@@ -152,13 +152,13 @@ List fileEntries = DLAppServiceUtil.getGroupFileEntries(scopeGroupId, 0, folderI
 
 				int foldersCount = DLAppServiceUtil.getFoldersCount(repositoryId, folderId, true);
 
-				int total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, mediaGalleryMimeTypes, true);
+				int total = DLAppServiceUtil.getRepositoryEntriesCount(repositoryId, folderId, status, mediaGalleryMimeTypes, true);
 
 				int imagesCount = total - foldersCount;
 
 				searchContainer.setTotal(total);
 
-				List results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, mediaGalleryMimeTypes, true, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+				List results = DLAppServiceUtil.getRepositoryEntries(repositoryId, folderId, status, mediaGalleryMimeTypes, true, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 
 				searchContainer.setResults(results);
 

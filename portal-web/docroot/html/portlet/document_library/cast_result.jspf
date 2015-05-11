@@ -17,10 +17,10 @@
 <%
 Folder curFolder = null;
 FileEntry fileEntry = null;
-DLFileShortcut fileShortcut = null;
+FileShortcut fileShortcut = null;
 
-if (result instanceof AssetEntry) {
-	AssetEntry assetEntry = (AssetEntry)result;
+if (repositoryEntry instanceof AssetEntry) {
+	AssetEntry assetEntry = (AssetEntry)repositoryEntry;
 
 	if (assetEntry.getClassName().equals(DLFileEntryConstants.getClassName())) {
 		fileEntry = DLAppLocalServiceUtil.getFileEntry(assetEntry.getClassPK());
@@ -37,23 +37,23 @@ if (result instanceof AssetEntry) {
 		fileEntry = fileEntry.toEscapedModel();
 	}
 }
-else if (result instanceof Folder) {
-	curFolder = (Folder)result;
-
-	curFolder = curFolder.toEscapedModel();
-}
-else if (result instanceof FileEntry) {
-	fileEntry = (FileEntry)result;
+else if (repositoryEntry instanceof FileEntry) {
+	fileEntry = (FileEntry)repositoryEntry;
 
 	fileEntry = fileEntry.toEscapedModel();
 }
-else {
-	fileShortcut = (DLFileShortcut)result;
+else if (repositoryEntry instanceof FileShortcut) {
+	fileShortcut = (FileShortcut)repositoryEntry;
 
 	fileShortcut = fileShortcut.toEscapedModel();
 
 	fileEntry = DLAppLocalServiceUtil.getFileEntry(fileShortcut.getToFileEntryId());
 
 	fileEntry = fileEntry.toEscapedModel();
+}
+else if (repositoryEntry instanceof Folder) {
+	curFolder = (Folder)repositoryEntry;
+
+	curFolder = curFolder.toEscapedModel();
 }
 %>

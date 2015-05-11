@@ -20,8 +20,10 @@ import com.liferay.portal.kernel.repository.capabilities.CapabilityProvider;
 import com.liferay.portal.kernel.repository.event.RepositoryEventTrigger;
 import com.liferay.portal.kernel.repository.event.RepositoryEventType;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -126,6 +128,23 @@ public class CapabilityRepository
 				getUserId(),
 			folderId, sourceFileName, mimeType, title, description, changeLog,
 			is, size, serviceContext);
+	}
+
+	@Override
+	public FileShortcut addFileShortcut(
+			long userId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Repository repository = getRepository();
+
+		FileShortcut fileShortcut = repository.addFileShortcut(
+			userId, folderId, toFileEntryId, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Add.class, FileShortcut.class, fileShortcut);
+
+		return fileShortcut;
 	}
 
 	@Override
@@ -361,6 +380,35 @@ public class CapabilityRepository
 	}
 
 	@Override
+	public void deleteFileShortcut(long fileShortcutId) throws PortalException {
+		Repository repository = getRepository();
+
+		FileShortcut fileShortcut = repository.getFileShortcut(fileShortcutId);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Delete.class, FileShortcut.class, fileShortcut);
+
+		repository.deleteFileShortcut(fileShortcutId);
+	}
+
+	@Override
+	public void deleteFileShortcuts(long toFileEntryId) throws PortalException {
+		Repository repository = getRepository();
+
+		FileEntry fileEntry = repository.getFileEntry(toFileEntryId);
+
+		List<FileShortcut> fileShortcuts = fileEntry.getFileShortcuts();
+
+		for (FileShortcut fileShortcut : fileShortcuts) {
+			_repositoryEventTrigger.trigger(
+				RepositoryEventType.Delete.class, FileShortcut.class,
+				fileShortcut);
+		}
+
+		repository.deleteFileShortcuts(toFileEntryId);
+	}
+
+	@Override
 	public void deleteFileVersion(long fileEntryId, String version)
 		throws PortalException {
 
@@ -402,6 +450,16 @@ public class CapabilityRepository
 
 	@Override
 	public List<FileEntry> getFileEntries(
+			long folderId, int status, int start, int end,
+			OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return getRepository().getFileEntries(
+			folderId, status, start, end, obc);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
 			long folderId, int start, int end, OrderByComparator<FileEntry> obc)
 		throws PortalException {
 
@@ -429,34 +487,15 @@ public class CapabilityRepository
 	}
 
 	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
-			long folderId, int status, int start, int end)
-		throws PortalException {
-
-		return getRepository().getFileEntriesAndFileShortcuts(
-			folderId, status, start, end);
-	}
-
-	@Override
-	public int getFileEntriesAndFileShortcutsCount(long folderId, int status)
-		throws PortalException {
-
-		return getRepository().getFileEntriesAndFileShortcutsCount(
-			folderId, status);
-	}
-
-	@Override
-	public int getFileEntriesAndFileShortcutsCount(
-			long folderId, int status, String[] mimeTypes)
-		throws PortalException {
-
-		return getRepository().getFileEntriesAndFileShortcutsCount(
-			folderId, status, mimeTypes);
-	}
-
-	@Override
 	public int getFileEntriesCount(long folderId) throws PortalException {
 		return getRepository().getFileEntriesCount(folderId);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return getRepository().getFileEntriesCount(folderId, status);
 	}
 
 	@Override
@@ -488,6 +527,13 @@ public class CapabilityRepository
 	@Override
 	public FileEntry getFileEntryByUuid(String uuid) throws PortalException {
 		return getRepository().getFileEntryByUuid(uuid);
+	}
+
+	@Override
+	public FileShortcut getFileShortcut(long fileShortcutId)
+		throws PortalException {
+
+		return getRepository().getFileShortcut(fileShortcutId);
 	}
 
 	@Override
@@ -530,46 +576,6 @@ public class CapabilityRepository
 	}
 
 	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
-			long folderId, int status, boolean includeMountFolders, int start,
-			int end, OrderByComparator<?> obc)
-		throws PortalException {
-
-		return getRepository().getFoldersAndFileEntriesAndFileShortcuts(
-			folderId, status, includeMountFolders, start, end, obc);
-	}
-
-	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
-			long folderId, int status, String[] mimetypes,
-			boolean includeMountFolders, int start, int end,
-			OrderByComparator<?> obc)
-		throws PortalException {
-
-		return getRepository().getFoldersAndFileEntriesAndFileShortcuts(
-			folderId, status, mimetypes, includeMountFolders, start, end, obc);
-	}
-
-	@Override
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-			long folderId, int status, boolean includeMountFolders)
-		throws PortalException {
-
-		return getRepository().getFoldersAndFileEntriesAndFileShortcutsCount(
-			folderId, status, includeMountFolders);
-	}
-
-	@Override
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-			long folderId, int status, String[] mimetypes,
-			boolean includeMountFolders)
-		throws PortalException {
-
-		return getRepository().getFoldersAndFileEntriesAndFileShortcutsCount(
-			folderId, status, mimetypes, includeMountFolders);
-	}
-
-	@Override
 	public int getFoldersCount(long parentFolderId, boolean includeMountfolders)
 		throws PortalException {
 
@@ -607,6 +613,71 @@ public class CapabilityRepository
 		throws PortalException {
 
 		return getRepository().getMountFoldersCount(parentFolderId);
+	}
+
+	@Override
+	public List<RepositoryEntry> getRepositoryEntries(
+			long folderId, int status, boolean includeMountFolders, int start,
+			int end, OrderByComparator<?> obc)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntries(
+			folderId, status, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public List<RepositoryEntry> getRepositoryEntries(
+			long folderId, int status, int start, int end)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntries(
+			folderId, status, start, end);
+	}
+
+	@Override
+	public List<RepositoryEntry> getRepositoryEntries(
+			long folderId, int status, String[] mimetypes,
+			boolean includeMountFolders, int start, int end,
+			OrderByComparator<?> obc)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntries(
+			folderId, status, mimetypes, includeMountFolders, start, end, obc);
+	}
+
+	@Override
+	public int getRepositoryEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntriesCount(folderId, status);
+	}
+
+	@Override
+	public int getRepositoryEntriesCount(
+			long folderId, int status, boolean includeMountFolders)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntriesCount(
+			folderId, status, includeMountFolders);
+	}
+
+	@Override
+	public int getRepositoryEntriesCount(
+			long folderId, int status, String[] mimeTypes)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntriesCount(
+			folderId, status, mimeTypes);
+	}
+
+	@Override
+	public int getRepositoryEntriesCount(
+			long folderId, int status, String[] mimetypes,
+			boolean includeMountFolders)
+		throws PortalException {
+
+		return getRepository().getRepositoryEntriesCount(
+			folderId, status, mimetypes, includeMountFolders);
 	}
 
 	@Override
@@ -949,6 +1020,43 @@ public class CapabilityRepository
 			RepositoryEventType.Update.class, FileEntry.class, fileEntry);
 
 		return fileEntry;
+	}
+
+	@Override
+	public FileShortcut updateFileShortcut(
+			long userId, long fileShortcutId, long folderId, long toFileEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Repository repository = getRepository();
+
+		FileShortcut fileShortcut = repository.updateFileShortcut(
+			userId, fileShortcutId, folderId, toFileEntryId, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Update.class, FileShortcut.class, fileShortcut);
+
+		return fileShortcut;
+	}
+
+	@Override
+	public void updateFileShortcuts(
+			long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException {
+
+		Repository repository = getRepository();
+
+		FileEntry oldToFileEntry = repository.getFileEntry(oldToFileEntryId);
+
+		List<FileShortcut> fileShortcuts = oldToFileEntry.getFileShortcuts();
+
+		for (FileShortcut fileShortcut : fileShortcuts) {
+			_repositoryEventTrigger.trigger(
+				RepositoryEventType.Update.class, FileShortcut.class,
+				fileShortcut);
+		}
+
+		repository.updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
 	}
 
 	@Override

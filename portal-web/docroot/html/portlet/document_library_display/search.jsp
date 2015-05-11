@@ -51,7 +51,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 	/>
 
 	<div class="form-search">
-		<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' title='<%= LanguageUtil.get(locale, "search-documents") %>' />
+		<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" placeholder='<%= LanguageUtil.get(request, "keywords") %>' title='<%= LanguageUtil.get(locale, "search-documents") %>' />
 	</div>
 
 	<br /><br />
@@ -156,7 +156,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 				<c:when test="<%= fileEntry != null %>">
 
 					<%
-					request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
+					request.setAttribute("search.jsp-fileEntry", fileEntry);
 					%>
 
 					<portlet:renderURL var="rowURL">
@@ -182,7 +182,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 					<%
 					String folderImage = "folder_empty_document";
 
-					if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(folder.getRepositoryId(), folder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0)) {
+					if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getRepositoryEntriesCount(folder.getRepositoryId(), folder.getFolderId(), WorkflowConstants.STATUS_APPROVED, true) > 0)) {
 						folderImage = "folder_full_document";
 					}
 

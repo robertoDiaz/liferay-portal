@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `5996ef5`.*
+*This document has been reviewed through commit `205a27d`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -1454,28 +1454,105 @@ OSGi plugins in a more extensible way, allowing the developer to include new
 sections to access to their own utils and services.
 
 ---------------------------------------
-### Removed the type settings breadcrumbShowParentGroups from groups
+
+### Removed the Type Setting `breadcrumbShowParentGroups` from Groups
 - **Date:** 2015-Apr-21
 - **JIRA Ticket:** LPS-54791
 
 #### What changed?
 
-The type settings breadcrumbShowParentGroups was removed from groups, it is
-no longer available in site configuration. Now it is only available in the
+The type setting `breadcrumbShowParentGroups` was removed from groups and is
+no longer available in the site configuration. Now, it is only available in the
 breadcrumb configuration.
 
 #### Who is affected?
 
-This affects all site administrators that have set the showParentGroups 
-preference in the site administration.
+This affects all site administrators that have set the `showParentGroups`
+preference in Site Administration.
 
 #### How should I update my code?
 
-There is no need to change the code. This should be updated at the portlet
-instance level. 
+There are no code updates required. This should only be updated at the portlet
+instance level.
 
 #### Why was this change made?
 
-This change was introduced to support the new settings API. 
+This change was introduced to support the new Settings API.
+
+---------------------------------------
+
+### Changed Return Value of the Method `getText` of the Editor's Window API
+- **Date:** 2015-Apr-28
+- **JIRA Ticket:** LPS-52698
+
+#### What changed?
+
+The method `getText` now returns the editor's content, without any HTML markup.
+
+#### Who is affected?
+
+This affects developers that are using the `getText` method of the editor's
+window API.
+
+#### How should I update my code?
+
+To continue using the editor the same way you did before this change was
+implemented, you should change calls to the `getText` method to instead call the
+`getHTML` method.
+
+#### Why was this change made?
+
+This change was made in the editor's window API to provide a proper `getText`
+method that returns just the editor's content, without any HTML markup. This
+change is used for the blog abstract field.
+
+---------------------------------------
+
+### [Title]
+- **Date:** 2015-May-8
+- **JIRA Ticket:** LPS-55103
+
+#### What changed?
+
+The methods `getFoldersAndFileEntriesAndFileShortcuts()` and
+`getFileEntriesAndFileShortcuts()` in `Repository` returned a list of
+raw `Object`s. As a consequence, consumers of this API had no
+information at all about the kind of objects returned, and the portal
+had to rely in a tacit knowledge of repository internals to make
+things work.
+
+A new `RepositoryEntry` interface has been created to abstract over
+the existing repository entity types (`FileEntry`, `FileShortcut`,
+`FileVersion` and `Folder`). The signature of the methods that
+returned raw `Object`s has been changed to return `RepositoryEntry`
+instead, and their name now is `getRepositoryEntries()`.
+
+Additionally, as the repository API already assumed that repositories
+may return DL shortcuts in some situations, a new interface
+`FileShortcut` has been added so that repositories may properly
+implement them.
+
+For consistency, `getFoldersAndFileEntriesAndFileShortcutsCount()`
+methods have also changed its name to `getRepositoryEntriesCount()`.
+
+#### Who is affected?
+
+Applications that use `Repository` or `DLAppService` directly.
+
+#### How should I update my code?
+
+There are two possible approaches:
+- Cast the returned list to a raw `List`, with no type parameters. Do this only
+  if strictly necessary.
+- Change the type annotation for variables storing the returned value or methods
+  accepting it from `List<Object>` to `List<RepositoryEntry>`.
+
+#### Why was this change made?
+
+To help the compiler catch errors and to make the API more explicit. By
+returning `List<Object>` the repository API wasn't telling anything at all about
+the returned objects; with this change at least the consumer knows that the
+returned objects must be one of `FileEntry`, `FileShortcut`, `FileVersion` or
+`Folder`.
 
 ---------------------------------------
