@@ -1938,8 +1938,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository repository = getRepository(repositoryId);
 
-		return (List)repository.getRepositoryEntries(
-			folderId, status, start, end);
+		return repository.getRepositoryEntries(folderId, status, start, end);
 	}
 
 	@Override
