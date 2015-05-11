@@ -1513,22 +1513,31 @@ change is used for the blog abstract field.
 - **JIRA Ticket:** LPS-55103
 
 #### What changed?
+
 The methods `getFoldersAndFileEntriesAndFileShortcuts()` and
-`getFileEntriesAndFileShortcuts()` in `Repository` returned a list of raw
-`Object`.
+`getFileEntriesAndFileShortcuts()` in `Repository` returned a list of
+raw `Object`s. As a consequence, consumers of this API had no
+information at all about the kind of objects returned, and the portal
+had to rely in a tacit knowledge of repository internals to make
+things work.
 
-A new interface `RepositoryEntry` has been created to abstract over the
-existing repository entity types (`FileEntry`, `FileShortcut`, `FileVersion`
-and `Folder`). The signature of the methods that returned raw `Object`s has
-been changed to return `RepositoryEntry` instead and their name now is
-`getRepositoryEntries()`.
+A new `RepositoryEntry` interface has been created to abstract over
+the existing repository entity types (`FileEntry`, `FileShortcut`,
+`FileVersion` and `Folder`). The signature of the methods that
+returned raw `Object`s has been changed to return `RepositoryEntry`
+instead, and their name now is `getRepositoryEntries()`.
 
-Due consistency `getFoldersAndFileEntriesAndFileShortcutsCount()` methods have
-also changed its name to `getRepositoryEntriesCount()`.
+Additionally, as the repository API already assumed that repositories
+may return DL shortcuts in some situations, a new interface
+`FileShortcut` has been added so that repositories may properly
+implement them.
+
+For consistency, `getFoldersAndFileEntriesAndFileShortcutsCount()`
+methods have also changed its name to `getRepositoryEntriesCount()`.
 
 #### Who is affected?
 
-Applications that use `Repository` directly.
+Applications that use `Repository` or `DLAppService` directly.
 
 #### How should I update my code?
 
