@@ -292,7 +292,6 @@ public abstract class BaseRepositoryImpl
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public List<com.liferay.portal.kernel.repository.model.RepositoryEntry>
 		getRepositoryEntries(
 			long folderId, int status, boolean includeMountFolders, int start,
@@ -317,7 +316,6 @@ public abstract class BaseRepositoryImpl
 			long folderId, int start, int end, OrderByComparator<?> obc);
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public List<com.liferay.portal.kernel.repository.model.RepositoryEntry>
 		getRepositoryEntries(
 			long folderId, int status, String[] mimeTypes,
