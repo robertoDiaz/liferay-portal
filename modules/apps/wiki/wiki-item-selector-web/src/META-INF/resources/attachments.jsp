@@ -17,7 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String itemSelectedCallback = (String)request.getAttribute(WikiAttachmentItemSelectorView.ITEM_SELECTED_CALLBACK);
 PortletURL portletURL = (PortletURL)request.getAttribute(WikiAttachmentItemSelectorView.PORTLET_URL);
 WikiAttachmentItemSelectorCriterion wikiAttachmentItemSelectorCriterion = (WikiAttachmentItemSelectorCriterion)request.getAttribute(WikiAttachmentItemSelectorView.WIKI_ATTACHMENT_ITEM_SELECTOR_CRITERION);
 
@@ -90,7 +89,7 @@ WikiPage wikiPage = WikiPageLocalServiceUtil.getPage(pageResource.getNodeId(), p
 		function(event) {
 			var fileEntryId = event.target.getAttribute('data-fileEntryId');
 
-			<%= itemSelectedCallback %>('<%= FileEntry.class.getName() %>', fileEntryId);
+			//TODO
 		}
 	);
 </aui:script>
