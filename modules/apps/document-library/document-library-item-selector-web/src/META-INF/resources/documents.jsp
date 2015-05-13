@@ -1,3 +1,7 @@
+<%@ page import="com.liferay.portal.kernel.repository.model.FileEntry" %>
+
+<%@ page import="java.net.URL" %>
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -18,7 +22,6 @@
 
 <%
 DLItemSelectorCriterion dlItemSelectorCriterion = (DLItemSelectorCriterion)request.getAttribute(DLItemSelectorView.DL_ITEM_SELECTOR_CRITERION);
-String itemSelectedCallback = (String)request.getAttribute(DLItemSelectorView.ITEM_SELECTED_CALLBACK);
 PortletURL portletURL = (PortletURL)request.getAttribute(DLItemSelectorView.PORTLET_URL);
 
 long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
@@ -348,7 +351,27 @@ if (folderId > 0) {
 				<%
 				Map<String, Object> data = new HashMap<String, Object>();
 
-				data.put("fileEntryid", fileEntry.getFileEntryId());
+				List<Class<?>> desiredReturnTypes = dlItemSelectorCriterion.getDesiredReturnTypes();
+
+				for (Class<?> desiredReturnType : desiredReturnTypes) {
+					if (desiredReturnType == FileEntry.class) {
+						data.put("returnType", FileEntry.class.getName());
+						data.put("value", fileEntry.getFileEntryId());
+					}
+					else if (desiredReturnType == URL.class) {
+						data.put("returnType", URL.class.getName());
+						data.put("value", HtmlUtil.escape(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)));
+					}
+					else {
+						continue;
+					}
+
+					break;
+				}
+
+				if (data.isEmpty()) {
+					throw new RuntimeException();
+				}
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -362,15 +385,17 @@ if (folderId > 0) {
 <aui:script>
 	var container = $('#<portlet:namespace />selectDocumentFm');
 
-	var selectorButtons = container.find('.selector-button');
-
 	container.on(
 		'click',
 		'.selector-button',
 		function(event) {
-			var fileEntryId = event.target.getAttribute('data-fileEntryId');
-
-			<%= itemSelectedCallback %>('<%= FileEntry.class.getName() %>', fileEntryId);
+			Liferay.fire(
+				'<portlet:namespace/>selectedItem',
+				{
+					returnType : event.target.getAttribute('data-returnType'),
+					value : event.target.getAttribute('data-value')
+				}
+			);
 		}
 	);
 </aui:script>

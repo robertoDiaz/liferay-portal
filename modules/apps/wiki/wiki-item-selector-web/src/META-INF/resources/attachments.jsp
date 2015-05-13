@@ -17,7 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String itemSelectedCallback = (String)request.getAttribute(WikiAttachmentItemSelectorView.ITEM_SELECTED_CALLBACK);
 PortletURL portletURL = (PortletURL)request.getAttribute(WikiAttachmentItemSelectorView.PORTLET_URL);
 WikiAttachmentItemSelectorCriterion wikiAttachmentItemSelectorCriterion = (WikiAttachmentItemSelectorCriterion)request.getAttribute(WikiAttachmentItemSelectorView.WIKI_ATTACHMENT_ITEM_SELECTOR_CRITERION);
 
@@ -68,7 +67,28 @@ WikiPage wikiPage = WikiPageLocalServiceUtil.getPage(pageResource.getNodeId(), p
 				<%
 				Map<String, Object> data = new HashMap<String, Object>();
 
-				data.put("fileEntryId", fileEntry.getFileEntryId());
+				List<Class<?>> desiredReturnTypes = wikiAttachmentItemSelectorCriterion.getDesiredReturnTypes();
+
+				for (Class<?> desiredReturnType : desiredReturnTypes) {
+					if (desiredReturnType == FileEntry.class) {
+						data.put("returnType", FileEntry.class.getName());
+						data.put("value", fileEntry.getFileEntryId());
+					}
+					else if (desiredReturnType == URL.class) {
+						data.put("returnType", URL.class.getName());
+						data.put("value", HtmlUtil.escape(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)));
+					}
+					else {
+						continue;
+					}
+
+					break;
+				}
+
+				if (data.isEmpty()) {
+					throw new RuntimeException();
+				}
+
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -82,15 +102,17 @@ WikiPage wikiPage = WikiPageLocalServiceUtil.getPage(pageResource.getNodeId(), p
 <aui:script>
 	var container = $('#<portlet:namespace />selectDocumentFm');
 
-	var selectorButtons = container.find('.selector-button');
-
 	container.on(
 		'click',
 		'.selector-button',
 		function(event) {
-			var fileEntryId = event.target.getAttribute('data-fileEntryId');
-
-			<%= itemSelectedCallback %>('<%= FileEntry.class.getName() %>', fileEntryId);
+			Liferay.fire(
+				'<portlet:namespace/>selectedItem',
+				{
+					returnType : event.target.getAttribute('data-returnType'),
+					value : event.target.getAttribute('data-value')
+				}
+			);
 		}
 	);
 </aui:script>
