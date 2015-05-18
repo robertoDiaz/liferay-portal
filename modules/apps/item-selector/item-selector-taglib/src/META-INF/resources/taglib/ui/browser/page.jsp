@@ -146,10 +146,17 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 </div>
 
 <aui:script use="liferay-item-selector-browser">
-	new Liferay.ItemSelectorBrowser(
+	var itemBrowser = new Liferay.ItemSelectorBrowser(
 		{
 			closeCaption: '<%= UnicodeLanguageUtil.get(request, tabName) %>',
 			rootNode: '#<%= idPrefix %>ItemSelectorContainer'
 		}
 	);
+
+	<% String eventName = ParamUtil.getString(request, "itemSelectedEventName"); %>
+
+	itemBrowser.on('selectedItem', function(event) {
+		Liferay.Util.getOpener().Liferay.fire('<%= eventName %>', event);
+	});
+
 </aui:script>
