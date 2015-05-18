@@ -16,6 +16,7 @@ package com.liferay.document.library.item.selector.web;
 
 import com.liferay.item.selector.BaseItemSelectorCriterion;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.Base64;
 
 import java.net.URL;
 
@@ -84,7 +85,7 @@ public class DLItemSelectorCriterion extends BaseItemSelectorCriterion {
 	}
 
 	private static final Set<Class<?>> _AVAILABLE_RETURN_TYPES =
-		getInmutableSet(FileEntry.class, URL.class);
+		getInmutableSet(Base64.class, FileEntry.class, URL.class);
 
 	private long _folderId;
 	private String[] _mimeTypes;
