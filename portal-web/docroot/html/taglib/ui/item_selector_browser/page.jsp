@@ -1,3 +1,4 @@
+<%@ page import="java.net.URL" %>
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -60,7 +61,8 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 						%>
 
 						<liferay-ui:search-container-column-text name="title">
-							<a class="item-preview" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
+
+							<a class="item-preview" data-returnType="<%= URL.class.getName() %>" data-value="<%= HtmlUtil.escapeAttribute(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" 	href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
 
 								<%
 								String iconCssClass = DLUtil.getFileIconCssClass(fileEntry.getExtension());
@@ -116,7 +118,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 						</div>
 
 						<div class="text-primary">
-							<a class="item-preview" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
+							<a class="item-preview" data-returnType="<%= URL.class.getName() %>" data-value="<%= HtmlUtil.escapeAttribute(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" 	href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
 								<%= HtmlUtil.escape(title) %>
 							</a>
 
@@ -142,29 +144,20 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 	<liferay-ui:drop-here-info message="drop-files-here" />
 </div>
 
+
+
 <aui:script use="liferay-item-selector-browser">
-	new Liferay.ItemSelectorBrowser(
+	<% String eventName = ParamUtil.getString(request, "itemSelectedEventName"); %>
+
+	var itemBrowser = new Liferay.ItemSelectorBrowser(
 		{
 			closeCaption: '<%= UnicodeLanguageUtil.get(request, tabName) %>',
 			rootNode: '#<%= idPrefix %>ItemSelectorContainer'
 		}
 	);
-</aui:script>
 
-<aui:script>
-	var container = $('#<portlet:namespace />selectDocumentFm');
+	itemBrowser.on('selectedItem', function(event) {
+		Liferay.Util.getOpener().Liferay.fire('<%= eventName %>', event);
+	});
 
-	container.on(
-		'click',
-		'.selector-button',
-		function(event) {
-			Liferay.fire(
-				'<portlet:namespace/>selectedItem',
-				{
-					returnType : event.target.getAttribute('data-returnType'),
-					value : event.target.getAttribute('data-value')
-				}
-			);
-		}
-	);
 </aui:script>
