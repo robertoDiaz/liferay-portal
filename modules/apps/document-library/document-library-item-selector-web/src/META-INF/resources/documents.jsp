@@ -36,6 +36,7 @@ documentsSearchContainer.setResults(DLAppServiceUtil.getFileEntries(repositoryId
 <liferay-ui:item-selector-browser
 	displayStyle="<%= displayStyle %>"
 	idPrefix="<%= dlItemSelectorCriterion.getType() %>"
+	returnType="<%= ReturnType.parseFirst(dlItemSelectorCriterion.getDesiredReturnTypes()) %>"
 	searchContainer="<%= documentsSearchContainer %>"
 	tabName="<%= dlItemSelectorCriterion.getType() %>"
 />

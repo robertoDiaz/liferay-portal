@@ -20,6 +20,7 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.document.library.item.selector.web.DLItemSelectorCriterion" %><%@
+page import="com.liferay.item.selector.taglib.ReturnType" %><%@
 page import="com.liferay.document.library.item.selector.web.DLItemSelectorView" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
