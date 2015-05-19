@@ -514,8 +514,6 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 		Liferay.on(
 			'<%= name %>selectDocument',
 			function(event) {
-				debugger;
-
 				CKEDITOR.tools.callFunction(event.ckeditorfuncnum, event.value);
 			}
 		);

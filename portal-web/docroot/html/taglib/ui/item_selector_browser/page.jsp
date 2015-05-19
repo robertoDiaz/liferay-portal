@@ -65,7 +65,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 						<liferay-ui:search-container-column-text name="title">
 
 							<%
-							ObjectValuePair<String, String> returnTypeAndValue = _getReturnTypeAndValue(desiredReturnTypes, fileEntry);
+							ObjectValuePair<String, String> returnTypeAndValue = _getReturnTypeAndValue(desiredReturnTypes, fileEntry, themeDisplay);
 							%>
 
 							<a class="item-preview" data-returnType="<%= returnTypeAndValue.getKey() %>" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" data-value="<%= returnTypeAndValue.getValue() %>" href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
@@ -111,7 +111,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 
 				String title = DLUtil.getTitleWithExtension(fileEntry);
 
-				ObjectValuePair<String, String> returnTypeAndValue = _getReturnTypeAndValue(desiredReturnTypes, fileEntry);
+				ObjectValuePair<String, String> returnTypeAndValue = _getReturnTypeAndValue(desiredReturnTypes, fileEntry, themeDisplay);
 			%>
 
 				<li class="list-group-item list-group-item-default">
@@ -178,19 +178,18 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 </aui:script>
 
 <%!
-private ObjectValuePair<String, String> _getReturnTypeAndValue(List<Class<?>> desiredReturnTypes, FileEntry fileEntry) throws Exception {
+private ObjectValuePair<String, String> _getReturnTypeAndValue(List<Class<?>> desiredReturnTypes, FileEntry fileEntry, ThemeDisplay themeDisplay) throws Exception {
 	ObjectValuePair<String, String> ovp = null;
 
 	for (Class<?> desiredReturnType : desiredReturnTypes) {
 		if (desiredReturnType == Base64.class) {
-			ovp = new ObjectValuePair<>(Base64.class.getName(), "");
+			ovp = new ObjectValuePair<String, String>(Base64.class.getName(), "");
 		}
 		else if (desiredReturnType == FileEntry.class) {
-			ovp = new ObjectValuePair<>(FileEntry.class.getName(), String.valueOf(fileEntry.getFileEntryId()));
+			ovp = new ObjectValuePair<String, String>(FileEntry.class.getName(), String.valueOf(fileEntry.getFileEntryId()));
 		}
 		else if (desiredReturnType == URL.class) {
-			ovp = new ObjectValuePair<>(URL.class.getName(), HtmlUtil.escapeAttribute(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)));
-
+			ovp = new ObjectValuePair<String, String>(URL.class.getName(), HtmlUtil.escapeAttribute(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)));
 		}
 		else {
 			continue;
@@ -200,5 +199,7 @@ private ObjectValuePair<String, String> _getReturnTypeAndValue(List<Class<?>> de
 	if (Validator.isNull(ovp.getValue())) {
 		throw new RuntimeException();
 	}
+
+	return ovp;
 }
 %>
