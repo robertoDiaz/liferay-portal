@@ -156,8 +156,6 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 
 	<%
 		String eventName = HtmlUtil.escape(ParamUtil.getString(request, "itemSelectedEventName"));
-
-		Map<String, String[]> parameterMap = liferayPortletRequest.getParameterMap();
 	%>
 
 	var itemBrowser = new Liferay.ItemSelectorBrowser(
@@ -168,10 +166,6 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 	);
 
 	itemBrowser.on('selectedItem', function(event) {
-		<% if (parameterMap.containsKey("CKEditorFuncNum")) { %>
-			event['data-ckeditorfuncnum'] = <%= parameterMap.get("CKEditorFuncNum")[0] %>;
-		<% } %>
-
 		Liferay.Util.getOpener().Liferay.fire('<%= eventName %>', event);
 	});
 

@@ -511,14 +511,7 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 			}
 		);
 
-		Liferay.on(
-			'<%= name %>selectDocument',
-			function(event) {
-				CKEDITOR.tools.callFunction(event.ckeditorfuncnum, event.value);
-			}
-		);
-
-		if (window['<%= name %>Config']) {sele
+		if (window['<%= name %>Config']) {
 			window['<%= name %>Config']();
 		}
 
