@@ -26,6 +26,16 @@ Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 request.setAttribute(WebKeys.GROUP, group);
 
 boolean showGroupsSelector = ParamUtil.getBoolean(request, "showGroupsSelector");
+
+String eventName = HtmlUtil.escape(ParamUtil.getString(request, "itemSelectedEventName"));
+
+String ckeditorfuncnum = null;
+
+Map<String, String[]> parameterMap = request.getParameterMap();
+
+if (parameterMap.containsKey("CKEditorFuncNum")) {
+	ckeditorfuncnum = parameterMap.get("CKEditorFuncNum")[0];
+}
 %>
 
 <c:if test="<%= showGroupsSelector %>">
@@ -148,13 +158,17 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 	button.on(
 		'click',
 		function(event) {
-			Liferay.fire(
-				'<portlet:namespace/>selectedItem',
+			Util.getOpener().Liferay.fire(
+				'<%= eventName %>',
 				{
+					ckeditorfuncnum: <%= ckeditorfuncnum %>,
+					layoutpath: event.target.getAttribute('data-layoutpath'),
 					returnType : event.target.getAttribute('data-returnType'),
 					value : event.target.getAttribute('data-value')
 				}
 			);
+
+			Util.getWindow().destroy();
 		}
 	);
 

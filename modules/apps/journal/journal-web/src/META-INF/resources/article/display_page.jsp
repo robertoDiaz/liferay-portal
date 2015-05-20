@@ -137,7 +137,7 @@ ItemSelector itemSelector = (ItemSelector)request.getAttribute("itemSelector");
 							uri: '<%= itemSelectorURL.toString() %>'
 						},
 						function(event) {
-							pagesContainerInput.val(event.uuid);
+							pagesContainerInput.val(event.value);
 
 							displayPageNameInput.html(event.layoutpath);
 

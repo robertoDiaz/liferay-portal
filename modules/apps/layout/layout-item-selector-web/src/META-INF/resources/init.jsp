@@ -26,6 +26,7 @@
 <%@ page import="com.liferay.layout.item.selector.web.LayoutItemSelectorCriterion" %><%@
 page import="com.liferay.layout.item.selector.web.LayoutItemSelectorView" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
@@ -37,6 +38,7 @@ page import="com.liferay.portlet.layoutsadmin.context.LayoutsAdminDisplayContext
 <%@ page import="java.net.URL" %>
 
 <%@ page import="java.util.List" %><%@
+page import="java.util.Map" %><%@
 page import="java.util.UUID" %>
 
 <portlet:defineObjects />
