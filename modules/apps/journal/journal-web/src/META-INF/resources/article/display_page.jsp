@@ -112,6 +112,8 @@ boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_artic
 		ItemSelector itemSelector = (ItemSelector)request.getAttribute(JournalWebKeys.ITEM_SELECTOR);
 
 		LayoutItemSelectorCriterion layoutItemSelectorCriterion = new LayoutItemSelectorCriterion(scopeGroupId);
+		
+		layoutItemSelectorCriterion.setDesiredReturnTypes(UUID.class);
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(liferayPortletResponse, eventName, layoutItemSelectorCriterion);
 		%>
@@ -137,7 +139,7 @@ boolean changeStructure = GetterUtil.getBoolean(request.getAttribute("edit_artic
 							uri: '<%= itemSelectorURL.toString() %>'
 						},
 						function(event) {
-							pagesContainerInput.val(event.uuid);
+							pagesContainerInput.val(event.value);
 
 							displayPageNameInput.html(event.layoutpath);
 
