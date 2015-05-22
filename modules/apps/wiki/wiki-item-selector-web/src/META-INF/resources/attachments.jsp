@@ -31,11 +31,14 @@ WikiPage wikiPage = WikiPageLocalServiceUtil.getPage(pageResource.getNodeId(), p
 
 wikiAttachmentsSearchContainer.setTotal(wikiPage.getAttachmentsFileEntriesCount());
 wikiAttachmentsSearchContainer.setResults(wikiPage.getAttachmentsFileEntries(wikiAttachmentsSearchContainer.getStart(), wikiAttachmentsSearchContainer.getEnd()));
+
+ItemSelectorBrowserTag.ReturnType itemSelectorBrowserReturnType = ItemSelectorBrowserTag.ReturnType.parseFirst(wikiAttachmentItemSelectorCriterion.getDesiredReturnTypes());
 %>
 
 <liferay-ui:item-selector-browser
 	displayStyle="<%= displayStyle %>"
 	idPrefix="wikiAttachments"
+	returnType="<%= itemSelectorBrowserReturnType %>"
 	searchContainer="<%= wikiAttachmentsSearchContainer %>"
 	tabName="attachments"
 />
