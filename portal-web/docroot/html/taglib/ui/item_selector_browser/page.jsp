@@ -17,9 +17,9 @@
 <%@ include file="/html/taglib/ui/item_selector_browser/init.jsp" %>
 
 <%
+List<ItemSelectorBrowserReturnType> desiredReturnTypes = (List<ItemSelectorBrowserReturnType>)request.getAttribute("liferay-ui:item-selector-browser:desiredReturnTypes");
 String displayStyle = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:displayStyle"), "descriptive");
 String idPrefix = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:idPrefix"));
-List<ItemSelectorBrowserReturnType> desiredReturnTypes = (List<ItemSelectorBrowserReturnType>)request.getAttribute("liferay-ui:item-selector-browser:desiredReturnTypes");
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:item-selector-browser:searchContainer");
 String tabName = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:tabName"));
 String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:uploadMessage"));
