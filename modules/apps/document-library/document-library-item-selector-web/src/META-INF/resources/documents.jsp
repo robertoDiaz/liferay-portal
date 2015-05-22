@@ -22,6 +22,7 @@ DLItemSelectorViewDisplayContext dlItemSelectorViewDisplayContext = (DLItemSelec
 ItemSelectorCriterion itemSelectorCriterion = dlItemSelectorViewDisplayContext.getItemSelectorCriterion();
 
 SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, "curDocuments", SearchContainer.DEFAULT_DELTA, dlItemSelectorViewDisplayContext.getPortletURL(), null, LanguageUtil.get(request, "there-are-no-documents-or-media-files-in-this-folder"));
+searchContainer.setOrderByComparator(DLUtil.getRepositoryModelOrderByComparator("title", "asc"));
 
 List results = null;
 int total = 0;
