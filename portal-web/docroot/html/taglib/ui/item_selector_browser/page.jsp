@@ -19,22 +19,24 @@
 <%
 String displayStyle = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:displayStyle"), "descriptive");
 String idPrefix = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:idPrefix"));
-List<ItemSelectorBrowserTag.ItemSelectorBrowserReturnType> desiredReturnTypes = (List<ItemSelectorBrowserTag.ItemSelectorBrowserReturnType>)request.getAttribute("liferay-ui:item-selector-browser:desiredReturnTypes");
+List<ItemSelectorBrowserReturnType> desiredReturnTypes = (List<ItemSelectorBrowserReturnType>)request.getAttribute("liferay-ui:item-selector-browser:desiredReturnTypes");
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:item-selector-browser:searchContainer");
 String tabName = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:tabName"));
 String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:uploadMessage"));
 %>
 
 <div class="lfr-item-viewer" id="<%= idPrefix %>ItemSelectorContainer">
-	<div class="drop-zone">
-		<label class="btn btn-primary" for="<%= idPrefix %>InputFile"><liferay-ui:message key="select-file" /></label>
+	<c:if test="<%= desiredReturnTypes.contains(Base64.class) %>">
+		<div class="drop-zone">
+			<label class="btn btn-primary" for="<%= idPrefix %>InputFile"><liferay-ui:message key="select-file" /></label>
 
-		<input class="hide" id="<%= idPrefix %>InputFile" type="file" />
+			<input class="hide" id="<%= idPrefix %>InputFile" type="file" />
 
-		<p>
-			<%= uploadMessage %>
-		</p>
-	</div>
+			<p>
+				<%= uploadMessage %>
+			</p>
+		</div>
+	</c:if>
 
 	<c:choose>
 		<c:when test='<%= displayStyle.equals("list") %>'>
