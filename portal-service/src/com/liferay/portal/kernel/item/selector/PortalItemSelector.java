@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.item.selector;
 
-import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -27,7 +27,7 @@ import javax.portlet.PortletURL;
 public interface PortalItemSelector {
 
 	public PortletURL getItemSelectorURL(
-		PortletRequest portletRequest, String itemSelectedCallback,
+		PortletResponse portletResponse, String itemSelectedCallback,
 		long groupId, Class<?>... desiredReturnTypes);
 
 }
