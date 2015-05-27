@@ -6,7 +6,7 @@ import com.liferay.portal.kernel.item.selector.PortalItemSelector;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 
-import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
@@ -20,7 +20,7 @@ public class ItemSelectorBridge implements PortalItemSelector {
 
 	@Override
 	public PortletURL getItemSelectorURL(
-		PortletRequest portletRequest, String itemSelectedCallback,
+		PortletResponse portletResponse, String itemSelectedCallback,
 		long groupId, Class<?>... desiredReturnTypes) {
 
 		DLItemSelectorCriterion dlItemSelectorCriterion =
@@ -29,7 +29,7 @@ public class ItemSelectorBridge implements PortalItemSelector {
 				PropsValues.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES, false);
 
 		return _itemSelector.getItemSelectorURL(
-			portletRequest, itemSelectedCallback, dlItemSelectorCriterion);
+			portletResponse, itemSelectedCallback, dlItemSelectorCriterion);
 	}
 
 	@Reference
