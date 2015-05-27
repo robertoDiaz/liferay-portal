@@ -14,7 +14,20 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.item.selector.PortalItemSelector;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 import com.liferay.taglib.util.IncludeTag;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,11 +82,40 @@ public class ImageSelectorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:image-selector:fileEntryId", _fileEntryId);
 		request.setAttribute(
+			"liferay-ui:image-selector:itemSelectorURL", _getItemSelectorURL());
+		request.setAttribute(
 			"liferay-ui:image-selector:maxFileSize", _maxFileSize);
 		request.setAttribute("liferay-ui:image-selector:paramName", _paramName);
 		request.setAttribute("liferay-ui:image-selector:uploadURL", _uploadURL);
 		request.setAttribute(
 			"liferay-ui:image-selector:validExtensions", _validExtensions);
+	}
+
+	private PortletURL _getItemSelectorURL() {
+		_ImageSelectorURL imageSelectorURL = new _ImageSelectorURL();
+
+		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST);
+
+		if (portletRequest == null) {
+			return null;
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
+			JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		LiferayPortletResponse liferayPortletResponse =
+			PortalUtil.getLiferayPortletResponse(portletResponse);
+
+		String itemSelectedEventName =
+			liferayPortletResponse.getNamespace() + "selectImage";
+
+		return imageSelectorURL.getItemSelectorURL(
+			portletRequest, itemSelectedEventName,
+			themeDisplay.getScopeGroupId(), null);
 	}
 
 	private static final String _PAGE =
@@ -85,5 +127,31 @@ public class ImageSelectorTag extends IncludeTag {
 	private String _paramName = "imageSelectorFileEntry";
 	private String _uploadURL;
 	private String _validExtensions;
+
+	private static class _ImageSelectorURL {
+
+		public _ImageSelectorURL() {
+			Registry registry = RegistryUtil.getRegistry();
+
+			_serviceTracker = registry.trackServices(PortalItemSelector.class);
+
+			_serviceTracker.open();
+		}
+
+		public PortletURL getItemSelectorURL(
+			PortletRequest portletRequest, String itemSelectedCallback,
+			long groupId, Class<?>... returnTypes) {
+
+			PortalItemSelector portalItemSelector =
+				_serviceTracker.getService();
+
+			return portalItemSelector.getItemSelectorURL(
+				portletRequest, itemSelectedCallback, groupId, returnTypes);
+		}
+
+		private final ServiceTracker<PortalItemSelector, PortalItemSelector>
+			_serviceTracker;
+
+	}
 
 }
