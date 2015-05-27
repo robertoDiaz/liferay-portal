@@ -70,8 +70,7 @@ AUI.add(
 
 				instance._bindUIACIBase();
 
-				var autocompleteAttrs = AArray.filter(
-					A.Object.keys(A.AutoComplete.ATTRS),
+				var autocompleteAttrs = A.Object.keys(A.AutoComplete.ATTRS).filter(
 					function(item) {
 						return item !== 'value';
 					}
@@ -93,8 +92,7 @@ AUI.add(
 
 				var tplResults = instance.get('tplResults');
 
-				return AArray.map(
-					results,
+				return results.map(
 					function(result) {
 						return Lang.sub(tplResults, result.raw);
 					}
@@ -263,7 +261,7 @@ AUI.add(
 			_syncUIPosAlign: Lang.emptyFn,
 
 			_validateOffset: function(value) {
-				return (Lang.isArray(value) || Lang.isNumber(value));
+				return Lang.isArray(value) || Lang.isNumber(value);
 			}
 		};
 
