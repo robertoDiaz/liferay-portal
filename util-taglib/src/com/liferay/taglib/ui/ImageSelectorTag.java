@@ -25,7 +25,6 @@ import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.taglib.util.IncludeTag;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
@@ -94,27 +93,20 @@ public class ImageSelectorTag extends IncludeTag {
 	private PortletURL _getItemSelectorURL() {
 		_ImageSelectorURL imageSelectorURL = new _ImageSelectorURL();
 
-		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST);
-
-		if (portletRequest == null) {
-			return null;
-		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		LiferayPortletResponse liferayPortletResponse =
 			PortalUtil.getLiferayPortletResponse(portletResponse);
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		String itemSelectedEventName =
 			liferayPortletResponse.getNamespace() + "selectImage";
 
 		return imageSelectorURL.getItemSelectorURL(
-			portletRequest, itemSelectedEventName,
+			portletResponse, itemSelectedEventName,
 			themeDisplay.getScopeGroupId(), null);
 	}
 
@@ -139,14 +131,14 @@ public class ImageSelectorTag extends IncludeTag {
 		}
 
 		public PortletURL getItemSelectorURL(
-			PortletRequest portletRequest, String itemSelectedCallback,
+			PortletResponse portletResponse, String itemSelectedEventName,
 			long groupId, Class<?>... returnTypes) {
 
 			PortalItemSelector portalItemSelector =
 				_serviceTracker.getService();
 
 			return portalItemSelector.getItemSelectorURL(
-				portletRequest, itemSelectedCallback, groupId, returnTypes);
+				portletResponse, itemSelectedEventName, groupId, returnTypes);
 		}
 
 		private final ServiceTracker<PortalItemSelector, PortalItemSelector>
