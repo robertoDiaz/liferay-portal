@@ -3681,6 +3681,42 @@ module.framework.properties.osgi.console=11312</echo>
 		</if>
 
 		<if>
+			<isset property="database.hsql.driver" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.driver=${database.hsql.driver}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.password" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.password=${database.hsql.password}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.url" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.url=${database.hsql.url}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.username" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.username=${database.hsql.username}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="database.mysql.driver" />
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
@@ -3944,6 +3980,42 @@ module.framework.properties.osgi.console=11312</echo>
 		</if>
 
 		<if>
+			<isset property="lcs.email.address.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.address.3=${lcs.email.address.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.1" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.1=${lcs.email.id.1}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.2" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.2=${lcs.email.id.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.3=${lcs.email.id.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="lcs.email.password.1" />
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
@@ -3957,6 +4029,15 @@ module.framework.properties.osgi.console=11312</echo>
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
 					lcs.email.password.2=${lcs.email.password.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.password.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.password.3=${lcs.email.password.3}
 				</echo>
 			</then>
 		</if>
@@ -4146,6 +4227,19 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 			</then>
 		</if>
 
+		<if>
+			<or>
+				<contains string="${liferay.portal.bundle}" substring="6.2.10" />
+				<equals arg1="${liferay.portal.bundle}" arg2="6.2.2" />
+				<equals arg1="${liferay.portal.bundle}" arg2="6.2.3" />
+			</or>
+			<then>
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties" append="true">
+
+app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.42</echo>
+			</then>
+		</if>
+
 		<property file="${lp.plugins.dir}/portlets/so-portlet/docroot/WEB-INF/liferay-releng.properties" />
 
 		<property name="plugins.includes" value="so-portlet,${dependent-apps}" />
@@ -4311,6 +4405,31 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 		<if>
 			<matches pattern="http" string="${test.build.bundle.tomcat.zip.url}" />
 			<then>
+				<if>
+					<equals arg1="${liferay.portal.bundle}" arg2="6.1.20" />
+					<then>
+						<echo file="app.server.${user.name}.properties" append="true">
+							app.server.tomcat.version=7.0.27
+						</echo>
+
+						<var name="app.server.tomcat.bin.dir" value="${app.server.parent.dir}/tomcat-7.0.27/bin" />
+					</then>
+					<elseif>
+						<or>
+							<contains string="${liferay.portal.bundle}" substring="6.2.10" />
+							<equals arg1="${liferay.portal.bundle}" arg2="6.2.2" />
+							<equals arg1="${liferay.portal.bundle}" arg2="6.2.3" />
+						</or>
+						<then>
+							<echo file="app.server.${user.name}.properties" append="true">
+								app.server.tomcat.version=7.0.42
+							</echo>
+
+							<var name="app.server.tomcat.bin.dir" value="${app.server.parent.dir}/tomcat-7.0.42/bin" />
+						</then>
+					</elseif>
+				</if>
+
 				<antcall target="prepare-test-bundle">
 					<param name="app.server.type" value="tomcat" />
 					<param name="test.app.server.bin.dir" value="${app.server.tomcat.bin.dir}" />
@@ -4493,22 +4612,6 @@ plugins.includes=marketplace-portlet</echo>
 				</unzip>
 
 				<delete file="${tstamp.value}.zip" />
-
-				<if>
-					<and>
-						<equals arg1="${app.server.type}" arg2="tomcat" />
-						<equals arg1="${liferay.portal.bundle}" arg2="6.1.20" />
-					</and>
-					<then>
-						<echo file="app.server.${user.name}.properties" append="true">
-							app.server.tomcat.version=7.0.27
-						</echo>
-
-						<var name="test.app.server.bin.dir" unset="true" />
-
-						<var name="test.app.server.bin.dir" value="${app.server.parent.dir}/tomcat-7.0.27/bin" />
-					</then>
-				</if>
 
 				<chmod perm="a+x">
 					<fileset dir="${test.app.server.bin.dir}">
@@ -4845,6 +4948,10 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				</exec>
 			</then>
 		</if>
+	</target>
+
+	<target name="record-database-type">
+		<echo file="database-type" append="true">${database.type},</echo>
 	</target>
 
 	<target name="record-git-commit-bottom-test-jsp">
@@ -5238,6 +5345,7 @@ if (ppstate.equals("normal")) {
 			<then>
 				<antcall target="rebuild-database" inheritAll="false">
 					<param name="database.type" value="mysql" />
+					<param name="delete.liferay.home" value="false" />
 				</antcall>
 
 				<echo file="portal-impl/classes/portal-ext.properties">liferay.home=${liferay.home}
