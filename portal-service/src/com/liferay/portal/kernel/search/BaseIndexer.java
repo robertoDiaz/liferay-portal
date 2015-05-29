@@ -80,8 +80,9 @@ import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
 import com.liferay.portlet.trash.model.TrashEntry;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -92,10 +93,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
-/**pasa
+/**
  * @author Brian Wing Shun Chan
  * @author Hugo Huijser
  * @author Ryan Park
