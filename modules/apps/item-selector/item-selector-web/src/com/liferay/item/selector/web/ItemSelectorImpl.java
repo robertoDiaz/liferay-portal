@@ -329,8 +329,8 @@ public class ItemSelectorImpl implements ItemSelector {
 
 			ItemSelectorCriterionSerializer<ItemSelectorCriterion>
 				itemSelectorCriterionSerializer =
-				new ItemSelectorCriterionSerializer<>(
-					itemSelectorCriterion, i + "_");
+					new ItemSelectorCriterionSerializer<>(
+						itemSelectorCriterion, i + "_");
 
 			parameters.putAll(itemSelectorCriterionSerializer.getProperties());
 		}
