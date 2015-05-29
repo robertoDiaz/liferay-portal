@@ -533,6 +533,9 @@
 							'liferay-portlet-base'
 						]
 					},
+					'liferay-item-selector-dialog': {
+						path: 'item_selector_dialog.js'
+					},
 					'liferay-item-viewer': {
 						path: 'item_viewer.js',
 						requires: [
@@ -851,6 +854,7 @@
 							'aui-component',
 							'aui-io-request',
 							'aui-parse-content',
+							'liferay-form',
 							'liferay-portlet-url',
 							'liferay-util-window',
 							'plugin'

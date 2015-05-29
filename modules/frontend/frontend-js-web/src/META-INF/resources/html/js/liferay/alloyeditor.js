@@ -26,11 +26,6 @@ AUI.add(
 						value: {}
 					},
 
-					editorOptions: {
-						validator: Lang.isObject,
-						value: {}
-					},
-
 					onBlurMethod: {
 						validator: Lang.isFunction
 					},
@@ -45,6 +40,11 @@ AUI.add(
 
 					onInitMethod: {
 						validator: Lang.isFunction
+					},
+
+					textMode: {
+						validator: Lang.isBoolean,
+						value: {}
 					}
 				},
 
@@ -90,6 +90,27 @@ AUI.add(
 						if (editorConfig.disallowedContent && editorConfig.disallowedContent.indexOf('br') !== -1) {
 							nativeEditor.on('key', instance._onKey, instance);
 						}
+
+						CKEDITOR.on(
+							'dialogDefinition',
+							function(event) {
+								var editorName = event.editor.name;
+
+								var dialogName = event.data.name;
+
+								if (editorName === nativeEditor.name && dialogName === 'image') {
+									var dialogDefinition = event.data.definition;
+
+									var infoTab = dialogDefinition.getContents('info');
+
+									infoTab.remove('browse');
+
+									var linkTab = dialogDefinition.getContents('Link');
+
+									linkTab.remove('browse');
+								}
+							}
+						);
 					},
 
 					destructor: function() {
@@ -125,9 +146,7 @@ AUI.add(
 					getHTML: function() {
 						var instance = this;
 
-						var editorOptions = instance.get('editorOptions');
-
-						return editorOptions.textMode ? instance.getText() : instance.getCkData();
+						return instance.get('textMode') ? instance.getText() : instance.getCkData();
 					},
 
 					getNativeEditor: function() {
