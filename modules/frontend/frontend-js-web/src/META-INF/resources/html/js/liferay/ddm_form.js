@@ -921,11 +921,26 @@ AUI.add(
 						portletURL.setParameter('criteria', 'com.liferay.document.library.item.selector.web.DLItemSelectorCriterion');
 						portletURL.setParameter('itemSelectedEventName', portletNamespace + 'selectDocumentLibrary');
 
-						debugger;
-
 						var json = {
-							desiredReturnTypes: ['java.net.URL','com.liferay.portal.kernel.repository.model.FileEntry'],
-							mimeTypes: ['image\/bmp','image\/gif','image\/jpeg','image\/pjpeg','image\/png','image\/tiff','image\/x-citrix-jpeg','image\/x-citrix-png','image\/x-ms-bmp','image\/x-png','image\/x-tiff'],
+							desiredReturnTypes:
+								[
+									'java.net.URL',
+									'com.liferay.portal.kernel.repository.model.FileEntry'
+								],
+							mimeTypes:
+								[
+									'image\/bmp',
+									'image\/gif',
+									'image\/jpeg',
+									'image\/pjpeg',
+									'image\/png',
+									'image\/tiff',
+									'image\/x-citrix-jpeg',
+									'image\/x-citrix-png',
+									'image\/x-ms-bmp',
+									'image\/x-png',
+									'image\/x-tiff'
+								],
 							repositoryId: 20230
 						};
 
