@@ -198,34 +198,20 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 			button.attr('data-layoutpath', messageText);
 
 			<%
-			String returnType = StringPool.BLANK;
+			Set<ItemSelectorReturnType> desiredReturnTypes = layoutItemSelectorCriterion.getDesiredReturnTypes();
 
-			for (Class<?> desiredReturnType : layoutItemSelectorCriterion.getDesiredReturnTypes()) {
-				if (desiredReturnType == URL.class) {
-					returnType = URL.class.getName();
-				}
-				else if (desiredReturnType == UUID.class) {
-					returnType = UUID.class.getName();
-				}
-				else {
-					continue;
-				}
+			Iterator<ItemSelectorReturnType> iterator = desiredReturnTypes.iterator();
 
-				break;
-			}
-
-			if (Validator.isNull(returnType)) {
-				throw new IllegalArgumentException("Invalid return type " + returnType);
-			}
+			ItemSelectorReturnType itemSelectorReturnType = iterator.next();
 			%>
 
-			button.attr('data-returnType', '<%= returnType %>' );
+			button.attr('data-returnType', '<%= itemSelectorReturnType %>' );
 
 			<c:choose>
-				<c:when test="<%= returnType.equals(URL.class.getName()) %>">
+				<c:when test="<%= itemSelectorReturnType == LayoutItemSelectorReturnType.URL %>">
 					button.attr('data-value', url);
 				</c:when>
-				<c:when test="<%= returnType.equals(UUID.class.getName()) %>">
+				<c:when test="<%= itemSelectorReturnType == LayoutItemSelectorReturnType.UUID %>">
 					button.attr('data-value', uuid);
 				</c:when>
 			</c:choose>

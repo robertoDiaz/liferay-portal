@@ -14,39 +14,20 @@
 
 package com.liferay.layout.item.selector.web;
 
-import com.liferay.item.selector.BaseItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorReturnType;
 
-import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Roberto Díaz
  */
-public class LayoutItemSelectorCriterion extends BaseItemSelectorCriterion {
+public enum LayoutItemSelectorReturnType implements ItemSelectorReturnType {
 
-	public LayoutItemSelectorCriterion() {
-		super(_AVAILABLE_RETURN_TYPES);
+	URL, UUID;
+
+	@Override
+	public String getName() {
+		return name();
 	}
-
-	public LayoutItemSelectorCriterion(long groupId) {
-		super(_AVAILABLE_RETURN_TYPES);
-
-		_groupId = groupId;
-	}
-
-	public long getGroupId() {
-		return _groupId;
-	}
-
-	public void setGroupId(long groupId) {
-		_groupId = groupId;
-	}
-
-	private static final Set<ItemSelectorReturnType> _AVAILABLE_RETURN_TYPES =
-		getInmutableSet(
-			LayoutItemSelectorReturnType.URL,
-			LayoutItemSelectorReturnType.UUID);
-
-	private long _groupId;
 
 }

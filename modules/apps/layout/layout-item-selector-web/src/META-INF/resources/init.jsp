@@ -27,12 +27,18 @@
 page import="com.liferay.layout.item.selector.web.LayoutItemSelectorView" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.model.Group" %><%@
 page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portlet.layoutsadmin.context.LayoutsAdminDisplayContext" %>
+
+<%@ page
+		import="com.liferay.layout.item.selector.web.LayoutItemSelectorReturnType" %><%@
+page import="com.liferay.item.selector.ItemSelectorReturnType" %>
+
+<%@ page import="java.util.Iterator" %><%@
+page import="java.util.Set" %>
 
 <%@ page import="java.net.URL" %>
 
