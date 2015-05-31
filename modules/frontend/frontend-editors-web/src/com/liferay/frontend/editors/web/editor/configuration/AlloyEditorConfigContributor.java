@@ -15,8 +15,10 @@
 package com.liferay.frontend.editors.web.editor.configuration;
 
 import com.liferay.document.library.item.selector.web.DLItemSelectorCriterion;
+import com.liferay.document.library.item.selector.web.DLItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.layout.item.selector.web.LayoutItemSelectorCriterion;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
@@ -31,8 +33,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-
-import java.net.URL;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -200,9 +200,9 @@ public class AlloyEditorConfigContributor extends BaseEditorConfigContributor {
 		JSONObject jsonObject, LiferayPortletResponse liferayPortletResponse,
 		long scopeGroupId, String eventName) {
 
-		Set<Class<?>> desiredReturnTypes = new HashSet<>();
+		Set<ItemSelectorReturnType> desiredReturnTypes = new HashSet<>();
 
-		desiredReturnTypes.add(URL.class);
+		desiredReturnTypes.add(DLItemSelectorReturnType.URL);
 
 		ItemSelectorCriterion layoutItemSelectorCriterion =
 			new LayoutItemSelectorCriterion(scopeGroupId);

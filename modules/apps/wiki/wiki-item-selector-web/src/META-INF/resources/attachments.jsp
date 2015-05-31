@@ -1,3 +1,4 @@
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -31,13 +32,19 @@ WikiPage wikiPage = WikiPageLocalServiceUtil.getPage(pageResource.getNodeId(), p
 
 wikiAttachmentsSearchContainer.setTotal(wikiPage.getAttachmentsFileEntriesCount());
 wikiAttachmentsSearchContainer.setResults(wikiPage.getAttachmentsFileEntries(wikiAttachmentsSearchContainer.getStart(), wikiAttachmentsSearchContainer.getEnd()));
+
+BrowserTagItemSelectorReturnType browserTagItemSelectorReturnType = null;
+
+for (ItemSelectorReturnType desiredReturnType : wikiAttachmentItemSelectorCriterion.getDesiredReturnTypes()) {
+	browserTagItemSelectorReturnType = (BrowserTagItemSelectorReturnType)desiredReturnType;
+}
 %>
 
 <item-selector-ui:browser
+	browserTagItemSelectorReturnType="<%= browserTagItemSelectorReturnType %>"
 	displayStyle="<%= displayStyle %>"
 	idPrefix="wikiAttachments"
 	itemSelectedEventName="<%= GetterUtil.getString(request.getAttribute(WikiAttachmentItemSelectorView.ITEM_SELECTED_EVENT_NAME)) %>"
-	returnType="<%= ReturnType.parseFirst(wikiAttachmentItemSelectorCriterion.getDesiredReturnTypes()) %>"
 	searchContainer="<%= wikiAttachmentsSearchContainer %>"
 	tabName="attachments"
 />

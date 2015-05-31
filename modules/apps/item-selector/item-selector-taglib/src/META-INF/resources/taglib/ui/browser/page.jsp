@@ -1,3 +1,5 @@
+<%@ page
+		import="com.liferay.item.selector.taglib.BrowserTagItemSelectorReturnType" %>
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -17,17 +19,17 @@
 <%@ include file="/taglib/ui/browser/init.jsp" %>
 
 <%
+BrowserTagItemSelectorReturnType browserTagItemSelectorReturnType = (BrowserTagItemSelectorReturnType)request.getAttribute("liferay-ui:item-selector-browser:browserTagItemSelectorReturnType");
 String displayStyle = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:displayStyle"), "descriptive");
 String idPrefix = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:idPrefix"));
 String itemSelectedEventName = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:itemSelectedEventName"));
-ReturnType returnType = (ReturnType)request.getAttribute("liferay-ui:item-selector-browser:returnType");
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:item-selector-browser:searchContainer");
 String tabName = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:tabName"));
 String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:item-selector-browser:uploadMessage"));
 %>
 
 <div class="lfr-item-viewer" id="<%= idPrefix %>ItemSelectorContainer">
-	<c:if test="<%= ReturnType.BASE_64.equals(returnType) %>">
+	<c:if test="<%= !browserTagItemSelectorReturnType.showDropZone() %>">
 		<div class="drop-zone">
 			<label class="btn btn-primary" for="<%= idPrefix %>InputFile"><liferay-ui:message key="select-file" /></label>
 
@@ -66,7 +68,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 						<liferay-ui:search-container-column-text name="title">
 
 							<%
-							ObjectValuePair<String, String> returnTypeAndValue = returnType.getReturnTypeAndValue(fileEntry, themeDisplay);
+							ObjectValuePair<String, String> returnTypeAndValue = browserTagItemSelectorReturnType.getReturnTypeAndValue(fileEntry, themeDisplay);
 							%>
 
 							<a class="item-preview" data-returnType="<%= returnTypeAndValue.getKey() %>" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" data-value="<%= returnTypeAndValue.getValue() %>" href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
@@ -127,7 +129,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 						<div class="text-primary">
 
 							<%
-							ObjectValuePair<String, String> returnTypeAndValue = returnType.getReturnTypeAndValue(fileEntry, themeDisplay);
+							ObjectValuePair<String, String> returnTypeAndValue = browserTagItemSelectorReturnType.getReturnTypeAndValue(fileEntry, themeDisplay);
 							%>
 
 							<a class="item-preview" data-returnType="<%= returnTypeAndValue.getKey() %>" data-url="<%= HtmlUtil.escapeAttribute(DLUtil.getPreviewURL(fileEntry, latestFileVersion, themeDisplay, StringPool.BLANK)) %>" data-value="<%= returnTypeAndValue.getValue() %>" href="<%= HtmlUtil.escapeHREF(DLUtil.getImagePreviewURL(fileEntry, themeDisplay)) %>" title="<%= HtmlUtil.escapeAttribute(title) %>">

@@ -15,9 +15,7 @@
 package com.liferay.wiki.item.selector.web;
 
 import com.liferay.item.selector.BaseItemSelectorCriterion;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-
-import java.net.URL;
+import com.liferay.item.selector.ItemSelectorReturnType;
 
 import java.util.Set;
 
@@ -45,8 +43,10 @@ public class WikiAttachmentItemSelectorCriterion
 		_wikiPageResourceId = wikiPageResourceId;
 	}
 
-	private static final Set<Class<?>> _AVAILABLE_RETURN_TYPES =
-		getInmutableSet(FileEntry.class, URL.class);
+	private static final Set<ItemSelectorReturnType> _AVAILABLE_RETURN_TYPES =
+		getInmutableSet(
+			WikiAttachmentItemSelectorReturnType.FILE_ENTRY,
+			WikiAttachmentItemSelectorReturnType.URL);
 
 	private long _wikiPageResourceId;
 

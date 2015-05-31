@@ -31,13 +31,19 @@ String[] mimeTypes = dlItemSelectorCriterion.getMimeTypes();
 
 documentsSearchContainer.setTotal(DLAppServiceUtil.getFileEntriesCount(repositoryId, folderId, mimeTypes));
 documentsSearchContainer.setResults(DLAppServiceUtil.getFileEntries(repositoryId, folderId, mimeTypes, documentsSearchContainer.getStart(), documentsSearchContainer.getEnd(), documentsSearchContainer.getOrderByComparator()));
+
+DLItemSelectorReturnType dlItemSelectorReturnType = null;
+
+for (ItemSelectorReturnType desiredReturnType : dlItemSelectorCriterion.getDesiredReturnTypes()) {
+	dlItemSelectorReturnType = (DLItemSelectorReturnType)desiredReturnType;
+}
 %>
 
 <item-selector-ui:browser
+	browserTagItemSelectorReturnType="<%= dlItemSelectorReturnType %>"
 	displayStyle="<%= displayStyle %>"
 	idPrefix="documents"
 	itemSelectedEventName="<%= GetterUtil.getString(request.getAttribute(DLItemSelectorView.ITEM_SELECTED_EVENT_NAME)) %>"
-	returnType="<%= ReturnType.parseFirst(dlItemSelectorCriterion.getDesiredReturnTypes()) %>"
 	searchContainer="<%= documentsSearchContainer %>"
 	tabName="documents"
 />

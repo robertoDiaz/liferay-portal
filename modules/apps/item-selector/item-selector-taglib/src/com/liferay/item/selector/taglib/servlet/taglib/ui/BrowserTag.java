@@ -14,7 +14,7 @@
 
 package com.liferay.item.selector.taglib.servlet.taglib.ui;
 
-import com.liferay.item.selector.taglib.ReturnType;
+import com.liferay.item.selector.taglib.BrowserTagItemSelectorReturnType;
 import com.liferay.item.selector.taglib.util.ServletContextUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -28,6 +28,12 @@ import javax.servlet.jsp.PageContext;
  * @author Roberto Díaz
  */
 public class BrowserTag extends IncludeTag {
+
+	public void setBrowserTagItemSelectorReturnType(
+		BrowserTagItemSelectorReturnType browserTagItemSelectorReturnType) {
+
+		_browserTagItemSelectorReturnType = browserTagItemSelectorReturnType;
+	}
 
 	public void setDisplayStyle(String displayStyle) {
 		_displayStyle = displayStyle;
@@ -46,10 +52,6 @@ public class BrowserTag extends IncludeTag {
 		super.setPageContext(pageContext);
 
 		servletContext = ServletContextUtil.getServletContext();
-	}
-
-	public void setReturnType(ReturnType returnType) {
-		_returnType = returnType;
 	}
 
 	public void setSearchContainer(SearchContainer<?> searchContainer) {
@@ -71,7 +73,7 @@ public class BrowserTag extends IncludeTag {
 		_displayStyle = "icon";
 		_idPrefix = null;
 		_itemSelectedEventName = null;
-		_returnType = null;
+		_browserTagItemSelectorReturnType = null;
 		_searchContainer = null;
 		_tabName = null;
 		_uploadMessage = null;
@@ -103,7 +105,8 @@ public class BrowserTag extends IncludeTag {
 			"liferay-ui:item-selector-browser:itemSelectedEventName",
 			_itemSelectedEventName);
 		request.setAttribute(
-			"liferay-ui:item-selector-browser:returnType", _returnType);
+			"liferay-ui:item-selector-browser:browserTagItemSelectorReturnType",
+			_browserTagItemSelectorReturnType);
 		request.setAttribute(
 			"liferay-ui:item-selector-browser:searchContainer",
 			_searchContainer);
@@ -116,10 +119,10 @@ public class BrowserTag extends IncludeTag {
 
 	private static final String _PAGE = "/taglib/ui/browser/page.jsp";
 
+	private BrowserTagItemSelectorReturnType _browserTagItemSelectorReturnType;
 	private String _displayStyle;
 	private String _idPrefix;
 	private String _itemSelectedEventName;
-	private ReturnType _returnType;
 	private SearchContainer<?> _searchContainer;
 	private String _tabName;
 	private String _uploadMessage;
