@@ -15,6 +15,7 @@
 package com.liferay.item.selector.web;
 
 import com.liferay.item.selector.ItemSelectorRendering;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.ItemSelectorViewRenderer;
 import com.liferay.portal.json.JSONFactoryImpl;
@@ -25,8 +26,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.PortletURLFactory;
 import com.liferay.portlet.PortletURLFactoryUtil;
-
-import java.net.URL;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +52,9 @@ public class ItemSelectorImplTest extends PowerMockito {
 	public void setUp() {
 		_flickrItemSelectorCriterion = new FlickrItemSelectorCriterion();
 
-		Set<Class<?>> desiredReturnTypes = new HashSet<>();
+		Set<ItemSelectorReturnType> desiredReturnTypes = new HashSet<>();
 
-		desiredReturnTypes.add(URL.class);
+		desiredReturnTypes.add(TestItemSelectorReturnType.URL);
 
 		_flickrItemSelectorCriterion.setDesiredReturnTypes(desiredReturnTypes);
 
@@ -105,11 +104,9 @@ public class ItemSelectorImplTest extends PowerMockito {
 			parameters.get(ItemSelectorImpl.PARAMETER_CRITERIA)[0]);
 		Assert.assertNull(parameters.get("0_desiredReturnTypes"));
 		Assert.assertNotNull(parameters.get("0_json")[0]);
-		Assert.assertEquals(
-			URL.class.getName(), parameters.get("1_desiredReturnTypes")[0]);
 		Assert.assertNotNull(parameters.get("1_json")[0]);
 
-		Assert.assertEquals(5, parameters.size());
+		Assert.assertEquals(4, parameters.size());
 	}
 
 	@Test

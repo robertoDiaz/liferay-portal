@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -255,8 +254,6 @@ public class ItemSelectorImpl implements ItemSelector {
 
 			String prefix = i + "_";
 
-			populateDesiredReturnTypes(
-				parameters, prefix, itemSelectorCriterion);
 			populateItemSelectorCriteria(
 				parameters, prefix, itemSelectorCriterion);
 		}
@@ -303,50 +300,6 @@ public class ItemSelectorImpl implements ItemSelector {
 		parameters.put(
 			PARAMETER_CRITERIA,
 			new String[] {ArrayUtil.toString(itemSelectorCriteria, accessor)});
-	}
-
-	protected void populateDesiredReturnTypes(
-		Map<String, String[]> parameters, String prefix,
-		ItemSelectorCriterion itemSelectorCriterion) {
-
-		Set<Class<?>> desiredReturnTypes =
-			itemSelectorCriterion.getDesiredReturnTypes();
-
-		Set<Class<?>> availableReturnTypes =
-			itemSelectorCriterion.getAvailableReturnTypes();
-
-		if (desiredReturnTypes.size() == availableReturnTypes.size()) {
-			return;
-		}
-
-		Accessor<Class<?>, String> accessor = new Accessor<Class<?>, String>() {
-
-			@Override
-			public String get(Class<?> clazz) {
-				return clazz.getName();
-			}
-
-			@Override
-			public Class<String> getAttributeClass() {
-				return String.class;
-			}
-
-			@Override
-			@SuppressWarnings("rawtypes")
-			public Class<Class<?>> getTypeClass() {
-				return (Class)Class.class;
-			}
-
-		};
-
-		parameters.put(
-			prefix + "desiredReturnTypes",
-			new String[] {
-				ArrayUtil.toString(
-					desiredReturnTypes.toArray(
-						new Class<?>[desiredReturnTypes.size()]),
-					accessor)
-			});
 	}
 
 	protected void populateItemSelectorCriteria(

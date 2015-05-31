@@ -14,11 +14,11 @@
 
 package com.liferay.item.selector.web.util;
 
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.web.FlickrItemSelectorCriterion;
+import com.liferay.item.selector.web.TestItemSelectorReturnType;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-
-import java.net.URL;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,9 +50,9 @@ public class ItemSelectorCriterionSerializerTest {
 
 	@Test
 	public void testGetProperties() {
-		Set<Class<?>> desiredReturnTypes = new HashSet<>();
+		Set<ItemSelectorReturnType> desiredReturnTypes = new HashSet<>();
 
-		desiredReturnTypes.add(URL.class);
+		desiredReturnTypes.add(TestItemSelectorReturnType.URL);
 
 		_flickrItemSelectorCriterion.setDesiredReturnTypes(desiredReturnTypes);
 
@@ -63,7 +63,9 @@ public class ItemSelectorCriterionSerializerTest {
 			_PREFIX + ItemSelectorCriterionSerializer.JSON)[0];
 
 		json = _assert(
-			"\"desiredReturnTypes\":[\"" + URL.class.getName() + "\"]", json);
+			"\"desiredReturnTypes\":[\"" +
+				TestItemSelectorReturnType.URL.getName() + "\"]",
+			json);
 		json = _assert("\"tags\":[\"me\",\"photo\",\"picture\"]", json);
 		json = _assert("\"user\":\"anonymous\"", json);
 
@@ -77,9 +79,9 @@ public class ItemSelectorCriterionSerializerTest {
 		properties.put(
 			_PREFIX + ItemSelectorCriterionSerializer.JSON,
 			new String[] {
-				"{\"desiredReturnTypes\":[\"" + URL.class.getName() +
-					"\"],\"tags\":[\"tag1\",\"tag2\",\"tag3\"],\"user\":" +
-						"\"Joe Bloggs\"}"
+				"{\"desiredReturnTypes\":[\"" +
+					TestItemSelectorReturnType.URL.getName() + "\"],\"tags\"" +
+					":[\"tag1\",\"tag2\",\"tag3\"],\"user\":\"Joe Bloggs\"}"
 			});
 
 		_itemSelectorCriterionSerializer.setProperties(properties);
@@ -90,9 +92,10 @@ public class ItemSelectorCriterionSerializerTest {
 			new String[] {"tag1", "tag2", "tag3"},
 			_flickrItemSelectorCriterion.getTags());
 
-		Set<Class<?>> expectedDesiredReturnTypes = new HashSet<>();
+		Set<ItemSelectorReturnType> expectedDesiredReturnTypes =
+			new HashSet<>();
 
-		expectedDesiredReturnTypes.add(URL.class);
+		expectedDesiredReturnTypes.add(TestItemSelectorReturnType.URL);
 
 		Assert.assertEquals(
 			expectedDesiredReturnTypes,
