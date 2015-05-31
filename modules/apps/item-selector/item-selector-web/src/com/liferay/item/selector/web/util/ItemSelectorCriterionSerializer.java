@@ -15,12 +15,11 @@
 package com.liferay.item.selector.web.util;
 
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONSerializer;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.lang.reflect.Array;
@@ -144,29 +143,28 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 	}
 
 	private void _setDesiredReturnTypes(Map<String, ?> map) {
-		Set<Class<?>> desiredReturnTypes = new LinkedHashSet<>();
+		Set<ItemSelectorReturnType> availableReturnTypes =
+			_itemSelectorCriterion.getAvailableReturnTypes();
+
+		Set<ItemSelectorReturnType> desiredReturnTypes = new LinkedHashSet<>();
 
 		List<String> desiredReturnTypeNames = (List<String>)map.get(
 			"desiredReturnTypes");
 
 		for (String desiredReturnTypeName : desiredReturnTypeNames) {
-			try {
-				Class<?> clazz = Class.forName(desiredReturnTypeName);
+			for (ItemSelectorReturnType availableReturnType :
+					availableReturnTypes) {
 
-				desiredReturnTypes.add(clazz);
-			}
-			catch (ClassNotFoundException cnfe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to load class " + desiredReturnTypeName);
+				String availableReturnTypeName = availableReturnType.getName();
+
+				if (desiredReturnTypeName.equals(availableReturnTypeName)) {
+					desiredReturnTypes.add(availableReturnType);
 				}
 			}
 		}
 
 		_itemSelectorCriterion.setDesiredReturnTypes(desiredReturnTypes);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ItemSelectorCriterionSerializer.class);
 
 	private String[] _externalPropertyKeys;
 	private final T _itemSelectorCriterion;

@@ -25,17 +25,19 @@ public abstract class BaseItemSelectorCriterion
 	implements ItemSelectorCriterion {
 
 	@Override
-	public Set<Class<?>> getAvailableReturnTypes() {
+	public Set<ItemSelectorReturnType> getAvailableReturnTypes() {
 		return _availableReturnTypes;
 	}
 
 	@Override
-	public Set<Class<?>> getDesiredReturnTypes() {
+	public Set<ItemSelectorReturnType> getDesiredReturnTypes() {
 		return _desiredReturnTypes;
 	}
 
 	@Override
-	public void setDesiredReturnTypes(Set<Class<?>> desiredReturnTypes) {
+	public void setDesiredReturnTypes(
+		Set<ItemSelectorReturnType> desiredReturnTypes) {
+
 		if (!_availableReturnTypes.containsAll(desiredReturnTypes)) {
 			throw new IllegalArgumentException(
 				"Desired return types must be a subset of available return " +
@@ -45,20 +47,24 @@ public abstract class BaseItemSelectorCriterion
 		_desiredReturnTypes = desiredReturnTypes;
 	}
 
-	protected static Set<Class<?>> getInmutableSet(Class<?>... classes) {
-		Set<Class<?>> set = new HashSet<>();
+	protected static Set<ItemSelectorReturnType> getInmutableSet(
+		ItemSelectorReturnType... itemSelectorReturnTypes) {
 
-		Collections.addAll(set, classes);
+		Set<ItemSelectorReturnType> set = new HashSet<>();
+
+		Collections.addAll(set, itemSelectorReturnTypes);
 
 		return Collections.unmodifiableSet(set);
 	}
 
-	protected BaseItemSelectorCriterion(Set<Class<?>> availableReturnTypes) {
+	protected BaseItemSelectorCriterion(
+		Set<ItemSelectorReturnType> availableReturnTypes) {
+
 		_availableReturnTypes = availableReturnTypes;
 		_desiredReturnTypes = _availableReturnTypes;
 	}
 
-	private final Set<Class<?>> _availableReturnTypes;
-	private Set<Class<?>> _desiredReturnTypes;
+	private final Set<ItemSelectorReturnType> _availableReturnTypes;
+	private Set<ItemSelectorReturnType> _desiredReturnTypes;
 
 }
