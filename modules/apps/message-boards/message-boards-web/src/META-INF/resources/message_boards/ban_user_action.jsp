@@ -24,9 +24,7 @@ MBBan ban = (MBBan)row.getObject();
 
 <liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<c:if test="<%= MBPermission.contains(permissionChecker, scopeGroupId, ActionKeys.BAN_USER) %>">
-		<portlet:actionURL var="unbanUserURL">
-			<portlet:param name="struts_action" value="/message_boards/ban_user" />
-			<portlet:param name="<%= Constants.CMD %>" value="unban" />
+		<portlet:actionURL name="unbanUser" var="unbanUserURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="banUserId" value="<%= String.valueOf(ban.getBanUserId()) %>" />
 		</portlet:actionURL>

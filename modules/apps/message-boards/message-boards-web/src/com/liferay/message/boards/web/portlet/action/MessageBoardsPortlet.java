@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
@@ -38,11 +39,15 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.ActionResponseImpl;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.messageboards.MBGroupServiceSettings;
+import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBThread;
+import com.liferay.portlet.messageboards.service.MBBanServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.InputStream;
 
@@ -88,6 +93,18 @@ import org.osgi.service.component.annotations.Component;
 )
 public class MessageBoardsPortlet extends MVCPortlet {
 
+	public void banUser(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long banUserId = ParamUtil.getLong(actionRequest, "banUserId");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			MBBan.class.getName(), actionRequest);
+
+		MBBanServiceUtil.addBan(banUserId, serviceContext);
+	}
+
 	public void deleteMessage(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
@@ -123,6 +140,18 @@ public class MessageBoardsPortlet extends MVCPortlet {
 		long messageId = ParamUtil.getLong(actionRequest, "messageId");
 
 		MBMessageServiceUtil.subscribeMessage(messageId);
+	}
+
+	public void unbanUser(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long banUserId = ParamUtil.getLong(actionRequest, "banUserId");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			MBBan.class.getName(), actionRequest);
+
+		MBBanServiceUtil.deleteBan(banUserId, serviceContext);
 	}
 
 	public void unlockThreads(
@@ -310,6 +339,50 @@ public class MessageBoardsPortlet extends MVCPortlet {
 		}
 	}
 
+	protected void deleteThreads(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		deleteThreads(actionRequest, false);
+	}
+
+	protected void deleteThreads(
+			ActionRequest actionRequest, boolean moveToTrash)
+		throws PortalException {
+
+		long[] deleteThreadIds = null;
+
+		long threadId = ParamUtil.getLong(actionRequest, "threadId");
+
+		if (threadId > 0) {
+			deleteThreadIds = new long[] {threadId};
+		}
+		else {
+			deleteThreadIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "threadIds"), 0L);
+		}
+
+		List<TrashedModel> trashedModels = new ArrayList<>();
+
+		for (long deleteThreadId : deleteThreadIds) {
+			if (moveToTrash) {
+				MBThread thread = MBThreadServiceUtil.moveThreadToTrash(
+					deleteThreadId);
+
+				trashedModels.add(thread);
+			}
+			else {
+				MBThreadServiceUtil.deleteThread(deleteThreadId);
+			}
+		}
+
+		if (moveToTrash && !trashedModels.isEmpty()) {
+			TrashUtil.addTrashSessionMessages(actionRequest, trashedModels);
+
+			hideDefaultSuccessMessage(actionRequest);
+		}
+	}
+
 	protected String getRedirect(
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		MBMessage message) {
@@ -362,6 +435,13 @@ public class MessageBoardsPortlet extends MVCPortlet {
 		portletURL.setParameter("preview", String.valueOf(preview));
 
 		return portletURL.toString();
+	}
+
+	protected void moveThreadsToTrash(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		deleteThreads(actionRequest, true);
 	}
 
 }

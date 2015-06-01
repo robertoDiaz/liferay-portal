@@ -91,9 +91,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 
 							<c:choose>
 								<c:when test="<%= MBBanLocalServiceUtil.hasBan(scopeGroupId, userDisplay.getUserId()) %>">
-									<portlet:actionURL var="unbanUserURL">
-										<portlet:param name="struts_action" value="/message_boards/ban_user" />
-										<portlet:param name="<%= Constants.CMD %>" value="unban" />
+									<portlet:actionURL name="unbanUser" var="unbanUserURL">
 										<portlet:param name="redirect" value="<%= currentURL %>" />
 										<portlet:param name="banUserId" value="<%= String.valueOf(userDisplay.getUserId()) %>" />
 									</portlet:actionURL>
@@ -106,9 +104,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 									/>
 								</c:when>
 								<c:otherwise>
-									<portlet:actionURL var="banUserURL">
-										<portlet:param name="struts_action" value="/message_boards/ban_user" />
-										<portlet:param name="<%= Constants.CMD %>" value="ban" />
+									<portlet:actionURL name="banUser" var="banUserURL">
 										<portlet:param name="redirect" value="<%= currentURL %>" />
 										<portlet:param name="banUserId" value="<%= String.valueOf(userDisplay.getUserId()) %>" />
 									</portlet:actionURL>
