@@ -25,27 +25,26 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"com.liferay.portlet.icon=/icons/message_boards.png",
 		"com.liferay.portlet.control-panel-entry-category=site_administration.content",
 		"com.liferay.portlet.control-panel-entry-weight=6.0",
-		"com.liferay.portlet.preferences-unique-per-layout=false",
+		"com.liferay.portlet.css-class-wrapper=portlet-message-boards",
+		"com.liferay.portlet.footer-portlet-javascript=/message_boards/js/main.js",
+		"com.liferay.portlet.header-portlet-css=/message_boards/css/main.css",
+		"com.liferay.portlet.icon=/icons/message_boards.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
-		"com.liferay.portlet.use-default-template=false",
-		"com.liferay.portlet.scopeable=true",
+		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
-		"com.liferay.portlet.header-portlet-css=/message_boards/css/main.css",
-		"com.liferay.portlet.footer-portlet-javascript=/message_boards/js/main.js",
-		"com.liferay.portlet.css-class-wrapper=portlet-message-boards",
-
+		"com.liferay.portlet.scopeable=true",
+		"com.liferay.portlet.use-default-template=false",
 		"javax.portlet.display-name=Message Boards Admin",
+		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-config.template-path=/message_boards_admin/configuration.jsp",
 		"javax.portlet.init-template-path=/message_boards_admin/",
-		"javax.portlet.expiration-cache=0",
-		"javax.portlet.supports.mime-type=text/html",
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator",
+		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = Portlet.class
 )
