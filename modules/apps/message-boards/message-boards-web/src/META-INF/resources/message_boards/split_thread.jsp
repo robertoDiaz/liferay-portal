@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
@@ -88,7 +88,7 @@ boolean splitThread = true;
 	request.setAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_THREAD, thread);
 	%>
 
-	<liferay-util:include page="/html/portlet/message_boards/view_thread_shortcut.jsp" />
+	<liferay-util:include page="/message_boards/view_thread_shortcut.jsp" />
 
 	</table>
 
@@ -111,10 +111,10 @@ boolean splitThread = true;
 			<aui:field-wrapper label="body">
 				<c:choose>
 					<c:when test="<%= message.isFormatBBCode() %>">
-						<%@ include file="/html/portlet/message_boards/bbcode_editor.jspf" %>
+						<%@ include file="/message_boards/bbcode_editor.jspf" %>
 					</c:when>
 					<c:otherwise>
-						<%@ include file="/html/portlet/message_boards/html_editor.jspf" %>
+						<%@ include file="/message_boards/html_editor.jspf" %>
 					</c:otherwise>
 				</c:choose>
 

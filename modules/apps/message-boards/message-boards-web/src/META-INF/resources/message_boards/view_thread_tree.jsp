@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 MBTreeWalker treeWalker = (MBTreeWalker)request.getAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER);
@@ -39,7 +39,7 @@ int depth = ((Integer)request.getAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_DE
 	request.setAttribute("edit_message.jsp-thread", thread);
 	%>
 
-	<liferay-util:include page="/html/portlet/message_boards/view_thread_message.jsp" />
+	<liferay-util:include page="/message_boards/view_thread_message.jsp" />
 
 	<%
 	request.setAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_VIEWABLE_THREAD, Boolean.TRUE.toString());
@@ -75,7 +75,7 @@ for (int i = range[0]; i < range[1]; i++) {
 	request.setAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_THREAD, thread);
 %>
 
-	<liferay-util:include page="/html/portlet/message_boards/view_thread_tree.jsp" />
+	<liferay-util:include page="/message_boards/view_thread_tree.jsp" />
 
 <%
 }

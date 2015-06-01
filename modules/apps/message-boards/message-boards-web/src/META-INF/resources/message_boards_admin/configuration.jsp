@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());

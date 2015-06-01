@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <liferay-portlet:actionURL varImpl="restoreURL">
 	<portlet:param name="struts_action" value="/message_boards/edit_message_attachments" />

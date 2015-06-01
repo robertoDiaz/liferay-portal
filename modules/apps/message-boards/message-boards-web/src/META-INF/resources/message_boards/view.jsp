@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String topLink = ParamUtil.getString(request, "topLink", "message-boards-home");
@@ -68,7 +68,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 	portletURL="<%= restoreTrashEntriesURL %>"
 />
 
-<liferay-util:include page="/html/portlet/message_boards/top_links.jsp" />
+<liferay-util:include page="/message_boards/top_links.jsp" />
 
 <c:choose>
 	<c:when test="<%= useAssetEntryQuery %>">
@@ -77,7 +77,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 			portletURL="<%= portletURL %>"
 		/>
 
-		<%@ include file="/html/portlet/message_boards/view_threads.jspf" %>
+		<%@ include file="/message_boards/view_threads.jspf" %>
 
 	</c:when>
 	<c:when test='<%= topLink.equals("message-boards-home") %>'>
@@ -142,7 +142,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				</c:if>
 			</div>
 
-			<%@ include file="/html/portlet/message_boards/category_subscriptions.jspf" %>
+			<%@ include file="/message_boards/category_subscriptions.jspf" %>
 		</c:if>
 
 		<c:if test="<%= category != null %>">
@@ -228,7 +228,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 		</c:if>
 
 		<div class="displayStyle-<%= HtmlUtil.escapeAttribute(displayStyle) %>">
-			<liferay-util:include page='<%= "/html/portlet/message_boards/view_category_" + displayStyle + ".jsp" %>' />
+			<liferay-util:include page='<%= "/message_boards/view_category_" + displayStyle + ".jsp" %>' />
 		</div>
 
 		<%
@@ -285,14 +285,14 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						<portlet:param name="mbCategoryId" value="<%= String.valueOf(curCategory.getCategoryId()) %>" />
 					</liferay-portlet:renderURL>
 
-					<%@ include file="/html/portlet/message_boards/subscribed_category_columns.jspf" %>
+					<%@ include file="/message_boards/subscribed_category_columns.jspf" %>
 				</liferay-ui:search-container-row>
 
 				<liferay-ui:search-iterator type="more" />
 			</liferay-ui:search-container>
 		</c:if>
 
-		<%@ include file="/html/portlet/message_boards/view_threads.jspf" %>
+		<%@ include file="/message_boards/view_threads.jspf" %>
 
 		<c:if test='<%= enableRSS && topLink.equals("recent-posts") %>'>
 
@@ -364,7 +364,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						modelVar="statsUser"
 					>
 						<liferay-ui:search-container-column-jsp
-							path="/html/portlet/message_boards/top_posters_user_display.jsp"
+							path="/message_boards/top_posters_user_display.jsp"
 						/>
 					</liferay-ui:search-container-row>
 
@@ -447,7 +447,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				<liferay-ui:search-container-column-jsp
 					align="right"
 					cssClass="entry-action"
-					path="/html/portlet/message_boards/ban_user_action.jsp"
+					path="/message_boards/ban_user_action.jsp"
 				/>
 			</liferay-ui:search-container-row>
 

@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
@@ -86,7 +86,7 @@ if (message != null) {
 		request.setAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE, curParentMessage);
 		%>
 
-		<liferay-util:include page="/html/portlet/message_boards/asset/discussion_full_content.jsp" />
+		<liferay-util:include page="/message_boards/asset/discussion_full_content.jsp" />
 	</c:if>
 
 	<c:if test="<%= pending %>">

@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String randomNamespace = PortalUtil.generateRandomKey(request, "discussion_full_content") + StringPool.UNDERLINE;
@@ -72,5 +72,5 @@ MBMessage parentMessage = MBMessageLocalServiceUtil.getMessage(message.getParent
 	request.setAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE, parentMessage);
 	%>
 
-	<liferay-util:include page="/html/portlet/message_boards/asset/discussion_full_content.jsp" />
+	<liferay-util:include page="/message_boards/asset/discussion_full_content.jsp" />
 </c:if>

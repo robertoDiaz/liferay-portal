@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/portlet/message_boards/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
@@ -109,7 +109,7 @@ iteratorURL.setParameter("messageId", String.valueOf(messageId));
 		<liferay-ui:search-container-column-jsp
 			align="right"
 			cssClass="entry-action"
-			path="/html/portlet/message_boards/deleted_message_attachment_action.jsp"
+			path="/message_boards/deleted_message_attachment_action.jsp"
 		/>
 	</liferay-ui:search-container-row>
 
