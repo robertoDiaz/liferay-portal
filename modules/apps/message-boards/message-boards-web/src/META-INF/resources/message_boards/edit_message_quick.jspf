@@ -53,7 +53,7 @@ boolean splitThread = ParamUtil.getBoolean(request, "splitThread");
 %>
 
 <portlet:actionURL var="editMessageURL">
-	<portlet:param name="struts_action" value="/message_boards/edit_message" />
+	<portlet:param name="mvcPath" value="edit_message.jsp" />
 </portlet:actionURL>
 
 <aui:form action="<%= editMessageURL %>" method="post" name="addQuickReplyFm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveMessage();" %>'>

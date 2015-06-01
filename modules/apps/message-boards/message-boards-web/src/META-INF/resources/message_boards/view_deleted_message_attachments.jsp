@@ -29,7 +29,7 @@ MBUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/message_boards/edit_message");
+portletURL.setParameter("mvcPath", "edit_message.jsp");
 portletURL.setParameter("messageId", String.valueOf(message.getMessageId()));
 
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), portletURL.toString());
