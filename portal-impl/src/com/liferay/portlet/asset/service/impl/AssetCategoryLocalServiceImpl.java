@@ -241,7 +241,7 @@ public class AssetCategoryLocalServiceImpl
 				rebuildTreeGroupIds.add(groupId);
 			}
 
-			deleteCategory(category, true);
+			assetCategoryLocalService.deleteCategory(category, true);
 		}
 	}
 
@@ -260,7 +260,6 @@ public class AssetCategoryLocalServiceImpl
 	}
 
 	@Override
-	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public AssetCategory deleteCategory(AssetCategory category)
 		throws PortalException {
 
@@ -269,6 +268,7 @@ public class AssetCategoryLocalServiceImpl
 
 	@Indexable(type = IndexableType.DELETE)
 	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public AssetCategory deleteCategory(
 			AssetCategory category, boolean skipRebuildTree)
 		throws PortalException {
@@ -847,7 +847,18 @@ public class AssetCategoryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
-			throw new AssetCategoryNameException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(
+				"Asset category name cannot be null for key {categoryId=");
+			sb.append(categoryId);
+			sb.append(", vocabularyId=");
+			sb.append(vocabularyId);
+			sb.append("}");
+
+			throw new AssetCategoryNameException(
+				"Category name cannot be null for category " + categoryId +
+					" and vocabulary " + vocabularyId);
 		}
 
 		AssetCategory category = assetCategoryPersistence.fetchByP_N_V(
