@@ -104,6 +104,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENABLE_RSS_SUBSCRIPTION</td>
+	<td>//label[contains(.,'RSS Subscription')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENABLE_SOCIAL_BOOKMARKS</td>
 	<td>//label[contains(.,'Enable Social Bookmarks')]/input[@type='checkbox']</td>
 	<td></td>
@@ -114,8 +119,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FACEBOOK</td>
+	<td>//input[contains(@id,'facebook')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GOOGLE_PLUS</td>
+	<td>//input[contains(@id,'plusone')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>HIDE_FROM_NAVIGATION_MENU</td>
 	<td>//label[contains(.,'Hide from Navigation Menu')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MERGE_WITH_PARENT_FOLDER</td>
+	<td>//input[contains(@id,'mergeWithParentFolder')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -171,6 +191,16 @@
 <tr>
 	<td>SITE_OWNER</td>
 	<td>xpath=(//input[contains(@name,'rowIds')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>THIS_IS_A_MINOR_EDIT</td>
+	<td>//label[contains(.,'This is a minor edit.')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TWITTER</td>
+	<td>//input[contains(@id,'twitter')]</td>
 	<td></td>
 </tr>
 </tbody>
