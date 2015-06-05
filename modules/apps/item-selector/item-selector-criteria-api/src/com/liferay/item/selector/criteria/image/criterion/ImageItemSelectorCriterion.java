@@ -15,6 +15,7 @@
 package com.liferay.item.selector.criteria.image.criterion;
 
 import com.liferay.item.selector.BaseItemSelectorCriterion;
+import com.liferay.item.selector.criteria.DocumentItemSelectorCriterion;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 
 import java.net.URL;
@@ -24,7 +25,8 @@ import java.util.Set;
 /**
  * @author Roberto Díaz
  */
-public class ImageItemSelectorCriterion extends BaseItemSelectorCriterion {
+public class ImageItemSelectorCriterion extends BaseItemSelectorCriterion
+	implements DocumentItemSelectorCriterion {
 
 	public ImageItemSelectorCriterion() {
 		super(_AVAILABLE_RETURN_TYPES);
