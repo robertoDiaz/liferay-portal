@@ -32,18 +32,11 @@ public class FileItemSelectorCriterion extends BaseItemSelectorCriterion
 		super(_AVAILABLE_RETURN_TYPES);
 	}
 
-	public FileItemSelectorCriterion(
-		long folderId, long repositoryId, String[] mimeTypes) {
-
+	public FileItemSelectorCriterion(long repositoryId, String[] mimeTypes) {
 		super(_AVAILABLE_RETURN_TYPES);
 
-		_folderId = folderId;
 		_repositoryId = repositoryId;
 		_mimeTypes = mimeTypes;
-	}
-
-	public long getFolderId() {
-		return _folderId;
 	}
 
 	public String[] getMimeTypes() {
@@ -52,10 +45,6 @@ public class FileItemSelectorCriterion extends BaseItemSelectorCriterion
 
 	public long getRepositoryId() {
 		return _repositoryId;
-	}
-
-	public void setFolderId(long folderId) {
-		_folderId = folderId;
 	}
 
 	public void setMimeTypes(String[] mimeTypes) {
@@ -69,7 +58,6 @@ public class FileItemSelectorCriterion extends BaseItemSelectorCriterion
 	private static final Set<Class<?>> _AVAILABLE_RETURN_TYPES =
 		getInmutableSet(FileEntry.class, URL.class);
 
-	private long _folderId;
 	private String[] _mimeTypes;
 	private long _repositoryId;
 
