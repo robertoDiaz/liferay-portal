@@ -17,6 +17,7 @@ package com.liferay.item.selector.criteria.image.criterion;
 import com.liferay.item.selector.BaseItemSelectorCriterion;
 import com.liferay.item.selector.criteria.DocumentItemSelectorCriterion;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.util.PropsValues;
 
 import java.net.URL;
 
@@ -32,23 +33,27 @@ public class ImageItemSelectorCriterion extends BaseItemSelectorCriterion
 		super(_AVAILABLE_RETURN_TYPES);
 	}
 
-	public ImageItemSelectorCriterion(long repositoryId, String[] mimeTypes) {
+	public ImageItemSelectorCriterion(long repositoryId) {
 		super(_AVAILABLE_RETURN_TYPES);
 
 		_repositoryId = repositoryId;
-		_mimeTypes = mimeTypes;
 	}
 
 	public String[] getMimeTypes() {
-		return _mimeTypes;
+		return PropsValues.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES;
 	}
 
 	public long getRepositoryId() {
 		return _repositoryId;
 	}
 
-	public void setMimeTypes(String[] mimeTypes) {
-		_mimeTypes = mimeTypes;
+	@Override
+	public boolean isInternalProperty(String key) {
+		if (key.equals("mimeTypes")) {
+			return true;
+		}
+
+		return super.isInternalProperty(key);
 	}
 
 	public void setRepositoryId(long repositoryId) {
@@ -58,7 +63,6 @@ public class ImageItemSelectorCriterion extends BaseItemSelectorCriterion
 	private static final Set<Class<?>> _AVAILABLE_RETURN_TYPES =
 		getInmutableSet(FileEntry.class, URL.class);
 
-	private String[] _mimeTypes;
 	private long _repositoryId;
 
 }
