@@ -38,10 +38,12 @@ public class FileItemSelectorCriterion extends BaseItemSelectorCriterion
 		_repositoryId = repositoryId;
 	}
 
+	@Override
 	public String[] getMimeTypes() {
 		return new String[0];
 	}
 
+	@Override
 	public long getRepositoryId() {
 		return _repositoryId;
 	}

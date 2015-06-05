@@ -39,10 +39,12 @@ public class ImageItemSelectorCriterion extends BaseItemSelectorCriterion
 		_repositoryId = repositoryId;
 	}
 
+	@Override
 	public String[] getMimeTypes() {
 		return PropsValues.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES;
 	}
 
+	@Override
 	public long getRepositoryId() {
 		return _repositoryId;
 	}

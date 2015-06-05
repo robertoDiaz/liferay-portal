@@ -20,4 +20,9 @@ import com.liferay.item.selector.ItemSelectorCriterion;
  * @author Roberto Díaz
  */
 public interface DocumentItemSelectorCriterion extends ItemSelectorCriterion {
+
+	public String[] getMimeTypes();
+
+	public long getRepositoryId();
+
 }
