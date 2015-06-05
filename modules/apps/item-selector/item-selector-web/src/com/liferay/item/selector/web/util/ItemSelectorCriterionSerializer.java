@@ -117,7 +117,7 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
 				String key = entry.getKey();
 
-				if (_isInternalProperty(key)) {
+				if (_itemSelectorCriterion.isInternalProperty(key)) {
 					continue;
 				}
 
@@ -131,16 +131,6 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 		}
 
 		_externalPropertyKeys = list.toArray(new String[list.size()]);
-	}
-
-	private boolean _isInternalProperty(String name) {
-		if (name.equals("availableReturnTypes") || name.equals("class") ||
-			name.equals("desiredReturnTypes")) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private void _setDesiredReturnTypes(Map<String, ?> map) {

@@ -25,6 +25,8 @@ public interface ItemSelectorCriterion {
 
 	public Set<Class<?>> getDesiredReturnTypes();
 
+	public boolean isInternalProperty(String key);
+
 	public void setDesiredReturnTypes(Set<Class<?>> desiredReturnTypes);
 
 }

@@ -35,6 +35,17 @@ public abstract class BaseItemSelectorCriterion
 	}
 
 	@Override
+	public boolean isInternalProperty(String key) {
+		if (key.equals("availableReturnTypes") || key.equals("class") ||
+			key.equals("desiredReturnTypes")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public void setDesiredReturnTypes(Set<Class<?>> desiredReturnTypes) {
 		if (!_availableReturnTypes.containsAll(desiredReturnTypes)) {
 			throw new IllegalArgumentException(
