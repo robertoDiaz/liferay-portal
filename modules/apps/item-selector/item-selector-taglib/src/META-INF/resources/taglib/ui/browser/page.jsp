@@ -31,18 +31,13 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 
 	<c:if test="<%= Validator.isNotNull(displayStyleURL) %>">
 		<aui:nav-bar>
-			<aui:col cssClass="context-pane">
-				<liferay-ui:app-view-toolbar includeDisplayStyle="<%= true %>">
-
-					<aui:nav collapsible="<%= false %>" cssClass="nav-display-style-buttons navbar-nav" icon="th-list" id="displayStyleButtons">
-						<liferay-ui:app-view-display-style
-							displayStyle="<%= displayStyle %>"
-							displayStyleURL="<%= displayStyleURL %>"
-							displayStyles='<%= new String[] {"descriptive", "list"} %>'
-						/>
-					</aui:nav>
-				</liferay-ui:app-view-toolbar>
-			</aui:col>
+			<aui:nav collapsible="<%= true %>" cssClass="nav-display-style-buttons navbar-nav" icon="th-list" id="displayStyleButtons">
+				<liferay-ui:app-view-display-style
+					displayStyle="<%= displayStyle %>"
+					displayStyleURL="<%= displayStyleURL %>"
+					displayStyles='<%= new String[] {"descriptive", "list"} %>'
+				/>
+			</aui:nav>
 		</aui:nav-bar>
 	</c:if>
 
@@ -183,7 +178,7 @@ String uploadMessage = GetterUtil.getString(request.getAttribute("liferay-ui:ite
 				selectedItem: function(event) {
 					Liferay.Util.getOpener().Liferay.fire('<%= itemSelectedEventName %>', event);
 				}
-			},e
+			},
 			rootNode: '#<%= idPrefix %>ItemSelectorContainer'
 		}
 	);
