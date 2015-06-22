@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -65,6 +66,7 @@ public class CKEditorBBCodeConfigContributor
 			"imagesPath",
 			HtmlUtil.escape(themeDisplay.getPathThemeImages()) +
 				"/message_boards/");
+		jsonObject.put("lang", getLangJSONObject(inputEditorTaglibAttributes));
 		jsonObject.put("newThreadURL", MBThreadConstants.NEW_THREAD_URL);
 		jsonObject.put(
 			"removePlugins",
@@ -92,6 +94,19 @@ public class CKEditorBBCodeConfigContributor
 		jsonObject.put(
 			"toolbar_tablet",
 			getToolbarsTabletJSONArray(inputEditorTaglibAttributes));
+	}
+
+	protected JSONObject getLangJSONObject(
+		Map<String, Object> inputEditorTaglibAttributes) {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		jsonObject.put(
+			"code",
+			LanguageUtil.get(
+				getContentsLocale(inputEditorTaglibAttributes), "code"));
+
+		return jsonObject;
 	}
 
 	protected JSONArray getToolbarsBBCodeJSONArray(
