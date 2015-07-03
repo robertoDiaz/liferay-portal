@@ -18,7 +18,9 @@ import com.liferay.portal.kernel.editor.EditorConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.FileExtensionUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Retrieve;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
@@ -126,6 +128,13 @@ public class BlogsEntryAttachmentFileEntryHelper {
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			userId, groupId);
 
+		try {
+			fileName = FileExtensionUtil.processFileName(
+				fileName, new FileEntryRetrieve(folder.getFolderId(), groupId));
+		}
+		catch (Exception e) {
+		}
+
 		return PortletFileRepositoryUtil.addPortletFileEntry(
 			groupId, userId, BlogsEntry.class.getName(), blogsEntryId,
 			PortletKeys.BLOGS, folder.getFolderId(), is, fileName, mimeType,
@@ -143,5 +152,28 @@ public class BlogsEntryAttachmentFileEntryHelper {
 
 	private static final String _ATTRIBUTE_LIST_REGEXP =
 		"(\\s*?\\w+\\s*?=\\s*?\"[^\"]*\")*?\\s*?";
+
+	private class FileEntryRetrieve implements Retrieve {
+
+		public FileEntryRetrieve(long folderId, long groupId) {
+			_folderId = folderId;
+			_groupId = groupId;
+		}
+
+		@Override
+		public FileEntry get(String name) {
+			try {
+				return PortletFileRepositoryUtil.getPortletFileEntry(
+					_groupId, _folderId, name);
+			}
+			catch (PortalException e) {
+				return null;
+			}
+		}
+
+		private final long _folderId;
+		private final long _groupId;
+
+	}
 
 }
