@@ -38,6 +38,10 @@ public interface TemporaryFileEntriesCapability extends Capability {
 			String fileName)
 		throws PortalException;
 
+	public FileEntry fetchTemporaryFileEntry(
+		TemporaryFileEntriesScope temporaryFileEntriesScope,
+		String fileName) throws PortalException;
+
 	public List<FileEntry> getTemporaryFileEntries(
 			TemporaryFileEntriesScope temporaryFileEntriesScope)
 		throws PortalException;
