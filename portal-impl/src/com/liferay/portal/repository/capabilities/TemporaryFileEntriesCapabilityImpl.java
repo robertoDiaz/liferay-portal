@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 
@@ -122,6 +123,23 @@ public class TemporaryFileEntriesCapabilityImpl
 			_documentRepository.deleteFileEntry(fileEntry.getFileEntryId());
 		}
 		catch (NoSuchModelException nsme) {
+		}
+	}
+
+	@Override
+	public FileEntry fetchTemporaryFileEntry(
+			TemporaryFileEntriesScope temporaryFileEntriesScope,
+			String fileName)
+		throws PortalException {
+
+		Folder folder = getTempFolder(temporaryFileEntriesScope);
+
+		try {
+			return _documentRepository.getFileEntry(
+				folder.getFolderId(), fileName);
+		}
+		catch (NoSuchFileEntryException nsfe) {
+			return null;
 		}
 	}
 

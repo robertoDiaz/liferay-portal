@@ -24,10 +24,11 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.FileExtensionUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Retrieve;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
@@ -137,10 +138,12 @@ public abstract class BaseImageSelectorUploadHandler
 			inputStream = uploadPortletRequest.getFileAsStream(
 				"imageSelectorFileName");
 
+			fileName = FileExtensionUtil.processFileName(
+				fileName, new TempFileEntryRetrieve(themeDisplay));
+
 			FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
-				_TEMP_FOLDER_NAME, StringUtil.randomString() + fileName,
-				inputStream, contentType);
+				_TEMP_FOLDER_NAME, fileName, inputStream, contentType);
 
 			imageJSONObject.put("fileEntryId", fileEntry.getFileEntryId());
 
@@ -151,8 +154,8 @@ public abstract class BaseImageSelectorUploadHandler
 
 			return imageJSONObject;
 		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
+		catch (Exception e) {
+			throw new SystemException(e);
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
@@ -170,5 +173,27 @@ public abstract class BaseImageSelectorUploadHandler
 
 	private static final String _TEMP_FOLDER_NAME =
 		BaseImageSelectorUploadHandler.class.getName();
+
+	private class TempFileEntryRetrieve implements Retrieve {
+
+		public TempFileEntryRetrieve(ThemeDisplay themeDisplay) {
+			_themeDisplay = themeDisplay;
+		}
+
+		@Override
+		public FileEntry get(String name) {
+			try {
+				return TempFileEntryUtil.getTempFileEntry(
+					_themeDisplay.getScopeGroupId(), _themeDisplay.getUserId(),
+					_TEMP_FOLDER_NAME, name);
+			}
+			catch (PortalException e) {
+				return null;
+			}
+		}
+
+		private final ThemeDisplay _themeDisplay;
+
+	}
 
 }

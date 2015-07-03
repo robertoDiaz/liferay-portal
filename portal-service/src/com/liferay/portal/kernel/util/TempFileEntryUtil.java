@@ -109,6 +109,17 @@ public class TempFileEntryUtil {
 			new TemporaryFileEntriesScope(_UUID, userId, folderName), fileName);
 	}
 
+	public static FileEntry fetchTempFileEntry(
+			long groupId, long userId, String folderName, String fileName)
+		throws PortalException {
+
+		TemporaryFileEntriesCapability temporaryFileEntriesCapability =
+			_getTemporaryFileEntriesCapability(groupId);
+
+		return temporaryFileEntriesCapability.fetchTemporaryFileEntry(
+			new TemporaryFileEntriesScope(_UUID, userId, folderName), fileName);
+	}
+
 	public static FileEntry getTempFileEntry(
 			long groupId, long userId, String folderName, String fileName)
 		throws PortalException {
