@@ -28,12 +28,13 @@ public class FileExtensionUtil {
 			String fileName, Retrieve<FileEntry> retrieve)
 		throws Exception {
 
+		fileName = restartFileName(fileName);
+
 		FileEntry existingFileEntry = retrieve.get(fileName);
 
 		while (existingFileEntry != null) {
 			Pattern extensionPattern = Pattern.compile(EXTENSION_REGEXP);
 
-			Pattern digitPattern = Pattern.compile(DIGIT_REGEXP);
 
 			Matcher matcher = extensionPattern.matcher(fileName);
 
@@ -45,8 +46,6 @@ public class FileExtensionUtil {
 				fileName = fileName.replaceAll(
 					EXTENSION_REGEXP, StringPool.BLANK);
 			}
-
-			matcher = digitPattern.matcher(fileName);
 
 			String suffix = "(1)";
 
@@ -71,6 +70,10 @@ public class FileExtensionUtil {
 		}
 
 		return fileName;
+	}
+
+	protected static String restartFileName(String fileName) {
+		return fileName.replaceAll(DIGIT_REGEXP, StringPool.BLANK);
 	}
 
 	public static final String DIGIT_REGEXP = "\\(\\d+\\)";
