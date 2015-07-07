@@ -37,7 +37,7 @@ if (Validator.isNotNull(keywords)) {
 
 	searchContext.setAttribute("mimeTypes", mimeTypes);
 	searchContext.setEnd(searchContainer.getEnd());
-	searchContext.setFolderIds(new long[] {dlItemSelectorViewDisplayContext.getFolderId(request)});
+	searchContext.setFolderIds(new long[] {folderId});
 	searchContext.setStart(searchContainer.getStart());
 
 	Hits hits = DLAppServiceUtil.search(repositoryId, searchContext);

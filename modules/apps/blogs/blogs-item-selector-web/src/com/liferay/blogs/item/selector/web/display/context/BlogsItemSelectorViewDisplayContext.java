@@ -63,14 +63,11 @@ public class BlogsItemSelectorViewDisplayContext {
 	}
 
 	public PortletURL getPortletURL(
-			HttpServletRequest request,
 			LiferayPortletResponse liferayPortletResponse)
 		throws PortletException {
 
 		PortletURL portletURL = PortletURLUtil.clone(
 			_portletURL, liferayPortletResponse);
-
-		portletURL.setParameter("displayStyle", getDisplayStyle(request));
 
 		return portletURL;
 	}

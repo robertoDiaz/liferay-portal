@@ -126,6 +126,12 @@ public class BrowserTag extends IncludeTag {
 		return _PAGE;
 	}
 
+	protected PortletURL getSearchURL() {
+		_searchURL.setParameter("displayStyle", _displayStyle);
+
+		return _searchURL;
+	}
+
 	protected String getUploadMessage() {
 		if (Validator.isNotNull(_uploadMessage)) {
 			return _uploadMessage;
@@ -158,7 +164,7 @@ public class BrowserTag extends IncludeTag {
 			"liferay-ui:item-selector-browser:searchContainer",
 			_searchContainer);
 		request.setAttribute(
-			"liferay-ui:item-selector-browser:searchURL", _searchURL);
+			"liferay-ui:item-selector-browser:searchURL", getSearchURL());
 		request.setAttribute(
 			"liferay-ui:item-selector-browser:tabName", _tabName);
 		request.setAttribute(

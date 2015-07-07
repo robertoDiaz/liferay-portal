@@ -74,7 +74,6 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 		PortletURL portletURL = PortletURLUtil.clone(
 			_portletURL, liferayPortletResponse);
 
-		portletURL.setParameter("displayStyle", getDisplayStyle(request));
 		portletURL.setParameter(
 			"folderId", String.valueOf(getFolderId(request)));
 
