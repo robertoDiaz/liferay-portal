@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
 import com.liferay.portal.kernel.servlet.PortalMessages;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
+import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
@@ -194,7 +195,6 @@ import com.liferay.portlet.StateAwareResponseImpl;
 import com.liferay.portlet.UserAttributes;
 import com.liferay.portlet.admin.util.OmniadminUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.calendar.model.CalEvent;
 import com.liferay.portlet.documentlibrary.ImageSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -5240,16 +5240,26 @@ public class PortalImpl implements Portal {
 		if (((parameterMap == null) || !parameterMap.containsKey("t")) &&
 			 !(timestamp < 0)) {
 
-			if ((timestamp == 0) && uri.startsWith(StrutsUtil.TEXT_HTML_DIR)) {
-				ServletContext servletContext =
-					(ServletContext)request.getAttribute(WebKeys.CTX);
-
-				timestamp = ServletContextUtil.getLastModified(
-					servletContext, uri, true);
-			}
-
 			if (timestamp == 0) {
-				timestamp = theme.getTimestamp();
+				String portalURL = getPortalURL(request);
+
+				String path = StringUtil.replace(
+					uri, portalURL, StringPool.BLANK);
+
+				if (path.startsWith(StrutsUtil.TEXT_HTML_DIR)) {
+					ServletContext servletContext =
+						(ServletContext)request.getAttribute(WebKeys.CTX);
+
+					timestamp = ServletContextUtil.getLastModified(
+						servletContext, path, true);
+				}
+				else if (PortalWebResourcesUtil.hasContextPath(path)) {
+					timestamp = PortalWebResourcesUtil.getLastModified(
+						PortalWebResourcesUtil.getPathResourceType(path));
+				}
+				else {
+					timestamp = theme.getTimestamp();
+				}
 			}
 
 			sb.append("&t=");
@@ -5890,7 +5900,6 @@ public class PortalImpl implements Portal {
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.USER$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.USERGROUP$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.BLOGS.MODEL.BLOGSENTRY$]",
-			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.CALENDAR.MODEL.CALEVENT$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.DOCUMENTLIBRARY.MODEL." +
 				"DLFILEENTRY$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.DOCUMENTLIBRARY.MODEL." +
@@ -5921,10 +5930,10 @@ public class PortalImpl implements Portal {
 			getClassNameId(Group.class), getClassNameId(Layout.class),
 			getClassNameId(Organization.class), getClassNameId(Role.class),
 			getClassNameId(User.class), getClassNameId(UserGroup.class),
-			getClassNameId(BlogsEntry.class), getClassNameId(CalEvent.class),
-			getClassNameId(DLFileEntry.class), getClassNameId(DLFolder.class),
-			getClassNameId(MBMessage.class), getClassNameId(MBThread.class),
-			ResourceConstants.SCOPE_COMPANY, ResourceConstants.SCOPE_GROUP,
+			getClassNameId(BlogsEntry.class), getClassNameId(DLFileEntry.class),
+			getClassNameId(DLFolder.class), getClassNameId(MBMessage.class),
+			getClassNameId(MBThread.class), ResourceConstants.SCOPE_COMPANY,
+			ResourceConstants.SCOPE_GROUP,
 			ResourceConstants.SCOPE_GROUP_TEMPLATE,
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			SocialRelationConstants.TYPE_BI_COWORKER,

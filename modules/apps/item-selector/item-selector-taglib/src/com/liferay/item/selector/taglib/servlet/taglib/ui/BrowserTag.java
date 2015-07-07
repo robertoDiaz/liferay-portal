@@ -65,6 +65,10 @@ public class BrowserTag extends IncludeTag {
 		_searchContainer = searchContainer;
 	}
 
+	public void setSearchURL(PortletURL searchURL) {
+		_searchURL = searchURL;
+	}
+
 	public void setTabName(String tabName) {
 		_tabName = tabName;
 	}
@@ -86,6 +90,7 @@ public class BrowserTag extends IncludeTag {
 		_displayStyleURL = null;
 		_itemSelectedEventName = null;
 		_searchContainer = null;
+		_searchURL = null;
 		_tabName = null;
 		_uploadMessage = null;
 		_uploadURL = null;
@@ -121,6 +126,12 @@ public class BrowserTag extends IncludeTag {
 		return _PAGE;
 	}
 
+	protected PortletURL getSearchURL() {
+		_searchURL.setParameter("displayStyle", _displayStyle);
+
+		return _searchURL;
+	}
+
 	protected String getUploadMessage() {
 		if (Validator.isNotNull(_uploadMessage)) {
 			return _uploadMessage;
@@ -153,6 +164,8 @@ public class BrowserTag extends IncludeTag {
 			"liferay-ui:item-selector-browser:searchContainer",
 			_searchContainer);
 		request.setAttribute(
+			"liferay-ui:item-selector-browser:searchURL", getSearchURL());
+		request.setAttribute(
 			"liferay-ui:item-selector-browser:tabName", _tabName);
 		request.setAttribute(
 			"liferay-ui:item-selector-browser:uploadMessage",
@@ -170,6 +183,7 @@ public class BrowserTag extends IncludeTag {
 	private PortletURL _displayStyleURL;
 	private String _itemSelectedEventName;
 	private SearchContainer<?> _searchContainer;
+	private PortletURL _searchURL;
 	private String _tabName;
 	private String _uploadMessage;
 	private PortletURL _uploadURL;
