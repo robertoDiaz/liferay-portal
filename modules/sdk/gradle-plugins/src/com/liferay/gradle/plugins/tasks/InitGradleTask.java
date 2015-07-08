@@ -45,6 +45,8 @@ import nebula.plugin.extraconfigurations.ProvidedBasePlugin;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.TaskAction;
@@ -55,6 +57,11 @@ import org.gradle.api.tasks.TaskAction;
  * @author Andrea Di Giorgi
  */
 public class InitGradleTask extends DefaultTask {
+
+	public static final String[] SOURCE_FILE_NAMES = {
+		"build.xml", "docroot/WEB-INF/liferay-plugin-package.properties",
+		"ivy.xml"
+	};
 
 	public InitGradleTask() {
 		portalDependencyNotation("antlr2.jar", "antlr", "antlr", "2.7.7");
@@ -158,6 +165,18 @@ public class InitGradleTask extends DefaultTask {
 	public void initGradle() throws Exception {
 		_project = getProject();
 
+		File buildGradleFile = _project.file("build.gradle");
+
+		if (!isOverwrite() && buildGradleFile.exists() &&
+			(buildGradleFile.length() > 0)) {
+
+			_logger.error(
+				"Unable to automatically upgrade build.gradle in \"" +
+					_project.getPath() + "\"");
+
+			return;
+		}
+
 		_liferayExtension = GradleUtil.getExtension(
 			_project, LiferayExtension.class);
 		_pluginPackageProperties = FileUtil.readProperties(
@@ -170,8 +189,6 @@ public class InitGradleTask extends DefaultTask {
 
 		_buildXmlNode = readXml(xmlParser, "build.xml");
 		_ivyXmlNode = readXml(xmlParser, "ivy.xml");
-
-		File buildGradleFile = _project.file("build.gradle");
 
 		List<String> contents = new ArrayList<>();
 
@@ -186,6 +203,10 @@ public class InitGradleTask extends DefaultTask {
 		return _ignoreMissingDependencies;
 	}
 
+	public boolean isOverwrite() {
+		return _overwrite;
+	}
+
 	public void portalDependencyNotation(
 		String fileName, String group, String name, String version) {
 
@@ -197,6 +218,10 @@ public class InitGradleTask extends DefaultTask {
 		boolean ignoreMissingDependencies) {
 
 		_ignoreMissingDependencies = ignoreMissingDependencies;
+	}
+
+	public void setOverwrite(boolean overwrite) {
+		_overwrite = overwrite;
 	}
 
 	protected void addContents(List<String> contents1, List<String> contents2) {
@@ -332,7 +357,7 @@ public class InitGradleTask extends DefaultTask {
 						"Unable to find project dependency " + projectFileName;
 
 					if (isIgnoreMissingDependencies()) {
-						System.out.println(message);
+						_logger.error(message);
 
 						continue;
 					}
@@ -406,7 +431,7 @@ public class InitGradleTask extends DefaultTask {
 					fileName);
 
 				if (portalDependencyNotation == null) {
-					System.out.println(
+					_logger.error(
 						"Unable to find portal dependency " + fileName);
 				}
 				else {
@@ -744,10 +769,14 @@ public class InitGradleTask extends DefaultTask {
 		return sb.toString();
 	}
 
+	private static final Logger _logger = Logging.getLogger(
+		InitGradleTask.class);
+
 	private Node _buildXmlNode;
 	private boolean _ignoreMissingDependencies;
 	private Node _ivyXmlNode;
 	private LiferayExtension _liferayExtension;
+	private boolean _overwrite;
 	private Properties _pluginPackageProperties;
 	private final Map<String, String[]> _portalDependencyNotations =
 		new HashMap<>();

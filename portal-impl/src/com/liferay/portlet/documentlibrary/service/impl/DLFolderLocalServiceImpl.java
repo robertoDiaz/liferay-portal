@@ -484,6 +484,22 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 	@Override
 	public List<DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		OrderByComparator<DLFolder> obc) {
+
+		if (includeMountfolders) {
+			return dlFolderPersistence.findByG_P_H_S(
+				groupId, parentFolderId, false, status, start, end, obc);
+		}
+		else {
+			return dlFolderPersistence.findByG_M_P_H_S(
+				groupId, false, parentFolderId, false, status, start, end, obc);
+		}
+	}
+
+	@Override
+	public List<DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
 		OrderByComparator<DLFolder> obc) {
 
@@ -845,11 +861,13 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 						return;
 					}
 
-					Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-						DLFolder.class);
+					Indexer<DLFolder> indexer =
+						IndexerRegistryUtil.nullSafeGetIndexer(DLFolder.class);
 
 					for (TreeModel treeModel : treeModels) {
-						indexer.reindex(treeModel);
+						DLFolder dlFolder = (DLFolder)treeModel;
+
+						indexer.reindex(dlFolder);
 					}
 				}
 
@@ -1260,8 +1278,8 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			 (oldStatus == WorkflowConstants.STATUS_IN_TRASH)) &&
 			((serviceContext == null) || serviceContext.isIndexingEnabled())) {
 
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				DLFolderConstants.getClassName());
+			Indexer<DLFolder> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				DLFolder.class);
 
 			indexer.reindex(dlFolder);
 		}

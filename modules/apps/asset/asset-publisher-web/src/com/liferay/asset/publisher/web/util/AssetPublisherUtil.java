@@ -440,6 +440,19 @@ public class AssetPublisherUtil {
 			boolean deleteMissingAssetEntries, boolean checkPermission)
 		throws Exception {
 
+		return getAssetEntries(
+			portletRequest, portletPreferences, permissionChecker, groupIds,
+			deleteMissingAssetEntries, checkPermission, false);
+	}
+
+	public static List<AssetEntry> getAssetEntries(
+			PortletRequest portletRequest,
+			PortletPreferences portletPreferences,
+			PermissionChecker permissionChecker, long[] groupIds,
+			boolean deleteMissingAssetEntries, boolean checkPermission,
+			boolean includeNonVisibleAssets)
+		throws Exception {
+
 		String[] assetEntryXmls = portletPreferences.getValues(
 			"assetEntryXml", new String[0]);
 
@@ -473,7 +486,7 @@ public class AssetPublisherUtil {
 				continue;
 			}
 
-			if (!assetEntry.isVisible()) {
+			if (!assetEntry.isVisible() && !includeNonVisibleAssets) {
 				continue;
 			}
 
@@ -483,7 +496,7 @@ public class AssetPublisherUtil {
 						assetEntry.getClassName());
 
 			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-				assetEntry.getClassPK());
+				assetEntry.getClassPK(), AssetRendererFactory.TYPE_LATEST);
 
 			if (!assetRendererFactory.isActive(
 					permissionChecker.getCompanyId())) {
@@ -496,7 +509,7 @@ public class AssetPublisherUtil {
 			}
 
 			if (checkPermission &&
-				(!assetRenderer.isDisplayable() ||
+				((!assetRenderer.isDisplayable() && !includeNonVisibleAssets) ||
 				 !assetRenderer.hasViewPermission(permissionChecker))) {
 
 				continue;
@@ -922,13 +935,9 @@ public class AssetPublisherUtil {
 
 			long scopeGroupId = GetterUtil.getLong(scopeIdSuffix);
 
-			Group scopeGroup = GroupLocalServiceUtil.fetchGroup(scopeGroupId);
+			Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
-			if (scopeGroup == null) {
-				throw new PrincipalException();
-			}
-
-			return scopeGroupId;
+			return scopeGroup.getGroupId();
 		}
 		else if (scopeId.startsWith(SCOPE_ID_LAYOUT_UUID_PREFIX)) {
 			String layoutUuid = scopeId.substring(

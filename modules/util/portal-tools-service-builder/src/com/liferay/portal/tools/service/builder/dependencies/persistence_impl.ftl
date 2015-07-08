@@ -110,8 +110,16 @@ import java.util.Set;
  * @author ${author}
  * @see ${entity.name}Persistence
  * @see ${packagePath}.service.persistence.${entity.name}Util
+<#if classDeprecated>
+ * @deprecated ${classDeprecatedComment}
+</#if>
  * @generated
  */
+
+<#if classDeprecated>
+	@Deprecated
+</#if>
+
 @ProviderType
 public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.name}> implements ${entity.name}Persistence {
 
@@ -1427,14 +1435,8 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 	</#if>
 
 	@Override
-	protected int getColumnType(String columnName) {
-		Integer type = ${entity.name}ModelImpl.TABLE_COLUMNS_MAP.get(columnName);
-
-		if (type == null) {
-			throw new IllegalArgumentException("Unknown column name " + columnName + " for table " + ${entity.name}ModelImpl.TABLE_NAME);
-		}
-
-		return type;
+	protected Map<String, Integer> getTableColumnsMap() {
+		return ${entity.name}ModelImpl.TABLE_COLUMNS_MAP;
 	}
 
 	<#if entity.isHierarchicalTree()>

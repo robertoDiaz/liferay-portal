@@ -646,7 +646,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 				user.getUserId(), announcementsDelivers);
 
 			if (indexingEnabled) {
-				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Indexer<User> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 					User.class);
 
 				indexer.reindex(user);
@@ -722,7 +722,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.isCompanyAdmin(companyId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 		}
 
 		return userPersistence.findByCompanyId(companyId, start, end);
@@ -733,7 +733,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (!permissionChecker.isCompanyAdmin(companyId)) {
-			throw new PrincipalException();
+			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 		}
 
 		return userPersistence.countByCompanyId(companyId);
