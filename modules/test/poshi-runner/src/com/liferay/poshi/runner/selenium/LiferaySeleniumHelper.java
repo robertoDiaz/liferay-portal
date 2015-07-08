@@ -266,7 +266,7 @@ public class LiferaySeleniumHelper {
 
 				Element throwableElement = eventElement.element("throwable");
 
-				Exception exception;
+				Exception exception = null;
 
 				if (throwableElement != null) {
 					exception = new Exception(
@@ -1074,14 +1074,6 @@ public class LiferaySeleniumHelper {
 		if (line.contains(
 				"The web application [/reports-portlet] appears to have " +
 					"started a thread named [C3P0PooledConnectionPool")) {
-
-			return true;
-		}
-
-		// LPS-55835, temporary workaround while Brian Wulbern investigates it
-
-		if (line.matches(
-				"Current URL.*add_panel generates exception:[\\s\\S]*")) {
 
 			return true;
 		}

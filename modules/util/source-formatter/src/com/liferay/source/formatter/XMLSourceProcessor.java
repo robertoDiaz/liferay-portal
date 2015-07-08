@@ -371,7 +371,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			"**/javadocs-*.xml", "**/logs/**", "**/portal-impl/**/*.action",
 			"**/portal-impl/**/*.function", "**/portal-impl/**/*.macro",
 			"**/portal-impl/**/*.testcase", "**/test-classes/unit/**",
-			"**/test-results/**", "**/test/unit/**"
+			"**/test-results/**", "**/test/unit/**", "**/tools/node**"
 		};
 
 		_numericalPortletNameElementExclusionFiles = getPropertyList(
@@ -1285,12 +1285,12 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			return elementName1.compareToIgnoreCase(elementName2);
 		}
 
-		protected String getNameAttribute() {
-			return _NAME_ATTRIBUTE;
-		}
-
 		protected String getElementName(Element element) {
 			return element.attributeValue(getNameAttribute());
+		}
+
+		protected String getNameAttribute() {
+			return _NAME_ATTRIBUTE;
 		}
 
 		private static final String _NAME_ATTRIBUTE = "name";
