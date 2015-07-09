@@ -1,0 +1,5 @@
+Bundle-Name: Liferay Item Selector Bridge API
+Bundle-SymbolicName: com.liferay.item.selector.bridge.api
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.item.selector.bridge
+Include-Resource: classes
