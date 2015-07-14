@@ -404,6 +404,10 @@ public class FileUtil {
 		getFile().unzip(source, destination);
 	}
 
+	public static String updateFileName(String fileName, String suffix) {
+		return getFile().updateFileName(fileName, suffix);
+	}
+
 	public static void write(File file, byte[] bytes) throws IOException {
 		write(file, bytes, false);
 	}
