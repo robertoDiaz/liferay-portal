@@ -330,7 +330,8 @@
 		<private-session-attributes>false</private-session-attributes>
 		<render-weight>50</render-weight>
 		<css-class-wrapper>portlet-page-comments</css-class-wrapper>
-	</portlet><portlet>
+	</portlet>
+	<portlet>
 		<portlet-name>110</portlet-name>
 		<icon>/html/icons/document_library_display.png</icon>
 		<struts-path>document_library_display</struts-path>
