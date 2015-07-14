@@ -38,10 +38,13 @@
 		<dirset dir="apps/password-generator" includes="*" />
 		<dirset dir="apps/password-policies-admin" includes="*" />
 		<dirset dir="apps/polls" includes="*" />
+		<dirset dir="apps/portal-instances" includes="*" />
+		<dirset dir="apps/portlet-configuration" includes="*" />
 		<dirset dir="apps/portlet-css" includes="*" />
 		<dirset dir="apps/portlet-display-template" includes="*" />
 		<dirset dir="apps/product-menu" includes="*" />
 		<dirset dir="apps/quick-note" includes="*" />
+		<dirset dir="apps/ratings" includes="*" />
 		<dirset dir="apps/roles" includes="*" />
 		<dirset dir="apps/rss" includes="*" />
 		<dirset dir="apps/search" includes="*" />
