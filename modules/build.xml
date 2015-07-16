@@ -18,8 +18,9 @@
 		<dirset dir="apps/document-library" includes="*" />
 		<dirset dir="apps/dynamic-data-lists" includes="*" />
 		<dirset dir="apps/dynamic-data-mapping" includes="*" />
-		<dirset dir="apps/export-import" includes="*" />
 		<dirset dir="apps/expando" includes="*" />
+		<dirset dir="apps/export-import" includes="*" />
+		<dirset dir="apps/flags" includes="*" />
 		<dirset dir="apps/hello-velocity" includes="*" />
 		<dirset dir="apps/iframe" includes="*" />
 		<dirset dir="apps/invitation" includes="*" />
@@ -38,10 +39,13 @@
 		<dirset dir="apps/password-generator" includes="*" />
 		<dirset dir="apps/password-policies-admin" includes="*" />
 		<dirset dir="apps/polls" includes="*" />
+		<dirset dir="apps/portal-instances" includes="*" />
+		<dirset dir="apps/portlet-configuration" includes="*" />
 		<dirset dir="apps/portlet-css" includes="*" />
 		<dirset dir="apps/portlet-display-template" includes="*" />
 		<dirset dir="apps/product-menu" includes="*" />
 		<dirset dir="apps/quick-note" includes="*" />
+		<dirset dir="apps/ratings" includes="*" />
 		<dirset dir="apps/roles" includes="*" />
 		<dirset dir="apps/rss" includes="*" />
 		<dirset dir="apps/search" includes="*" />
