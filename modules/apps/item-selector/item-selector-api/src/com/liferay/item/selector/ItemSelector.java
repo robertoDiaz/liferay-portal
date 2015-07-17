@@ -21,13 +21,34 @@ import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
+ * A helper class to retrieve the ItemSelectorRendering and the PortletURL of
+ * item selector.
+ *
  * @author Iván Zaera
  */
 public interface ItemSelector {
 
+	/**
+	 * Returns the ItemSelectorRendering
+	 *
+	 * @param  portletRequest
+	 * @param  portletResponse
+	 * @return
+	 */
 	public ItemSelectorRendering getItemSelectorRendering(
 		PortletRequest portletRequest, PortletResponse portletResponse);
 
+	/**
+	 * Returns the item selector PortletURL.
+	 *
+	 * @param  requestBackedPortletURLFactory the factory used to generate the
+	 *         PortletURL
+	 * @param  itemSelectedEventName the event name that should be fired by
+	 *         views.
+	 * @param  itemSelectorCriteria an array of the Criteria that item selector
+	 *         should use to retrive the views.
+	 * @return
+	 */
 	public PortletURL getItemSelectorURL(
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
 		String itemSelectedEventName,

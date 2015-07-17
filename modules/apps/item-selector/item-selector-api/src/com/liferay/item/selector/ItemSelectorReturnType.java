@@ -15,6 +15,9 @@
 package com.liferay.item.selector;
 
 /**
+ * A java abstraction to represent the type of the returned elements. Could be
+ * used to pass information to the framework by the caller.
+ *
  * @author Roberto Díaz
  */
 public interface ItemSelectorReturnType {
