@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.tools.JavaImportsFormatter;
+import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.util.FileUtil;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
@@ -63,7 +65,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		while (true) {
 			y = annotation.indexOf(CharPool.CLOSE_CURLY_BRACE, y + 1);
 
-			if (!isInsideQuotes(annotation, y)) {
+			if (!ToolsUtil.isInsideQuotes(annotation, y)) {
 				break;
 			}
 		}
@@ -88,7 +90,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			while (true) {
 				z = parameterProperty.indexOf(CharPool.QUOTE, z + 1);
 
-				if ((z == -1) || !isInsideQuotes(parameterProperty, z)) {
+				if ((z == -1) ||
+					!ToolsUtil.isInsideQuotes(parameterProperty, z)) {
+
 					break;
 				}
 			}
@@ -534,34 +538,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		className = className.substring(0, pos);
 
-		String packagePath = fileName;
-
-		int packagePathX = packagePath.indexOf("/src/");
-
-		if (packagePathX == -1) {
-			packagePathX = packagePath.indexOf("/integration/");
-		}
-
-		if (packagePathX == -1) {
-			packagePathX = packagePath.indexOf("/unit/");
-		}
-
-		if (packagePathX != -1) {
-			packagePathX = packagePath.indexOf(
-				CharPool.SLASH, packagePathX + 1);
-		}
-
-		int packagePathY = packagePath.lastIndexOf(CharPool.SLASH);
-
-		if (packagePathX >= packagePathY) {
-			packagePath = StringPool.BLANK;
-		}
-		else {
-			packagePath = packagePath.substring(packagePathX + 1, packagePathY);
-		}
-
-		packagePath = StringUtil.replace(
-			packagePath, StringPool.SLASH, StringPool.PERIOD);
+		String packagePath = ToolsUtil.getPackagePath(file);
 
 		if (packagePath.endsWith(".model")) {
 			if (content.contains("extends " + className + "Model")) {
@@ -2698,7 +2675,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				return x;
 			}
 
-			if (isInsideQuotes(line, x)) {
+			if (ToolsUtil.isInsideQuotes(line, x)) {
 				continue;
 			}
 
