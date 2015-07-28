@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -123,6 +124,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.util.PortalUtil;
@@ -144,6 +146,10 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
+import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLinkLocalService;
+import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
@@ -4788,6 +4794,10 @@ public class JournalArticleLocalServiceImpl
 			final long folderId, final String treePath, final boolean reindex)
 		throws PortalException {
 
+		if (treePath == null) {
+			throw new IllegalArgumentException("Tree path is null");
+		}
+
 		final ActionableDynamicQuery actionableDynamicQuery =
 			getActionableDynamicQuery();
 
@@ -4804,7 +4814,10 @@ public class JournalArticleLocalServiceImpl
 					Property treePathProperty = PropertyFactoryUtil.forName(
 						"treePath");
 
-					dynamicQuery.add(treePathProperty.ne(treePath));
+					dynamicQuery.add(
+						RestrictionsFactoryUtil.or(
+							treePathProperty.isNull(),
+							treePathProperty.ne(treePath)));
 				}
 
 			});
@@ -6871,7 +6884,7 @@ public class JournalArticleLocalServiceImpl
 			}
 			catch (NoSuchTemplateException nste) {
 				if (!defaultDDMTemplateKey.equals(ddmTemplateKey)) {
-					ddmTemplate = ddmTemplatePersistence.findByG_C_T(
+					ddmTemplate = ddmTemplateLocalService.getTemplate(
 						PortalUtil.getSiteGroupId(article.getGroupId()),
 						classNameLocalService.getClassNameId(
 							DDMStructure.class),
@@ -7769,6 +7782,18 @@ public class JournalArticleLocalServiceImpl
 			"Invalid structure " + ddmStructure.getStructureId() +
 				" for folder " + folderId);
 	}
+
+	@ServiceReference(type = DDMStorageLinkLocalService.class)
+	protected DDMStorageLinkLocalService ddmStorageLinkLocalService;
+
+	@ServiceReference(type = DDMStructureLocalService.class)
+	protected DDMStructureLocalService ddmStructureLocalService;
+
+	@ServiceReference(type = DDMTemplateLinkLocalService.class)
+	protected DDMTemplateLinkLocalService ddmTemplateLinkLocalService;
+
+	@ServiceReference(type = DDMTemplateLocalService.class)
+	protected DDMTemplateLocalService ddmTemplateLocalService;
 
 	private static final long _JOURNAL_ARTICLE_CHECK_INTERVAL =
 		JournalServiceConfigurationValues.JOURNAL_ARTICLE_CHECK_INTERVAL

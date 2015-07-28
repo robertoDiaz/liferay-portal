@@ -64,13 +64,13 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationSettingsMapFactory;
-import com.liferay.portlet.exportimport.lar.CurrentUserIdStrategy;
 import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
 import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
 import com.liferay.portlet.exportimport.lar.MissingReference;
 import com.liferay.portlet.exportimport.lar.MissingReferences;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 import com.liferay.portlet.exportimport.lar.PortletDataContextFactoryUtil;
+import com.liferay.portlet.exportimport.lar.UserIdStrategy;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.portlet.exportimport.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.portlet.exportimport.service.ExportImportLocalServiceUtil;
@@ -164,8 +164,7 @@ public class ExportImportHelperUtilTest {
 		_portletDataContextImport =
 			PortletDataContextFactoryUtil.createImportPortletDataContext(
 				_liveGroup.getCompanyId(), _liveGroup.getGroupId(),
-				new HashMap<String, String[]>(),
-				new CurrentUserIdStrategy(TestPropsValues.getUser()),
+				new HashMap<String, String[]>(), new TestUserIdStrategy(),
 				testReaderWriter);
 
 		_portletDataContextImport.setImportDataRootElement(rootElement);
@@ -705,13 +704,14 @@ public class ExportImportHelperUtilTest {
 
 		User user = TestPropsValues.getUser();
 
-		Map<String, Serializable> settingsMap =
-			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-				user.getUserId(), _stagingGroup.getGroupId(),
-				_liveGroup.getGroupId(), privateLayout,
-				ExportImportHelperUtil.getLayoutIds(layouts),
-				new HashMap<String, String[]>(), user.getLocale(),
-				user.getTimeZone());
+		Map<String, Serializable> publishLayoutLocalSettingsMap =
+			ExportImportConfigurationSettingsMapFactory.
+				buildPublishLayoutLocalSettingsMap(
+					user.getUserId(), _stagingGroup.getGroupId(),
+					_liveGroup.getGroupId(), privateLayout,
+					ExportImportHelperUtil.getLayoutIds(layouts),
+					new HashMap<String, String[]>(), user.getLocale(),
+					user.getTimeZone());
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
@@ -720,8 +720,8 @@ public class ExportImportHelperUtilTest {
 					StringPool.BLANK, StringPool.BLANK,
 					ExportImportConfigurationConstants.
 						TYPE_PUBLISH_LAYOUT_LOCAL,
-					settingsMap, WorkflowConstants.STATUS_DRAFT,
-					new ServiceContext());
+					publishLayoutLocalSettingsMap,
+					WorkflowConstants.STATUS_DRAFT, new ServiceContext());
 
 		File larFile = ExportImportLocalServiceUtil.exportLayoutsAsFile(
 			exportImportConfiguration);
@@ -958,6 +958,20 @@ public class ExportImportHelperUtilTest {
 
 		private final List<String> _binaryEntries = new ArrayList<>();
 		private final Map<String, String> _entries = new HashMap<>();
+
+	}
+
+	private class TestUserIdStrategy implements UserIdStrategy {
+
+		@Override
+		public long getUserId(String userUuid) {
+			try {
+				return TestPropsValues.getUserId();
+			}
+			catch (Exception e) {
+				return 0;
+			}
+		}
 
 	}
 

@@ -28,6 +28,8 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.PortletPreferencesIds;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.permission.ModelPermissions;
+import com.liferay.portal.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -173,17 +175,33 @@ public class ServiceContextFactory {
 
 		// Permissions
 
-		boolean addGroupPermissions = ParamUtil.getBoolean(
-			request, "addGroupPermissions");
-		boolean addGuestPermissions = ParamUtil.getBoolean(
-			request, "addGuestPermissions");
-		String[] groupPermissions = PortalUtil.getGroupPermissions(request);
-		String[] guestPermissions = PortalUtil.getGuestPermissions(request);
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
+			request);
 
-		serviceContext.setAddGroupPermissions(addGroupPermissions);
-		serviceContext.setAddGuestPermissions(addGuestPermissions);
-		serviceContext.setGroupPermissions(groupPermissions);
-		serviceContext.setGuestPermissions(guestPermissions);
+		if (!modelPermissions.isEmpty()) {
+			serviceContext.setModelPermissions(modelPermissions);
+		}
+		else {
+			boolean addGroupPermissions = ParamUtil.getBoolean(
+				request, "addGroupPermissions");
+			boolean addGuestPermissions = ParamUtil.getBoolean(
+				request, "addGuestPermissions");
+			String[] groupPermissions = PortalUtil.getGroupPermissions(request);
+			String[] guestPermissions = PortalUtil.getGuestPermissions(request);
+
+			serviceContext.setAddGroupPermissions(addGroupPermissions);
+			serviceContext.setAddGuestPermissions(addGuestPermissions);
+			serviceContext.setGroupPermissions(groupPermissions);
+			serviceContext.setGuestPermissions(guestPermissions);
+
+			if ((groupPermissions != null) || (guestPermissions != null)) {
+				modelPermissions = ModelPermissionsFactory.create(
+					themeDisplay.getCompanyId(), themeDisplay.getSiteGroupId(),
+					groupPermissions, guestPermissions);
+			}
+
+			serviceContext.setModelPermissions(modelPermissions);
+		}
 
 		// Portlet preferences ids
 
@@ -371,19 +389,35 @@ public class ServiceContextFactory {
 
 		// Permissions
 
-		boolean addGroupPermissions = ParamUtil.getBoolean(
-			portletRequest, "addGroupPermissions");
-		boolean addGuestPermissions = ParamUtil.getBoolean(
-			portletRequest, "addGuestPermissions");
-		String[] groupPermissions = PortalUtil.getGroupPermissions(
-			portletRequest);
-		String[] guestPermissions = PortalUtil.getGuestPermissions(
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
 			portletRequest);
 
-		serviceContext.setAddGroupPermissions(addGroupPermissions);
-		serviceContext.setAddGuestPermissions(addGuestPermissions);
-		serviceContext.setGroupPermissions(groupPermissions);
-		serviceContext.setGuestPermissions(guestPermissions);
+		if (!modelPermissions.isEmpty()) {
+			serviceContext.setModelPermissions(modelPermissions);
+		}
+		else {
+			boolean addGroupPermissions = ParamUtil.getBoolean(
+				portletRequest, "addGroupPermissions");
+			boolean addGuestPermissions = ParamUtil.getBoolean(
+				portletRequest, "addGuestPermissions");
+			String[] groupPermissions = PortalUtil.getGroupPermissions(
+				portletRequest);
+			String[] guestPermissions = PortalUtil.getGuestPermissions(
+				portletRequest);
+
+			serviceContext.setAddGroupPermissions(addGroupPermissions);
+			serviceContext.setAddGuestPermissions(addGuestPermissions);
+			serviceContext.setGroupPermissions(groupPermissions);
+			serviceContext.setGuestPermissions(guestPermissions);
+
+			if ((groupPermissions != null) || (guestPermissions != null)) {
+				modelPermissions = ModelPermissionsFactory.create(
+					themeDisplay.getCompanyId(), themeDisplay.getSiteGroupId(),
+					groupPermissions, guestPermissions);
+			}
+
+			serviceContext.setModelPermissions(modelPermissions);
+		}
 
 		// Portlet preferences ids
 
@@ -529,12 +563,15 @@ public class ServiceContextFactory {
 		String[] guestPermissions = PortalUtil.getGuestPermissions(
 			portletRequest, className);
 
-		if (groupPermissions != null) {
+		if ((groupPermissions != null) || (guestPermissions != null)) {
 			serviceContext.setGroupPermissions(groupPermissions);
-		}
-
-		if (guestPermissions != null) {
 			serviceContext.setGuestPermissions(guestPermissions);
+
+			ModelPermissions modelPermissions = ModelPermissionsFactory.create(
+				serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
+				groupPermissions, guestPermissions);
+
+			serviceContext.setModelPermissions(modelPermissions);
 		}
 
 		// Expando
