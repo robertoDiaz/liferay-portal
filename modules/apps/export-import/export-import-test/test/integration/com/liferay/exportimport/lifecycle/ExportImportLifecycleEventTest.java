@@ -29,11 +29,9 @@ import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.test.log.CaptureAppender;
@@ -43,18 +41,16 @@ import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationSettingsMapFactory;
-import com.liferay.portlet.exportimport.lar.LayoutExporter;
-import com.liferay.portlet.exportimport.lar.LayoutImporter;
-import com.liferay.portlet.exportimport.lar.PortletExporter;
-import com.liferay.portlet.exportimport.lar.PortletImporter;
 import com.liferay.portlet.exportimport.lifecycle.ExportImportLifecycleConstants;
 import com.liferay.portlet.exportimport.lifecycle.ExportImportLifecycleEvent;
 import com.liferay.portlet.exportimport.lifecycle.ExportImportLifecycleEventListenerRegistryUtil;
 import com.liferay.portlet.exportimport.lifecycle.ExportImportLifecycleListener;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.portlet.exportimport.service.ExportImportConfigurationLocalServiceUtil;
+import com.liferay.portlet.exportimport.service.ExportImportLocalServiceUtil;
 import com.liferay.portlet.exportimport.staging.StagingUtil;
 
+import java.io.File;
 import java.io.Serializable;
 
 import java.util.HashMap;
@@ -103,24 +99,22 @@ public class ExportImportLifecycleEventTest {
 
 	@Test
 	public void testFailedLayoutExport() throws Exception {
-		LayoutExporter layoutExporter = LayoutExporter.getInstance();
-
-		Map<String, Serializable> settingsMap =
-			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-				TestPropsValues.getUserId(), 0, false, new long[0],
-				_parameterMap, Locale.US, TimeZoneUtil.GMT);
+		Map<String, Serializable> exportLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactory.
+				buildExportLayoutSettingsMap(
+					TestPropsValues.getUserId(), 0, false, new long[0],
+					_parameterMap, Locale.US, TimeZoneUtil.GMT);
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
-				addExportImportConfiguration(
-					TestPropsValues.getUserId(), 0,
-					RandomTestUtil.randomString(), StringPool.BLANK,
+				addDraftExportImportConfiguration(
+					TestPropsValues.getUserId(),
 					ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
-					settingsMap, WorkflowConstants.STATUS_DRAFT,
-					ServiceContextTestUtil.getServiceContext());
+					exportLayoutSettingsMap);
 
 		try {
-			layoutExporter.exportLayoutsAsFile(exportImportConfiguration);
+			ExportImportLocalServiceUtil.exportLayoutsAsFile(
+				exportImportConfiguration);
 
 			Assert.fail();
 		}
@@ -136,24 +130,22 @@ public class ExportImportLifecycleEventTest {
 
 	@Test
 	public void testFailedLayoutImport() throws Exception {
-		LayoutImporter layoutImporter = LayoutImporter.getInstance();
-
-		Map<String, Serializable> settingsMap =
-			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-				TestPropsValues.getUserId(), 0, false, new long[0],
-				_parameterMap, Locale.US, TimeZoneUtil.GMT);
+		Map<String, Serializable> importLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactory.
+				buildImportLayoutSettingsMap(
+					TestPropsValues.getUserId(), 0, false, new long[0],
+					_parameterMap, Locale.US, TimeZoneUtil.GMT);
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
-				addExportImportConfiguration(
-					TestPropsValues.getUserId(), 0,
-					RandomTestUtil.randomString(), StringPool.BLANK,
+				addDraftExportImportConfiguration(
+					TestPropsValues.getUserId(),
 					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
-					settingsMap, WorkflowConstants.STATUS_DRAFT,
-					ServiceContextTestUtil.getServiceContext());
+					importLayoutSettingsMap);
 
 		try {
-			layoutImporter.importLayouts(exportImportConfiguration, null);
+			ExportImportLocalServiceUtil.importLayouts(
+				exportImportConfiguration, (File)null);
 
 			Assert.fail();
 		}
@@ -203,27 +195,25 @@ public class ExportImportLifecycleEventTest {
 
 	@Test
 	public void testFailedPortletExport() throws Exception {
-		PortletExporter portletExporter = PortletExporter.getInstance();
-
 		long plid = RandomTestUtil.nextLong();
 
-		Map<String, Serializable> settingsMap =
-			ExportImportConfigurationSettingsMapFactory.buildExportSettingsMap(
-				TestPropsValues.getUserId(), plid, _group.getGroupId(),
-				StringPool.BLANK, _parameterMap, StringPool.BLANK, Locale.US,
-				TimeZoneUtil.GMT, StringPool.BLANK);
+		Map<String, Serializable> exportPortletSettingsMap =
+			ExportImportConfigurationSettingsMapFactory.
+				buildExportPortletSettingsMap(
+					TestPropsValues.getUserId(), plid, _group.getGroupId(),
+					StringPool.BLANK, _parameterMap, Locale.US,
+					TimeZoneUtil.GMT, StringPool.BLANK);
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
-				addExportImportConfiguration(
-					TestPropsValues.getUserId(), 0,
-					RandomTestUtil.randomString(), StringPool.BLANK,
+				addDraftExportImportConfiguration(
+					TestPropsValues.getUserId(),
 					ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET,
-					settingsMap, WorkflowConstants.STATUS_DRAFT,
-					ServiceContextTestUtil.getServiceContext());
+					exportPortletSettingsMap);
 
 		try {
-			portletExporter.exportPortletInfoAsFile(exportImportConfiguration);
+			ExportImportLocalServiceUtil.exportPortletInfoAsFile(
+				exportImportConfiguration);
 
 			Assert.fail();
 		}
@@ -240,25 +230,23 @@ public class ExportImportLifecycleEventTest {
 
 	@Test
 	public void testFailedPortletImport() throws Exception {
-		PortletImporter portletImporter = PortletImporter.getInstance();
-
-		Map<String, Serializable> settingsMap =
-			ExportImportConfigurationSettingsMapFactory.buildImportSettingsMap(
-				TestPropsValues.getUserId(), 0, _group.getGroupId(),
-				StringPool.BLANK, _parameterMap, StringPool.BLANK, Locale.US,
-				TimeZoneUtil.GMT, StringPool.BLANK);
+		Map<String, Serializable> importPortletSettingsMap =
+			ExportImportConfigurationSettingsMapFactory.
+				buildImportPortletSettingsMap(
+					TestPropsValues.getUserId(), 0, _group.getGroupId(),
+					StringPool.BLANK, _parameterMap, Locale.US,
+					TimeZoneUtil.GMT);
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
-				addExportImportConfiguration(
-					TestPropsValues.getUserId(), 0,
-					RandomTestUtil.randomString(), StringPool.BLANK,
+				addDraftExportImportConfiguration(
+					TestPropsValues.getUserId(),
 					ExportImportConfigurationConstants.TYPE_IMPORT_PORTLET,
-					settingsMap, WorkflowConstants.STATUS_DRAFT,
-					ServiceContextTestUtil.getServiceContext());
+					importPortletSettingsMap);
 
 		try {
-			portletImporter.importPortletInfo(exportImportConfiguration, null);
+			ExportImportLocalServiceUtil.importPortletInfo(
+				exportImportConfiguration, (File)null);
 
 			Assert.fail();
 		}
