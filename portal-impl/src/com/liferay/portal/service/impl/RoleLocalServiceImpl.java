@@ -510,13 +510,11 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *
 	 * <p>
 	 * If the group is a site, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#SITE_MEMBER}. If the group is an
-	 * organization, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#ORGANIZATION_USER}. If the group
-	 * is a user or user group, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#POWER_USER}. For all other group
-	 * types, the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#USER}.
+	 * RoleConstants#SITE_MEMBER}. If the group is an organization, then the
+	 * default role is {@link RoleConstants#ORGANIZATION_USER}. If the group is
+	 * a user or user group, then the default role is {@link
+	 * RoleConstants#POWER_USER}. For all other group types, the default role is
+	 * {@link RoleConstants#USER}.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
@@ -1546,6 +1544,12 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			}
 		}
 		catch (NoSuchRoleException nsre) {
+		}
+
+		if (name.equals(RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE)) {
+			throw new RoleNameException(
+				RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE +
+					" is a temporary placeholder that must not be persisted");
 		}
 	}
 

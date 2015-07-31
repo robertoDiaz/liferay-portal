@@ -21,7 +21,6 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
-taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/staging" prefix="liferay-staging" %><%@
@@ -36,6 +35,7 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.counter.service.CounterLocalServiceUtil" %><%@
 page import="com.liferay.portal.GroupFriendlyURLException" %><%@
 page import="com.liferay.portal.LocaleException" %><%@
+page import="com.liferay.portal.NoSuchOrganizationException" %><%@
 page import="com.liferay.portal.NoSuchRoleException" %><%@
 page import="com.liferay.portal.NoSuchUserException" %><%@
 page import="com.liferay.portal.NoSuchWorkflowDefinitionLinkException" %><%@
@@ -240,12 +240,10 @@ page import="com.liferay.portlet.documentlibrary.util.DLUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.NoSuchStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.storage.Fields" %><%@
 page import="com.liferay.portlet.expando.model.ExpandoBridge" %><%@
 page import="com.liferay.portlet.exportimport.lar.ExportImportDateUtil" %><%@
-page import="com.liferay.portlet.exportimport.lar.LayoutExporter" %><%@
+page import="com.liferay.portlet.exportimport.lar.ExportImportHelperUtil" %><%@
 page import="com.liferay.portlet.exportimport.lar.ManifestSummary" %><%@
 page import="com.liferay.portlet.exportimport.lar.PortletDataContext" %><%@
 page import="com.liferay.portlet.exportimport.lar.PortletDataContextFactoryUtil" %><%@
@@ -321,7 +319,8 @@ page import="java.util.TimeZone" %><%@
 page import="java.util.TreeMap" %><%@
 page import="java.util.TreeSet" %>
 
-<%@ page import="javax.portlet.MimeResponse" %><%@
+<%@ page import="javax.portlet.ActionRequest" %><%@
+page import="javax.portlet.MimeResponse" %><%@
 page import="javax.portlet.PortletConfig" %><%@
 page import="javax.portlet.PortletContext" %><%@
 page import="javax.portlet.PortletException" %><%@

@@ -10,7 +10,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.util", version: "latest.release"
+		classpath group: "com.liferay", name: "com.liferay.gradle.util", version: "1.0.15"
 	}
 }
 
@@ -18,10 +18,16 @@ apply plugin: "com.liferay.plugin"
 apply plugin: "eclipse"
 
 liferay {
-	appServerParentDir = rootProject.file("../../bundles")
+	appServerParentDir = System.properties["appServerParentDir"] ?: rootProject.file("../../bundles")
 
 	if (deployDir == new File(appServerParentDir, "deploy")) {
 		deployDir = new File(liferayHome, "osgi/apps")
+	}
+
+	String liferayHomeSystemProperty = System.properties["liferayHome"]
+
+	if (liferayHomeSystemProperty) {
+		liferayHome = liferayHomeSystemProperty
 	}
 }
 
@@ -39,6 +45,10 @@ afterEvaluate {
 	project.ext.set("plugin.full.version", project.version.toString())
 }
 
+buildCSS {
+	portalCommonDirName = new File(rootDir, "../portal-web/docroot/html/css/common")
+}
+
 configurations {
 	portal
 	portalTest
@@ -53,6 +63,10 @@ if (FileUtil.exists(project, "docroot")) {
 }
 
 dependencies {
+	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "1.0.6"
+	javadocFormatter group: "com.liferay", name: "com.liferay.javadoc.formatter", version: "1.0.4"
+	langBuilder group: "com.liferay", name: "com.liferay.lang.builder", version: "1.0.1"
+
 	portal files(appServerClassesPortalDir)
 	portal fileTree(dir: appServerLibPortalDir, include: "*.jar")
 	portal fileTree(dir: liferay.appServerLibGlobalDir, include: "*.jar")
@@ -63,6 +77,11 @@ dependencies {
 	portal group: "javax.servlet.jsp", name: "jsp-api", version: "2.1"
 
 	portalTest fileTree(dir: new File(moduleFrameworkBaseDir, "test"), include: "portal-test*.jar")
+	serviceBuilder group: "com.liferay", name: "com.liferay.portal.tools.service.builder", version: "1.0.25"
+	sourceFormatter group: "com.liferay", name: "com.liferay.source.formatter", version: "1.0.42"
+	tldFormatter group: "com.liferay", name: "com.liferay.tld.formatter", version: "1.0.0"
+	wsddBuilder group: "com.liferay", name: "com.liferay.portal.tools.wsdd.builder", version: "1.0.2"
+	xmlFormatter group: "com.liferay", name: "com.liferay.xml.formatter", version: "1.0.0"
 }
 
 eclipseClasspath {
@@ -77,8 +96,16 @@ eclipseProject {
 	}
 }
 
+jspC {
+	jspCVersion = "1.0.3"
+}
+
 repositories {
 	mavenLocal()
+
+	maven {
+		url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+	}
 }
 
 sourceSets {
@@ -92,8 +119,8 @@ sourceSets {
 	}
 
 	testIntegration {
-		compileClasspath += configurations.portal + configurations.portalTest
-		runtimeClasspath += configurations.portal + configurations.portalTest
+		compileClasspath = configurations.portal + compileClasspath + configurations.portalTest
+		runtimeClasspath = configurations.portal + runtimeClasspath + configurations.portalTest
 	}
 }
 
@@ -128,6 +155,10 @@ testIntegration {
 
 	maxHeapSize = "512m"
 	minHeapSize = "512m"
+}
+
+whip {
+	version = "1.0.0"
 }
 
 pluginManager.withPlugin("com.liferay.maven.plugin.builder") {
@@ -187,8 +218,14 @@ if (project.hasProperty("testClassGroupIndex")) {
 	properties.load(new StringReader(file.text.replace("\\", "/")))
 
 	String testClassGroup = properties["TEST_CLASS_GROUP_" + testClassGroupIndex]
+	String testClassGroups = properties["TEST_CLASS_GROUPS"]
 
 	List<String> testClasses = testClassGroup.tokenize(",")
 
-	[test, testIntegration]*.include testClasses
+	configure([test, testIntegration]) {
+		include testClasses
+
+		jvmArgs "-Dtest.class.group.index=" + testClassGroupIndex
+		jvmArgs "-Dtest.class.groups=" + testClassGroups
+	}
 }
