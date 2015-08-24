@@ -86,10 +86,10 @@ public class AssetVocabularyLocalServiceWrapper
 	@Override
 	public void addVocabularyResources(
 		com.liferay.portlet.asset.model.AssetVocabulary vocabulary,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_assetVocabularyLocalService.addVocabularyResources(vocabulary,
-			groupPermissions, guestPermissions);
+			modelPermissions);
 	}
 
 	/**
@@ -147,10 +147,10 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteVocabulary(
+	public com.liferay.portlet.asset.model.AssetVocabulary deleteVocabulary(
 		com.liferay.portlet.asset.model.AssetVocabulary vocabulary)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_assetVocabularyLocalService.deleteVocabulary(vocabulary);
+		return _assetVocabularyLocalService.deleteVocabulary(vocabulary);
 	}
 
 	@Override

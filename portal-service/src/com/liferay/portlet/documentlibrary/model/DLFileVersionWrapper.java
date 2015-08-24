@@ -78,6 +78,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		attributes.put("version", getVersion());
 		attributes.put("size", getSize());
 		attributes.put("checksum", getChecksum());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -226,6 +227,12 @@ public class DLFileVersionWrapper implements DLFileVersion,
 			setChecksum(checksum);
 		}
 
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
+		}
+
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -324,7 +331,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	}
 
 	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getDDMStructures()
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.DDMStructure> getDDMStructures()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersion.getDDMStructures();
 	}
@@ -450,6 +457,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	@Override
 	public java.lang.String getIcon() {
 		return _dlFileVersion.getIcon();
+	}
+
+	/**
+	* Returns the last publish date of this document library file version.
+	*
+	* @return the last publish date of this document library file version
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _dlFileVersion.getLastPublishDate();
 	}
 
 	/**
@@ -889,6 +906,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	@Override
 	public void setGroupId(long groupId) {
 		_dlFileVersion.setGroupId(groupId);
+	}
+
+	/**
+	* Sets the last publish date of this document library file version.
+	*
+	* @param lastPublishDate the last publish date of this document library file version
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_dlFileVersion.setLastPublishDate(lastPublishDate);
 	}
 
 	/**

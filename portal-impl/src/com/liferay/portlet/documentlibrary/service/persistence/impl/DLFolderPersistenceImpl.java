@@ -11071,7 +11071,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				dlFolder.setNew(false);
 			}
 			else {
-				session.merge(dlFolder);
+				dlFolder = (DLFolder)session.merge(dlFolder);
 			}
 		}
 		catch (Exception e) {
@@ -11384,6 +11384,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		dlFolderImpl.setDefaultFileEntryTypeId(dlFolder.getDefaultFileEntryTypeId());
 		dlFolderImpl.setHidden(dlFolder.isHidden());
 		dlFolderImpl.setRestrictionType(dlFolder.getRestrictionType());
+		dlFolderImpl.setLastPublishDate(dlFolder.getLastPublishDate());
 		dlFolderImpl.setStatus(dlFolder.getStatus());
 		dlFolderImpl.setStatusByUserId(dlFolder.getStatusByUserId());
 		dlFolderImpl.setStatusByUserName(dlFolder.getStatusByUserName());

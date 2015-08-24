@@ -520,6 +520,22 @@ public interface CalendarResourceModel extends AttachedModel,
 	 */
 	public void setActive(boolean active);
 
+	/**
+	 * Returns the last publish date of this calendar resource.
+	 *
+	 * @return the last publish date of this calendar resource
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this calendar resource.
+	 *
+	 * @param lastPublishDate the last publish date of this calendar resource
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
+
 	@Override
 	public boolean isNew();
 

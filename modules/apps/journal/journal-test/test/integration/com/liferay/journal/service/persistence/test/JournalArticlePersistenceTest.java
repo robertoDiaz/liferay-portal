@@ -179,6 +179,8 @@ public class JournalArticlePersistenceTest {
 
 		newJournalArticle.setSmallImageURL(RandomTestUtil.randomString());
 
+		newJournalArticle.setLastPublishDate(RandomTestUtil.nextDate());
+
 		newJournalArticle.setStatus(RandomTestUtil.nextInt());
 
 		newJournalArticle.setStatusByUserId(RandomTestUtil.nextLong());
@@ -254,6 +256,9 @@ public class JournalArticlePersistenceTest {
 			newJournalArticle.getSmallImageId());
 		Assert.assertEquals(existingJournalArticle.getSmallImageURL(),
 			newJournalArticle.getSmallImageURL());
+		Assert.assertEquals(Time.getShortTimestamp(
+				existingJournalArticle.getLastPublishDate()),
+			Time.getShortTimestamp(newJournalArticle.getLastPublishDate()));
 		Assert.assertEquals(existingJournalArticle.getStatus(),
 			newJournalArticle.getStatus());
 		Assert.assertEquals(existingJournalArticle.getStatusByUserId(),
@@ -657,12 +662,12 @@ public class JournalArticlePersistenceTest {
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "folderId", true, "classNameId", true,
 			"classPK", true, "treePath", true, "articleId", true, "version",
-			true, "title", true, "urlTitle", true, "description", true,
-			"content", true, "DDMStructureKey", true, "DDMTemplateKey", true,
-			"layoutUuid", true, "displayDate", true, "expirationDate", true,
-			"reviewDate", true, "indexable", true, "smallImage", true,
-			"smallImageId", true, "smallImageURL", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate", true);
+			true, "title", true, "urlTitle", true, "DDMStructureKey", true,
+			"DDMTemplateKey", true, "layoutUuid", true, "displayDate", true,
+			"expirationDate", true, "reviewDate", true, "indexable", true,
+			"smallImage", true, "smallImageId", true, "smallImageURL", true,
+			"lastPublishDate", true, "status", true, "statusByUserId", true,
+			"statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -956,6 +961,8 @@ public class JournalArticlePersistenceTest {
 		journalArticle.setSmallImageId(RandomTestUtil.nextLong());
 
 		journalArticle.setSmallImageURL(RandomTestUtil.randomString());
+
+		journalArticle.setLastPublishDate(RandomTestUtil.nextDate());
 
 		journalArticle.setStatus(RandomTestUtil.nextInt());
 

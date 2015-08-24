@@ -6059,7 +6059,7 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 				dlFileShortcut.setNew(false);
 			}
 			else {
-				session.merge(dlFileShortcut);
+				dlFileShortcut = (DLFileShortcut)session.merge(dlFileShortcut);
 			}
 		}
 		catch (Exception e) {
@@ -6257,6 +6257,7 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 		dlFileShortcutImpl.setToFileEntryId(dlFileShortcut.getToFileEntryId());
 		dlFileShortcutImpl.setTreePath(dlFileShortcut.getTreePath());
 		dlFileShortcutImpl.setActive(dlFileShortcut.isActive());
+		dlFileShortcutImpl.setLastPublishDate(dlFileShortcut.getLastPublishDate());
 		dlFileShortcutImpl.setStatus(dlFileShortcut.getStatus());
 		dlFileShortcutImpl.setStatusByUserId(dlFileShortcut.getStatusByUserId());
 		dlFileShortcutImpl.setStatusByUserName(dlFileShortcut.getStatusByUserName());

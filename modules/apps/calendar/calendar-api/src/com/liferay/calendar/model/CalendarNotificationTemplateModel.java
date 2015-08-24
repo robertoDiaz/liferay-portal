@@ -298,6 +298,22 @@ public interface CalendarNotificationTemplateModel extends BaseModel<CalendarNot
 	 */
 	public void setBody(String body);
 
+	/**
+	 * Returns the last publish date of this calendar notification template.
+	 *
+	 * @return the last publish date of this calendar notification template
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this calendar notification template.
+	 *
+	 * @param lastPublishDate the last publish date of this calendar notification template
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
+
 	@Override
 	public boolean isNew();
 

@@ -160,10 +160,6 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void assertLiferayErrors() throws Exception {
-		if (!PropsValues.TEST_ASSERT_LIFERAY_ERRORS) {
-			return;
-		}
-
 		LiferaySeleniumHelper.assertLiferayErrors();
 	}
 
@@ -505,11 +501,7 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public boolean isPartialText(String locator, String value) {
-		WebElement webElement = getWebElement(locator, "1");
-
-		String text = webElement.getText();
-
-		return text.contains(value);
+		return WebDriverHelper.isPartialText(this, locator, value);
 	}
 
 	@Override
@@ -519,6 +511,11 @@ public abstract class BaseWebDriverImpl
 		}
 
 		return pattern.equals(getSelectedLabel(selectLocator, "1"));
+	}
+
+	@Override
+	public boolean isSikuliImagePresent(String image) throws Exception {
+		return LiferaySeleniumHelper.isSikuliImagePresent(this, image);
 	}
 
 	@Override
@@ -539,6 +536,16 @@ public abstract class BaseWebDriverImpl
 	@Override
 	public boolean isValue(String locator, String value) {
 		return value.equals(getValue(locator, "1"));
+	}
+
+	@Override
+	public void javaScriptMouseDown(String locator) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void javaScriptMouseUp(String locator) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -844,7 +851,8 @@ public abstract class BaseWebDriverImpl
 
 		uploadFile(
 			location,
-			_TEST_BASE_DIR_NAME + slash + _testDependenciesDirName + value);
+			_TEST_BASE_DIR_NAME + slash + _testDependenciesDirName + slash +
+				value);
 	}
 
 	@Override

@@ -3932,7 +3932,7 @@ public class CalendarPersistenceImpl extends BasePersistenceImpl<Calendar>
 				calendar.setNew(false);
 			}
 			else {
-				session.merge(calendar);
+				calendar = (Calendar)session.merge(calendar);
 			}
 		}
 		catch (Exception e) {
@@ -4087,6 +4087,7 @@ public class CalendarPersistenceImpl extends BasePersistenceImpl<Calendar>
 		calendarImpl.setDefaultCalendar(calendar.isDefaultCalendar());
 		calendarImpl.setEnableComments(calendar.isEnableComments());
 		calendarImpl.setEnableRatings(calendar.isEnableRatings());
+		calendarImpl.setLastPublishDate(calendar.getLastPublishDate());
 
 		return calendarImpl;
 	}

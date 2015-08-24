@@ -31,12 +31,10 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
@@ -500,8 +498,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -538,8 +535,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -592,8 +588,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -634,8 +629,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -1014,42 +1008,40 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		Group group = userGroup.getGroup();
 
 		if (userGroup.hasPrivateLayouts()) {
-			Map<String, Serializable> settingsMap =
-				ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-					user.getUserId(), group.getGroupId(), true,
-					ExportImportHelperUtil.getAllLayoutIds(
-						group.getGroupId(), true),
-					parameterMap, user.getLocale(), user.getTimeZone());
+			Map<String, Serializable> exportLayoutSettingsMap =
+				ExportImportConfigurationSettingsMapFactory.
+					buildExportLayoutSettingsMap(
+						user, group.getGroupId(), true,
+						ExportImportHelperUtil.getAllLayoutIds(
+							group.getGroupId(), true),
+						parameterMap);
 
 			ExportImportConfiguration exportImportConfiguration =
 				exportImportConfigurationLocalService.
-					addExportImportConfiguration(
-						user.getUserId(), group.getGroupId(), StringPool.BLANK,
-						StringPool.BLANK,
+					addDraftExportImportConfiguration(
+						user.getUserId(),
 						ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
-						settingsMap, WorkflowConstants.STATUS_DRAFT,
-						new ServiceContext());
+						exportLayoutSettingsMap);
 
 			files[0] = exportImportLocalService.exportLayoutsAsFile(
 				exportImportConfiguration);
 		}
 
 		if (userGroup.hasPublicLayouts()) {
-			Map<String, Serializable> settingsMap =
-				ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-					user.getUserId(), group.getGroupId(), false,
-					ExportImportHelperUtil.getAllLayoutIds(
-						group.getGroupId(), false),
-					parameterMap, user.getLocale(), user.getTimeZone());
+			Map<String, Serializable> exportLayoutSettingsMap =
+				ExportImportConfigurationSettingsMapFactory.
+					buildExportLayoutSettingsMap(
+						user, group.getGroupId(), false,
+						ExportImportHelperUtil.getAllLayoutIds(
+							group.getGroupId(), false),
+						parameterMap);
 
 			ExportImportConfiguration exportImportConfiguration =
 				exportImportConfigurationLocalService.
-					addExportImportConfiguration(
-						user.getUserId(), group.getGroupId(), StringPool.BLANK,
-						StringPool.BLANK,
+					addDraftExportImportConfiguration(
+						user.getUserId(),
 						ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
-						settingsMap, WorkflowConstants.STATUS_DRAFT,
-						new ServiceContext());
+						exportLayoutSettingsMap);
 
 			files[1] = exportImportLocalService.exportLayoutsAsFile(
 				exportImportConfiguration);
@@ -1127,42 +1119,34 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		long groupId = user.getGroupId();
 
 		if (privateLayoutsFile != null) {
-			Map<String, Serializable> settingsMap =
+			Map<String, Serializable> importLayoutSettingsMap =
 				ExportImportConfigurationSettingsMapFactory.
-					buildImportSettingsMap(
-						user.getUserId(), groupId, true, null, parameterMap,
-						Constants.IMPORT, user.getLocale(), user.getTimeZone(),
-						privateLayoutsFile.getName());
+					buildImportLayoutSettingsMap(
+						user, groupId, true, null, parameterMap);
 
 			ExportImportConfiguration exportImportConfiguration =
 				exportImportConfigurationLocalService.
-					addExportImportConfiguration(
-						user.getUserId(), groupId, StringPool.BLANK,
-						StringPool.BLANK,
+					addDraftExportImportConfiguration(
+						user.getUserId(),
 						ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
-						settingsMap, WorkflowConstants.STATUS_DRAFT,
-						new ServiceContext());
+						importLayoutSettingsMap);
 
 			exportImportLocalService.importLayouts(
 				exportImportConfiguration, privateLayoutsFile);
 		}
 
 		if (publicLayoutsFile != null) {
-			Map<String, Serializable> settingsMap =
+			Map<String, Serializable> importLayoutSettingsMap =
 				ExportImportConfigurationSettingsMapFactory.
-					buildImportSettingsMap(
-						user.getUserId(), groupId, false, null, parameterMap,
-						Constants.IMPORT, user.getLocale(), user.getTimeZone(),
-						publicLayoutsFile.getName());
+					buildImportLayoutSettingsMap(
+						user, groupId, false, null, parameterMap);
 
 			ExportImportConfiguration exportImportConfiguration =
 				exportImportConfigurationLocalService.
-					addExportImportConfiguration(
-						user.getUserId(), groupId, StringPool.BLANK,
-						StringPool.BLANK,
+					addDraftExportImportConfiguration(
+						user.getUserId(),
 						ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
-						settingsMap, WorkflowConstants.STATUS_DRAFT,
-						new ServiceContext());
+						importLayoutSettingsMap);
 
 			exportImportLocalService.importLayouts(
 				exportImportConfiguration, publicLayoutsFile);

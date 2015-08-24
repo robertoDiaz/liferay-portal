@@ -5059,7 +5059,7 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 				layoutFriendlyURL.setNew(false);
 			}
 			else {
-				session.merge(layoutFriendlyURL);
+				layoutFriendlyURL = (LayoutFriendlyURL)session.merge(layoutFriendlyURL);
 			}
 		}
 		catch (Exception e) {
@@ -5248,6 +5248,7 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 		layoutFriendlyURLImpl.setPrivateLayout(layoutFriendlyURL.isPrivateLayout());
 		layoutFriendlyURLImpl.setFriendlyURL(layoutFriendlyURL.getFriendlyURL());
 		layoutFriendlyURLImpl.setLanguageId(layoutFriendlyURL.getLanguageId());
+		layoutFriendlyURLImpl.setLastPublishDate(layoutFriendlyURL.getLastPublishDate());
 
 		return layoutFriendlyURLImpl;
 	}

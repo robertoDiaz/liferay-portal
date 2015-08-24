@@ -65,8 +65,8 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 					portletURL="<%= editLayoutURL %>"
 					rootNodeName="<%= group.getLayoutRootNodeName(false, themeDisplay.getLocale()) %>"
 					saveState="<%= false %>"
-					selPlid="<%= selPlid %>"
 					selectedLayoutIds="<%= selectedLayoutIds %>"
+					selPlid="<%= selPlid %>"
 					treeId="treeContainerPublicPages"
 				/>
 			</div>
@@ -89,8 +89,8 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 					privateLayout="<%= true %>"
 					rootNodeName="<%= group.getLayoutRootNodeName(true, themeDisplay.getLocale()) %>"
 					saveState="<%= false %>"
-					selPlid="<%= selPlid %>"
 					selectedLayoutIds="<%= selectedLayoutIds %>"
+					selPlid="<%= selPlid %>"
 					treeId="treeContainerPrivatePages"
 				/>
 			</div>
@@ -224,7 +224,7 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 				<c:when test="<%= itemSelectorReturnTypeName.equals(URLItemSelectorReturnType.class.getName()) %>">
 					button.attr('data-value', url);
 				</c:when>
-				<c:when test="<%= Validator.equals(ClassUtil.getClassName(itemSelectorReturnTypeName), UUIDItemSelectorReturnType.class.getName()) %>">
+				<c:when test="<%= Validator.equals(itemSelectorReturnTypeName, UUIDItemSelectorReturnType.class.getName()) %>">
 					button.attr('data-value', uuid);
 				</c:when>
 			</c:choose>

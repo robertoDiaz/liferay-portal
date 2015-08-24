@@ -109,9 +109,9 @@ public class CalEventLocalServiceUtil {
 
 	public static void addEventResources(
 		com.liferay.portlet.calendar.model.CalEvent event,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().addEventResources(event, groupPermissions, guestPermissions);
+		getService().addEventResources(event, modelPermissions);
 	}
 
 	public static void addEventResources(long eventId,
@@ -122,10 +122,9 @@ public class CalEventLocalServiceUtil {
 	}
 
 	public static void addEventResources(long eventId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService()
-			.addEventResources(eventId, groupPermissions, guestPermissions);
+		getService().addEventResources(eventId, modelPermissions);
 	}
 
 	public static void checkEvents() {
@@ -447,11 +446,6 @@ public class CalEventLocalServiceUtil {
 
 	public static int getEventsCount(long groupId, java.lang.String[] types) {
 		return getService().getEventsCount(groupId, types);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
-		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getNoAssetEvents() {

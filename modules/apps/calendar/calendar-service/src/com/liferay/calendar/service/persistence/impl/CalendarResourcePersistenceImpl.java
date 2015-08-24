@@ -6604,7 +6604,7 @@ public class CalendarResourcePersistenceImpl extends BasePersistenceImpl<Calenda
 				calendarResource.setNew(false);
 			}
 			else {
-				session.merge(calendarResource);
+				calendarResource = (CalendarResource)session.merge(calendarResource);
 			}
 		}
 		catch (Exception e) {
@@ -6796,6 +6796,7 @@ public class CalendarResourcePersistenceImpl extends BasePersistenceImpl<Calenda
 		calendarResourceImpl.setName(calendarResource.getName());
 		calendarResourceImpl.setDescription(calendarResource.getDescription());
 		calendarResourceImpl.setActive(calendarResource.isActive());
+		calendarResourceImpl.setLastPublishDate(calendarResource.getLastPublishDate());
 
 		return calendarResourceImpl;
 	}

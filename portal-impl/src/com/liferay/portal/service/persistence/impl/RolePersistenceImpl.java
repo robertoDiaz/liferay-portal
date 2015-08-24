@@ -8570,7 +8570,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 				role.setNew(false);
 			}
 			else {
-				session.merge(role);
+				role = (Role)session.merge(role);
 			}
 		}
 		catch (Exception e) {
@@ -8763,6 +8763,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		roleImpl.setDescription(role.getDescription());
 		roleImpl.setType(role.getType());
 		roleImpl.setSubtype(role.getSubtype());
+		roleImpl.setLastPublishDate(role.getLastPublishDate());
 
 		return roleImpl;
 	}

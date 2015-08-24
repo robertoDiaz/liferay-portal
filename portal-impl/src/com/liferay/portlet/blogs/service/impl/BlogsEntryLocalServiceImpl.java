@@ -14,8 +14,8 @@
 
 package com.liferay.portlet.blogs.service.impl;
 
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.comment.CommentManager;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -63,6 +63,7 @@ import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.util.LayoutURLUtil;
@@ -71,7 +72,6 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SubscriptionSender;
-import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.blogs.BlogsGroupServiceSettings;
@@ -80,11 +80,11 @@ import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
 import com.liferay.portlet.blogs.EntrySmallImageSizeException;
 import com.liferay.portlet.blogs.EntryTitleException;
+import com.liferay.portlet.blogs.constants.BlogsConstants;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.base.BlogsEntryLocalServiceBaseImpl;
 import com.liferay.portlet.blogs.service.permission.BlogsPermission;
 import com.liferay.portlet.blogs.social.BlogsActivityKeys;
-import com.liferay.portlet.blogs.util.BlogsConstants;
 import com.liferay.portlet.blogs.util.BlogsUtil;
 import com.liferay.portlet.blogs.util.LinkbackProducerUtil;
 import com.liferay.portlet.blogs.util.comparator.EntryDisplayDateComparator;
@@ -263,9 +263,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				serviceContext.isAddGuestPermissions());
 		}
 		else {
-			addEntryResources(
-				entry, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+			addEntryResources(entry, serviceContext.getModelPermissions());
 		}
 
 		// Asset
@@ -393,14 +391,12 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 	@Override
 	public void addEntryResources(
-			BlogsEntry entry, String[] groupPermissions,
-			String[] guestPermissions)
+			BlogsEntry entry, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		resourceLocalService.addModelResources(
 			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
-			BlogsEntry.class.getName(), entry.getEntryId(), groupPermissions,
-			guestPermissions);
+			BlogsEntry.class.getName(), entry.getEntryId(), modelPermissions);
 	}
 
 	@Override
@@ -416,12 +412,12 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 	@Override
 	public void addEntryResources(
-			long entryId, String[] groupPermissions, String[] guestPermissions)
+			long entryId, ModelPermissions modelPermissions)
 		throws PortalException {
 
 		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
 
-		addEntryResources(entry, groupPermissions, guestPermissions);
+		addEntryResources(entry, modelPermissions);
 	}
 
 	@Override
@@ -1274,9 +1270,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		if ((serviceContext.getGroupPermissions() != null) ||
 			(serviceContext.getGuestPermissions() != null)) {
 
-			updateEntryResources(
-				entry, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
+			updateEntryResources(entry, serviceContext.getModelPermissions());
 		}
 
 		// Asset
@@ -1443,6 +1437,16 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 	@Override
 	public void updateEntryResources(
+			BlogsEntry entry, ModelPermissions modelPermissions)
+		throws PortalException {
+
+		resourceLocalService.updateResources(
+			entry.getCompanyId(), entry.getGroupId(),
+			BlogsEntry.class.getName(), entry.getEntryId(), modelPermissions);
+	}
+
+	@Override
+	public void updateEntryResources(
 			BlogsEntry entry, String[] groupPermissions,
 			String[] guestPermissions)
 		throws PortalException {
@@ -1543,6 +1547,11 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			// Trash
 
 			if (oldStatus == WorkflowConstants.STATUS_IN_TRASH) {
+				if (PropsValues.BLOGS_ENTRY_COMMENTS_ENABLED) {
+					commentManager.restoreDiscussionFromTrash(
+						BlogsEntry.class.getName(), entryId);
+				}
+
 				trashEntryLocalService.deleteEntry(
 					BlogsEntry.class.getName(), entryId);
 			}
@@ -1594,12 +1603,22 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			// Trash
 
 			if (status == WorkflowConstants.STATUS_IN_TRASH) {
+				if (PropsValues.BLOGS_ENTRY_COMMENTS_ENABLED) {
+					commentManager.moveDiscussionToTrash(
+						BlogsEntry.class.getName(), entryId);
+				}
+
 				trashEntryLocalService.addTrashEntry(
 					userId, entry.getGroupId(), BlogsEntry.class.getName(),
 					entry.getEntryId(), entry.getUuid(), null, oldStatus, null,
 					null);
 			}
 			else if (oldStatus == WorkflowConstants.STATUS_IN_TRASH) {
+				if (PropsValues.BLOGS_ENTRY_COMMENTS_ENABLED) {
+					commentManager.restoreDiscussionFromTrash(
+						BlogsEntry.class.getName(), entryId);
+				}
+
 				trashEntryLocalService.deleteEntry(
 					BlogsEntry.class.getName(), entryId);
 			}
@@ -1738,9 +1757,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			}
 		}
 
-		long controlPanelPlid = PortalUtil.getControlPanelPlid(
-			serviceContext.getCompanyId());
-
 		portletId = PortletProviderUtil.getPortletId(
 			BlogsEntry.class.getName(), PortletProvider.Action.MANAGE);
 
@@ -1748,8 +1764,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return StringPool.BLANK;
 		}
 
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			request, portletId, controlPanelPlid, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			request, portletId, 0, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("mvcRenderCommandName", "/blogs/view_entry");
 		portletURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
@@ -2248,8 +2264,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		}
 	}
 
-	@BeanReference(type = CommentManager.class)
-	protected CommentManager commentManager;
+	protected CommentManager commentManager =
+		CommentManagerUtil.getCommentManager();
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BlogsEntryLocalServiceImpl.class);

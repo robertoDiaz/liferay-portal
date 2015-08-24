@@ -197,7 +197,7 @@ public class CompileThemeTask extends DefaultTask {
 	protected void copyPortalThemeDir(
 		String theme, final String[] excludes, final String[] includes) {
 
-		final String prefix = "html/themes/" + theme + "/";
+		final String prefix = theme + "/";
 
 		final File frontendThemesWebDir = getFrontendThemesWebDir();
 		final File frontendThemesWebFile = getFrontendThemesWebFile();
@@ -325,12 +325,15 @@ public class CompileThemeTask extends DefaultTask {
 	}
 
 	protected void copyThemeParentStyled() {
-		copyPortalThemeDir("_styled", new String[] {"package.json"}, "**");
+		copyPortalThemeDir(
+			"_styled", new String[] {"npm-debug.log", "package.json"}, "**");
 	}
 
 	protected void copyThemeParentUnstyled() {
 		copyPortalThemeDir(
-			"_unstyled", new String[] {"package.json", "templates/**"}, "**");
+			"_unstyled",
+			new String[] {"npm-debug.log", "package.json", "templates/**"},
+			"**");
 
 		Set<String> themeTypes = getThemeTypes();
 

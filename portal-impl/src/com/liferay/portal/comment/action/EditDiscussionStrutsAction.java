@@ -55,7 +55,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author Adolfo Pérez
  */
 @OSGiBeanProperties(
-	property = "path=/portal/edit_discussion", service = StrutsAction.class
+	property = "path=/portal/comment/edit_discussion",
+	service = StrutsAction.class
 )
 public class EditDiscussionStrutsAction extends BaseStrutsAction {
 
@@ -128,9 +129,8 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 
 		long commentId = ParamUtil.getLong(request, "commentId");
 
-		DiscussionPermission discussionPermission =
-			CommentManagerUtil.getDiscussionPermission(
-				themeDisplay.getPermissionChecker());
+		DiscussionPermission discussionPermission = getDiscussionPermission(
+			themeDisplay);
 
 		discussionPermission.checkDeletePermission(commentId);
 
@@ -173,9 +173,8 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 		Function<String, ServiceContext> serviceContextFunction =
 			new ServiceContextFunction(request);
 
-		DiscussionPermission discussionPermission =
-			CommentManagerUtil.getDiscussionPermission(
-				themeDisplay.getPermissionChecker());
+		DiscussionPermission discussionPermission = getDiscussionPermission(
+			themeDisplay);
 
 		if (commentId <= 0) {
 
@@ -266,6 +265,21 @@ public class EditDiscussionStrutsAction extends BaseStrutsAction {
 		ServletResponseUtil.write(response, json.toString());
 
 		response.flushBuffer();
+	}
+
+	private DiscussionPermission getDiscussionPermission(
+			ThemeDisplay themeDisplay)
+		throws PrincipalException {
+
+		DiscussionPermission discussionPermission =
+			CommentManagerUtil.getDiscussionPermission(
+				themeDisplay.getPermissionChecker());
+
+		if (discussionPermission == null) {
+			throw new PrincipalException("Discussion permission is null");
+		}
+
+		return discussionPermission;
 	}
 
 }

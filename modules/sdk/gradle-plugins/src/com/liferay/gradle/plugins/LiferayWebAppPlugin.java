@@ -27,6 +27,7 @@ import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
 import com.liferay.gradle.util.StringUtil;
 import com.liferay.gradle.util.Validator;
+import com.liferay.gradle.util.copy.RenameDependencyClosure;
 
 import groovy.lang.Closure;
 
@@ -320,11 +321,15 @@ public class LiferayWebAppPlugin extends LiferayJavaPlugin {
 		buildXSDTask.setInputDir(inputDir);
 	}
 
-	protected void configureTaskDeployFrom(Copy copy, CopySpec copySpec) {
-		War war = (War)GradleUtil.getTask(
-			copy.getProject(), WarPlugin.WAR_TASK_NAME);
+	@Override
+	protected void configureTaskDeployFrom(Copy copy) {
+		Project project = copy.getProject();
 
-		copySpec.from(war.getOutputs());
+		War war = (War)GradleUtil.getTask(project, WarPlugin.WAR_TASK_NAME);
+
+		copy.from(war);
+
+		addCleanDeployedFile(project, war.getArchivePath());
 	}
 
 	protected void configureTaskDirectDeploy(

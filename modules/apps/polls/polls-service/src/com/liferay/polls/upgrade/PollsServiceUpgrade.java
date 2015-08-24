@@ -14,9 +14,10 @@
 
 package com.liferay.polls.upgrade;
 
-import com.liferay.polls.service.configuration.configurator.PollsServiceConfigurator;
 import com.liferay.polls.upgrade.v1_0_0.UpgradeClassNames;
+import com.liferay.polls.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 import com.liferay.portal.upgrade.util.UpgradePortletId;
@@ -34,9 +35,9 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = PollsServiceUpgrade.class)
 public class PollsServiceUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setPollsServiceConfigurator(
-		PollsServiceConfigurator pollsServiceConfigurator) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
@@ -53,6 +54,7 @@ public class PollsServiceUpgrade {
 		upgradeProcesses.add(new UpgradePortletId());
 
 		upgradeProcesses.add(new UpgradeClassNames());
+		upgradeProcesses.add(new UpgradeLastPublishDate());
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.polls.service", upgradeProcesses, 1, 1, false);

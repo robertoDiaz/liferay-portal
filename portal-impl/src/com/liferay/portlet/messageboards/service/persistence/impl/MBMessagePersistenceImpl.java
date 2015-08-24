@@ -18402,8 +18402,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			try {
 				mbMessage.setSubject(SanitizerUtil.sanitize(companyId, groupId,
-						userId, MBMessage.class.getName(), messageId,
-						ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
+						userId,
+						com.liferay.portlet.messageboards.model.MBMessage.class.getName(),
+						messageId, ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
 						mbMessage.getSubject(), null));
 			}
 			catch (SanitizerException se) {
@@ -18422,7 +18423,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				mbMessage.setNew(false);
 			}
 			else {
-				session.merge(mbMessage);
+				mbMessage = (MBMessage)session.merge(mbMessage);
 			}
 		}
 		catch (Exception e) {
@@ -19032,6 +19033,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		mbMessageImpl.setPriority(mbMessage.getPriority());
 		mbMessageImpl.setAllowPingbacks(mbMessage.isAllowPingbacks());
 		mbMessageImpl.setAnswer(mbMessage.isAnswer());
+		mbMessageImpl.setLastPublishDate(mbMessage.getLastPublishDate());
 		mbMessageImpl.setStatus(mbMessage.getStatus());
 		mbMessageImpl.setStatusByUserId(mbMessage.getStatusByUserId());
 		mbMessageImpl.setStatusByUserName(mbMessage.getStatusByUserName());

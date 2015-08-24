@@ -14,11 +14,14 @@
 
 package com.liferay.dynamic.data.mapping.internal;
 
+import com.liferay.dynamic.data.mapping.storage.StorageEngine;
+import com.liferay.dynamic.data.mapping.util.DDM;
+import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.dynamicdatamapping.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.StorageEngineManager;
-import com.liferay.portlet.dynamicdatamapping.StorageException;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
-import com.liferay.portlet.dynamicdatamapping.storage.StorageEngine;
+import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,38 +36,64 @@ public class StorageEngineManagerImpl implements StorageEngineManager {
 	public long create(
 			long companyId, long ddmStructureId, DDMFormValues ddmFormValues,
 			ServiceContext serviceContext)
-		throws StorageException {
+		throws PortalException {
 
-		return _storageEngine.create(
-			companyId, ddmStructureId, ddmFormValues, serviceContext);
+		try {
+			return _storageEngine.create(
+				companyId, ddmStructureId,
+				_ddmBeanTranslator.translate(ddmFormValues), serviceContext);
+		}
+		catch (PortalException pe) {
+			throw translate(pe);
+		}
 	}
 
 	@Override
-	public void deleteByClass(long classPK) throws StorageException {
+	public void deleteByClass(long classPK) throws PortalException {
 		_storageEngine.deleteByClass(classPK);
 	}
 
 	@Override
-	public void deleteByDDMStructure(long ddmStructureId)
-		throws StorageException {
-
-		_storageEngine.deleteByDDMStructure(ddmStructureId);
+	public DDMFormValues getDDMFormValues(long classPK) throws PortalException {
+		return _ddmBeanTranslator.translate(
+			_storageEngine.getDDMFormValues(classPK));
 	}
 
 	@Override
-	public DDMFormValues getDDMFormValues(long classPK)
-		throws StorageException {
+	public DDMFormValues getDDMFormValues(
+			long ddmStructureId, String fieldNamespace,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		return _storageEngine.getDDMFormValues(classPK);
+		return _ddmBeanTranslator.translate(
+			_ddm.getDDMFormValues(
+				ddmStructureId, fieldNamespace, serviceContext));
 	}
 
 	@Override
 	public void update(
 			long classPK, DDMFormValues ddmFormValues,
 			ServiceContext serviceContext)
-		throws StorageException {
+		throws PortalException {
 
-		_storageEngine.update(classPK, ddmFormValues, serviceContext);
+		try {
+			_storageEngine.update(
+				classPK, _ddmBeanTranslator.translate(ddmFormValues),
+				serviceContext);
+		}
+		catch (PortalException pe) {
+			throw translate(pe);
+		}
+	}
+
+	@Reference
+	protected void setDDM(DDM ddm) {
+		_ddm = ddm;
+	}
+
+	@Reference
+	protected void setDDMBeanTranslator(DDMBeanTranslator ddmBeanTranslator) {
+		_ddmBeanTranslator = ddmBeanTranslator;
 	}
 
 	@Reference
@@ -72,6 +101,20 @@ public class StorageEngineManagerImpl implements StorageEngineManager {
 		_storageEngine = storageEngine;
 	}
 
+	protected PortalException translate(PortalException portalException) {
+		if (portalException instanceof
+				com.liferay.dynamic.data.mapping.exception.
+					StorageFieldRequiredException) {
+
+			return new StorageFieldRequiredException(
+				portalException.getMessage(), portalException.getCause());
+		}
+
+		return portalException;
+	}
+
+	private DDM _ddm;
+	private DDMBeanTranslator _ddmBeanTranslator;
 	private StorageEngine _storageEngine;
 
 }

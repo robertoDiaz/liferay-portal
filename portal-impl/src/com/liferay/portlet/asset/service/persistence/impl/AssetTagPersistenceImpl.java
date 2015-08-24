@@ -4750,7 +4750,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 				assetTag.setNew(false);
 			}
 			else {
-				session.merge(assetTag);
+				assetTag = (AssetTag)session.merge(assetTag);
 			}
 		}
 		catch (Exception e) {
@@ -4852,6 +4852,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 		assetTagImpl.setModifiedDate(assetTag.getModifiedDate());
 		assetTagImpl.setName(assetTag.getName());
 		assetTagImpl.setAssetCount(assetTag.getAssetCount());
+		assetTagImpl.setLastPublishDate(assetTag.getLastPublishDate());
 
 		return assetTagImpl;
 	}

@@ -5422,13 +5422,15 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			try {
 				calEvent.setTitle(SanitizerUtil.sanitize(companyId, groupId,
-						userId, CalEvent.class.getName(), eventId,
-						ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
+						userId,
+						com.liferay.portlet.calendar.model.CalEvent.class.getName(),
+						eventId, ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
 						calEvent.getTitle(), null));
 
 				calEvent.setDescription(SanitizerUtil.sanitize(companyId,
-						groupId, userId, CalEvent.class.getName(), eventId,
-						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
+						groupId, userId,
+						com.liferay.portlet.calendar.model.CalEvent.class.getName(),
+						eventId, ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
 						calEvent.getDescription(), null));
 			}
 			catch (SanitizerException se) {
@@ -5447,7 +5449,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				calEvent.setNew(false);
 			}
 			else {
-				session.merge(calEvent);
+				calEvent = (CalEvent)session.merge(calEvent);
 			}
 		}
 		catch (Exception e) {

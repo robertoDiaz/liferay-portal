@@ -4710,7 +4710,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 				wikiNode.setNew(false);
 			}
 			else {
-				session.merge(wikiNode);
+				wikiNode = (WikiNode)session.merge(wikiNode);
 			}
 		}
 		catch (Exception e) {
@@ -4874,6 +4874,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 		wikiNodeImpl.setName(wikiNode.getName());
 		wikiNodeImpl.setDescription(wikiNode.getDescription());
 		wikiNodeImpl.setLastPostDate(wikiNode.getLastPostDate());
+		wikiNodeImpl.setLastPublishDate(wikiNode.getLastPublishDate());
 		wikiNodeImpl.setStatus(wikiNode.getStatus());
 		wikiNodeImpl.setStatusByUserId(wikiNode.getStatusByUserId());
 		wikiNodeImpl.setStatusByUserName(wikiNode.getStatusByUserName());

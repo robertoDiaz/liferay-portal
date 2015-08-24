@@ -14,12 +14,21 @@
 
 package com.liferay.journal.search;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.Fields;
+import com.liferay.dynamic.data.mapping.util.DDMIndexer;
+import com.liferay.dynamic.data.mapping.util.DDMIndexerUtil;
+import com.liferay.dynamic.data.mapping.util.DDMUtil;
+import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverterUtil;
 import com.liferay.journal.configuration.JournalServiceConfigurationValues;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.permission.JournalArticlePermission;
 import com.liferay.journal.util.JournalContentUtil;
+import com.liferay.journal.util.JournalConverter;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -45,7 +54,6 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -61,15 +69,6 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
-import com.liferay.portlet.dynamicdatamapping.util.DDMIndexer;
-import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
-import com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil;
-import com.liferay.portlet.journal.util.JournalConverterUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.Serializable;
@@ -193,7 +192,8 @@ public class JournalArticleIndexer
 				ddmStructureFieldName,
 				StringPool.QUOTE + ddmStructureFieldValue + StringPool.QUOTE);
 
-			contextBooleanFilter.add(new QueryFilter(booleanQuery));
+			contextBooleanFilter.add(
+				new QueryFilter(booleanQuery), BooleanClauseOccur.MUST);
 		}
 
 		String articleType = (String)searchContext.getAttribute("articleType");
@@ -281,8 +281,6 @@ public class JournalArticleIndexer
 			final Indexer<JournalArticle> indexer =
 				IndexerRegistryUtil.nullSafeGetIndexer(JournalArticle.class);
 
-			_indexAllVersions.set(false);
-
 			final ActionableDynamicQuery actionableDynamicQuery =
 				_journalArticleLocalService.getActionableDynamicQuery();
 
@@ -322,7 +320,9 @@ public class JournalArticleIndexer
 						JournalArticle article = (JournalArticle)object;
 
 						try {
-							indexer.reindex(article);
+							indexer.reindex(
+								indexer.getClassName(),
+								article.getResourcePrimKey());
 						}
 						catch (Exception e) {
 							throw new PortalException(e);
@@ -356,7 +356,7 @@ public class JournalArticleIndexer
 		DDMFormValues ddmFormValues = null;
 
 		try {
-			Fields fields = JournalConverterUtil.getDDMFields(
+			Fields fields = _journalConverter.getDDMFields(
 				ddmStructure, article.getDocument());
 
 			ddmFormValues = FieldsToDDMFormValuesConverterUtil.convert(
@@ -593,19 +593,7 @@ public class JournalArticleIndexer
 	}
 
 	@Override
-	protected void doReindex(JournalArticle journalArticle) throws Exception {
-		Boolean indexAllVersions = _indexAllVersions.get();
-
-		if (indexAllVersions == null) {
-			indexAllVersions = true;
-		}
-
-		doReindex(journalArticle, indexAllVersions);
-	}
-
-	protected void doReindex(JournalArticle article, boolean allVersions)
-		throws Exception {
-
+	protected void doReindex(JournalArticle article) throws Exception {
 		if (PortalUtil.getClassNameId(DDMStructure.class) ==
 				article.getClassNameId()) {
 
@@ -618,21 +606,7 @@ public class JournalArticleIndexer
 			return;
 		}
 
-		if (allVersions) {
-			reindexArticleVersions(article);
-		}
-		else {
-			if (!JournalServiceConfigurationValues.
-					JOURNAL_ARTICLE_INDEX_ALL_VERSIONS) {
-
-				article = fetchLatestIndexableArticleVersion(
-					article.getResourcePrimKey());
-			}
-
-			SearchEngineUtil.updateDocument(
-				getSearchEngineId(), article.getCompanyId(),
-				getDocument(article), isCommitImmediately());
-		}
+		reindexArticleVersions(article);
 	}
 
 	@Override
@@ -672,7 +646,7 @@ public class JournalArticleIndexer
 		DDMFormValues ddmFormValues = null;
 
 		try {
-			Fields fields = JournalConverterUtil.getDDMFields(
+			Fields fields = _journalConverter.getDDMFields(
 				ddmStructure, article.getDocument());
 
 			ddmFormValues = FieldsToDDMFormValuesConverterUtil.convert(
@@ -771,7 +745,7 @@ public class JournalArticleIndexer
 					LocaleUtil.toLanguageId(snippetLocale), 1,
 					portletRequestModel, themeDisplay);
 
-			content = HtmlUtil.escape(articleDisplay.getDescription());
+			content = articleDisplay.getDescription();
 			content = HtmlUtil.replaceNewLine(content);
 
 			if (Validator.isNull(content)) {
@@ -877,13 +851,16 @@ public class JournalArticleIndexer
 		_journalArticleLocalService = journalArticleLocalService;
 	}
 
+	@Reference
+	protected void setJournalConverter(JournalConverter journalConverter) {
+		_journalConverter = journalConverter;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleIndexer.class);
 
 	private DDMStructureLocalService _ddmStructureLocalService;
-	private final ThreadLocal<Boolean> _indexAllVersions =
-		new AutoResetThreadLocal<>(
-			JournalArticleIndexer.class + "._indexAllVersions", true);
 	private JournalArticleLocalService _journalArticleLocalService;
+	private JournalConverter _journalConverter;
 
 }

@@ -2658,7 +2658,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 				calendarNotificationTemplate.setNew(false);
 			}
 			else {
-				session.merge(calendarNotificationTemplate);
+				calendarNotificationTemplate = (CalendarNotificationTemplate)session.merge(calendarNotificationTemplate);
 			}
 		}
 		catch (Exception e) {
@@ -2776,6 +2776,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 		calendarNotificationTemplateImpl.setNotificationTemplateType(calendarNotificationTemplate.getNotificationTemplateType());
 		calendarNotificationTemplateImpl.setSubject(calendarNotificationTemplate.getSubject());
 		calendarNotificationTemplateImpl.setBody(calendarNotificationTemplate.getBody());
+		calendarNotificationTemplateImpl.setLastPublishDate(calendarNotificationTemplate.getLastPublishDate());
 
 		return calendarNotificationTemplateImpl;
 	}

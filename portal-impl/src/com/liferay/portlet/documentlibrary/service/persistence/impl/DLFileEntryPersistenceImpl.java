@@ -11756,7 +11756,7 @@ public class DLFileEntryPersistenceImpl extends BasePersistenceImpl<DLFileEntry>
 				dlFileEntry.setNew(false);
 			}
 			else {
-				session.merge(dlFileEntry);
+				dlFileEntry = (DLFileEntry)session.merge(dlFileEntry);
 			}
 		}
 		catch (Exception e) {
@@ -12084,6 +12084,7 @@ public class DLFileEntryPersistenceImpl extends BasePersistenceImpl<DLFileEntry>
 		dlFileEntryImpl.setCustom1ImageId(dlFileEntry.getCustom1ImageId());
 		dlFileEntryImpl.setCustom2ImageId(dlFileEntry.getCustom2ImageId());
 		dlFileEntryImpl.setManualCheckInRequired(dlFileEntry.isManualCheckInRequired());
+		dlFileEntryImpl.setLastPublishDate(dlFileEntry.getLastPublishDate());
 
 		return dlFileEntryImpl;
 	}

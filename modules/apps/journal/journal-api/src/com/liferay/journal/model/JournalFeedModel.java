@@ -415,6 +415,22 @@ public interface JournalFeedModel extends BaseModel<JournalFeed>,
 	 */
 	public void setFeedVersion(double feedVersion);
 
+	/**
+	 * Returns the last publish date of this journal feed.
+	 *
+	 * @return the last publish date of this journal feed
+	 */
+	@Override
+	public Date getLastPublishDate();
+
+	/**
+	 * Sets the last publish date of this journal feed.
+	 *
+	 * @param lastPublishDate the last publish date of this journal feed
+	 */
+	@Override
+	public void setLastPublishDate(Date lastPublishDate);
+
 	@Override
 	public boolean isNew();
 

@@ -15,13 +15,13 @@
 package com.liferay.journal.web.asset;
 
 import com.liferay.journal.configuration.JournalServiceConfigurationValues;
+import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.journal.service.permission.JournalArticlePermission;
-import com.liferay.journal.web.constants.JournalPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -66,7 +66,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Raymond Augé
  */
 public class JournalArticleAssetRenderer
-	extends BaseJSPAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer<JournalArticle> implements TrashRenderer {
 
 	public static final String TYPE = "journal_article";
 
@@ -86,6 +86,11 @@ public class JournalArticleAssetRenderer
 	}
 
 	public JournalArticle getArticle() {
+		return _article;
+	}
+
+	@Override
+	public JournalArticle getAssetObject() {
 		return _article;
 	}
 
@@ -223,9 +228,9 @@ public class JournalArticleAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
-			getControlPanelPlid(liferayPortletRequest),
-			JournalPortletKeys.JOURNAL, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, JournalPortletKeys.JOURNAL, 0,
+			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("mvcPath", "/edit_article.jsp");
 		portletURL.setParameter(
@@ -243,10 +248,11 @@ public class JournalArticleAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		LiferayPortletURL liferayPortletURL =
-			liferayPortletResponse.createLiferayPortletURL(
-				getControlPanelPlid(liferayPortletRequest),
-				JournalPortletKeys.JOURNAL, PortletRequest.RESOURCE_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, JournalPortletKeys.JOURNAL, 0,
+			PortletRequest.RESOURCE_PHASE);
+
+		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 
 		liferayPortletURL.setParameter(
 			"groupId", String.valueOf(_article.getGroupId()));
@@ -267,9 +273,9 @@ public class JournalArticleAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
-			getControlPanelPlid(liferayPortletRequest),
-			JournalPortletKeys.JOURNAL, PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, JournalPortletKeys.JOURNAL, 0,
+			PortletRequest.RENDER_PHASE);
 
 		JournalArticle previousApprovedArticle =
 			JournalArticleLocalServiceUtil.getPreviousApprovedArticle(_article);

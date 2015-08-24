@@ -16,7 +16,9 @@ package com.liferay.calendar.upgrade;
 
 import com.liferay.calendar.upgrade.v1_0_0.UpgradeCalendar;
 import com.liferay.calendar.upgrade.v1_0_0.UpgradeCalendarBooking;
+import com.liferay.calendar.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 
@@ -27,20 +29,15 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import org.springframework.context.ApplicationContext;
-
 /**
  * @author Iván Zaera
  */
 @Component(immediate = true, service = CalendarServiceUpgrade.class)
 public class CalendarServiceUpgrade {
 
-	@Reference(
-		target = "(org.springframework.context.service.name=com.liferay.calendar.service)",
-		unbind = "-"
-	)
-	protected void setApplicationContext(
-		ApplicationContext applicationContext) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")
@@ -56,6 +53,7 @@ public class CalendarServiceUpgrade {
 
 		upgradeProcesses.add(new UpgradeCalendar());
 		upgradeProcesses.add(new UpgradeCalendarBooking());
+		upgradeProcesses.add(new UpgradeLastPublishDate());
 
 		_releaseLocalService.updateRelease(
 			"com.liferay.calendar.service", upgradeProcesses, 1, 1, false);

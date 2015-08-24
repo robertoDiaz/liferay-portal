@@ -3368,7 +3368,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 				mbBan.setNew(false);
 			}
 			else {
-				session.merge(mbBan);
+				mbBan = (MBBan)session.merge(mbBan);
 			}
 		}
 		catch (Exception e) {
@@ -3500,6 +3500,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 		mbBanImpl.setCreateDate(mbBan.getCreateDate());
 		mbBanImpl.setModifiedDate(mbBan.getModifiedDate());
 		mbBanImpl.setBanUserId(mbBan.getBanUserId());
+		mbBanImpl.setLastPublishDate(mbBan.getLastPublishDate());
 
 		return mbBanImpl;
 	}

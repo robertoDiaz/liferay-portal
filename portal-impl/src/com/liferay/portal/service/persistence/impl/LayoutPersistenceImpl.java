@@ -8260,7 +8260,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				layout.setNew(false);
 			}
 			else {
-				session.merge(layout);
+				layout = (Layout)session.merge(layout);
 			}
 		}
 		catch (Exception e) {
@@ -8509,6 +8509,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		layoutImpl.setLayoutPrototypeUuid(layout.getLayoutPrototypeUuid());
 		layoutImpl.setLayoutPrototypeLinkEnabled(layout.isLayoutPrototypeLinkEnabled());
 		layoutImpl.setSourcePrototypeLayoutUuid(layout.getSourcePrototypeLayoutUuid());
+		layoutImpl.setLastPublishDate(layout.getLastPublishDate());
 
 		return layoutImpl;
 	}

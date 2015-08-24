@@ -3666,7 +3666,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 				passwordPolicy.setNew(false);
 			}
 			else {
-				session.merge(passwordPolicy);
+				passwordPolicy = (PasswordPolicy)session.merge(passwordPolicy);
 			}
 		}
 		catch (Exception e) {
@@ -3798,6 +3798,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		passwordPolicyImpl.setRequireUnlock(passwordPolicy.isRequireUnlock());
 		passwordPolicyImpl.setResetFailureCount(passwordPolicy.getResetFailureCount());
 		passwordPolicyImpl.setResetTicketMaxAge(passwordPolicy.getResetTicketMaxAge());
+		passwordPolicyImpl.setLastPublishDate(passwordPolicy.getLastPublishDate());
 
 		return passwordPolicyImpl;
 	}

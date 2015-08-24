@@ -19,6 +19,12 @@ import com.liferay.dynamic.data.lists.helper.DDLRecordSetTestHelper;
 import com.liferay.dynamic.data.lists.helper.DDLRecordTestHelper;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
@@ -38,12 +44,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
-import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -93,8 +93,6 @@ public class DDLRecordSearchTest {
 
 	@Test
 	public void testExactPhrase() throws Exception {
-		Assume.assumeTrue(isExactPhraseQueryImplementedForSearchEngine());
-
 		addRecord("Joe Bloggs", "Simple description");
 		addRecord("Bloggs", "Another description example");
 		addRecord(RandomTestUtil.randomString(), RandomTestUtil.randomString());
@@ -124,8 +122,6 @@ public class DDLRecordSearchTest {
 
 	@Test
 	public void testPunctuationInExactPhrase() throws Exception {
-		Assume.assumeTrue(isExactPhraseQueryImplementedForSearchEngine());
-
 		addRecord("Joe? Bloggs!");
 		addRecord("Joe! Bloggs?");
 		addRecord("Joe Bloggs");
@@ -137,8 +133,6 @@ public class DDLRecordSearchTest {
 
 	@Test
 	public void testQuestionMarksVersusStopwords1() throws Exception {
-		Assume.assumeTrue(isExactPhraseQueryImplementedForSearchEngine());
-
 		addRecord(RandomTestUtil.randomString());
 		addRecord("how ? create ? coupon");
 
@@ -173,8 +167,6 @@ public class DDLRecordSearchTest {
 
 	@Test
 	public void testQuestionMarksVersusStopwords4() throws Exception {
-		Assume.assumeTrue(isExactPhraseQueryImplementedForSearchEngine());
-
 		addRecord(RandomTestUtil.randomString());
 		addRecord("how ! create ! coupon");
 
@@ -327,11 +319,11 @@ public class DDLRecordSearchTest {
 
 		String vendor = searchEngine.getVendor();
 
-		if (vendor.equals("SOLR")) {
-			return true;
+		if (vendor.equals("Elasticsearch") || vendor.equals("Solr")) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	@DeleteAfterTestRun

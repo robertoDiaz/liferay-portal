@@ -6683,7 +6683,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				organization.setNew(false);
 			}
 			else {
-				session.merge(organization);
+				organization = (Organization)session.merge(organization);
 			}
 		}
 		catch (Exception e) {
@@ -6838,6 +6838,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		organizationImpl.setStatusId(organization.getStatusId());
 		organizationImpl.setComments(organization.getComments());
 		organizationImpl.setLogoId(organization.getLogoId());
+		organizationImpl.setLastPublishDate(organization.getLastPublishDate());
 
 		return organizationImpl;
 	}

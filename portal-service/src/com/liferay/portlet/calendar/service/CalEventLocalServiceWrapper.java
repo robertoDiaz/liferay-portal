@@ -104,10 +104,9 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 	@Override
 	public void addEventResources(
 		com.liferay.portlet.calendar.model.CalEvent event,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_calEventLocalService.addEventResources(event, groupPermissions,
-			guestPermissions);
+		_calEventLocalService.addEventResources(event, modelPermissions);
 	}
 
 	@Override
@@ -120,10 +119,9 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 
 	@Override
 	public void addEventResources(long eventId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		com.liferay.portal.service.permission.ModelPermissions modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_calEventLocalService.addEventResources(eventId, groupPermissions,
-			guestPermissions);
+		_calEventLocalService.addEventResources(eventId, modelPermissions);
 	}
 
 	@Override
@@ -479,12 +477,6 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 	@Override
 	public int getEventsCount(long groupId, java.lang.String[] types) {
 		return _calEventLocalService.getEventsCount(groupId, types);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
-		return _calEventLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	@Override

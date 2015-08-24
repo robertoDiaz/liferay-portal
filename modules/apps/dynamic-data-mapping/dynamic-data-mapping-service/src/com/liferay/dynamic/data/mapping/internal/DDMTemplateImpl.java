@@ -25,11 +25,12 @@ import java.util.Locale;
 
 /**
  * @author Marcellus Tavares
+ * @author Rafael Praxedes
  */
 public class DDMTemplateImpl implements DDMTemplate {
 
 	public DDMTemplateImpl(
-		com.liferay.portlet.dynamicdatamapping.model.DDMTemplate ddmTemplate) {
+		com.liferay.dynamic.data.mapping.model.DDMTemplate ddmTemplate) {
 
 		_ddmTemplate = ddmTemplate;
 	}
@@ -37,7 +38,7 @@ public class DDMTemplateImpl implements DDMTemplate {
 	@Override
 	public Object clone() {
 		DDMTemplateImpl ddmTemplateImpl = new DDMTemplateImpl(
-			(com.liferay.portlet.dynamicdatamapping.model.DDMTemplate)
+			(com.liferay.dynamic.data.mapping.model.DDMTemplate)
 				_ddmTemplate.clone());
 
 		return ddmTemplateImpl;
@@ -94,6 +95,11 @@ public class DDMTemplateImpl implements DDMTemplate {
 	}
 
 	@Override
+	public Date getLastPublishDate() {
+		return _ddmTemplate.getLastPublishDate();
+	}
+
+	@Override
 	public String getMode() {
 		return _ddmTemplate.getMode();
 	}
@@ -121,6 +127,11 @@ public class DDMTemplateImpl implements DDMTemplate {
 	@Override
 	public String getName(Locale locale) {
 		return _ddmTemplate.getName(locale);
+	}
+
+	@Override
+	public long getPrimaryKey() {
+		return _ddmTemplate.getPrimaryKey();
 	}
 
 	@Override
@@ -184,6 +195,11 @@ public class DDMTemplateImpl implements DDMTemplate {
 	}
 
 	@Override
+	public String getUserUuid() {
+		return _ddmTemplate.getUserUuid();
+	}
+
+	@Override
 	public String getUuid() {
 		return _ddmTemplate.getUuid();
 	}
@@ -224,6 +240,16 @@ public class DDMTemplateImpl implements DDMTemplate {
 	}
 
 	@Override
+	public void setGroupId(long groupId) {
+		_ddmTemplate.setGroupId(groupId);
+	}
+
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_ddmTemplate.setLastPublishDate(lastPublishDate);
+	}
+
+	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_ddmTemplate.setModifiedDate(modifiedDate);
 	}
@@ -234,11 +260,26 @@ public class DDMTemplateImpl implements DDMTemplate {
 	}
 
 	@Override
+	public void setUserId(long userId) {
+		_ddmTemplate.setUserId(userId);
+	}
+
+	@Override
+	public void setUserName(String userName) {
+		_ddmTemplate.setUserName(userName);
+	}
+
+	@Override
+	public void setUserUuid(String userUuid) {
+		_ddmTemplate.setUserUuid(userUuid);
+	}
+
+	@Override
 	public void setUuid(String uuid) {
 		_ddmTemplate.setUuid(uuid);
 	}
 
-	private final com.liferay.portlet.dynamicdatamapping.model.DDMTemplate
+	private final com.liferay.dynamic.data.mapping.model.DDMTemplate
 		_ddmTemplate;
 
 }

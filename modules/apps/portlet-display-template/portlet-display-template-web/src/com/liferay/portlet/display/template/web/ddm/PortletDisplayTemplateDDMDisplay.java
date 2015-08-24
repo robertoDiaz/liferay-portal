@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.display.template.web.ddm;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.dynamic.data.mapping.model.DDMTemplateConstants;
+import com.liferay.dynamic.data.mapping.util.BaseDDMDisplay;
+import com.liferay.dynamic.data.mapping.util.DDMDisplay;
+import com.liferay.dynamic.data.mapping.util.DDMPermissionHandler;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -27,12 +33,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
-import com.liferay.portlet.dynamicdatamapping.util.BaseDDMDisplay;
-import com.liferay.portlet.dynamicdatamapping.util.DDMDisplay;
-import com.liferay.portlet.dynamicdatamapping.util.DDMPermissionHandler;
 
 import java.util.Locale;
 import java.util.Set;
@@ -97,7 +97,7 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 		}
 
 		return new long[] {
-			_portletDisplayTemplate.getDDMTemplateGroupId(
+			portletDisplayTemplate.getDDMTemplateGroupId(
 				themeDisplay.getScopeGroupId())
 			};
 	}
@@ -109,6 +109,12 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 
 	@Override
 	public String getTemplateType(DDMTemplate template, Locale locale) {
+		String type = template.getType();
+
+		if (!type.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) {
+			return type;
+		}
+
 		TemplateHandler templateHandler =
 			TemplateHandlerRegistryUtil.getTemplateHandler(
 				template.getClassNameId());
@@ -161,10 +167,10 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 	protected void setPortletDisplayTemplate(
 		PortletDisplayTemplate portletDisplayTemplate) {
 
-		_portletDisplayTemplate = portletDisplayTemplate;
+		this.portletDisplayTemplate = portletDisplayTemplate;
 	}
 
-	protected PortletDisplayTemplate _portletDisplayTemplate;
+	protected PortletDisplayTemplate portletDisplayTemplate;
 
 	private static final Set<String> _viewTemplateExcludedColumnNames =
 		SetUtil.fromArray(new String[] {"language", "mode", "structure"});

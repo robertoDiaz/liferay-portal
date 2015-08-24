@@ -1,0 +1,21 @@
+@import "bourbon";
+@import "mixins";
+
+@include sm() {
+	body.open {
+		.control-menu {
+			left: 320px;
+		}
+	}
+
+	.sidenav-transition .control-menu {
+		@include transition(all 0.5s ease);
+	}
+}
+
+.portlet-control-menu ul > li {
+	@include sm() {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+}

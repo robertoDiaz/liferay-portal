@@ -66,9 +66,23 @@ if (organizationId > 0) {
 									constrain: true,
 									modal: true
 								},
-								id: '<portlet:namespace />selectOrganization',
+
+								<%
+								String portletId = PortletProviderUtil.getPortletId(User.class.getName(), PortletProvider.Action.VIEW);
+								%>
+
+								id: '<%= PortalUtil.getPortletNamespace(portletId) %>selectOrganization',
+
 								title: '<liferay-ui:message arguments="organization" key="select-x" />',
-								uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/users_admin/select_organization" /><portlet:param name="tabs1" value="organizations" /></portlet:renderURL>'
+
+								<%
+								PortletURL selectOrganizationURL = PortletProviderUtil.getPortletURL(request, Organization.class.getName(), PortletProvider.Action.BROWSE);
+
+								selectOrganizationURL.setParameter("tabs1", "organizations");
+								selectOrganizationURL.setWindowState(LiferayWindowState.POP_UP);
+								%>
+
+								uri: '<%= selectOrganizationURL.toString() %>'
 							},
 							function(event) {
 								document.<portlet:namespace />fm.<portlet:namespace />organizationId.value = event.organizationid;

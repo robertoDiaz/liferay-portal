@@ -14,10 +14,12 @@
 
 package com.liferay.blogs.layout.prototype.action;
 
+import com.liferay.asset.tags.navigation.web.constants.AssetTagsNavigationPortletKeys;
 import com.liferay.blogs.recent.bloggers.web.constants.RecentBloggersPortletKeys;
 import com.liferay.blogs.web.constants.BlogsPortletKeys;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Layout;
@@ -30,8 +32,6 @@ import com.liferay.portal.util.DefaultLayoutPrototypesUtil;
 
 import java.util.List;
 import java.util.ResourceBundle;
-
-import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -84,7 +84,21 @@ public class AddLayoutPrototypeAction {
 			layout, BlogsPortletKeys.BLOGS, "column-1");
 
 		DefaultLayoutPrototypesUtil.addPortletId(
+			layout, AssetTagsNavigationPortletKeys.ASSET_TAGS_CLOUD,
+			"column-2");
+
+		DefaultLayoutPrototypesUtil.addPortletId(
 			layout, RecentBloggersPortletKeys.RECENT_BLOGGERS, "column-2");
+	}
+
+	@Reference(
+		target = "(javax.portlet.name=" + AssetTagsNavigationPortletKeys.ASSET_TAGS_CLOUD + ")"
+	)
+	protected void setAssetTagsCloudPortlet(Portlet portlet) {
+	}
+
+	@Reference(target = "(javax.portlet.name=" + BlogsPortletKeys.BLOGS + ")")
+	protected void setBlogsPortlet(Portlet portlet) {
 	}
 
 	@Reference(unbind = "-")
@@ -101,14 +115,15 @@ public class AddLayoutPrototypeAction {
 		_layoutPrototypeLocalService = layoutPrototypeLocalService;
 	}
 
-	@Reference(
-		target = "(javax.portlet.name=com.liferay.blogs.web.portlet.BlogsPortlet)"
-	)
-	protected void setPortlet(Portlet portlet) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(target = "(original.bean=*)", unbind = "-")
-	protected void setServletContext(ServletContext servletContext) {
+	@Reference(
+		target = "(javax.portlet.name=" + RecentBloggersPortletKeys.RECENT_BLOGGERS + ")"
+	)
+	protected void setRecentBloggersPortlet(Portlet portlet) {
 	}
 
 	@Reference(unbind = "-")

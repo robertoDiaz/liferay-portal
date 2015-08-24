@@ -168,7 +168,7 @@
 		<execute function="AssertClick" locator1="PGWiki#EDIT_BUTTON" value1="Edit" />
 
 		<execute function="AssertTextEquals" locator1="PGWikiAddpage#WORKFLOW_STATUS" value1="Draft" />
-		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD" />
+		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD_IFRAME" />
 
 		<var name="key_wikiPageContent" value="${wikiPageContent}" />
 
@@ -306,7 +306,7 @@
 
 		<execute function="Type" locator1="PGWikiAddpage#TITLE_FIELD" value1="${wikiPageTitle}" />
 		<execute function="Type#typeCKEditorWaitForCKEditor" locator1="CKEditor#BODY_FIELD" value1="${wikiPageContent}" />
-		<execute function="AssertClick#assertTextClickAtCKEditor" locator1="PGWikiAddpage#SUBMIT_FOR_PUBLICATION_BUTTON" value1="Submit for Publication" />
+		<execute function="AssertClick#assertTextClickAtCKEditor" locator1="Button#SUBMIT_FOR_PUBLICATION" value1="Submit for Publication" />
 
 		<execute function="AssertTextEquals" locator1="PGWikiAllpages#SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
@@ -316,7 +316,7 @@
 
 		<execute function="Type" locator1="PGWikidisplayAddpage#TITLE_FIELD" value1="${wikiPageTitle}" />
 		<execute function="Type#typeCKEditorWaitForCKEditor" locator1="CKEditor#BODY_FIELD" value1="${wikiPageContent}" />
-		<execute function="AssertClick" locator1="PGWikidisplayAddpage#SUBMIT_FOR_PUBLICATION_BUTTON" value1="Submit for Publication" />
+		<execute function="AssertClick" locator1="Button#SUBMIT_FOR_PUBLICATION" value1="Submit for Publication" />
 
 		<execute function="AssertTextEquals" locator1="PGWikidisplayAllpages#SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
@@ -944,7 +944,7 @@
 
 		<execute function="Click" locator1="CPWikiAllpages#WIKI_PAGE_TABLE_ACTIONS" />
 		<execute function="AssertClick" locator1="CPWikiAllpages#WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="CPWikiAllpages#SUCCESS_MESSAGE_RECYCLE_BIN" value1="The ${assetType} ${wikiPageTitle} was moved to the Recycle Bin. Undo" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#RECYCLE_BIN_SUCCESS" value1="The ${assetType} ${wikiPageTitle} was moved to the Recycle Bin. Undo" />
 	</command>
 
 	<command name="moveWikiPagePG">
@@ -1006,6 +1006,14 @@
 		<execute function="AssertClick" locator1="Permissions#SAVE_BUTTON" value1="Save" />
 		<execute function="AssertTextEquals" locator1="Permissions#SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute function="SelectFrame" value1="relative=top" />
+	</command>
+
+	<command name="renamePage">
+		<execute function="Type" locator1="TextInput#NEW_TITLE" value1="${newPageTitle}" />
+
+		<execute function="AssertClick" locator1="Button#RENAME" value1="Rename" />
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request has been completed successfully." />
 	</command>
 
 	<command name="renameWikiPagePG">
@@ -1082,7 +1090,7 @@
 		<execute function="AssertClick" locator1="PGWikiAddpage#SAVE_AS_DRAFT_BUTTON" value1="Save as Draft" />
 		<execute function="AssertTextEquals" locator1="PGWikiAddpage#SUCCESS_MESSAGE"  value1="Your request completed successfully." />
 		<execute function="AssertTextEquals" locator1="PGWikiAddpage#WORKFLOW_STATUS" value1="Draft" />
-		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD" />
+		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD_IFRAME" />
 
 		<var name="key_wikiPageContent" value="${wikiPageContent}" />
 
@@ -1097,8 +1105,14 @@
 		<execute function="AssertClick" locator1="PGWiki#SEARCH_BUTTON" value1="Search" />
 	</command>
 
+	<command name="selectNewNode">
+		<execute function="Select" locator1="Select#NEW_NODE" value1="${wikiNodeName}" />
+
+		<execute function="AssertClick" locator1="Button#CHANGE_NODE" value1="Change Node" />
+	</command>
+
 	<command name="submitForPublication">
-		<execute function="AssertClick" locator1="PGWikiAddpage#SUBMIT_FOR_PUBLICATION_BUTTON" value1="Submit for Publication" />
+		<execute function="AssertClick" locator1="Button#SUBMIT_FOR_PUBLICATION" value1="Submit for Publication" />
 
 		<execute function="AssertTextEquals" locator1="PGWiki#SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
@@ -1370,6 +1384,14 @@
 		<execute function="AssertElementNotPresent" locator1="PGWikiAllpages#WIKI_PAGE_TABLE_PAGE" value1="${wikiPageTitle}" />
 	</command>
 
+	<command name="viewPageContentBody">
+		<execute function="AssertTextEquals" locator1="Wiki#BODY" value1="${wikiPageContent}" />
+	</command>
+
+	<command name="viewPageContentBodyHeader">
+		<execute function="AssertTextEquals" locator1="Wiki#BODY_HEADER" value1="${wikiPageContent}" />
+	</command>
+
 	<command name="viewPagePG">
 		<var name="key_wikiPageTitle" value="${wikiPageTitle}" />
 
@@ -1526,7 +1548,7 @@
 		<execute function="AssertClick" locator1="PGWiki#EDIT_BUTTON" value1="Edit" />
 
 		<execute function="AssertTextEquals" locator1="PGWikiAddpage#WORKFLOW_STATUS" value1="Draft" />
-		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD" />
+		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD_IFRAME" />
 
 		<var name="key_wikiPageContent" value="${wikiPageContent}" />
 

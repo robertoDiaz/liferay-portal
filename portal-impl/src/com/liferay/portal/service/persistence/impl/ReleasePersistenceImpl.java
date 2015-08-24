@@ -599,7 +599,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 				release.setNew(false);
 			}
 			else {
-				session.merge(release);
+				release = (Release)session.merge(release);
 			}
 		}
 		catch (Exception e) {
@@ -641,6 +641,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		releaseImpl.setCreateDate(release.getCreateDate());
 		releaseImpl.setModifiedDate(release.getModifiedDate());
 		releaseImpl.setServletContextName(release.getServletContextName());
+		releaseImpl.setVersion(release.getVersion());
 		releaseImpl.setBuildNumber(release.getBuildNumber());
 		releaseImpl.setBuildDate(release.getBuildDate());
 		releaseImpl.setVerified(release.isVerified());

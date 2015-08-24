@@ -18,18 +18,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.test.IdempotentRetryAssert;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -46,7 +42,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -61,8 +56,7 @@ public class UserIndexerTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			SynchronousDestinationTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -100,9 +94,6 @@ public class UserIndexerTest {
 
 	@Test
 	public void testEmailAddressSubstring() throws Exception {
-		Assume.assumeTrue(
-			isTwoEndedSubstringSearchImplementedForSearchEngine());
-
 		addUserEmailAddress("Em.Ail@liferay.com");
 
 		User user = assertSearchOneUser("ail@life");
@@ -210,9 +201,6 @@ public class UserIndexerTest {
 
 	@Test
 	public void testNamesSubstring() throws Exception {
-		Assume.assumeTrue(
-			isTwoEndedSubstringSearchImplementedForSearchEngine());
-
 		String firstName = "First";
 		String lastName = "Last";
 		String middleName = "Middle";
@@ -261,12 +249,18 @@ public class UserIndexerTest {
 
 	@Test
 	public void testScreenNameSubstring() throws Exception {
-		Assume.assumeTrue(
-			isTwoEndedSubstringSearchImplementedForSearchEngine());
-
 		addUserScreenName("Open4Life");
 
 		User user = assertSearchOneUser("4lif");
+
+		Assert.assertEquals("open4life", user.getScreenName());
+	}
+
+	@Test
+	public void testScreenNameTwoWords() throws Exception {
+		addUserScreenName("Open4Life");
+
+		User user = assertSearchOneUser("screenName", "open lite");
 
 		Assert.assertEquals("open4life", user.getScreenName());
 	}
@@ -399,17 +393,6 @@ public class UserIndexerTest {
 		long userId = UserIndexer.getUserId(hits.doc(0));
 
 		return UserLocalServiceUtil.getUser(userId);
-	}
-
-	protected boolean isSearchEngineVendor(String... vendors) {
-		SearchEngine searchEngine = SearchEngineUtil.getSearchEngine(
-			SearchEngineUtil.getDefaultSearchEngineId());
-
-		return ArrayUtil.contains(vendors, searchEngine.getVendor(), true);
-	}
-
-	protected boolean isTwoEndedSubstringSearchImplementedForSearchEngine() {
-		return !isSearchEngineVendor("Solr");
 	}
 
 	protected void testNameFields(

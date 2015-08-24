@@ -55,6 +55,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -165,6 +166,12 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	@Override
 	public void processResponse(String response) throws Exception {
 		if (_syncDLObjectUpdate == null) {
+			if (response.startsWith("\"")) {
+				response = StringEscapeUtils.unescapeJava(response);
+
+				response = response.substring(1, response.length() - 1);
+			}
+
 			_syncDLObjectUpdate = JSONUtil.readValue(
 				response, SyncDLObjectUpdate.class);
 		}
@@ -216,14 +223,16 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				filePath, String.valueOf(syncFile.getSyncFileId()), false);
 		}
 		else {
-			if (syncFile.getSize() <= 0) {
+			String checksum = syncFile.getChecksum();
+
+			if (checksum.isEmpty() || (syncFile.getSize() <= 0)) {
 				downloadFile(syncFile, null, 0, false);
 
 				return;
 			}
 
 			SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
-				syncFile.getChecksum(), SyncFile.STATE_SYNCED);
+				checksum, SyncFile.STATE_SYNCED);
 
 			SyncFileService.update(syncFile);
 
@@ -377,6 +386,12 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	@Override
 	protected void logResponse(String response) {
 		try {
+			if (response.startsWith("\"")) {
+				response = StringEscapeUtils.unescapeJava(response);
+
+				response = response.substring(1, response.length() - 1);
+			}
+
 			_syncDLObjectUpdate = JSONUtil.readValue(
 				response, SyncDLObjectUpdate.class);
 
@@ -431,7 +446,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 	protected void processDependentSyncFiles(SyncFile syncFile) {
 		List<SyncFile> dependentSyncFiles = _dependentSyncFilesMap.remove(
-			syncFile.getTypePK());
+			getSyncAccountId() + "#" + syncFile.getTypePK());
 
 		if (dependentSyncFiles == null) {
 			return;
@@ -561,12 +576,14 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	}
 
 	protected void queueSyncFile(long parentFolderId, SyncFile syncFile) {
-		List<SyncFile> syncFiles = _dependentSyncFilesMap.get(parentFolderId);
+		List<SyncFile> syncFiles = _dependentSyncFilesMap.get(
+			getSyncAccountId() + "#" + parentFolderId);
 
 		if (syncFiles == null) {
 			syncFiles = new ArrayList<>();
 
-			_dependentSyncFilesMap.put(parentFolderId, syncFiles);
+			_dependentSyncFilesMap.put(
+				getSyncAccountId() + "#" + parentFolderId, syncFiles);
 		}
 
 		syncFiles.add(syncFile);
@@ -644,11 +661,11 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		GetSyncDLObjectUpdateHandler.class);
 
+	private static final Map<String, List<SyncFile>> _dependentSyncFilesMap =
+		new HashMap<>();
 	private static final ScheduledExecutorService _scheduledExecutorService =
 		Executors.newScheduledThreadPool(5);
 
-	private final Map<Long, List<SyncFile>> _dependentSyncFilesMap =
-		new HashMap<>();
 	private final ScheduledFuture<?> _scheduledFuture;
 	private SyncDLObjectUpdate _syncDLObjectUpdate;
 

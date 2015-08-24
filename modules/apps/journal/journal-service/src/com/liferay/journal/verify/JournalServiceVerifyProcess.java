@@ -14,6 +14,8 @@
 
 package com.liferay.journal.verify;
 
+import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
+import com.liferay.dynamic.data.mapping.util.impl.DDMFieldsCounter;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticleImage;
@@ -25,7 +27,6 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
-import com.liferay.journal.service.configuration.configurator.JournalServiceConfigurator;
 import com.liferay.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
@@ -58,8 +59,6 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalService;
-import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
-import com.liferay.portlet.dynamicdatamapping.util.DDMFieldsCounter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -147,11 +146,6 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		JournalFolderLocalService journalFolderLocalService) {
 
 		_journalFolderLocalService = journalFolderLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalServiceConfigurator(
-		JournalServiceConfigurator JournalServiceConfigurator) {
 	}
 
 	@Reference(unbind = "-")

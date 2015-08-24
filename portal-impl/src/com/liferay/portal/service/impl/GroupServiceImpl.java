@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
@@ -518,8 +519,7 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *
@@ -697,6 +697,18 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		if (max != QueryUtil.ALL_POS) {
 			start = 0;
 			end = max;
+		}
+
+		if ((classNames == null) ||
+			ArrayUtil.contains(classNames, Company.class.getName())) {
+
+			userSiteGroups.addAll(
+				groupLocalService.search(
+					user.getCompanyId(),
+					new long[] {
+						classNameLocalService.getClassNameId(Company.class)
+					},
+					null, new LinkedHashMap<String, Object>(), start, end));
 		}
 
 		if ((classNames == null) ||
@@ -946,8 +958,7 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	 * start</code> instances. <code>start</code> and <code>end</code> are not
 	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
 	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
 	 *

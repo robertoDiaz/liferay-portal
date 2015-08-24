@@ -122,15 +122,15 @@ public class JournalFolderServiceSoap {
 		}
 	}
 
-	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap[] getDDMStructures(
+	public static com.liferay.dynamic.data.mapping.model.DDMStructureSoap[] getDDMStructures(
 		long[] groupIds, long folderId, int restrictionType)
 		throws RemoteException {
 		try {
-			java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> returnValue =
+			java.util.List<com.liferay.dynamic.data.mapping.model.DDMStructure> returnValue =
 				JournalFolderServiceUtil.getDDMStructures(groupIds, folderId,
 					restrictionType);
 
-			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModels(returnValue);
+			return com.liferay.dynamic.data.mapping.model.DDMStructureSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -280,6 +280,21 @@ public class JournalFolderServiceSoap {
 		try {
 			int returnValue = JournalFolderServiceUtil.getFoldersAndArticlesCount(groupId,
 					folderId, status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getFoldersAndArticlesCount(long groupId, long userId,
+		long folderId, int status) throws RemoteException {
+		try {
+			int returnValue = JournalFolderServiceUtil.getFoldersAndArticlesCount(groupId,
+					userId, folderId, status);
 
 			return returnValue;
 		}

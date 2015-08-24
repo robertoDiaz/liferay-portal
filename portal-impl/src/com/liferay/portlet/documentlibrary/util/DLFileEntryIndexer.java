@@ -59,7 +59,6 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -72,14 +71,11 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
+import com.liferay.portlet.dynamicdatamapping.DDMFormValues;
+import com.liferay.portlet.dynamicdatamapping.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.DDMStructureManager;
+import com.liferay.portlet.dynamicdatamapping.DDMStructureManagerUtil;
 import com.liferay.portlet.dynamicdatamapping.StorageEngineManagerUtil;
-import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
-import com.liferay.portlet.dynamicdatamapping.util.DDMIndexer;
-import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
@@ -226,9 +222,10 @@ public class DLFileEntryIndexer
 			Validator.isNotNull(ddmStructureFieldValue)) {
 
 			String[] ddmStructureFieldNameParts = StringUtil.split(
-				ddmStructureFieldName, DDMIndexer.DDM_FIELD_SEPARATOR);
+				ddmStructureFieldName,
+				DDMStructureManager.STRUCTURE_INDEXER_FIELD_SEPARATOR);
 
-			DDMStructure structure = DDMStructureLocalServiceUtil.getStructure(
+			DDMStructure ddmStructure = DDMStructureManagerUtil.getStructure(
 				GetterUtil.getLong(ddmStructureFieldNameParts[1]));
 
 			String fieldName = StringUtil.replaceLast(
@@ -238,12 +235,14 @@ public class DLFileEntryIndexer
 				StringPool.BLANK);
 
 			try {
-				ddmStructureFieldValue = DDMUtil.getIndexedFieldValue(
-					ddmStructureFieldValue, structure.getFieldType(fieldName));
+				ddmStructureFieldValue =
+					DDMStructureManagerUtil.getIndexedFieldValue(
+						ddmStructureFieldValue,
+						ddmStructure.getFieldType(fieldName));
 			}
-			catch (StructureFieldException sfe) {
+			catch (Exception e) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(sfe, sfe);
+					_log.debug(e, e);
 				}
 			}
 
@@ -253,7 +252,8 @@ public class DLFileEntryIndexer
 				ddmStructureFieldName,
 				StringPool.QUOTE + ddmStructureFieldValue + StringPool.QUOTE);
 
-			contextBooleanFilter.add(new QueryFilter(booleanQuery));
+			contextBooleanFilter.add(
+				new QueryFilter(booleanQuery), BooleanClauseOccur.MUST);
 		}
 
 		String[] mimeTypes = (String[])searchContext.getAttribute("mimeTypes");
@@ -357,12 +357,9 @@ public class DLFileEntryIndexer
 			}
 
 			if (ddmFormValues != null) {
-				DDMStructure ddmStructure =
-					DDMStructureLocalServiceUtil.getStructure(
-						dlFileEntryMetadata.getDDMStructureId());
-
-				DDMIndexerUtil.addAttributes(
-					document, ddmStructure, ddmFormValues);
+				DDMStructureManagerUtil.addAttributes(
+					dlFileEntryMetadata.getDDMStructureId(), document,
+					ddmFormValues);
 			}
 		}
 	}
@@ -560,8 +557,8 @@ public class DLFileEntryIndexer
 		}
 		else {
 			long companyId = GetterUtil.getLong(ids[0]);
-			long groupId = GetterUtil.getLong(ids[2]);
-			long dataRepositoryId = GetterUtil.getLong(ids[3]);
+			long groupId = GetterUtil.getLong(ids[1]);
+			long dataRepositoryId = GetterUtil.getLong(ids[2]);
 
 			reindexFileEntries(companyId, groupId, dataRepositoryId);
 		}
@@ -589,13 +586,10 @@ public class DLFileEntryIndexer
 			}
 
 			if (ddmFormValues != null) {
-				DDMStructure ddmStructure =
-					DDMStructureLocalServiceUtil.getStructure(
-						dlFileEntryMetadata.getDDMStructureId());
-
 				sb.append(
-					DDMIndexerUtil.extractAttributes(
-						ddmStructure, ddmFormValues, locale));
+					DDMStructureManagerUtil.extractAttributes(
+						dlFileEntryMetadata.getDDMStructureId(), ddmFormValues,
+						locale));
 			}
 		}
 
@@ -669,13 +663,12 @@ public class DLFileEntryIndexer
 
 					DLFolder dlFolder = (DLFolder)object;
 
-					String portletId = PortletKeys.DOCUMENT_LIBRARY;
 					long groupId = dlFolder.getGroupId();
 					long folderId = dlFolder.getFolderId();
 
 					String[] newIds = {
-						String.valueOf(companyId), portletId,
-						String.valueOf(groupId), String.valueOf(folderId)
+						String.valueOf(companyId), String.valueOf(groupId),
+						String.valueOf(folderId)
 					};
 
 					reindex(newIds);
@@ -700,13 +693,12 @@ public class DLFileEntryIndexer
 
 					Group group = (Group)object;
 
-					String portletId = PortletKeys.DOCUMENT_LIBRARY;
 					long groupId = group.getGroupId();
 					long folderId = groupId;
 
 					String[] newIds = {
-						String.valueOf(companyId), portletId,
-						String.valueOf(groupId), String.valueOf(folderId)
+						String.valueOf(companyId), String.valueOf(groupId),
+						String.valueOf(folderId)
 					};
 
 					reindex(newIds);

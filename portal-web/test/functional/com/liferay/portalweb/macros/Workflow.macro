@@ -194,7 +194,7 @@
 		<execute function="Select" locator1="CPDocumentsandmediaEditWorkflow#ALL_STRUCTURES_WORKFLOW_SELECT" value1="${workflowDefinition}" />
 		<execute function="AssertClick" locator1="CPDocumentsandmediaEditWorkflow#SAVE_BUTTON" value1="Save" />
 
-		<execute function="AssertTextEquals" locator1="CPDocumentsandmedia#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="configurePortalWorkflow">
@@ -432,7 +432,7 @@
 			<var name="portletName" value="Workflow Configuration" />
 		</execute>
 
-		<var name="defaultWorkflow" value="Default: No Workflow" />
+		<var name="defaultWorkflow" value="No Workflow" />
 
 		<if>
 			<condition function="IsElementPresent" locator1="CPSiteWorkflowconfiguration#RESOURCE_TABLE_KNOWLEDGE_BASE_ARTICLE_SELECT" />
@@ -528,7 +528,6 @@
 		<execute function="AssertClick" locator1="CPMyworkflowtasks#ASSIGNED_TO_MY_ROLES_MENULIST_UPDATE_DUE_DATE" value1="Update Due Date" />
 
 		<execute function="Type#clickAtSendKeys" locator1="CPMyworkflowtasks#DIALOG_BOX_DUE_DATE" value1="${workflowDueDate}" />
-		<execute function="Type#clickAtSendKeys" locator1="CPMyworkflowtasks#DIALOG_BOX_DUE_DATE" value1="${workflowDueDate}" />
 		<execute function="Type#clickAtSendKeys" locator1="CPMyworkflowtasks#DIALOG_BOX_DUE_DATE_TIME" value1="${workflowDueDateTime}" />
 
 		<execute macro="Workflow#confirmAndViewSucessMessageViaActions" />
@@ -581,6 +580,8 @@
 
 	<command name="viewCompletedTask">
 		<execute function="Click" locator1="CPMyworkflowtasks#NAVIGATION_COMPLETED" value1="Completed" />
+
+		<var name="key_workflowAssetTitle" value="${workflowAssetTitle}" />
 
 		<execute function="AssertTextEquals" locator1="CPMyworkflowtasksCompleted#COMPLETED_TABLE_TASK" value1="${workflowTask}" />
 

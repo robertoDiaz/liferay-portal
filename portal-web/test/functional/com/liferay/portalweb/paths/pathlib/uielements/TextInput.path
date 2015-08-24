@@ -49,6 +49,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DESCRIPTION</td>
+	<td>//textarea[contains(@id,'description')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DISPLAY_DATE</td>
 	<td>//input[contains(@id,'displayDate')]</td>
 	<td></td>
@@ -71,6 +76,11 @@
 <tr>
 	<td>DISPLAY_DATE_TIME</td>
 	<td>//input[contains(@id,'displayDateTime')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EMAIL</td>
+	<td>//div[label[contains(.,'Email')]]/input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>
@@ -109,11 +119,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>FOLDER_NAME</td>
-	<td>//input[contains(@id,'folderName')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>FILE</td>
 	<td>//input[contains(@id,'file') and @type='file']</td>
 	<td></td>
@@ -131,6 +136,11 @@
 <tr>
 	<td>ICQ</td>
 	<td>//div[label[contains(.,'ICQ')]]//input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INITIAL_URL</td>
+	<td>//input[contains(@id,'_initUrl')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -244,6 +254,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>NEW_NAME</td>
+	<td>//input[contains(@id,'newName')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NEW_TITLE</td>
 	<td>//input[contains(@id,'newTitle')]</td>
 	<td></td>
@@ -261,6 +276,21 @@
 <tr>
 	<td>PASSWORD</td>
 	<td>//div[label[contains(.,'Password')]]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>POLL_CHOICE_A</td>
+	<td>//input[contains(.,'choiceDescriptiona')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>POLL_CHOICE_B</td>
+	<td>//input[contains(.,'choiceDescriptionb')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTAL_NAME</td>
+	<td>//div[label[contains(.,'Portal Name')]]//input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>
@@ -311,6 +341,11 @@
 <tr>
 	<td>SKYPE</td>
 	<td>//div[label[contains(.,'Skype')]]//input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE_URL</td>
+	<td>//input[contains(@id,'_src')]</td>
 	<td></td>
 </tr>
 <tr>

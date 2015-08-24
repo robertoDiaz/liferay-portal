@@ -14,8 +14,8 @@
 
 package com.liferay.microblogs.upgrade;
 
-import com.liferay.microblogs.service.configuration.configurator.MicroblogsServiceConfigurator;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.service.ReleaseLocalService;
 
@@ -32,9 +32,9 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = MicroblogsServiceUpgrade.class)
 public class MicroblogsServiceUpgrade {
 
-	@Reference(unbind = "-")
-	protected void setMicroblogsServiceConfigurator(
-		MicroblogsServiceConfigurator microblogsServiceConfigurator) {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	@Reference(unbind = "-")

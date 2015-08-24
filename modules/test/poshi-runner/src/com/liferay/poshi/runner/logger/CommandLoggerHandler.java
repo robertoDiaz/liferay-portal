@@ -110,6 +110,10 @@ public final class CommandLoggerHandler {
 		_xmlLogLoggerElement.removeClassName("running");
 	}
 
+	public static void warnCommand(Element element) throws Exception {
+		failCommand(element);
+	}
+
 	private static void _failLineGroupLoggerElement(
 			LoggerElement lineGroupLoggerElement)
 		throws Exception {
@@ -442,8 +446,8 @@ public final class CommandLoggerHandler {
 		loggerElement.setAttribute("data-status01", status);
 
 		LoggerUtil.executeJavaScript(
-			"loggerInterface.fire('command-complete', " +
-				loggerElement.getID() + ")");
+			"loggerInterface.fire('command-complete', '" +
+				loggerElement.getID() + "')");
 	}
 
 	private static int _btnLinkId;

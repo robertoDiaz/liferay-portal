@@ -17,12 +17,14 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="AnnouncementsEntry#tearDownPG" />
+		<execute macro="AnnouncementsEntry#tearDownPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
 
 		<execute macro="Page#tearDownPG" />
 	</tear-down>
 
-	<command name="AddAnnouncementsEntry" priority="4">
+	<command name="AddAnnouncementsEntry" priority="5">
 		<var name="announcementType" value="General" />
 		<var name="distributionScope" value="General" />
 		<var name="entryContent" value="Announcements Entry Content" />
@@ -83,7 +85,7 @@
 
 		<execute function="Uncheck" locator1="PGAnnouncementsAddentry#DISPLAY_DATE_DISPLAY_IMMEDIATELY_CHECKBOX" />
 
-		<var attribute="value" locator="//input[@id='_84_displayDateHour']" name="displayDateHour" />
+		<var attribute="value" locator="//input[contains(@id,'displayDateHour')]" name="displayDateHour" />
 		<var name="displayDateHourLength" value="${displayDateHour?length()}" />
 
 		<if>
@@ -93,11 +95,11 @@
 			</then>
 		</if>
 
-		<var attribute="value" locator="//input[@id='_84_displayDateAmPm']" name="displayDateAMPM" />
+		<var attribute="value" locator="//input[contains(@id,'displayDateAmPm')]" name="displayDateAMPM" />
 		<var method="StringUtil#replace('${displayDateAMPM}', '0', 'AM')" name="displayDateAMPM" />
 		<var method="StringUtil#replace('${displayDateAMPM}', '1', 'PM')" name="displayDateAMPM" />
 
-		<var attribute="value" locator="//input[@id='_84_displayDateMinute']" name="displayDateMinute" />
+		<var attribute="value" locator="//input[contains(@id,'displayDateMinute')]" name="displayDateMinute" />
 		<var method="MathUtil#sum('${displayDateMinute}', '2')" name="displayDateMinuteFuture" />
 		<var name="displayDateMinuteFutureLength" value="${displayDateMinuteFuture?length()}" />
 
@@ -256,7 +258,7 @@
 		</execute>
 	</command>
 
-	<command name="DeleteAnnoucementsEntry" priority="4">
+	<command name="DeleteAnnouncementsEntry" priority="5">
 		<var name="distributionScope" value="General" />
 		<var name="entryContent" value="Announcements Entry Content" />
 		<var name="entryTitle" value="Announcements Entry Title" />
@@ -289,7 +291,7 @@
 		</execute>
 	</command>
 
-	<command name="EditAnnouncementsEntry" priority="4">
+	<command name="EditAnnouncementsEntry" priority="5">
 		<var name="distributionScope" value="General" />
 		<var name="entryContent" value="Announcements Entry Content" />
 		<var name="entryContentEdit" value="Announcements Entry Content Edit" />
@@ -333,7 +335,7 @@
 		</execute>
 	</command>
 
-	<command name="HideAnnouncementsEntry" priority="4">
+	<command name="HideAnnouncementsEntry" priority="5">
 		<var name="distributionScope" value="General" />
 		<var name="entryContent" value="Announcements Entry Content" />
 		<var name="entryTitle" value="Announcements Entry Title" />

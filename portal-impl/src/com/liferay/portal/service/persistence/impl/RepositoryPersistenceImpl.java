@@ -2547,7 +2547,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 				repository.setNew(false);
 			}
 			else {
-				session.merge(repository);
+				repository = (Repository)session.merge(repository);
 			}
 		}
 		catch (Exception e) {
@@ -2656,6 +2656,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 		repositoryImpl.setPortletId(repository.getPortletId());
 		repositoryImpl.setTypeSettings(repository.getTypeSettings());
 		repositoryImpl.setDlFolderId(repository.getDlFolderId());
+		repositoryImpl.setLastPublishDate(repository.getLastPublishDate());
 
 		return repositoryImpl;
 	}

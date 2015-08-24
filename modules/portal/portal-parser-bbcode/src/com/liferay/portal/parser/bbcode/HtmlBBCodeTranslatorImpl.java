@@ -164,7 +164,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 				handleData(sb, bbCodeItems, tags, marker, bbCodeItem);
 			}
 			else if (type == BBCodeParser.TYPE_TAG_END) {
-				handleTagEnd(sb, tags, bbCodeItem);
+				handleTagEnd(sb, tags);
 			}
 			else if (type == BBCodeParser.TYPE_TAG_START) {
 				handleTagStart(sb, bbCodeItems, tags, marker, bbCodeItem);
@@ -272,14 +272,12 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");
-			sb.append("<td class=\"line-numbers\">");
-			sb.append("<span class=\"number\">");
+			sb.append("<td class=\"line-numbers\" data-line-number=\"");
 
 			String index = String.valueOf(i + 1);
 
 			sb.append(index);
-			sb.append("</span>");
-			sb.append("</td>");
+			sb.append("\"></td>");
 			sb.append("<td class=\"lines\">");
 
 			String line = lines[i];
@@ -392,7 +390,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 			sb.append(_fontSizes[1]);
 		}
 
-		sb.append("px\">");
+		sb.append("px;\">");
 
 		tags.push("</span>");
 	}
@@ -460,36 +458,39 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		String tag = "ul";
 		StringBundler attributesSB = new StringBundler();
 
-		Matcher matcher = _attributesPattern.matcher(bbCodeItem.getAttribute());
+		if (Validator.isNotNull(bbCodeItem.getAttribute())) {
+			Matcher matcher = _attributesPattern.matcher(
+				bbCodeItem.getAttribute());
 
-		while (matcher.find()) {
-			String listStyle = null;
+			while (matcher.find()) {
+				String listStyle = null;
 
-			String attributeName = matcher.group(1);
-			String attributeValue = matcher.group(2);
+				String attributeName = matcher.group(1);
+				String attributeValue = matcher.group(2);
 
-			if (Validator.equals(attributeName, "type")) {
-				if (_orderedListStyles.get(attributeValue) != null) {
-					listStyle = _orderedListStyles.get(attributeValue);
+				if (Validator.equals(attributeName, "type")) {
+					if (_orderedListStyles.get(attributeValue) != null) {
+						listStyle = _orderedListStyles.get(attributeValue);
 
-					tag = "ol";
+						tag = "ol";
+					}
+					else {
+						listStyle = _unorderedListStyles.get(attributeValue);
+					}
+
+					if (Validator.isNotNull(listStyle)) {
+						attributesSB.append(" style=\"");
+						attributesSB.append(listStyle);
+						attributesSB.append("\"");
+					}
 				}
-				else {
-					listStyle = _unorderedListStyles.get(attributeValue);
-				}
+				else if (Validator.equals(attributeName, "start") &&
+						 Validator.isNumber(attributeValue)) {
 
-				if (Validator.isNotNull(listStyle)) {
-					attributesSB.append(" style=\"");
-					attributesSB.append(listStyle);
+					attributesSB.append(" start=\"");
+					attributesSB.append(attributeValue);
 					attributesSB.append("\"");
 				}
-			}
-			else if (Validator.equals(attributeName, "start") &&
-					 Validator.isNumber(attributeValue)) {
-
-				attributesSB.append(" start=\"");
-				attributesSB.append(attributeValue);
-				attributesSB.append("\"");
 			}
 		}
 
@@ -606,14 +607,8 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		handleSimpleTag(sb, tags, "tr");
 	}
 
-	protected void handleTagEnd(
-		StringBundler sb, Stack<String> tags, BBCodeItem bbCodeItem) {
-
-		String tag = bbCodeItem.getValue();
-
-		if (isValidTag(tag)) {
-			sb.append(tags.pop());
-		}
+	protected void handleTagEnd(StringBundler sb, Stack<String> tags) {
+		sb.append(tags.pop());
 	}
 
 	protected void handleTagStart(
@@ -621,10 +616,6 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		IntegerWrapper marker, BBCodeItem bbCodeItem) {
 
 		String tag = bbCodeItem.getValue();
-
-		if (!isValidTag(tag)) {
-			return;
-		}
 
 		if (tag.equals("b")) {
 			handleBold(sb, tags);
@@ -721,17 +712,10 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		tags.push("</a>");
 	}
 
-	protected boolean isValidTag(String tag) {
-		if ((tag != null) && (tag.length() > 0)) {
-			Matcher matcher = _tagPattern.matcher(tag);
+	private static final Log _log = LogFactoryUtil.getLog(
+		HtmlBBCodeTranslatorImpl.class);
 
-			return matcher.matches();
-		}
-
-		return false;
-	}
-
-	private static final String[][] _EMOTICONS = {
+	private final String[][] _EMOTICONS = {
 		{"happy.gif", ":)", "happy"},
 		{"smile.gif", ":D", "smile"},
 		{"cool.gif", "B)", "cool"},
@@ -770,9 +754,6 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		{"wub.gif", ":wub:", "wub"}
 	};
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		HtmlBBCodeTranslatorImpl.class);
-
 	private final Pattern _attributesPattern = Pattern.compile(
 		"\\s*([^=]+)\\s*=\\s*\"([^\"]+)\"\\s*");
 	private final Map<String, String> _bbCodeCharacters;
@@ -793,10 +774,6 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		"^(?:https?://|/)[-;/?:@&=+$,_.!~*'()%0-9a-z]{1,2048}$",
 		Pattern.CASE_INSENSITIVE);
 	private final Map<String, String> _orderedListStyles;
-	private final Pattern _tagPattern = Pattern.compile(
-		"^/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|" +
-			"right|\\*|s|size|table|tr|th|td|li|list|font|u|url)$",
-		Pattern.CASE_INSENSITIVE);
 	private final Map<String, String> _unorderedListStyles;
 	private final Pattern _urlPattern = Pattern.compile(
 		"^[-;/?:@&=+$,_.!~*'()%0-9a-z#]{1,2048}$", Pattern.CASE_INSENSITIVE);

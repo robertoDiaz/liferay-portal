@@ -12763,7 +12763,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 				mbThread.setNew(false);
 			}
 			else {
-				session.merge(mbThread);
+				mbThread = (MBThread)session.merge(mbThread);
 			}
 		}
 		catch (Exception e) {
@@ -13002,6 +13002,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		mbThreadImpl.setLastPostDate(mbThread.getLastPostDate());
 		mbThreadImpl.setPriority(mbThread.getPriority());
 		mbThreadImpl.setQuestion(mbThread.isQuestion());
+		mbThreadImpl.setLastPublishDate(mbThread.getLastPublishDate());
 		mbThreadImpl.setStatus(mbThread.getStatus());
 		mbThreadImpl.setStatusByUserId(mbThread.getStatusByUserId());
 		mbThreadImpl.setStatusByUserName(mbThread.getStatusByUserName());

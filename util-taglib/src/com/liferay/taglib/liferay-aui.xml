@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<taglibs short-name="aui" uri="http://alloy.liferay.com/tld/aui" tlib-version="1.0">
+<taglibs short-name="aui" uri="http://liferay.com/tld/aui" tlib-version="1.0">
 	<authors>
 		<author>Eduardo Lundgren</author>
 		<author>Bruno Basto</author>
@@ -663,6 +663,11 @@
 			<attribute>
 				<description>A URL navigated to when the icon is clicked.</description>
 				<name>url</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>view</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>
@@ -1349,6 +1354,11 @@
 				<defaultValue>false</defaultValue>
 			</attribute>
 			<attribute>
+				<name>require</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
 				<description>AlloyUI modules to be used in the script. Names of multiple modules must be separated by commas.</description>
 				<name>use</name>
 				<inputType>java.lang.String</inputType>
@@ -1714,6 +1724,11 @@
 			<attribute>
 				<description>A version for the workflow status that is displayed in a label next to the workflow status.</description>
 				<name>version</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
+				<name>view</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
 			</attribute>

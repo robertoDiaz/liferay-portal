@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.cache.ThreadLocalCachable;
 import com.liferay.portal.kernel.cache.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
@@ -61,6 +63,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.admin.util.PortalMyAccountApplicationType;
 import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
@@ -510,13 +513,11 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *
 	 * <p>
 	 * If the group is a site, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#SITE_MEMBER}. If the group is an
-	 * organization, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#ORGANIZATION_USER}. If the group
-	 * is a user or user group, then the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#POWER_USER}. For all other group
-	 * types, the default role is {@link
-	 * com.liferay.portal.model.RoleConstants#USER}.
+	 * RoleConstants#SITE_MEMBER}. If the group is an organization, then the
+	 * default role is {@link RoleConstants#ORGANIZATION_USER}. If the group is
+	 * a user or user group, then the default role is {@link
+	 * RoleConstants#POWER_USER}. For all other group types, the default role is
+	 * {@link RoleConstants#USER}.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
@@ -1428,8 +1429,12 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	}
 
 	protected String[] getDefaultControlPanelPortlets() {
+		String myAccountPortletId = PortletProviderUtil.getPortletId(
+			PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
+			PortletProvider.Action.VIEW);
+
 		return new String[] {
-			PortletKeys.MY_ACCOUNT, PortletKeys.MY_PAGES,
+			myAccountPortletId, PortletKeys.MY_PAGES,
 			PortletKeys.MY_WORKFLOW_INSTANCE, PortletKeys.MY_WORKFLOW_TASK
 		};
 	}
@@ -1546,6 +1551,12 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			}
 		}
 		catch (NoSuchRoleException nsre) {
+		}
+
+		if (name.equals(RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE)) {
+			throw new RoleNameException(
+				RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE +
+					" is a temporary placeholder that must not be persisted");
 		}
 	}
 

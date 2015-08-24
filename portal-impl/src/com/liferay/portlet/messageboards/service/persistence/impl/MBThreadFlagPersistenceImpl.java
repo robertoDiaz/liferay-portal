@@ -2933,7 +2933,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 				mbThreadFlag.setNew(false);
 			}
 			else {
-				session.merge(mbThreadFlag);
+				mbThreadFlag = (MBThreadFlag)session.merge(mbThreadFlag);
 			}
 		}
 		catch (Exception e) {
@@ -3054,6 +3054,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		mbThreadFlagImpl.setCreateDate(mbThreadFlag.getCreateDate());
 		mbThreadFlagImpl.setModifiedDate(mbThreadFlag.getModifiedDate());
 		mbThreadFlagImpl.setThreadId(mbThreadFlag.getThreadId());
+		mbThreadFlagImpl.setLastPublishDate(mbThreadFlag.getLastPublishDate());
 
 		return mbThreadFlagImpl;
 	}
