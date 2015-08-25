@@ -18,6 +18,8 @@ import com.liferay.portal.InvalidRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
@@ -25,24 +27,36 @@ import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.trash.BaseTrashRenderer;
 import com.liferay.portal.kernel.trash.TrashActionKeys;
 import com.liferay.portal.kernel.trash.TrashHandler;
+import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
+import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileShortcutPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.util.TrashUtil;
+
+import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -130,6 +144,14 @@ public class DLFileShortcutTrashHandler extends DLBaseTrashHandler {
 		DLFileShortcut dlFileShortcut = getDLFileShortcut(classPK);
 
 		return dlFileShortcut.getTrashEntry();
+	}
+
+	@Override
+	public TrashRenderer getTrashRenderer(long classPK) throws PortalException {
+		DLFileShortcut dlFileShortcut =
+			DLFileShortcutLocalServiceUtil.getDLFileShortcut(classPK);
+
+		return new DLFileShortcutTrashRenderer(dlFileShortcut);
 	}
 
 	@Override
@@ -299,5 +321,65 @@ public class DLFileShortcutTrashHandler extends DLBaseTrashHandler {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileShortcutTrashHandler.class);
+
+	private static class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
+
+		public DLFileShortcutTrashRenderer(DLFileShortcut dlFileShortcut) {
+			_dlFileShortcut = dlFileShortcut;
+		}
+
+		@Override
+		public String getClassName() {
+			return DLFileShortcutConstants.getClassName();
+		}
+
+		@Override
+		public long getClassPK() {
+			return _dlFileShortcut.getFileShortcutId();
+		}
+
+		@Override
+		public String getPortletId() {
+			return PortletProviderUtil.getPortletId(
+				DLFileShortcutConstants.getClassName(),
+				PortletProvider.Action.VIEW);
+		}
+
+		@Override
+		public String getSummary(
+			PortletRequest portletRequest, PortletResponse portletResponse) {
+
+			return getTitle(null);
+		}
+
+		@Override
+		public String getTitle(Locale locale) {
+			return TrashUtil.getOriginalTitle(_dlFileShortcut.getToTitle());
+		}
+
+		@Override
+		public String getType() {
+			return "shortcut";
+		}
+
+		@Override
+		public boolean include(
+				HttpServletRequest request, HttpServletResponse response,
+				String template)
+			throws Exception {
+
+			TrashHandler trashHandler =
+				TrashHandlerRegistryUtil.getTrashHandler(
+					DLFileEntryConstants.getClassName());
+
+			TrashRenderer trashRenderer = trashHandler.getTrashRenderer(
+				_dlFileShortcut.getToFileEntryId());
+
+			return trashRenderer.include(request, response, template);
+		}
+
+		private final DLFileShortcut _dlFileShortcut;
+
+	}
 
 }
