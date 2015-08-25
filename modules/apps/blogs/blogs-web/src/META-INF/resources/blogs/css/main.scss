@@ -180,9 +180,13 @@
 
 	.entry-title {
 		display: block;
+		position: relative;
 
-		h2 .alloy-editor-placeholder {
-			p {
+		h2 {
+			margin-right: 30px;
+			margin-top: 10px;
+
+			.alloy-editor-placeholder p {
 				margin-bottom: 0;
 			}
 		}
@@ -213,10 +217,6 @@
 	.entry-navigation {
 		padding: 60px 0;
 		width: 100%;
-
-		.entry-info {
-			margin-top: 0;
-		}
 
 		.small-image {
 			height: 140px;

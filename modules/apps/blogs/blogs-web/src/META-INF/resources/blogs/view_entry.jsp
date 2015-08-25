@@ -106,21 +106,13 @@ request.setAttribute("view_entry_content.jsp-assetEntry", assetEntry);
 								</aui:a>
 							</c:if>
 
-							<div class="entry-info">
-								<liferay-ui:user-display
-									showUserName="<%= false %>"
-									userIconCssClass="user-icon-md"
-									userId="<%= previousEntry.getUserId() %>"
-									userName="<%= previousEntry.getUserName() %>"
-									view="lexicon"
-								>
-									<small>
-										<strong><%= previousEntry.getUserName() %></strong>
-										<span> - </span>
-										<span class="hide-accessible"><liferay-ui:message key="published-date" /></span>
-										<%= dateFormatDate.format(previousEntry.getDisplayDate()) %>
-									</small>
-								</liferay-ui:user-display>
+							<div class="entry-info text-muted">
+								<small>
+									<strong><%= previousEntry.getUserName() %></strong>
+									<span> - </span>
+									<span class="hide-accessible"><liferay-ui:message key="published-date" /></span>
+									<%= dateFormatDate.format(previousEntry.getDisplayDate()) %>
+								</small>
 							</div>
 
 							<div class="entry-content">
@@ -153,21 +145,13 @@ request.setAttribute("view_entry_content.jsp-assetEntry", assetEntry);
 								</aui:a>
 							</c:if>
 
-							<div class="entry-info">
-								<liferay-ui:user-display
-									showUserName="<%= false %>"
-									userIconCssClass="user-icon-md"
-									userId="<%= nextEntry.getUserId() %>"
-									userName="<%= nextEntry.getUserName() %>"
-									view="lexicon"
-								>
-									<small>
-										<strong><%= nextEntry.getUserName() %></strong>
-										<span> - </span>
-										<span class="hide-accessible"><liferay-ui:message key="published-date" /></span>
-										<%= dateFormatDate.format(nextEntry.getDisplayDate()) %>
-									</small>
-								</liferay-ui:user-display>
+							<div class="entry-info text-muted">
+								<small>
+									<strong><%= nextEntry.getUserName() %></strong>
+									<span> - </span>
+									<span class="hide-accessible"><liferay-ui:message key="published-date" /></span>
+									<%= dateFormatDate.format(nextEntry.getDisplayDate()) %>
+								</small>
 							</div>
 
 							<div class="entry-content">
