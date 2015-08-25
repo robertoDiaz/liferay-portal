@@ -12,18 +12,27 @@
  * details.
  */
 
-package com.liferay.microblogs.constants;
+package com.liferay.microblogs.web.upgrade.v1_0_0;
+
+import com.liferay.microblogs.constants.MicroblogsPortletKeys;
 
 /**
- * @author Jonathan Lee
- * @author Joan Kim
+ * @author Adolfo Pérez
  */
-public class MicroblogsPortletKeys {
+public class UpgradePortletId
+	extends com.liferay.portal.upgrade.util.UpgradePortletId {
 
-	public static final String MICROBLOGS =
-		"com_liferay_microblogs_web_portlet_MicroblogsPortlet";
-
-	public static final String MICROBLOGS_STATUS_UPDATE =
-		"com_liferay_microblogs_web_portlet_MicroblogsStatusUpdatePortlet";
+	@Override
+	protected String[][] getRenamePortletIdsArray() {
+		return new String[][] {
+			new String[] {
+				"1_WAR_microblogsportlet", MicroblogsPortletKeys.MICROBLOGS
+			},
+			new String[] {
+				"2_WAR_microblogsportlet",
+				MicroblogsPortletKeys.MICROBLOGS_STATUS_UPDATE
+			}
+		};
+	}
 
 }

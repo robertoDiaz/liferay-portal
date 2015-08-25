@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,19 +12,12 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package com.liferay.microblogs.constants;
+<%@ include file="/init.jsp" %>
 
-/**
- * @author Jonathan Lee
- * @author Joan Kim
- */
-public class MicroblogsPortletKeys {
+<%
+MicroblogsEntry microblogsEntry = (MicroblogsEntry)request.getAttribute(WebKeys.MICROBLOGS_ENTRY);
+%>
 
-	public static final String MICROBLOGS =
-		"com_liferay_microblogs_web_portlet_MicroblogsPortlet";
-
-	public static final String MICROBLOGS_STATUS_UPDATE =
-		"com_liferay_microblogs_web_portlet_MicroblogsStatusUpdatePortlet";
-
-}
+<%= HtmlUtil.stripHtml(microblogsEntry.getContent()) %>
