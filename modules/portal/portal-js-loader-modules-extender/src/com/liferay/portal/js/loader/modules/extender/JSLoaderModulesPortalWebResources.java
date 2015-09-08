@@ -52,13 +52,6 @@ public class JSLoaderModulesPortalWebResources {
 	}
 
 	@Reference
-	protected void setJSBundleConfigTracker(
-		JSBundleConfigTracker jsBundleConfigTracker) {
-
-		_jsBundleConfigTracker = jsBundleConfigTracker;
-	}
-
-	@Reference
 	protected void setJSLoaderModulesServlet(
 		JSLoaderModulesServlet jsLoaderModulesServlet) {
 
@@ -72,7 +65,6 @@ public class JSLoaderModulesPortalWebResources {
 		_jsLoaderModulesTracker = jsLoaderModulesTracker;
 	}
 
-	private JSBundleConfigTracker _jsBundleConfigTracker;
 	private JSLoaderModulesServlet _jsLoaderModulesServlet;
 	private JSLoaderModulesTracker _jsLoaderModulesTracker;
 	private ServiceRegistration<?> _serviceRegistration;
@@ -89,8 +81,7 @@ public class JSLoaderModulesPortalWebResources {
 
 		@Override
 		public long getLastModified() {
-			return _jsLoaderModulesTracker.getTrackingCount() +
-				_jsBundleConfigTracker.getTrackingCount();
+			return _jsLoaderModulesTracker.getTrackingCount();
 		}
 
 		@Override
