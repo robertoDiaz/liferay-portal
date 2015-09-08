@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactory
 import com.liferay.portal.kernel.editor.configuration.EditorOptions;
 import com.liferay.portal.kernel.editor.configuration.EditorOptionsContributor;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -77,21 +75,14 @@ public class EditorConfigTransformerTest {
 
 			_bundleIds.add(bundleId);
 
-			ModuleFrameworkUtilAdapter.stopBundle(Long.valueOf(bundleId));
+			ModuleFrameworkUtilAdapter.stopBundle(bundleId);
 		}
 	}
 
 	@AfterClass
-	public static void tearDownClass() {
+	public static void tearDownClass() throws Exception {
 		for (long bundleId : _bundleIds) {
-			try {
-				ModuleFrameworkUtilAdapter.startBundle(bundleId);
-			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn("Could not start bundle " + bundleId);
-				}
-			}
+			ModuleFrameworkUtilAdapter.startBundle(bundleId);
 		}
 	}
 
@@ -323,9 +314,6 @@ public class EditorConfigTransformerTest {
 	private static final String _PORTLET_NAME = "testPortletName";
 
 	private static final String _UNUSED_EDITOR_NAME = "testUnusedEditorName";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		EditorConfigTransformerTest.class);
 
 	private static final List<Long> _bundleIds = new ArrayList<>();
 
