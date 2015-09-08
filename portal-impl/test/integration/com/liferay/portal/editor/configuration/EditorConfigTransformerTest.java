@@ -24,19 +24,26 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.RequestBackedPortletURLFactory;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceRegistration;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +58,33 @@ public class EditorConfigTransformerTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Collection<ServiceReference<EditorConfigContributor>>
+			serviceReferences = registry.getServiceReferences(
+				EditorConfigContributor.class, null);
+
+		for (ServiceReference<EditorConfigContributor> serviceReference :
+				serviceReferences) {
+
+			Long bundleId = (Long)serviceReference.getProperty(
+				"service.bundleid");
+
+			_bundleIds.add(bundleId);
+
+			ModuleFrameworkUtilAdapter.stopBundle(bundleId);
+		}
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		for (long bundleId : _bundleIds) {
+			ModuleFrameworkUtilAdapter.startBundle(bundleId);
+		}
+	}
 
 	@After
 	public void tearDown() {
@@ -280,6 +314,8 @@ public class EditorConfigTransformerTest {
 	private static final String _PORTLET_NAME = "testPortletName";
 
 	private static final String _UNUSED_EDITOR_NAME = "testUnusedEditorName";
+
+	private static final List<Long> _bundleIds = new ArrayList<>();
 
 	private ServiceRegistration<EditorConfigContributor>
 		_editorConfigContributorServiceRegistration;
