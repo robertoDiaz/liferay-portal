@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -78,7 +80,7 @@ import com.liferay.portlet.blogs.BlogsGroupServiceSettings;
 import com.liferay.portlet.blogs.EntryContentException;
 import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
-import com.liferay.portlet.blogs.EntrySmallImageSizeException;
+import com.liferay.portlet.blogs.EntrySmallImageScaleException;
 import com.liferay.portlet.blogs.EntryTitleException;
 import com.liferay.portlet.blogs.constants.BlogsConstants;
 import com.liferay.portlet.blogs.model.BlogsEntry;
@@ -91,6 +93,8 @@ import com.liferay.portlet.blogs.util.comparator.EntryDisplayDateComparator;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
+
+import java.awt.image.RenderedImage;
 
 import java.io.File;
 import java.io.IOException;
@@ -1707,19 +1711,44 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			String title, InputStream is)
 		throws PortalException {
 
-		ServiceContext serviceContext = new ServiceContext();
+		File file = null;
 
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
+		try {
+			ImageBag imageBag = ImageToolUtil.read(is);
 
-		Folder folder = addAttachmentsFolder(userId, groupId);
+			RenderedImage renderedImage = imageBag.getRenderedImage();
 
-		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			groupId, userId, BlogsEntry.class.getName(), entryId,
-			BlogsConstants.SERVICE_NAME, folder.getFolderId(), is, title,
-			mimeType, false);
+			BlogsGroupServiceSettings blogsGroupServiceSettings =
+				BlogsGroupServiceSettings.getInstance(groupId);
 
-		return fileEntry.getFileEntryId();
+			renderedImage = ImageToolUtil.scale(
+				renderedImage, blogsGroupServiceSettings.getSmallImageWidth());
+
+			byte[] bytes = ImageToolUtil.getBytes(
+				renderedImage, imageBag.getType());
+
+			file = FileUtil.createTempFile(bytes);
+
+			ServiceContext serviceContext = new ServiceContext();
+
+			serviceContext.setAddGroupPermissions(true);
+			serviceContext.setAddGuestPermissions(true);
+
+			Folder folder = addAttachmentsFolder(userId, groupId);
+
+			FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+				groupId, userId, BlogsEntry.class.getName(), entryId,
+				BlogsConstants.SERVICE_NAME, folder.getFolderId(), file, title,
+				mimeType, false);
+
+			return fileEntry.getFileEntryId();
+		}
+		catch (IOException e) {
+			throw new EntrySmallImageScaleException();
+		}
+		finally {
+			FileUtil.delete(file);
+		}
 	}
 
 	protected void deleteDiscussion(BlogsEntry entry) throws PortalException {
@@ -2223,15 +2252,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				throw new EntrySmallImageNameException(
 					"Invalid small image for file entry " +
 						smallImageFileEntryId);
-			}
-
-			long smallImageMaxSize = PrefsPropsUtil.getLong(
-				PropsKeys.BLOGS_IMAGE_SMALL_MAX_SIZE);
-
-			if ((smallImageMaxSize > 0) &&
-				(fileEntry.getSize() > smallImageMaxSize)) {
-
-				throw new EntrySmallImageSizeException();
 			}
 		}
 	}
