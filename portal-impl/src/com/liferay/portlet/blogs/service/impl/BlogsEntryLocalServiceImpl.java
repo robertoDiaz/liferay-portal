@@ -1634,52 +1634,22 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			ImageSelector imageSelector)
 		throws PortalException {
 
-		FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
-			imageSelector.getImageId());
-
-		BlogsEntryAttachmentFileEntryHelper
-			blogsEntryAttachmentFileEntryHelper =
-				new BlogsEntryAttachmentFileEntryHelper();
-
-		if (fileEntry.isRepositoryCapabilityProvided(
-				TemporaryFileEntriesCapability.class)) {
-
-			Folder folder = addAttachmentsFolder(userId, groupId);
-
-			blogsEntryAttachmentFileEntryHelper.
-				addBlogsEntryAttachmentFileEntry(
-					groupId, userId, entryId, folder.getFolderId(),
-					fileEntry.getTitle(), fileEntry.getMimeType(),
-					fileEntry.getContentStream());
-		}
-
 		File file = null;
 
 		try {
 			byte[] bytes = imageSelector.getCroppedImageBytes();
 
 			if (bytes == null) {
-				return 0;
+				throw new EntryCoverImageCropException();
 			}
 
 			file = FileUtil.createTempFile(bytes);
 
-			String title = imageSelector.getTitle();
-
-			if (Validator.isNull(title)) {
-				title =
-					StringUtil.randomString() + "_tempCroppedImage_" + entryId;
-			}
-
 			Folder folder = addCoverImageFolder(userId, groupId);
 
-			FileEntry coverImageFileEntry =
-				blogsEntryAttachmentFileEntryHelper.
-					addBlogsEntryAttachmentFileEntry(
-						groupId, userId, entryId, folder.getFolderId(), title,
-						imageSelector.getMimeType(), file);
-
-			return coverImageFileEntry.getFileEntryId();
+			return addImageFileEntry(
+				userId, groupId, entryId, folder.getFolderId(), imageSelector,
+				file);
 		}
 		catch (IOException ioe) {
 			throw new EntryCoverImageCropException();
@@ -1705,9 +1675,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		}
 	}
 
-	protected long addSmallImageFileEntry(
-			long userId, long groupId, long entryId,
-			ImageSelector imageSelector)
+	protected long addImageFileEntry(
+			long userId, long groupId, long entryId, long folderId,
+			ImageSelector imageSelector, File file)
 		throws PortalException {
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
@@ -1720,18 +1690,51 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		if (fileEntry.isRepositoryCapabilityProvided(
 				TemporaryFileEntriesCapability.class)) {
 
-			Folder folder = addAttachmentsFolder(userId, groupId);
+			addOriginalFileEntry(
+				userId, groupId, entryId, fileEntry,
+				blogsEntryAttachmentFileEntryHelper);
+		}
 
+		String title = imageSelector.getTitle();
+
+		if (Validator.isNull(title)) {
+			title = StringUtil.randomString() + "_tempImage_" + entryId;
+		}
+
+		FileEntry coverImageFileEntry =
 			blogsEntryAttachmentFileEntryHelper.
 				addBlogsEntryAttachmentFileEntry(
-					groupId, userId, entryId, folder.getFolderId(),
-					fileEntry.getTitle(), fileEntry.getMimeType(),
-					fileEntry.getContentStream());
-		}
+					groupId, userId, entryId, folderId, title,
+					imageSelector.getMimeType(), file);
+
+		return coverImageFileEntry.getFileEntryId();
+	}
+
+	protected void addOriginalFileEntry(
+			long userId, long groupId, long entryId, FileEntry fileEntry,
+			BlogsEntryAttachmentFileEntryHelper
+				blogsEntryAttachmentFileEntryHelper)
+		throws PortalException {
+
+		Folder folder = addAttachmentsFolder(userId, groupId);
+
+		blogsEntryAttachmentFileEntryHelper.addBlogsEntryAttachmentFileEntry(
+			groupId, userId, entryId, folder.getFolderId(),
+			fileEntry.getTitle(), fileEntry.getMimeType(),
+			fileEntry.getContentStream());
+	}
+
+	protected long addSmallImageFileEntry(
+			long userId, long groupId, long entryId,
+			ImageSelector imageSelector)
+		throws PortalException {
 
 		File file = null;
 
 		try {
+			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
+				imageSelector.getImageId());
+
 			ImageBag imageBag = ImageToolUtil.read(
 				fileEntry.getContentStream());
 
@@ -1748,24 +1751,13 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 			file = FileUtil.createTempFile(bytes);
 
-			String title = imageSelector.getTitle();
-
-			if (Validator.isNull(title)) {
-				title =
-					StringUtil.randomString() + "_tempSmallImage_" + entryId;
-			}
-
 			Folder folder = addSmallImageFolder(userId, groupId);
 
-			FileEntry smallImageFileEntry =
-				blogsEntryAttachmentFileEntryHelper.
-					addBlogsEntryAttachmentFileEntry(
-						groupId, userId, entryId, folder.getFolderId(), title,
-						imageSelector.getMimeType(), file);
-
-			return smallImageFileEntry.getFileEntryId();
+			return addImageFileEntry(
+				userId, groupId, entryId, folder.getFolderId(), imageSelector,
+				file);
 		}
-		catch (IOException e) {
+		catch (IOException ioe) {
 			throw new EntrySmallImageScaleException();
 		}
 		finally {
