@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -58,10 +59,11 @@ import com.liferay.portlet.asset.AssetTagException;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryHelper;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryReference;
 import com.liferay.portlet.blogs.EntryContentException;
+import com.liferay.portlet.blogs.EntryCoverImageCropException;
 import com.liferay.portlet.blogs.EntryDescriptionException;
 import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
-import com.liferay.portlet.blogs.EntrySmallImageSizeException;
+import com.liferay.portlet.blogs.EntrySmallImageScaleException;
 import com.liferay.portlet.blogs.EntryTitleException;
 import com.liferay.portlet.blogs.NoSuchEntryException;
 import com.liferay.portlet.blogs.model.BlogsEntry;
@@ -331,10 +333,11 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 				mvcPath = "/blogs/error.jsp";
 			}
 			else if (e instanceof EntryContentException ||
+					 e instanceof EntryCoverImageCropException ||
 					 e instanceof EntryDescriptionException ||
 					 e instanceof EntryDisplayDateException ||
 					 e instanceof EntrySmallImageNameException ||
-					 e instanceof EntrySmallImageSizeException ||
+					 e instanceof EntrySmallImageScaleException ||
 					 e instanceof EntryTitleException ||
 					 e instanceof FileSizeException ||
 					 e instanceof LiferayFileItemException ||
@@ -521,12 +524,16 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 				blogsEntryAttachmentFileEntryHelper.
 					getTempBlogsEntryAttachmentFileEntries(content);
 
+			Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
+				themeDisplay.getUserId(), entry.getGroupId());
+
 			if (!tempBlogsEntryAttachments.isEmpty()) {
 				blogsEntryAttachmentFileEntryReferences =
 					blogsEntryAttachmentFileEntryHelper.
 						addBlogsEntryAttachmentFileEntries(
 							entry.getGroupId(), themeDisplay.getUserId(),
-							entry.getEntryId(), tempBlogsEntryAttachments);
+							entry.getEntryId(), folder.getFolderId(),
+							tempBlogsEntryAttachments);
 
 				content = blogsEntryAttachmentFileEntryHelper.updateContent(
 					content, blogsEntryAttachmentFileEntryReferences);
@@ -570,12 +577,15 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 				blogsEntryAttachmentHelper.
 					getTempBlogsEntryAttachmentFileEntries(content);
 
+			Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
+				themeDisplay.getUserId(), entry.getGroupId());
+
 			if (!tempBlogsEntryAttachmentFileEntries.isEmpty()) {
 				blogsEntryAttachmentFileEntryReferences =
 					blogsEntryAttachmentHelper.
 						addBlogsEntryAttachmentFileEntries(
 							entry.getGroupId(), themeDisplay.getUserId(),
-							entry.getEntryId(),
+							entry.getEntryId(), folder.getFolderId(),
 							tempBlogsEntryAttachmentFileEntries);
 
 				content = blogsEntryAttachmentHelper.updateContent(
