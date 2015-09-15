@@ -44,18 +44,18 @@ import org.junit.Test;
 public abstract class BaseImageTestCase {
 
 	@Test
-	public void testAddCoverImage() throws Exception {
+	public void testAddImage() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
-		Assert.assertEquals("image.jpg", coverImageFileEntry.getTitle());
+		Assert.assertEquals("image.jpg", imageFileEntry.getTitle());
 	}
 
 	@Test
-	public void testAddOriginalCoverImage() throws Exception {
+	public void testAddOriginalImage() throws Exception {
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			user.getUserId(), group.getGroupId());
 
@@ -77,9 +77,7 @@ public abstract class BaseImageTestCase {
 	}
 
 	@Test
-	public void testAddOriginalCoverImageWhenUpdatingBlogEntry()
-		throws Exception {
-
+	public void testAddOriginalImageWhenUpdatingBlogEntry() throws Exception {
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			user.getUserId(), group.getGroupId());
 
@@ -103,57 +101,52 @@ public abstract class BaseImageTestCase {
 	}
 
 	@Test(expected = NoSuchFileEntryException.class)
-	public void testCoverImageDeletedWhenDeletingEntry() throws Exception {
+	public void testImageDeletedWhenDeletingEntry() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
 		BlogsEntryLocalServiceUtil.deleteEntry(entry);
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
-			coverImageFileEntry.getFileEntryId());
+			imageFileEntry.getFileEntryId());
 	}
 
 	@Test(expected = NoSuchFileEntryException.class)
-	public void testCoverImageDeletedWhenEmptyCoverImageSelector()
-		throws Exception {
-
+	public void testImageDeletedWhenEmptyImageSelector() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
-		ImageSelector coverImageSelector = new ImageSelector(
+		ImageSelector imageSelector = new ImageSelector(
 			0, StringPool.BLANK, StringPool.BLANK);
 
-		entry = updateBlogsEntry(entry.getEntryId(), coverImageSelector);
+		entry = updateBlogsEntry(entry.getEntryId(), imageSelector);
 
-		Assert.assertEquals(0, entry.getCoverImageFileEntryId());
+		Assert.assertEquals(0, getFileEntryId(entry));
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
-			coverImageFileEntry.getFileEntryId());
+			imageFileEntry.getFileEntryId());
 	}
 
 	@Test
-	public void testCoverImageNotChangedWhenNullCoverImageSelector()
-		throws Exception {
-
+	public void testImageNotChangedWhenNullImageSelector() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
-		ImageSelector coverImageSelector = null;
+		ImageSelector imageSelector = null;
 
-		entry = updateBlogsEntry(entry.getEntryId(), coverImageSelector);
+		entry = updateBlogsEntry(entry.getEntryId(), imageSelector);
 
 		Assert.assertEquals(
-			coverImageFileEntry.getFileEntryId(),
-			entry.getCoverImageFileEntryId());
+			imageFileEntry.getFileEntryId(), getFileEntryId(entry));
 
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			user.getUserId(), group.getGroupId());
@@ -162,47 +155,47 @@ public abstract class BaseImageTestCase {
 			group.getGroupId(), folder.getFolderId(), "image.jpg");
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
-			coverImageFileEntry.getFileEntryId());
+			imageFileEntry.getFileEntryId());
 	}
 
 	@Test
-	public void testCoverImageStoredInBlogsRepository() throws Exception {
+	public void testImageStoredInBlogsRepository() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
 		Repository repository = RepositoryLocalServiceUtil.getRepository(
-			coverImageFileEntry.getRepositoryId());
+			imageFileEntry.getRepositoryId());
 
 		Assert.assertEquals(BlogsConstants.SERVICE_NAME, repository.getName());
 	}
 
 	@Test
-	public void testCoverImageStoredInCoverImageFolder() throws Exception {
+	public void testImageStoredInImageFolder() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
-		Folder coverImageFolder = coverImageFileEntry.getFolder();
+		Folder imageFolder = imageFileEntry.getFolder();
 
 		Assert.assertNotEquals(
-			BlogsConstants.SERVICE_NAME, coverImageFolder.getName());
+			BlogsConstants.SERVICE_NAME, imageFolder.getName());
 	}
 
 	@Test
-	public void testOriginalCoverImageNotDeletedWhenEmptyCoverImageSelector()
+	public void testOriginalImageNotDeletedWhenEmptyImageSelector()
 		throws Exception {
 
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		ImageSelector coverImageSelector = new ImageSelector(
+		ImageSelector imageSelector = new ImageSelector(
 			0, StringPool.BLANK, StringPool.BLANK);
 
-		updateBlogsEntry(entry.getEntryId(), coverImageSelector);
+		updateBlogsEntry(entry.getEntryId(), imageSelector);
 
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			user.getUserId(), group.getGroupId());
@@ -212,7 +205,7 @@ public abstract class BaseImageTestCase {
 	}
 
 	@Test
-	public void testOriginalCoverImageNotDeletedWhenNullCoverImageSelector()
+	public void testOriginalImageNotDeletedWhenNullImageSelector()
 		throws Exception {
 
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
@@ -224,9 +217,9 @@ public abstract class BaseImageTestCase {
 
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		ImageSelector coverImageSelector = null;
+		ImageSelector imageSelector = null;
 
-		updateBlogsEntry(entry.getEntryId(), coverImageSelector);
+		updateBlogsEntry(entry.getEntryId(), imageSelector);
 
 		int finalPortletFileEntriesCount =
 			PortletFileRepositoryUtil.getPortletFileEntriesCount(
@@ -240,39 +233,35 @@ public abstract class BaseImageTestCase {
 	}
 
 	@Test
-	public void testOriginalCoverImageStoredInBlogsRepository()
-		throws Exception {
-
+	public void testOriginalImageStoredInBlogsRepository() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
 		Repository repository = RepositoryLocalServiceUtil.getRepository(
-			coverImageFileEntry.getRepositoryId());
+			imageFileEntry.getRepositoryId());
 
 		Assert.assertEquals(BlogsConstants.SERVICE_NAME, repository.getName());
 	}
 
 	@Test(expected = NoSuchFileEntryException.class)
-	public void testPreviousCoverImageDeletedWhenChangingCoverImage()
-		throws Exception {
-
+	public void testPreviousImageDeletedWhenChangingImage() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
 		updateBlogsEntry(entry.getEntryId(), "image2.jpg");
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
-			coverImageFileEntry.getFileEntryId());
+			imageFileEntry.getFileEntryId());
 	}
 
 	@Test
-	public void testPreviousOriginalCoverImageNotDeletedWhenChangingCoverImage()
+	public void testPreviousOriginalImageNotDeletedWhenChangingImage()
 		throws Exception {
 
 		BlogsEntry entry = addBlogsEntry("image.jpg");
@@ -287,20 +276,22 @@ public abstract class BaseImageTestCase {
 	}
 
 	@Test
-	public void testUpdateCoverImage() throws Exception {
+	public void testUpdateImage() throws Exception {
 		BlogsEntry entry = addBlogsEntry("image.jpg");
 
 		entry = updateBlogsEntry(entry.getEntryId(), "image2.jpg");
 
-		FileEntry coverImageFileEntry =
+		FileEntry imageFileEntry =
 			PortletFileRepositoryUtil.getPortletFileEntry(
-				entry.getCoverImageFileEntryId());
+				getFileEntryId(entry));
 
-		Assert.assertEquals("image2.jpg", coverImageFileEntry.getTitle());
+		Assert.assertEquals("image2.jpg", imageFileEntry.getTitle());
 	}
 
-	protected abstract BlogsEntry addBlogsEntry(String coverImageTitle)
+	protected abstract BlogsEntry addBlogsEntry(String ImageTitle)
 		throws Exception;
+
+	protected abstract long getFileEntryId(BlogsEntry entry);
 
 	protected FileEntry getTempFileEntry(
 			long userId, String title, ServiceContext serviceContext)
@@ -318,11 +309,11 @@ public abstract class BaseImageTestCase {
 	}
 
 	protected abstract BlogsEntry updateBlogsEntry(
-			long entryId, ImageSelector coverImageSelector)
+			long entryId, ImageSelector imageSelector)
 		throws Exception;
 
 	protected abstract BlogsEntry updateBlogsEntry(
-			long entryId, String coverImageTitle)
+			long entryId, String imageTitle)
 		throws Exception;
 
 	@DeleteAfterTestRun
