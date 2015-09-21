@@ -1273,6 +1273,10 @@ public class VerifyProperties extends VerifyProcess {
 			"ldap.import.user.password.enabled", "import.user.password.enabled",
 			"com.liferay.portal.ldap"
 		},
+		new String[] {
+			"ldap.import.user.sync.strategy", "import.user.sync.strategy",
+			"com.liferay.portal.ldap"
+		},
 		new String[] {"ldap.page.size", "page.size", "com.liferay.portal.ldap"},
 		new String[] {
 			"ldap.password.policy.enabled", "password.policy.enabled",
@@ -1785,7 +1789,7 @@ public class VerifyProperties extends VerifyProcess {
 		"asset.publisher.filter.unlistable.entries",
 		"asset.tag.permissions.enabled", "asset.tag.properties.default",
 		"asset.tag.properties.enabled", "auth.max.failures.limit",
-		"breadcrumb.display.style.options",
+		"blogs.image.small.max.size", "breadcrumb.display.style.options",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
