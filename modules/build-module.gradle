@@ -11,7 +11,7 @@ buildscript {
 		}
 
 		maven {
-			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+			url System.properties["repository.url"] ?: "http://cdn.repository.liferay.com/nexus/content/groups/public"
 		}
 	}
 
@@ -41,6 +41,18 @@ afterEvaluate {
 
 	if (project.hasProperty("snapshot") && !project.version.endsWith("-SNAPSHOT")) {
 		project.version = project.version + "-SNAPSHOT"
+	}
+
+	Iterable<Task> publishNodeModuleTasks = tasks.matching {
+		it.class.name.startsWith "com.liferay.gradle.plugins.node.tasks.PublishNodeModuleTask"
+	}
+
+	publishNodeModuleTasks.each {
+		it.dependsOn jar
+
+		if (!project.version.endsWith("-SNAPSHOT")) {
+			uploadArchives.dependsOn it
+		}
 	}
 
 	javadoc {
@@ -215,7 +227,7 @@ repositories {
 	}
 
 	maven {
-		url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		url System.properties["repository.url"] ?: "http://cdn.repository.liferay.com/nexus/content/groups/public"
 	}
 }
 
