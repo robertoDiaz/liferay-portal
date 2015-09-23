@@ -271,6 +271,8 @@
 	</command>
 
 	<command name="addPG">
+		<var name="dmDocumentTitle" value="${dmDocumentFile}" />
+
 		<if>
 			<equals arg1="${stagingActivated}" arg2="true" />
 			<then>
@@ -723,6 +725,7 @@
 	</command>
 
 	<command name="deletePGViaMG">
+		<var name="key_assetType" value="${assetType}" />
 		<var name="key_mgDocumentTitle" value="${mgDocumentTitle}" />
 
 		<execute function="AssertClick" locator1="MediaGallery#ENTRY_TITLE" value1="${mgDocumentTitle}" />
@@ -1116,7 +1119,7 @@
 	<command name="moveToFolderCP">
 		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
 
-		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_ACTIONS" />
+		<execute function="Click" locator1="DocumentsAndMedia#ICON_DOCUMENT_ACTIONS" />
 		<execute function="AssertElementPresent" locator1="MenuItem#MOVE" />
 		<execute function="AssertClick" locator1="MenuItem#MOVE" value1="Move" />
 
@@ -1129,7 +1132,7 @@
 				<execute function="AssertClick" locator1="Button#CHOOSE_THIS_FOLDER" value1="Choose This Folder" />
 			</then>
 			<else>
-				<execute function="AssertClick" locator1="CHOOSE_BUTTON_GENERIC" value1="Choose" />
+				<execute function="AssertClick" locator1="DocumentsAndMediaSelectFolder#CHOOSE_BUTTON_GENERIC" value1="Choose" />
 			</else>
 		</if>
 
@@ -2047,6 +2050,9 @@
 		<execute function="AssertElementPresent" locator1="DocumentsAndMedia#ICON_FOLDER_THUMBNAIL" />
 		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#ICON_FOLDER_THUMBNAIL" value1="${dmFolderName}" />
 		<execute function="Click" locator1="DocumentsAndMedia#ICON_FOLDER_THUMBNAIL" value1="${dmFolderName}" />
+
+		<var method="StringUtil#upperCase('${key_dmFolderName}')" name="dmFolderName" />
+
 		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#BREADCRUMB_LAST" value1="${dmFolderName}" />
 		<execute function="AssertElementPresent" locator1="DocumentsAndMedia#ICON_DOCUMENT" />
 		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
@@ -2280,7 +2286,7 @@
 
 	<command name="viewStagingDetailsPG">
 		<execute function="Click" locator1="Toolbar#ADD" />
-		<execute function="AssertTextEquals" locator1="MenuItem#FOLDER_DM" value1="Folder" />
+		<execute function="AssertTextEquals" locator1="MenuItem#FOLDER" value1="Folder" />
 		<execute function="AssertTextEquals" locator1="MenuItem#SHORTCUT" value1="Shortcut" />
 		<execute function="AssertTextEquals" locator1="MenuItem#REPOSITORY" value1="Repository" />
 		<execute function="AssertTextEquals" locator1="MenuItem#MULTIPLE_DOCUMENTS" value1="Multiple Documents" />

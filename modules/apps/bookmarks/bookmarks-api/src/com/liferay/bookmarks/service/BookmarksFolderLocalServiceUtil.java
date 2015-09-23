@@ -16,6 +16,7 @@ package com.liferay.bookmarks.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
