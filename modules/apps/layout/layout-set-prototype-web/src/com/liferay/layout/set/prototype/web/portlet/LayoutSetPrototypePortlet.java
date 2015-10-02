@@ -14,6 +14,10 @@
 
 package com.liferay.layout.set.prototype.web.portlet;
 
+import com.liferay.application.list.PanelAppRegistry;
+import com.liferay.application.list.PanelCategoryRegistry;
+import com.liferay.application.list.constants.ApplicationListWebKeys;
+import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
 import com.liferay.layout.set.prototype.web.constants.LayoutSetPrototypePortletKeys;
 import com.liferay.layout.set.prototype.web.upgrade.LayoutSetPrototypeWebUpgrade;
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
@@ -57,9 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"com.liferay.portlet.control-panel-entry-category=sites",
-		"com.liferay.portlet.control-panel-entry-weight=2.0",
-		"com.liferay.portlet.css-class-wrapper=portlet-users-admin",
+		"com.liferay.portlet.css-class-wrapper=portlet-layout-set-prototype",
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.icon=/icons/layout_set_prototypes.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
@@ -184,6 +186,12 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
+		PanelCategoryHelper panelCategoryHelper = new PanelCategoryHelper(
+			_panelAppRegistry, _panelCategoryRegistry);
+
+		renderRequest.setAttribute(
+			ApplicationListWebKeys.PANEL_CATEGORY_HELPER, panelCategoryHelper);
+
 		if (SessionErrors.contains(
 				renderRequest, PrincipalException.getNestedClasses())) {
 
@@ -210,5 +218,20 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 	protected void setLayoutSetPrototypeWebUpgrade(
 		LayoutSetPrototypeWebUpgrade layoutSetPrototypeWebUpgrade) {
 	}
+
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelCategoryRegistry(
+		PanelCategoryRegistry panelCategoryRegistry) {
+
+		_panelCategoryRegistry = panelCategoryRegistry;
+	}
+
+	private PanelAppRegistry _panelAppRegistry;
+	private PanelCategoryRegistry _panelCategoryRegistry;
 
 }

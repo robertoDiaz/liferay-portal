@@ -91,6 +91,10 @@ public class WebDriverHelper {
 			WebDriver webDriver, String ignoreJavaScriptError)
 		throws Exception {
 
+		if (!PropsValues.TEST_ASSERT_JAVASCRIPT_ERRORS) {
+			return;
+		}
+
 		String location = getLocation(webDriver);
 
 		if (!location.contains("localhost")) {
@@ -573,9 +577,7 @@ public class WebDriverHelper {
 			try {
 				webDriver.get(targetURL);
 
-				if (PropsValues.BROWSER_TYPE.equals("*iehta") ||
-					PropsValues.BROWSER_TYPE.equals("*iexplore")) {
-
+				if (PropsValues.BROWSER_TYPE.equals("internetexplorer")) {
 					refresh(webDriver);
 				}
 

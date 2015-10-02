@@ -60,8 +60,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,13 +223,6 @@ public class SyncEngine {
 
 		SyncWatchEventService.deleteSyncWatchEvents(syncAccountId);
 
-		Path dataFilePath = FileUtil.getFilePath(
-			syncAccount.getFilePathName(), ".data");
-
-		if (Files.exists(dataFilePath)) {
-			FileUtils.cleanDirectory(dataFilePath.toFile());
-		}
-
 		if (!ConnectionRetryUtil.retryInProgress(syncAccountId)) {
 			ServerEventUtil.synchronizeSyncSites(syncAccountId);
 		}
@@ -362,8 +353,8 @@ public class SyncEngine {
 					}
 
 					FileEventUtil.getUpdates(
-						syncSite.getCompanyId(), syncSite.getGroupId(),
-						syncAccount.getSyncAccountId(), syncSite);
+						syncSite.getGroupId(), syncAccount.getSyncAccountId(),
+						syncSite);
 				}
 
 				BatchDownloadEvent batchDownloadEvent =

@@ -1001,6 +1001,10 @@
 		<run-integration-test database.type="db2" />
 	</target>
 
+	<target name="integration-hypersonic">
+		<run-integration-test database.type="hypersonic" />
+	</target>
+
 	<target name="integration-mysql">
 		<run-integration-test database.type="mysql" />
 	</target>
@@ -1019,6 +1023,10 @@
 
 	<target name="modules-integration-db2">
 		<run-modules-integration-test database.type="db2" />
+	</target>
+
+	<target name="modules-integration-hypersonic">
+		<run-modules-integration-test database.type="hypersonic" />
 	</target>
 
 	<target name="modules-integration-mysql">
@@ -1255,6 +1263,10 @@ ${output.content}</echo>
 
 			<test-set-up>
 				<prepare-test-build />
+
+				<antcall target="prepare-portal-ext-properties" />
+
+				<antcall target="prepare-system-ext-properties" />
 			</test-set-up>
 		</run-batch-test>
 	</target>

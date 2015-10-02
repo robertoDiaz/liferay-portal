@@ -245,8 +245,6 @@ public interface PropsKeys {
 
 	public static final String BLOGS_IMAGE_MAX_SIZE = "blogs.image.max.size";
 
-	public static final String BLOGS_IMAGE_SMALL_MAX_SIZE = "blogs.image.small.max.size";
-
 	public static final String BLOGS_LINKBACK_EXCERPT_LENGTH = "blogs.linkback.excerpt.length";
 
 	public static final String BLOGS_PAGE_ABSTRACT_LENGTH = "blogs.page.abstract.length";
@@ -515,6 +513,10 @@ public interface PropsKeys {
 
 	public static final String DEFAULT_LOGOUT_PAGE_PATH = "default.logout.page.path";
 
+	public static final String DEFAULT_PORTLET_DECORATOR_CSS_CLASS = "default.portlet.decorator.css.class";
+
+	public static final String DEFAULT_PORTLET_DECORATOR_ID = "default.portlet.decorator.id";
+
 	public static final String DEFAULT_REGULAR_COLOR_SCHEME_ID = "default.regular.color.scheme.id";
 
 	public static final String DEFAULT_REGULAR_THEME_ID = "default.regular.theme.id";
@@ -749,9 +751,9 @@ public interface PropsKeys {
 
 	public static final String DL_TABS_VISIBLE = "dl.tabs.visible";
 
-	public static final String DOCKBAR_ADD_PORTLETS = "dockbar.add.portlets";
+	public static final String DL_WEBDAV_SUBSTITUTION_CHAR = "dl.webdav.substitution.char";
 
-	public static final String DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP = "dockbar.administrative.links.show.in.pop.up";
+	public static final String DOCKBAR_ADD_PORTLETS = "dockbar.add.portlets";
 
 	public static final String DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = "dynamic.resource.servlet.allowed.paths";
 
@@ -1759,10 +1761,6 @@ public interface PropsKeys {
 
 	public static final String POP_SERVER_SUBDOMAIN = "pop.server.subdomain";
 
-	public static final String PORTAL_CACHE_MANAGER_TYPE_MULTI_VM ="portal.cache.manager.type.multi.vm";
-
-	public static final String PORTAL_CACHE_MANAGER_TYPE_SINGLE_VM ="portal.cache.manager.type.single.vm";
-
 	public static final String PORTAL_FABRIC_AGENT_SELECTOR_CLASS = "portal.fabric.agent.selector.class";
 
 	public static final String PORTAL_FABRIC_CLIENT_EVENT_LOOP_GROUP_THREAD_COUNT = "portal.fabric.client.event.loop.group.thread.count";
@@ -1930,6 +1928,8 @@ public interface PropsKeys {
 	public static final String RESOURCE_REPOSITORIES_ROOT = "resource.repositories.root";
 
 	public static final String REST_PROXY_URL_PREFIXES_ALLOWED = "rest.proxy.url.prefixes.allowed";
+
+	public static final String RETRY_ADVICE_MAX_RETRIES = "retry.advice.max.retries";
 
 	public static final String ROBOTS_TXT_WITH_SITEMAP = "robots.txt.with.sitemap";
 

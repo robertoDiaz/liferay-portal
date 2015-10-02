@@ -32,6 +32,8 @@ public interface LiferaySelenium extends Selenium {
 
 	public void assertConfirmation(String pattern) throws Exception;
 
+	public void assertConsoleErrors() throws Exception;
+
 	public void assertConsoleTextNotPresent(String text) throws Exception;
 
 	public void assertConsoleTextPresent(String text) throws Exception;
@@ -142,8 +144,6 @@ public interface LiferaySelenium extends Selenium {
 	public String getOutputDirName();
 
 	public String getPrimaryTestSuiteName();
-
-	public String getProjectDirName();
 
 	public String getSikuliImagesDirName();
 
@@ -297,7 +297,7 @@ public interface LiferaySelenium extends Selenium {
 
 	public void typeScreen(String value);
 
-	public void uploadCommonFile(String locator, String value);
+	public void uploadCommonFile(String locator, String value) throws Exception;
 
 	public void uploadFile(String locator, String value);
 
