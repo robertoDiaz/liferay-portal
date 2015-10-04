@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.0.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_0_0.dtd">
+
+<service-builder package-path="com.liferay.document.library.repository.dropbox">
+	<namespace>Dropbox</namespace>
+	<entity name="DropboxEntry" uuid="true" local-service="true" remote-service="false" trash-enabled="false">
+
+		<!-- PK fields -->
+
+		<column name="entryId" type="long" primary="true" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="repositoryId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="changeLog" type="String" />
+		<column name="description" type="String" />
+		<column name="name" type="String" />
+		<column name="path" type="String" />
+		<column name="parentPath" type="String" />
+		<column name="rev" type="String" />
+		<column name="size" type="long" />
+		<column name="type" type="int" />
+
+		<!-- Finder methods -->
+
+		<finder name="R_P" return-type="DropboxEntry">
+			<finder-column name="repositoryId" />
+			<finder-column name="path" />
+		</finder>
+
+		<finder name="R_PP" return-type="Collection">
+			<finder-column name="repositoryId" />
+			<finder-column name="parentPath" />
+		</finder>
+
+		<finder name="R_PP_T" return-type="Collection">
+			<finder-column name="repositoryId" />
+			<finder-column name="parentPath" />
+			<finder-column name="type" />
+		</finder>
+
+		<!-- References -->
+
+		<reference package-path="com.liferay.document.library.repository.dropbox" entity="DropboxRevision" />
+		<reference package-path="com.liferay.portal" entity="Repository" />
+		<reference package-path="com.liferay.portal" entity="RepositoryEntry" />
+	</entity>
+
+	<entity name="DropboxRevision" uuid="true" local-service="true" remote-service="false" trash-enabled="false">
+
+		<!-- PK fields -->
+
+		<column name="revisionId" type="long" primary="true" />
+
+		<!-- Audit fields -->
+
+		<column name="createDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="entryId" type="long" />
+		<column name="path" type="String" />
+		<column name="repositoryId" type="long" />
+		<column name="rev" type="String" />
+		<column name="size" type="long" />
+
+		<!-- Finder methods -->
+
+		<finder name="R_E" return-type="Collection">
+			<finder-column name="repositoryId" />
+			<finder-column name="entryId" />
+		</finder>
+
+		<finder name="R_E_R" return-type="DropboxRevision">
+			<finder-column name="repositoryId" />
+			<finder-column name="entryId" />
+			<finder-column name="rev" />
+		</finder>
+	</entity>
+</service-builder>
