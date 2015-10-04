@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.liferay.document.library.repository.dropbox.model.DropboxEntry">
+		<field name="uuid" type="String" />
+		<field name="entryId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="repositoryId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="changeLog" type="String" />
+		<field name="description" type="String" />
+		<field name="name" type="String" />
+		<field name="path" type="String">
+			<hint name="max-length">4000</hint>
+		</field>
+		<field name="parentPath" type="String">
+			<hint name="max-length">4000</hint>
+		</field>
+		<field name="rev" type="String" />
+		<field name="size" type="long" />
+		<field name="type" type="int" />
+	</model>
+	<model name="com.liferay.document.library.repository.dropbox.model.DropboxRevision">
+		<field name="uuid" type="String" />
+		<field name="revisionId" type="long" />
+		<field name="createDate" type="Date" />
+		<field name="entryId" type="long" />
+		<field name="path" type="String">
+			<hint name="max-length">4000</hint>
+		</field>
+		<field name="repositoryId" type="long" />
+		<field name="rev" type="String" />
+		<field name="size" type="long" />
+	</model>
+</model-hints>
