@@ -14,11 +14,9 @@
 
 package com.liferay.document.library.repository.dropbox.internal.model;
 
-import com.dropbox.core.DbxEntry;
-
+import com.liferay.document.library.repository.dropbox.model.DropboxEntry;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.repository.external.ExtRepositoryFileEntry;
 
 import java.util.Date;
@@ -28,8 +26,8 @@ import java.util.Date;
  */
 public class DropboxFileEntry implements ExtRepositoryFileEntry {
 
-	public DropboxFileEntry(DbxEntry.File file) {
-		_file = file;
+	public DropboxFileEntry(DropboxEntry dropboxEntry) {
+		_dropboxEntry = dropboxEntry;
 	}
 
 	@Override
@@ -49,23 +47,19 @@ public class DropboxFileEntry implements ExtRepositoryFileEntry {
 		return getModifiedDate();
 	}
 
-	public DbxEntry.File getDbxFile() {
-		return _file;
-	}
-
 	@Override
 	public String getDescription() {
-		return StringPool.BLANK;
+		return _dropboxEntry.getDescription();
 	}
 
 	@Override
 	public String getExtension() {
-		return FileUtil.getExtension(_file.name);
+		return FileUtil.getExtension(_dropboxEntry.getName());
 	}
 
 	@Override
 	public String getExtRepositoryModelKey() {
-		return _file.path;
+		return _dropboxEntry.getPath();
 	}
 
 	@Override
@@ -75,7 +69,7 @@ public class DropboxFileEntry implements ExtRepositoryFileEntry {
 
 	@Override
 	public Date getModifiedDate() {
-		return _file.lastModified;
+		return _dropboxEntry.getModifiedDate();
 	}
 
 	@Override
@@ -85,14 +79,14 @@ public class DropboxFileEntry implements ExtRepositoryFileEntry {
 
 	@Override
 	public long getSize() {
-		return _file.numBytes;
+		return _dropboxEntry.getSize();
 	}
 
 	@Override
 	public String getTitle() {
-		return _file.name;
+		return _dropboxEntry.getName();
 	}
 
-	private final DbxEntry.File _file;
+	private final DropboxEntry _dropboxEntry;
 
 }

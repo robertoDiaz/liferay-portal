@@ -14,8 +14,7 @@
 
 package com.liferay.document.library.repository.dropbox.internal.model;
 
-import com.dropbox.core.DbxEntry;
-
+import com.liferay.document.library.repository.dropbox.model.DropboxRevision;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.repository.external.ExtRepositoryFileVersion;
@@ -27,13 +26,8 @@ import java.util.Date;
  */
 public class DropboxFileVersion implements ExtRepositoryFileVersion {
 
-	public DropboxFileVersion(DbxEntry.File dbxFile) {
-		this(dbxFile, dbxFile.rev);
-	}
-
-	public DropboxFileVersion(DbxEntry.File dbxFile, String revision) {
-		_dbxFile = dbxFile;
-		_revision = revision;
+	public DropboxFileVersion(DropboxRevision dropboxRevision) {
+		_dropboxRevision = dropboxRevision;
 	}
 
 	@Override
@@ -43,16 +37,17 @@ public class DropboxFileVersion implements ExtRepositoryFileVersion {
 
 	@Override
 	public Date getCreateDate() {
-		return _dbxFile.lastModified;
+		return _dropboxRevision.getCreateDate();
 	}
 
-	public DbxEntry.File getDbxFile() {
-		return _dbxFile;
+	public DropboxRevision getDropboxRevision() {
+		return _dropboxRevision;
 	}
 
 	@Override
 	public String getExtRepositoryModelKey() {
-		return _dbxFile.path + StringPool.AT + _revision;
+		return _dropboxRevision.getPath() + StringPool.AT +
+			_dropboxRevision.getRev();
 	}
 
 	@Override
@@ -67,15 +62,14 @@ public class DropboxFileVersion implements ExtRepositoryFileVersion {
 
 	@Override
 	public long getSize() {
-		return _dbxFile.numBytes;
+		return _dropboxRevision.getSize();
 	}
 
 	@Override
 	public String getVersion() {
-		return _revision;
+		return _dropboxRevision.getRev();
 	}
 
-	private final DbxEntry.File _dbxFile;
-	private final String _revision;
+	private final DropboxRevision _dropboxRevision;
 
 }

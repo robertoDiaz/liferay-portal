@@ -14,9 +14,7 @@
 
 package com.liferay.document.library.repository.dropbox.internal.model;
 
-import com.dropbox.core.DbxEntry;
-
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.document.library.repository.dropbox.model.DropboxEntry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.repository.external.ExtRepositoryFolder;
 
@@ -27,8 +25,63 @@ import java.util.Date;
  */
 public class DropboxFolder implements ExtRepositoryFolder {
 
-	public DropboxFolder(DbxEntry.Folder folder) {
-		_folder = folder;
+	public static final ExtRepositoryFolder ROOT = new ExtRepositoryFolder() {
+
+		@Override
+		public String getName() {
+			return StringPool.BLANK;
+		}
+
+		@Override
+		public boolean isRoot() {
+			return true;
+		}
+
+		@Override
+		public boolean containsPermission(
+			ExtRepositoryPermission extRepositoryPermission) {
+
+			return true;
+		}
+
+		@Override
+		public String getDescription() {
+			return StringPool.BLANK;
+		}
+
+		@Override
+		public String getExtension() {
+			return StringPool.BLANK;
+		}
+
+		@Override
+		public Date getModifiedDate() {
+			return null;
+		}
+
+		@Override
+		public Date getCreateDate() {
+			return null;
+		}
+
+		@Override
+		public String getExtRepositoryModelKey() {
+			return StringPool.BLANK;
+		}
+
+		@Override
+		public String getOwner() {
+			return null;
+		}
+
+		@Override
+		public long getSize() {
+			return 0;
+		}
+	};
+
+	public DropboxFolder(DropboxEntry dropboxEntry) {
+		_dropboxEntry = dropboxEntry;
 	}
 
 	@Override
@@ -40,16 +93,12 @@ public class DropboxFolder implements ExtRepositoryFolder {
 
 	@Override
 	public Date getCreateDate() {
-		return new Date();
-	}
-
-	public DbxEntry.Folder getDbxFolder() {
-		return _folder;
+		return _dropboxEntry.getCreateDate();
 	}
 
 	@Override
 	public String getDescription() {
-		return StringPool.BLANK;
+		return _dropboxEntry.getDescription();
 	}
 
 	@Override
@@ -59,25 +108,17 @@ public class DropboxFolder implements ExtRepositoryFolder {
 
 	@Override
 	public String getExtRepositoryModelKey() {
-		return _folder.path;
+		return _dropboxEntry.getPath();
 	}
 
 	@Override
 	public Date getModifiedDate() {
-		return new Date();
+		return _dropboxEntry.getModifiedDate();
 	}
 
 	@Override
 	public String getName() {
-		String name = _folder.path;
-
-		int i = name.lastIndexOf(CharPool.SLASH);
-
-		if (i == -1) {
-			return name;
-		}
-
-		return name.substring(i + 1);
+		return _dropboxEntry.getName();
 	}
 
 	@Override
@@ -92,9 +133,11 @@ public class DropboxFolder implements ExtRepositoryFolder {
 
 	@Override
 	public boolean isRoot() {
-		return _folder.path.equals(StringPool.SLASH);
+		String path = _dropboxEntry.getPath();
+
+		return path.equals(StringPool.SLASH);
 	}
 
-	private final DbxEntry.Folder _folder;
+	private final DropboxEntry _dropboxEntry;
 
 }

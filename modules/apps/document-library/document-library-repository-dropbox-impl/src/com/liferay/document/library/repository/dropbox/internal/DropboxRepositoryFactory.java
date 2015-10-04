@@ -15,6 +15,8 @@
 package com.liferay.document.library.repository.dropbox.internal;
 
 import com.liferay.document.library.repository.dropbox.internal.constants.DropboxRepositoryConstants;
+import com.liferay.document.library.repository.dropbox.service.DropboxEntryLocalService;
+import com.liferay.document.library.repository.dropbox.service.DropboxRevisionLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.DefaultLocalRepositoryImpl;
 import com.liferay.portal.kernel.repository.LocalRepository;
@@ -62,6 +64,7 @@ public class DropboxRepositoryFactory implements RepositoryFactory {
 			repository.getTypeSettingsProperties(), _dbxClientFactory,
 			_assetEntryLocalService, _companyLocalService,
 			_dlAppHelperLocalService, _dlFolderLocalService,
+			_dropboxEntryLocalService, _dropboxRevisionLocalService,
 			_repositoryEntryLocalService, _userLocalService);
 	}
 
@@ -99,6 +102,20 @@ public class DropboxRepositoryFactory implements RepositoryFactory {
 	}
 
 	@Reference(unbind = "-")
+	public void setDropboxEntryLocalService(
+		DropboxEntryLocalService dropboxEntryLocalService) {
+
+		_dropboxEntryLocalService = dropboxEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setDropboxRevisionLocalService(
+		DropboxRevisionLocalService dropboxRevisionLocalService) {
+
+		_dropboxRevisionLocalService = dropboxRevisionLocalService;
+	}
+
+	@Reference(unbind = "-")
 	public void setRepositoryEntryLocalService(
 		RepositoryEntryLocalService repositoryEntryLocalService) {
 
@@ -122,6 +139,8 @@ public class DropboxRepositoryFactory implements RepositoryFactory {
 	private DbxClientFactory _dbxClientFactory;
 	private DLAppHelperLocalService _dlAppHelperLocalService;
 	private DLFolderLocalService _dlFolderLocalService;
+	private DropboxEntryLocalService _dropboxEntryLocalService;
+	private DropboxRevisionLocalService _dropboxRevisionLocalService;
 	private RepositoryEntryLocalService _repositoryEntryLocalService;
 	private RepositoryLocalService _repositoryLocalService;
 	private UserLocalService _userLocalService;
