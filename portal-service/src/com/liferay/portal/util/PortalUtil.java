@@ -39,6 +39,7 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.InvokerPortlet;
 import com.liferay.portlet.PortletInstanceFactoryUtil;
+import com.liferay.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
@@ -670,6 +671,15 @@ public class PortalUtil {
 
 		return getPortal().getControlPanelPortletURL(
 			portletRequest, portletId, refererPlid, lifecycle);
+	}
+
+	public static PortletURL getControlPanelPortletURL(
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
+		Group group, String portletId, long refererPlid, String lifecycle) {
+
+		return getPortal().getControlPanelPortletURL(
+			requestBackedPortletURLFactory, group, portletId, refererPlid,
+			lifecycle);
 	}
 
 	public static String getCreateAccountURL(

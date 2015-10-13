@@ -33,6 +33,7 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.User;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
@@ -504,6 +505,10 @@ public interface Portal {
 	public PortletURL getControlPanelPortletURL(
 		PortletRequest portletRequest, String portletId, long refererPlid,
 		String lifecycle);
+
+	public PortletURL getControlPanelPortletURL(
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
+		Group group, String portletId, long refererPlid, String lifecycle);
 
 	public String getCreateAccountURL(
 			HttpServletRequest request, ThemeDisplay themeDisplay)
