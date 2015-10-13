@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -35,7 +34,6 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.PortletURLUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
@@ -44,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,14 +51,19 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ItemSelectorBrowserUtil {
 
+	public static void addGroupSelectorBreadcrumbEntry(
+		HttpServletRequest request, PortletURL portletURL) {
+
+		portletURL.setParameter("showGroupSelector", Boolean.TRUE.toString());
+
+		PortalUtil.addPortletBreadcrumbEntry(
+			request, "sites", portletURL.toString());
+	}
+
 	public static void addPortletBreadcrumbEntries(
 			long folderId, String displayStyle, HttpServletRequest request,
-			LiferayPortletResponse liferayPortletResponse,
 			PortletURL portletURL)
 		throws Exception {
-
-		addGroupSelectorBreadcrumbEntry(
-			request, liferayPortletResponse, portletURL);
 
 		portletURL.setParameter("displayStyle", displayStyle);
 
@@ -171,22 +173,6 @@ public class ItemSelectorBrowserUtil {
 		itemMetadataJSONObject.put("groups", groupsJSONArray);
 
 		return itemMetadataJSONObject;
-	}
-
-	protected static void addGroupSelectorBreadcrumbEntry(
-			HttpServletRequest request,
-			LiferayPortletResponse liferayPortletResponse,
-			PortletURL portletURL)
-		throws PortalException, PortletException {
-
-		PortletURL viewSiteSelectorURL = PortletURLUtil.clone(
-			portletURL, liferayPortletResponse);
-
-		viewSiteSelectorURL.setParameter(
-			"showGroupSelector", String.valueOf(true));
-
-		PortalUtil.addPortletBreadcrumbEntry(
-			request, "sites", viewSiteSelectorURL.toString());
 	}
 
 	protected static void addPortletBreadcrumbEntry(

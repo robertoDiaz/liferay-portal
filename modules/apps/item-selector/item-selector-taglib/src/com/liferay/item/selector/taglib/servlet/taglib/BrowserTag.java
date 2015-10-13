@@ -80,6 +80,10 @@ public class BrowserTag extends IncludeTag {
 		_showDragAndDropZone = showDragAndDropZone;
 	}
 
+	public void setShowGroupSelector(boolean showGroupSelector) {
+		_showGroupSelector = showGroupSelector;
+	}
+
 	public void setTabName(String tabName) {
 		_tabName = tabName;
 	}
@@ -99,6 +103,7 @@ public class BrowserTag extends IncludeTag {
 		_searchContainer = null;
 		_showBreadcrumb = false;
 		_showDragAndDropZone = true;
+		_showGroupSelector = true;
 		_tabName = null;
 		_uploadURL = null;
 	}
@@ -182,6 +187,9 @@ public class BrowserTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-item-selector:browser:showDragAndDropZone",
 			_showDragAndDropZone);
+		request.setAttribute(
+			"liferay-item-selector:browser:showGroupSelector",
+			_showGroupSelector);
 		request.setAttribute("liferay-item-selector:browser:tabName", _tabName);
 		request.setAttribute(
 			"liferay-item-selector:browser:uploadURL", _uploadURL);
@@ -194,6 +202,7 @@ public class BrowserTag extends IncludeTag {
 	private SearchContainer<?> _searchContainer;
 	private boolean _showBreadcrumb;
 	private boolean _showDragAndDropZone = true;
+	private boolean _showGroupSelector = true;
 	private String _tabName;
 	private PortletURL _uploadURL;
 

@@ -27,6 +27,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("liferay-item-selector:
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-item-selector:browser:searchContainer");
 boolean showBreadcrumb = GetterUtil.getBoolean(request.getAttribute("liferay-item-selector:browser:showBreadcrumb"));
 boolean showDragAndDropZone = GetterUtil.getBoolean(request.getAttribute("liferay-item-selector:browser:showDragAndDropZone"));
+boolean showGroupSelector = GetterUtil.getBoolean(request.getAttribute("liferay-item-selector:browser:showGroupSelector"));
 String tabName = GetterUtil.getString(request.getAttribute("liferay-item-selector:browser:tabName"));
 PortletURL uploadURL = (PortletURL)request.getAttribute("liferay-item-selector:browser:uploadURL");
 %>
@@ -82,7 +83,11 @@ PortletURL uploadURL = (PortletURL)request.getAttribute("liferay-item-selector:b
 	}
 
 	if (showBreadcrumb && !showSearchInfo) {
-		ItemSelectorBrowserUtil.addPortletBreadcrumbEntries(folderId, displayStyle, request, liferayPortletResponse, PortletURLUtil.clone(portletURL, liferayPortletResponse));
+		if (showGroupSelector) {
+			ItemSelectorBrowserUtil.addGroupSelectorBreadcrumbEntry(request, PortletURLUtil.clone(portletURL, liferayPortletResponse));
+		}
+
+		ItemSelectorBrowserUtil.addPortletBreadcrumbEntries(folderId, displayStyle, request, PortletURLUtil.clone(portletURL, liferayPortletResponse));
 	%>
 
 		<liferay-ui:breadcrumb
