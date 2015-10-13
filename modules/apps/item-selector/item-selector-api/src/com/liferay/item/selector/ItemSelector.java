@@ -14,6 +14,7 @@
 
 package com.liferay.item.selector;
 
+import com.liferay.portal.model.Group;
 import com.liferay.portlet.RequestBackedPortletURLFactory;
 
 import javax.portlet.PortletRequest;
@@ -27,6 +28,11 @@ public interface ItemSelector {
 
 	public ItemSelectorRendering getItemSelectorRendering(
 		PortletRequest portletRequest, PortletResponse portletResponse);
+
+	public PortletURL getItemSelectorURL(
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
+		String itemSelectedEventName, Group group,
+		ItemSelectorCriterion... itemSelectorCriteria);
 
 	public PortletURL getItemSelectorURL(
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,

@@ -30,7 +30,9 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portlet.RequestBackedPortletURLFactoryUtil;
 
@@ -141,34 +143,29 @@ public class ItemSelectorImpl implements ItemSelector {
 	@Override
 	public PortletURL getItemSelectorURL(
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
+		String itemSelectedEventName, Group group,
+		ItemSelectorCriterion... itemSelectorCriteria) {
+
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			requestBackedPortletURLFactory, group,
+			ItemSelectorPortletKeys.ITEM_SELECTOR, 0,
+			PortletRequest.RENDER_PHASE);
+
+		return getItemSelectorURL(
+			itemSelectedEventName, portletURL, itemSelectorCriteria);
+	}
+
+	@Override
+	public PortletURL getItemSelectorURL(
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
 		String itemSelectedEventName,
 		ItemSelectorCriterion... itemSelectorCriteria) {
 
 		PortletURL portletURL = requestBackedPortletURLFactory.createRenderURL(
 			ItemSelectorPortletKeys.ITEM_SELECTOR);
 
-		try {
-			portletURL.setPortletMode(PortletMode.VIEW);
-		}
-		catch (PortletModeException pme) {
-			throw new SystemException(pme);
-		}
-
-		try {
-			portletURL.setWindowState(LiferayWindowState.POP_UP);
-		}
-		catch (WindowStateException wse) {
-			throw new SystemException(wse);
-		}
-
-		Map<String, String[]> parameters = getItemSelectorParameters(
-			itemSelectedEventName, itemSelectorCriteria);
-
-		for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-			portletURL.setParameter(entry.getKey(), entry.getValue());
-		}
-
-		return portletURL;
+		return getItemSelectorURL(
+			itemSelectedEventName, portletURL, itemSelectorCriteria);
 	}
 
 	protected List<ItemSelectorCriterion> getItemSelectorCriteria(
@@ -260,6 +257,34 @@ public class ItemSelectorImpl implements ItemSelector {
 		populateItemSelectorCriteria(parameters, itemSelectorCriteria);
 
 		return parameters;
+	}
+
+	protected PortletURL getItemSelectorURL(
+		String itemSelectedEventName, PortletURL portletURL,
+		ItemSelectorCriterion... itemSelectorCriteria) {
+
+		try {
+			portletURL.setPortletMode(PortletMode.VIEW);
+		}
+		catch (PortletModeException pme) {
+			throw new SystemException(pme);
+		}
+
+		try {
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+		}
+		catch (WindowStateException wse) {
+			throw new SystemException(wse);
+		}
+
+		Map<String, String[]> parameters = getItemSelectorParameters(
+			itemSelectedEventName, itemSelectorCriteria);
+
+		for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+			portletURL.setParameter(entry.getKey(), entry.getValue());
+		}
+
+		return portletURL;
 	}
 
 	protected String getValue(Map<String, String[]> parameters, String name) {

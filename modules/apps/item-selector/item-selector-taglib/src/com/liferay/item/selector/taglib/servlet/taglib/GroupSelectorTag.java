@@ -14,6 +14,7 @@
 
 package com.liferay.item.selector.taglib.servlet.taglib;
 
+import com.liferay.item.selector.ItemSelectorUtil;
 import com.liferay.item.selector.taglib.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
@@ -93,6 +94,9 @@ public class GroupSelectorTag extends IncludeTag {
 			getSearchContainer(request));
 		request.setAttribute(
 			"liferay-item-selector:group-selector:portletURL", _portletURL);
+		request.setAttribute(
+			"liferay-item-selector:group-selector:itemSelector",
+			ItemSelectorUtil.getItemSelector());
 	}
 
 	private SearchContainer<Group> getSearchContainer(
