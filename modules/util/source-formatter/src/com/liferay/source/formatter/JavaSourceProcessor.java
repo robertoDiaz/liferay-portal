@@ -900,6 +900,28 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					"modules: " + fileName);
 		}
 
+		// LPS-58529
+
+		if (portalSource && newContent.contains("ResourceBundle.getBundle(") &&
+			!fileName.endsWith("ResourceBundleUtil.java")) {
+
+			processErrorMessage(
+				fileName,
+				"Use ResourceBundleUtil.getBundle instead of " +
+					"ResourceBundle.getBundle: " + fileName);
+		}
+
+		// LPS-59076
+
+		if (_checkModulesServiceUtil && isModulesFile(absolutePath) &&
+			newContent.contains("@Component") &&
+			newContent.contains("ServiceUtil.")) {
+
+			processErrorMessage(
+				fileName,
+				"OSGI Component should not call ServiceUtil: " + fileName);
+		}
+
 		newContent = getCombinedLinesContent(
 			newContent, _combinedLinesPattern1);
 		newContent = getCombinedLinesContent(
@@ -938,6 +960,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		if (portalSource) {
 			fileNames = getPortalJavaFiles();
 
+			_checkModulesServiceUtil = GetterUtil.getBoolean(
+				System.getProperty(
+					"source.formatter.check.modules.service.util"));
 			_checkUnprocessedExceptions = GetterUtil.getBoolean(
 				System.getProperty(
 					"source.formatter.check.unprocessed.exceptions"));
@@ -1465,9 +1490,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							StringPool.TAB);
 					}
 
-					line = formatIncorrectSyntax(line, ",}", "}");
+					line = formatIncorrectSyntax(line, ",}", "}", false);
 
-					line = formatWhitespace(line, trimmedLine);
+					line = formatWhitespace(line, trimmedLine, true);
 				}
 
 				if (line.contains(StringPool.TAB + "for (") &&
@@ -1632,19 +1657,45 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				if (!trimmedLine.startsWith(StringPool.DOUBLE_SLASH) &&
 					!trimmedLine.startsWith(StringPool.STAR)) {
 
-					if ((line.contains(" && ") || line.contains(" || ")) &&
-						line.endsWith(StringPool.OPEN_PARENTHESIS)) {
-
-						processErrorMessage(
-							fileName,
-							"line break: " + fileName + " " + lineCount);
-					}
-
 					String strippedQuotesLine = stripQuotes(
 						trimmedLine, CharPool.QUOTE);
 
 					strippedQuotesLine = stripQuotes(
 						strippedQuotesLine, CharPool.APOSTROPHE);
+
+					if (line.endsWith(StringPool.OPEN_PARENTHESIS)) {
+						if (line.contains(" && ") || line.contains(" || ")) {
+							processErrorMessage(
+								fileName,
+								"line break: " + fileName + " " + lineCount);
+						}
+
+						int pos = strippedQuotesLine.indexOf(" + ");
+
+						if (pos != -1) {
+							String linePart = strippedQuotesLine.substring(
+								0, pos);
+
+							int closeBracketCount = StringUtil.count(
+								linePart, StringPool.CLOSE_BRACKET);
+							int closeParenthesisCount = StringUtil.count(
+								linePart, StringPool.CLOSE_PARENTHESIS);
+							int openBracketCount = StringUtil.count(
+								linePart, StringPool.OPEN_BRACKET);
+							int openParenthesisCount = StringUtil.count(
+								linePart, StringPool.OPEN_PARENTHESIS);
+
+							if ((openBracketCount == closeBracketCount) &&
+								(openParenthesisCount ==
+									closeParenthesisCount)) {
+
+								processErrorMessage(
+									fileName,
+									"line break: " + fileName + " " +
+										lineCount);
+							}
+						}
+					}
 
 					if (!trimmedLine.startsWith(StringPool.CLOSE_CURLY_BRACE) &&
 						strippedQuotesLine.contains(
@@ -2239,8 +2290,15 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				firstLine = StringUtil.replaceLast(
 					firstLine, StringUtil.trim(linePart), StringPool.BLANK);
 
-				secondLine = StringUtil.replaceLast(
-					line, StringPool.TAB, StringPool.TAB + linePart);
+				if (extraSpace) {
+					secondLine = StringUtil.replaceLast(
+						line, StringPool.TAB,
+						StringPool.TAB + linePart + StringPool.SPACE);
+				}
+				else {
+					secondLine = StringUtil.replaceLast(
+						line, StringPool.TAB, StringPool.TAB + linePart);
+				}
 			}
 			else {
 				processErrorMessage(
@@ -2283,13 +2341,19 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		if (previousLine.endsWith(" extends")) {
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, "extends", tabDiff, false, false, 0);
+				previousLine, "extends", tabDiff, false, true, 0);
 		}
 
 		if (previousLine.endsWith(" implements")) {
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, "implements ", tabDiff, false, false, 0);
+				previousLine, "implements ", tabDiff, false, true, 0);
+		}
+
+		if (previousLine.endsWith("= new")) {
+			return getCombinedLinesContent(
+				content, fileName, line, trimmedLine, lineLength, lineCount,
+				previousLine, "new", tabDiff, false, true, 0);
 		}
 
 		if (trimmedLine.startsWith("+ ") || trimmedLine.startsWith("- ") ||
@@ -3197,6 +3261,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private Pattern _catchExceptionPattern = Pattern.compile(
 		"\n(\t+)catch \\((.+Exception) (.+)\\) \\{\n");
 	private List<String> _checkJavaFieldTypesExclusionFiles;
+	private boolean _checkModulesServiceUtil;
 	private boolean _checkUnprocessedExceptions;
 	private Pattern _combinedLinesPattern1 = Pattern.compile(
 		"\n(\t*).+(=|\\]) (\\{)\n");
