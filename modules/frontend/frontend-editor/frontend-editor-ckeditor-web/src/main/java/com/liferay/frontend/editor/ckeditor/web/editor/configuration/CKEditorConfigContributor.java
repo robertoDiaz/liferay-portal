@@ -267,9 +267,7 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 
 		String buttons = "['Table', '-', 'ImageSelector',";
 
-		if (XugglerUtil.isEnabled()) {
-			buttons +=" 'Audio', 'Video',";
-		}
+		buttons += " 'AudioSelector', 'VideoSelector',";
 
 		buttons += " 'Flash', '-', 'LiferayPageBreak', '-', " +
 			"'Smiley', 'SpecialChar']";
@@ -316,9 +314,7 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 
 		String buttons = "['Table', '-', 'ImageSelector',";
 
-		if (XugglerUtil.isEnabled()) {
-			buttons = buttons.concat(" 'AudioSelector', 'VideoSelector',");
-		}
+		buttons = buttons.concat(" 'AudioSelector', 'VideoSelector',");
 
 		buttons = buttons.concat(" 'Flash', '-', 'Smiley', 'SpecialChar']");
 
