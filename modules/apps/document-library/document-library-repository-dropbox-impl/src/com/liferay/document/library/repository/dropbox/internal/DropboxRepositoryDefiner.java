@@ -1,0 +1,90 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.document.library.repository.dropbox.internal;
+
+import com.liferay.document.library.repository.dropbox.internal.constants.DropboxRepositoryConstants;
+import com.liferay.portal.kernel.repository.RepositoryFactory;
+import com.liferay.portal.kernel.repository.registry.BaseRepositoryDefiner;
+import com.liferay.portal.kernel.repository.registry.RepositoryDefiner;
+import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Adolfo Pérez
+ */
+@Component(immediate = true, service = RepositoryDefiner.class)
+public class DropboxRepositoryDefiner extends BaseRepositoryDefiner {
+
+	@Override
+	public String getClassName() {
+		return DropboxRepository.class.getName();
+	}
+
+	@Override
+	public String getRepositoryTypeLabel(Locale locale) {
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return resourceBundle.getString(
+			_MODEL_RESOURCE_NAME_PREFIX + getClassName());
+	}
+
+	@Override
+	public String[] getSupportedConfigurations() {
+		return _SUPPORTED_CONFIGURATION;
+	}
+
+	@Override
+	public String[][] getSupportedParameters() {
+		return _SUPPORTED_PARAMETERS;
+	}
+
+	@Override
+	public boolean isExternalRepository() {
+		return true;
+	}
+
+	@Override
+	public void registerRepositoryFactory(
+		RepositoryFactoryRegistry repositoryFactoryRegistry) {
+
+		repositoryFactoryRegistry.setRepositoryFactory(_repositoryFactory);
+	}
+
+	@Reference(
+		target ="(repository.targetClassName=" + DropboxRepositoryConstants.DROPBOX_REPOSITORY_CLASS_NAME + ")",
+		unbind = "-"
+	)
+	public void setRepositoryFactory(RepositoryFactory repositoryFactory) {
+		_repositoryFactory = repositoryFactory;
+	}
+
+	private static final String _MODEL_RESOURCE_NAME_PREFIX = "model.resource.";
+
+	private static final String[] _SUPPORTED_CONFIGURATION = {"DROPBOX"};
+
+	private static final String[][] _SUPPORTED_PARAMETERS = {
+		{"ACCESS_TOKEN"}
+	};
+
+	private RepositoryFactory _repositoryFactory;
+
+}

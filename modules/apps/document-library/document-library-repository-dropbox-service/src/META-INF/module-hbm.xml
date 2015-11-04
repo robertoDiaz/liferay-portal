@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.liferay.document.library.repository.dropbox.model.DropboxEntry" />
+	<import class="com.liferay.document.library.repository.dropbox.model.DropboxRevision" />
+	<class name="com.liferay.document.library.repository.dropbox.model.impl.DropboxEntryImpl" table="DropboxEntry">
+		<id name="entryId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="uuid" type="com.liferay.portal.dao.orm.hibernate.StringType" column="uuid_" />
+		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="repositoryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="changeLog" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="path" type="com.liferay.portal.dao.orm.hibernate.StringType" column="path_" />
+		<property name="parentPath" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="rev" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="size" type="com.liferay.portal.dao.orm.hibernate.LongType" column="size_" />
+		<property name="type" type="com.liferay.portal.dao.orm.hibernate.IntegerType" column="type_" />
+	</class>
+	<class name="com.liferay.document.library.repository.dropbox.model.impl.DropboxRevisionImpl" table="DropboxRevision">
+		<id name="revisionId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="uuid" type="com.liferay.portal.dao.orm.hibernate.StringType" column="uuid_" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="entryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="path" type="com.liferay.portal.dao.orm.hibernate.StringType" column="path_" />
+		<property name="repositoryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="rev" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="size" type="com.liferay.portal.dao.orm.hibernate.LongType" column="size_" />
+	</class>
+</hibernate-mapping>
