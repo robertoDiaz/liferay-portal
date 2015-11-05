@@ -44,6 +44,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -104,37 +106,61 @@ public class UploadServletRequestImpl
 				PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
 			long uploadServletRequestImplSize = 0;
 
-			Collections.sort(
-				fileItems,
-				new Comparator<org.apache.commons.fileupload.FileItem>() {
+			Map<String, GroupedFileItems> groupedFileItemsMap = new TreeMap<>();
+
+			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
+				GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
+					fileItem.getFieldName());
+
+				if (groupedFileItems == null) {
+					groupedFileItems = new GroupedFileItems();
+				}
+
+				groupedFileItems.addFileItem(fileItem);
+
+				groupedFileItemsMap.put(
+					fileItem.getFieldName(), groupedFileItems);
+			}
+
+			Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
+				new Comparator<Map.Entry<String, GroupedFileItems>>() {
 
 					@Override
 					public int compare(
-						org.apache.commons.fileupload.FileItem fileItem1,
-						org.apache.commons.fileupload.FileItem fileItem2) {
+						Map.Entry<String, GroupedFileItems> entry1,
+						Map.Entry<String, GroupedFileItems> entry2) {
 
-						LiferayFileItem liferayFileItem1 =
-							(LiferayFileItem)fileItem1;
+						String groupedFileItemsKey1 = entry1.getKey();
+						String groupedFileItemsKey2 = entry2.getKey();
 
-						long itemSize1 = liferayFileItem1.getItemSize();
-
-						LiferayFileItem liferayFileItem2 =
-							(LiferayFileItem)fileItem2;
-
-						long itemSize2 = liferayFileItem2.getItemSize();
-
-						if (itemSize1 > itemSize2) {
+						if (groupedFileItemsKey1.equals(groupedFileItemsKey2)) {
 							return 1;
 						}
 
-						if (itemSize1 < itemSize2) {
-							return -1;
+						GroupedFileItems groupedFileItems1 = entry1.getValue();
+						GroupedFileItems groupedFileItems2 = entry2.getValue();
+
+						long itemSize1 = groupedFileItems1.getFileItemsSize();
+						long itemSize2 = groupedFileItems2.getFileItemsSize();
+
+						if (itemSize1 >= itemSize2) {
+							return 1;
 						}
 
-						return 0;
+						return -1;
 					}
-
 				});
+
+			set.addAll(groupedFileItemsMap.entrySet());
+
+			fileItems.clear();
+
+			for (Map.Entry<String, GroupedFileItems> entry : set) {
+				GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
+					entry.getKey());
+
+				fileItems.addAll(groupedFileItems.getFileItems());
+			}
 
 			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
 				LiferayFileItem liferayFileItem = (LiferayFileItem)fileItem;
@@ -608,5 +634,28 @@ public class UploadServletRequestImpl
 	private final Map<String, FileItem[]> _fileParameters;
 	private final LiferayServletRequest _liferayServletRequest;
 	private final Map<String, List<String>> _regularParameters;
+
+	private class GroupedFileItems {
+
+		public void addFileItem(
+			org.apache.commons.fileupload.FileItem fileItem) {
+
+			_fileItems.add(fileItem);
+			_fileItemsSize += fileItem.getSize();
+		}
+
+		public List<org.apache.commons.fileupload.FileItem> getFileItems() {
+			return _fileItems;
+		}
+
+		public int getFileItemsSize() {
+			return _fileItemsSize;
+		}
+
+		private final List<org.apache.commons.fileupload.FileItem> _fileItems =
+			new ArrayList<>();
+		private int _fileItemsSize = 0;
+
+	}
 
 }
