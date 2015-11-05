@@ -65,7 +65,7 @@ public class ItemSelectorBrowserReturnTypeUtil
 			return getFileEntryValue(fileEntry, themeDisplay);
 		}
 		else if (className.equals(URLItemSelectorReturnType.class.getName())) {
-			return getURLValue(fileEntry, themeDisplay);
+			return getPreviewURL(fileEntry, themeDisplay);
 		}
 
 		return StringPool.BLANK;
@@ -80,8 +80,7 @@ public class ItemSelectorBrowserReturnTypeUtil
 		fileEntryJSONObject.put("fileEntryId", fileEntry.getFileEntryId());
 		fileEntryJSONObject.put("groupId", fileEntry.getGroupId());
 		fileEntryJSONObject.put("title", fileEntry.getTitle());
-		fileEntryJSONObject.put(
-			"url", DLUtil.getImagePreviewURL(fileEntry, themeDisplay));
+		fileEntryJSONObject.put("url", getPreviewURL(fileEntry, themeDisplay));
 		fileEntryJSONObject.put("uuid", fileEntry.getUuid());
 
 		return fileEntryJSONObject.toString();
@@ -108,11 +107,15 @@ public class ItemSelectorBrowserReturnTypeUtil
 		return null;
 	}
 
-	protected static String getURLValue(
+	protected static String getPreviewURL(
 			FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		return DLUtil.getImagePreviewURL(fileEntry, themeDisplay);
+		String previewURL = DLUtil.getPreviewURL(
+			fileEntry, fileEntry.getFileVersion(), themeDisplay,
+			StringPool.BLANK, false, false);
+
+		return previewURL;
 	}
 
 	private static final List<String> _draggableFileReturnTypeNames =
