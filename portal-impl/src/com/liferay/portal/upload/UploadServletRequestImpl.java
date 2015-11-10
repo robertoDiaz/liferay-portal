@@ -123,33 +123,7 @@ public class UploadServletRequestImpl
 			}
 
 			Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
-				new Comparator<Map.Entry<String, GroupedFileItems>>() {
-
-					@Override
-					public int compare(
-						Map.Entry<String, GroupedFileItems> entry1,
-						Map.Entry<String, GroupedFileItems> entry2) {
-
-						String groupedFileItemsKey1 = entry1.getKey();
-						String groupedFileItemsKey2 = entry2.getKey();
-
-						if (groupedFileItemsKey1.equals(groupedFileItemsKey2)) {
-							return 1;
-						}
-
-						GroupedFileItems groupedFileItems1 = entry1.getValue();
-						GroupedFileItems groupedFileItems2 = entry2.getValue();
-
-						long itemSize1 = groupedFileItems1.getFileItemsSize();
-						long itemSize2 = groupedFileItems2.getFileItemsSize();
-
-						if (itemSize1 >= itemSize2) {
-							return 1;
-						}
-
-						return -1;
-					}
-				});
+				new GroupedFileItemsComparator());
 
 			set.addAll(groupedFileItemsMap.entrySet());
 
@@ -655,6 +629,36 @@ public class UploadServletRequestImpl
 		private final List<org.apache.commons.fileupload.FileItem> _fileItems =
 			new ArrayList<>();
 		private int _fileItemsSize = 0;
+
+	}
+
+	private class GroupedFileItemsComparator
+			implements Comparator<Map.Entry<String, GroupedFileItems>> {
+
+		@Override
+		public int compare(
+			Map.Entry<String, GroupedFileItems> entry1,
+			Map.Entry<String, GroupedFileItems> entry2) {
+
+			String groupedFileItemsKey1 = entry1.getKey();
+			String groupedFileItemsKey2 = entry2.getKey();
+
+			if (groupedFileItemsKey1.equals(groupedFileItemsKey2)) {
+				return 1;
+			}
+
+			GroupedFileItems groupedFileItems1 = entry1.getValue();
+			GroupedFileItems groupedFileItems2 = entry2.getValue();
+
+			long itemSize1 = groupedFileItems1.getFileItemsSize();
+			long itemSize2 = groupedFileItems2.getFileItemsSize();
+
+			if (itemSize1 >= itemSize2) {
+				return 1;
+			}
+
+			return -1;
+		}
 
 	}
 
