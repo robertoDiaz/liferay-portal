@@ -640,6 +640,10 @@ public class UploadServletRequestImpl
 			Map.Entry<String, GroupedFileItems> entry1,
 			Map.Entry<String, GroupedFileItems> entry2) {
 
+			if (entry1.equals(entry2)) {
+				return 0;
+			}
+
 			String groupedFileItemsKey1 = entry1.getKey();
 			String groupedFileItemsKey2 = entry2.getKey();
 
