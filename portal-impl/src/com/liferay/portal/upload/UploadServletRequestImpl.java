@@ -624,19 +624,6 @@ public class UploadServletRequestImpl
 			_fileItemsSize += fileItem.getSize();
 		}
 
-		public List<org.apache.commons.fileupload.FileItem> getFileItems() {
-			return _fileItems;
-		}
-
-		public int getFileItemsSize() {
-			return _fileItemsSize;
-		}
-
-		private final List<org.apache.commons.fileupload.FileItem> _fileItems =
-			new ArrayList<>();
-		private int _fileItemsSize = 0;
-		private final String _key;
-
 		@Override
 		public int compareTo(GroupedFileItems groupedFileItems) {
 			if (groupedFileItems == null) {
@@ -657,6 +644,19 @@ public class UploadServletRequestImpl
 
 			return -1;
 		}
+
+		public List<org.apache.commons.fileupload.FileItem> getFileItems() {
+			return _fileItems;
+		}
+
+		public int getFileItemsSize() {
+			return _fileItemsSize;
+		}
+
+		private final List<org.apache.commons.fileupload.FileItem> _fileItems =
+			new ArrayList<>();
+		private int _fileItemsSize = 0;
+		private final String _key;
 
 	}
 
