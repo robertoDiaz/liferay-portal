@@ -104,7 +104,13 @@ public class UploadServletRequestImpl
 				PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
 			long uploadServletRequestImplSize = 0;
 
-			fileItems = sort(fileItems);
+			int contentLength = request.getContentLength();
+
+			if ((contentLength == -1) ||
+				(contentLength > uploadServletRequestImplMaxSize)) {
+
+				fileItems = sortBySize(fileItems);
+			}
 
 			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
 				LiferayFileItem liferayFileItem = (LiferayFileItem)fileItem;
@@ -570,7 +576,7 @@ public class UploadServletRequestImpl
 		return inputStream;
 	}
 
-	protected List<org.apache.commons.fileupload.FileItem> sort(
+	protected List<org.apache.commons.fileupload.FileItem> sortBySize(
 		List<org.apache.commons.fileupload.FileItem> fileItems) {
 
 		Map<String, GroupedFileItems> groupedFileItemsMap = new HashMap<>();
