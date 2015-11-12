@@ -44,7 +44,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletInputStream;
@@ -575,19 +574,21 @@ public class UploadServletRequestImpl
 	protected List<org.apache.commons.fileupload.FileItem> sort(
 		List<org.apache.commons.fileupload.FileItem> fileItems) {
 
-		Map<String, GroupedFileItems> groupedFileItemsMap = new TreeMap<>();
+		Map<String, GroupedFileItems> groupedFileItemsMap = new HashMap<>();
 
 		for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
+			String fieldName = fileItem.getFieldName();
+
 			GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
-				fileItem.getFieldName());
+				fieldName);
 
 			if (groupedFileItems == null) {
 				groupedFileItems = new GroupedFileItems();
+
+				groupedFileItemsMap.put(fieldName, groupedFileItems);
 			}
 
 			groupedFileItems.addFileItem(fileItem);
-
-			groupedFileItemsMap.put(fileItem.getFieldName(), groupedFileItems);
 		}
 
 		Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
@@ -598,8 +599,7 @@ public class UploadServletRequestImpl
 		List<org.apache.commons.fileupload.FileItem> result = new ArrayList<>();
 
 		for (Map.Entry<String, GroupedFileItems> entry : set) {
-			GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
-				entry.getKey());
+			GroupedFileItems groupedFileItems = entry.getValue();
 
 			result.addAll(groupedFileItems.getFileItems());
 		}
