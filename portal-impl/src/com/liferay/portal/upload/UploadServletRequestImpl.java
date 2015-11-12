@@ -36,7 +36,6 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -583,7 +582,7 @@ public class UploadServletRequestImpl
 				fieldName);
 
 			if (groupedFileItems == null) {
-				groupedFileItems = new GroupedFileItems();
+				groupedFileItems = new GroupedFileItems(fieldName);
 
 				groupedFileItemsMap.put(fieldName, groupedFileItems);
 			}
@@ -591,16 +590,12 @@ public class UploadServletRequestImpl
 			groupedFileItems.addFileItem(fileItem);
 		}
 
-		Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
-			new GroupedFileItemsComparator());
-
-		set.addAll(groupedFileItemsMap.entrySet());
+		Set<GroupedFileItems> groupedFileItemsList = new TreeSet<>(
+			groupedFileItemsMap.values());
 
 		List<org.apache.commons.fileupload.FileItem> result = new ArrayList<>();
 
-		for (Map.Entry<String, GroupedFileItems> entry : set) {
-			GroupedFileItems groupedFileItems = entry.getValue();
-
+		for (GroupedFileItems groupedFileItems : groupedFileItemsList) {
 			result.addAll(groupedFileItems.getFileItems());
 		}
 
@@ -616,7 +611,11 @@ public class UploadServletRequestImpl
 	private final LiferayServletRequest _liferayServletRequest;
 	private final Map<String, List<String>> _regularParameters;
 
-	private class GroupedFileItems {
+	private class GroupedFileItems implements Comparable<GroupedFileItems> {
+
+		public GroupedFileItems(String key) {
+			_key = key;
+		}
 
 		public void addFileItem(
 			org.apache.commons.fileupload.FileItem fileItem) {
@@ -636,35 +635,23 @@ public class UploadServletRequestImpl
 		private final List<org.apache.commons.fileupload.FileItem> _fileItems =
 			new ArrayList<>();
 		private int _fileItemsSize = 0;
-
-	}
-
-	private class GroupedFileItemsComparator
-			implements Comparator<Map.Entry<String, GroupedFileItems>> {
+		private final String _key;
 
 		@Override
-		public int compare(
-			Map.Entry<String, GroupedFileItems> entry1,
-			Map.Entry<String, GroupedFileItems> entry2) {
-
-			if (entry1.equals(entry2)) {
-				return 0;
-			}
-
-			String groupedFileItemsKey1 = entry1.getKey();
-			String groupedFileItemsKey2 = entry2.getKey();
-
-			if (groupedFileItemsKey1.equals(groupedFileItemsKey2)) {
+		public int compareTo(GroupedFileItems groupedFileItems) {
+			if (groupedFileItems == null) {
 				return 1;
 			}
 
-			GroupedFileItems groupedFileItems1 = entry1.getValue();
-			GroupedFileItems groupedFileItems2 = entry2.getValue();
+			if (equals(groupedFileItems)) {
+				return 0;
+			}
 
-			long itemSize1 = groupedFileItems1.getFileItemsSize();
-			long itemSize2 = groupedFileItems2.getFileItemsSize();
+			if (_key.equals(groupedFileItems._key)) {
+				return 1;
+			}
 
-			if (itemSize1 >= itemSize2) {
+			if (getFileItemsSize() >= groupedFileItems.getFileItemsSize()) {
 				return 1;
 			}
 
