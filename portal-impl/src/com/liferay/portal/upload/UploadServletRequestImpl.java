@@ -106,35 +106,7 @@ public class UploadServletRequestImpl
 				PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
 			long uploadServletRequestImplSize = 0;
 
-			Map<String, GroupedFileItems> groupedFileItemsMap = new TreeMap<>();
-
-			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
-				GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
-					fileItem.getFieldName());
-
-				if (groupedFileItems == null) {
-					groupedFileItems = new GroupedFileItems();
-				}
-
-				groupedFileItems.addFileItem(fileItem);
-
-				groupedFileItemsMap.put(
-					fileItem.getFieldName(), groupedFileItems);
-			}
-
-			Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
-				new GroupedFileItemsComparator());
-
-			set.addAll(groupedFileItemsMap.entrySet());
-
-			fileItems.clear();
-
-			for (Map.Entry<String, GroupedFileItems> entry : set) {
-				GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
-					entry.getKey());
-
-				fileItems.addAll(groupedFileItems.getFileItems());
-			}
+			fileItems = sort(fileItems);
 
 			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
 				LiferayFileItem liferayFileItem = (LiferayFileItem)fileItem;
@@ -598,6 +570,41 @@ public class UploadServletRequestImpl
 		}
 
 		return inputStream;
+	}
+
+	protected List<org.apache.commons.fileupload.FileItem> sort(
+		List<org.apache.commons.fileupload.FileItem> fileItems) {
+
+		Map<String, GroupedFileItems> groupedFileItemsMap = new TreeMap<>();
+
+		for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
+			GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
+				fileItem.getFieldName());
+
+			if (groupedFileItems == null) {
+				groupedFileItems = new GroupedFileItems();
+			}
+
+			groupedFileItems.addFileItem(fileItem);
+
+			groupedFileItemsMap.put(fileItem.getFieldName(), groupedFileItems);
+		}
+
+		Set<Map.Entry<String, GroupedFileItems>> set = new TreeSet<>(
+			new GroupedFileItemsComparator());
+
+		set.addAll(groupedFileItemsMap.entrySet());
+
+		List<org.apache.commons.fileupload.FileItem> result = new ArrayList<>();
+
+		for (Map.Entry<String, GroupedFileItems> entry : set) {
+			GroupedFileItems groupedFileItems = groupedFileItemsMap.get(
+				entry.getKey());
+
+			result.addAll(groupedFileItems.getFileItems());
+		}
+
+		return result;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
