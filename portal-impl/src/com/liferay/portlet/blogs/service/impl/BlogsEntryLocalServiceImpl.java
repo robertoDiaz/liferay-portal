@@ -1618,8 +1618,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		addOriginalImageFileEntry(userId, groupId, entryId, imageSelector);
 
-		File file = null;
-
 		try {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				imageSelector.getImageCropRegion());
@@ -1645,19 +1643,15 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				throw new EntryCoverImageCropException();
 			}
 
-			file = FileUtil.createTempFile(imageBytes);
-
 			Folder folder = addCoverImageFolder(userId, groupId);
 
 			return addProcessedImageFileEntry(
-				userId, groupId, entryId, folder.getFolderId(), imageSelector,
-				file);
+				userId, groupId, entryId, folder.getFolderId(),
+				imageSelector.getImageTitle(), imageSelector.getImageMimeType(),
+				imageBytes);
 		}
 		catch (IOException ioe) {
 			throw new EntryCoverImageCropException();
-		}
-		finally {
-			FileUtil.delete(file);
 		}
 	}
 
@@ -1691,26 +1685,15 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 			Folder folder = addAttachmentsFolder(userId, groupId);
 
-			FileEntry originalFileEntry = null;
+			FileEntry originalFileEntry =
+				blogsEntryAttachmentFileEntryHelper.
+					addBlogsEntryAttachmentFileEntry(
+						groupId, userId, entryId, folder.getFolderId(),
+						imageSelector.getImageTitle(),
+						imageSelector.getImageMimeType(),
+						imageSelector.getImageBytes());
 
-			try {
-				File tempFile = FileUtil.createTempFile(
-					imageSelector.getImageBytes());
-
-				originalFileEntry =
-					blogsEntryAttachmentFileEntryHelper.
-						addBlogsEntryAttachmentFileEntry(
-							groupId, userId, entryId, folder.getFolderId(),
-							imageSelector.getImageTitle(),
-							imageSelector.getImageMimeType(), tempFile);
-
-				return originalFileEntry.getFileEntryId();
-			}
-			catch (IOException e) {
-				if (_log.isErrorEnabled()) {
-					_log.error("Could not add the original file entry", e);
-				}
-			}
+			return originalFileEntry.getFileEntryId();
 		}
 
 		return 0;
@@ -1718,10 +1701,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 	protected long addProcessedImageFileEntry(
 			long userId, long groupId, long entryId, long folderId,
-			ImageSelector imageSelector, File file)
+			String title, String mimeType, byte[] bytes)
 		throws PortalException {
-
-		String title = imageSelector.getImageTitle();
 
 		if (Validator.isNull(title)) {
 			title = StringUtil.randomString() + "_processedImage_" + entryId;
@@ -1734,8 +1715,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		FileEntry processedImageFileEntry =
 			blogsEntryAttachmentFileEntryHelper.
 				addBlogsEntryAttachmentFileEntry(
-					groupId, userId, entryId, folderId, title,
-					imageSelector.getImageMimeType(), file);
+					groupId, userId, entryId, folderId, title, mimeType, bytes);
 
 		return processedImageFileEntry.getFileEntryId();
 	}
@@ -1753,7 +1733,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		addOriginalImageFileEntry(userId, groupId, entryId, imageSelector);
 
-		File file = null;
 
 		try {
 			ImageBag imageBag = ImageToolUtil.read(imageBytes);
@@ -1766,26 +1745,22 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			renderedImage = ImageToolUtil.scale(
 				renderedImage, blogsGroupServiceSettings.getSmallImageWidth());
 
-			byte[] bytes = ImageToolUtil.getBytes(
+			imageBytes = ImageToolUtil.getBytes(
 				renderedImage, imageBag.getType());
 
-			if (bytes == null) {
+			if (imageBytes == null) {
 				throw new EntrySmallImageScaleException();
 			}
-
-			file = FileUtil.createTempFile(bytes);
 
 			Folder folder = addSmallImageFolder(userId, groupId);
 
 			return addProcessedImageFileEntry(
-				userId, groupId, entryId, folder.getFolderId(), imageSelector,
-				file);
+				userId, groupId, entryId, folder.getFolderId(),
+				imageSelector.getImageTitle(), imageSelector.getImageMimeType(),
+				imageBytes);
 		}
 		catch (IOException ioe) {
 			throw new EntrySmallImageScaleException();
-		}
-		finally {
-			FileUtil.delete(file);
 		}
 	}
 
