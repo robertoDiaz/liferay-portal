@@ -495,30 +495,44 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		String coverImageCaption = ParamUtil.getString(
 			actionRequest, "coverImageCaption");
 
+		long oldCoverImageId = 0;
+		long oldSmallImageId = 0;
+
+		if (entryId != 0) {
+			BlogsEntry entry = _blogsEntryLocalService.getBlogsEntry(entryId);
+
+			oldCoverImageId = entry.getCoverImageFileEntryId();
+			oldSmallImageId = entry.getSmallImageId();
+		}
+
 		ImageSelector coverImageImageSelector = null;
+
+		if ((coverImageFileEntryId != 0) ||
+			Validator.isNotNull(coverImageURL)) {
+
+			coverImageImageSelector = new ImageSelector(
+				coverImageFileEntryId, coverImageURL,
+				coverImageFileEntryCropRegion);
+		}
+
 		boolean coverImageTempFile = false;
 
-		if (coverImageFileEntryId != 0) {
+		if ((coverImageFileEntryId != 0) &&
+			(coverImageFileEntryId != oldCoverImageId)) {
+
 			FileEntry coverImageFileEntry =
-				PortletFileRepositoryUtil.getPortletFileEntry(
-					coverImageFileEntryId);
+					PortletFileRepositoryUtil.getPortletFileEntry(
+						coverImageFileEntryId);
 
 			coverImageTempFile =
 				coverImageFileEntry.isRepositoryCapabilityProvided(
 					TemporaryFileEntriesCapability.class);
 
-			if (coverImageTempFile) {
-				coverImageImageSelector = new ImageSelector(
-					FileUtil.getBytes(coverImageFileEntry.getContentStream()),
-					coverImageFileEntry.getTitle(),
-					coverImageFileEntry.getMimeType(), coverImageURL,
-					coverImageFileEntryCropRegion);
-			}
-			else {
-				coverImageImageSelector = new ImageSelector(
-					coverImageFileEntryId, coverImageURL,
-					coverImageFileEntryCropRegion);
-			}
+			coverImageImageSelector = new ImageSelector(
+				FileUtil.getBytes(coverImageFileEntry.getContentStream()),
+				coverImageFileEntry.getTitle(),
+				coverImageFileEntry.getMimeType(), coverImageURL,
+				coverImageFileEntryCropRegion);
 		}
 
 		long smallImageFileEntryId = ParamUtil.getLong(
@@ -526,10 +540,20 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		String smallImageURL = ParamUtil.getString(
 			actionRequest, "smallImageURL");
 
-		boolean smallImageTempFile = false;
 		ImageSelector smallImageImageSelector = null;
 
-		if (smallImageFileEntryId != 0) {
+		boolean smallImageTempFile = false;
+
+		if ((smallImageFileEntryId != 0) ||
+			Validator.isNotNull(smallImageURL)) {
+
+			smallImageImageSelector = new ImageSelector(
+				smallImageFileEntryId, smallImageURL, StringPool.BLANK);
+		}
+
+		if ((smallImageFileEntryId != 0) &&
+			(smallImageFileEntryId != oldSmallImageId)) {
+
 			FileEntry smallImageFileEntry =
 				PortletFileRepositoryUtil.getPortletFileEntry(
 					smallImageFileEntryId);
@@ -538,17 +562,11 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 				smallImageFileEntry.isRepositoryCapabilityProvided(
 					TemporaryFileEntriesCapability.class);
 
-			if (smallImageTempFile) {
-				smallImageImageSelector = new ImageSelector(
-					FileUtil.getBytes(smallImageFileEntry.getContentStream()),
-					smallImageFileEntry.getTitle(),
-					smallImageFileEntry.getMimeType(), smallImageURL,
-					StringPool.BLANK);
-			}
-			else {
-				smallImageImageSelector = new ImageSelector(
-					smallImageFileEntryId, smallImageURL, StringPool.BLANK);
-			}
+			smallImageImageSelector = new ImageSelector(
+				FileUtil.getBytes(smallImageFileEntry.getContentStream()),
+				smallImageFileEntry.getTitle(),
+				smallImageFileEntry.getMimeType(), smallImageURL,
+				StringPool.BLANK);
 		}
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -667,11 +685,19 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		if (coverImageTempFile) {
+			_blogsEntryLocalService.addOriginalImageFileEntry(
+				themeDisplay.getUserId(), entry.getGroupId(),
+				entry.getEntryId(), coverImageImageSelector);
+
 			PortletFileRepositoryUtil.deletePortletFileEntry(
 				coverImageFileEntryId);
 		}
 
 		if (smallImageTempFile) {
+			_blogsEntryLocalService.addOriginalImageFileEntry(
+				themeDisplay.getUserId(), entry.getGroupId(),
+				entry.getEntryId(), smallImageImageSelector);
+
 			PortletFileRepositoryUtil.deletePortletFileEntry(
 				smallImageFileEntryId);
 		}
