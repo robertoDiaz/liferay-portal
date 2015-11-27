@@ -487,27 +487,29 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "coverImageCaption");
 
 		ImageSelector coverImageImageSelector = null;
+
+		if ((coverImageFileEntryId != 0) ||Validator.isNotNull(coverImageURL)) {
+			coverImageImageSelector = new ImageSelector(
+				coverImageFileEntryId, coverImageURL,
+				coverImageFileEntryCropRegion);
+		}
+
 		boolean coverImageTempFile = false;
 
 		if (coverImageFileEntryId != 0) {
 			FileEntry coverImageFileEntry =
-				PortletFileRepositoryUtil.getPortletFileEntry(
-					coverImageFileEntryId);
+					PortletFileRepositoryUtil.getPortletFileEntry(
+						coverImageFileEntryId);
 
 			coverImageTempFile =
-				coverImageFileEntry.isRepositoryCapabilityProvided(
-					TemporaryFileEntriesCapability.class);
+					coverImageFileEntry.isRepositoryCapabilityProvided(
+						TemporaryFileEntriesCapability.class);
 
 			if (coverImageTempFile) {
 				coverImageImageSelector = new ImageSelector(
 					FileUtil.getBytes(coverImageFileEntry.getContentStream()),
 					coverImageFileEntry.getTitle(),
 					coverImageFileEntry.getMimeType(), coverImageURL,
-					coverImageFileEntryCropRegion);
-			}
-			else {
-				coverImageImageSelector = new ImageSelector(
-					coverImageFileEntryId, coverImageURL,
 					coverImageFileEntryCropRegion);
 			}
 		}
@@ -517,8 +519,16 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		String smallImageURL = ParamUtil.getString(
 			actionRequest, "smallImageURL");
 
-		boolean smallImageTempFile = false;
 		ImageSelector smallImageImageSelector = null;
+
+		boolean smallImageTempFile = false;
+
+		if ((smallImageFileEntryId != 0) ||
+			Validator.isNotNull(smallImageURL)) {
+
+			smallImageImageSelector = new ImageSelector(
+				smallImageFileEntryId, smallImageURL, StringPool.BLANK);
+		}
 
 		if (smallImageFileEntryId != 0) {
 			FileEntry smallImageFileEntry =
@@ -535,10 +545,6 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 					smallImageFileEntry.getTitle(),
 					smallImageFileEntry.getMimeType(), smallImageURL,
 					StringPool.BLANK);
-			}
-			else {
-				smallImageImageSelector = new ImageSelector(
-					smallImageFileEntryId, smallImageURL, StringPool.BLANK);
 			}
 		}
 
