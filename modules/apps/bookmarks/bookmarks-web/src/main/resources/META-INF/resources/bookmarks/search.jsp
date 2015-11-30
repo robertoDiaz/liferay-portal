@@ -43,7 +43,7 @@ if (portletTitleBasedNavigation) {
 }
 %>
 
-<div <%= portletName.equals(BookmarksPortletKeys.BOOKMARKS_ADMIN) ? "class=\"container-fluid-1280\"" : StringPool.BLANK %>>
+<div class="container-fluid-1280">
 	<liferay-portlet:renderURL varImpl="searchURL">
 		<portlet:param name="mvcPath" value="/bookmarks/search.jsp" />
 	</liferay-portlet:renderURL>
