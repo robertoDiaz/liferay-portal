@@ -91,7 +91,6 @@ import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.awt.image.RenderedImage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;

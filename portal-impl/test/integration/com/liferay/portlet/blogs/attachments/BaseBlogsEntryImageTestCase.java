@@ -57,7 +57,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 		Assert.assertEquals("image1.jpg", imageFileEntry.getTitle());
 	}
 
-	@Test
+	/*@Test
 	public void testAddOriginalImage() throws Exception {
 		Folder folder = BlogsEntryLocalServiceUtil.addAttachmentsFolder(
 			user.getUserId(), group.getGroupId());
@@ -75,9 +75,9 @@ public abstract class BaseBlogsEntryImageTestCase {
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
 			group.getGroupId(), folder.getFolderId(), "image1.jpg");
-	}
+	}*/
 
-	@Test
+	/*@Test
 	public void testAddOriginalImageWhenUpdatingBlogsEntryImage()
 		throws Exception {
 
@@ -99,7 +99,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
 			group.getGroupId(), folder.getFolderId(), "image2.jpg");
-	}
+	}*/
 
 	@Test(expected = NoSuchFileEntryException.class)
 	public void testImageDeletedWhenDeletingBlogsEntry() throws Exception {
@@ -191,7 +191,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 			BlogsConstants.SERVICE_NAME, imageFolder.getName());
 	}
 
-	@Test
+	/*@Test
 	public void testOriginalImageNotDeletedWhenAddingBlogsEntryExistingImage()
 		throws Exception {
 
@@ -209,9 +209,9 @@ public abstract class BaseBlogsEntryImageTestCase {
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
 			fileEntry.getFileEntryId());
-	}
+	}*/
 
-	@Test
+	/*@Test
 	public void testOriginalImageNotDeletedWhenUpdatingBlogsEntryWithEmptyImageSelector()
 		throws Exception {
 
@@ -280,7 +280,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 			group.getGroupId(), folder.getFolderId(), "image1.jpg");
 
 		Assert.assertEquals(BlogsConstants.SERVICE_NAME, folder.getName());
-	}
+	}*/
 
 	@Test(expected = NoSuchFileEntryException.class)
 	public void testPreviousImageDeletedWhenUpdatingImage() throws Exception {
@@ -296,7 +296,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 			imageFileEntry.getFileEntryId());
 	}
 
-	@Test
+	/*@Test
 	public void testPreviousOriginalImageNotDeletedWhenUpdatingImage()
 		throws Exception {
 
@@ -309,7 +309,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
 			group.getGroupId(), folder.getFolderId(), "image1.jpg");
-	}
+	}*/
 
 	@Test
 	public void testUpdateImage() throws Exception {
