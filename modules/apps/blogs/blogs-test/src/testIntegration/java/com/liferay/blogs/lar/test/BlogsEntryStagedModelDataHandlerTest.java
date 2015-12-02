@@ -14,6 +14,7 @@
 
 package com.liferay.blogs.lar.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -41,8 +42,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.jboss.arquillian.junit.Arquillian;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -75,11 +74,9 @@ public class BlogsEntryStagedModelDataHandlerTest
 
 		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
 
-		long initialCoverImageFileEntryId =
-			exportedEntry.getCoverImageFileEntryId();
-
-		FileEntry initialFileEntry = DLAppLocalServiceUtil.getFileEntry(
-			initialCoverImageFileEntryId);
+		FileEntry initialCoverImageFileEntry =
+			DLAppLocalServiceUtil.getFileEntry(
+				exportedEntry.getCoverImageFileEntryId());
 
 		Assert.assertNotNull(exportedEntry);
 
@@ -89,12 +86,12 @@ public class BlogsEntryStagedModelDataHandlerTest
 		BlogsEntry importedEntry = (BlogsEntry)getStagedModel(
 			entry.getUuid(), liveGroup);
 
-		long coverImageFileEntryId = importedEntry.getCoverImageFileEntryId();
+		FileEntry coverImageFileEntry = DLAppLocalServiceUtil.getFileEntry(
+			importedEntry.getCoverImageFileEntryId());
 
-		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-			coverImageFileEntryId);
-
-		Assert.assertEquals(initialFileEntry.getUuid(), fileEntry.getUuid());
+		Assert.assertEquals(
+			initialCoverImageFileEntry.getUuid(),
+			coverImageFileEntry.getUuid());
 	}
 
 	@Test
@@ -109,11 +106,9 @@ public class BlogsEntryStagedModelDataHandlerTest
 
 		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
 
-		long initialCoverImageFileEntryId =
-			exportedEntry.getCoverImageFileEntryId();
-
-		FileEntry initialFileEntry = DLAppLocalServiceUtil.getFileEntry(
-			initialCoverImageFileEntryId);
+		FileEntry initialSmallImageFileEntry =
+			DLAppLocalServiceUtil.getFileEntry(
+				exportedEntry.getSmallImageFileEntryId());
 
 		Assert.assertNotNull(exportedEntry);
 
@@ -123,12 +118,12 @@ public class BlogsEntryStagedModelDataHandlerTest
 		BlogsEntry importedEntry = (BlogsEntry)getStagedModel(
 			entry.getUuid(), liveGroup);
 
-		long coverImageFileEntryId = importedEntry.getCoverImageFileEntryId();
+		FileEntry smallImageFileEntry = DLAppLocalServiceUtil.getFileEntry(
+			importedEntry.getSmallImageFileEntryId());
 
-		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
-			coverImageFileEntryId);
-
-		Assert.assertEquals(initialFileEntry.getUuid(), fileEntry.getUuid());
+		Assert.assertEquals(
+			initialSmallImageFileEntry.getUuid(),
+			smallImageFileEntry.getUuid());
 	}
 
 	protected BlogsEntry addBlogsEntryWithCoverImage() throws Exception {
@@ -142,7 +137,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 
 		ImageSelector imageSelector = new ImageSelector(
 			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
-			IMAGE_CROP_REGION);
+			_IMAGE_CROP_REGION);
 
 		return addBlogsEntry(imageSelector, null, serviceContext);
 	}
@@ -220,9 +215,6 @@ public class BlogsEntryStagedModelDataHandlerTest
 		return true;
 	}
 
-	protected static final String IMAGE_CROP_REGION =
-		"{\"height\": 10, \"width\": 10, \"x\": 0, \"y\": 0}";
-
 	private BlogsEntry addBlogsEntry(
 			ImageSelector coverImageImageSelector,
 			ImageSelector smallImageImageSelector,
@@ -245,6 +237,9 @@ public class BlogsEntryStagedModelDataHandlerTest
 		return classLoader.getResourceAsStream(
 			"com/liferay/blogs/dependencies/test.jpg");
 	}
+
+	private static final String _IMAGE_CROP_REGION =
+		"{\"height\": 10, \"width\": 10, \"x\": 0, \"y\": 0}";
 
 	private static final String _IMAGE_TITLE = "test.jpg";
 
