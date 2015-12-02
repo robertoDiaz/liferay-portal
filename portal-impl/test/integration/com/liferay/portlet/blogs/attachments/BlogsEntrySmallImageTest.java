@@ -68,21 +68,6 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 	}
 
 	@Override
-	protected BlogsEntry addBlogsEntry(String imageTitle) throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId());
-
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), imageTitle, serviceContext);
-
-		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId(), StringPool.BLANK, StringPool.BLANK);
-
-		return addBlogsEntry(imageSelector);
-	}
-
-	@Override
 	protected long getImageFileEntry(BlogsEntry blogsEntry) {
 		return blogsEntry.getSmallImageFileEntryId();
 	}
@@ -105,21 +90,8 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 	}
 
 	@Override
-	protected BlogsEntry updateBlogsEntry(
-			long blogsEntryId, String coverImageTitle)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId());
-
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), coverImageTitle, serviceContext);
-
-		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId(), StringPool.BLANK, StringPool.BLANK);
-
-		return updateBlogsEntry(blogsEntryId, imageSelector);
+	protected String getCropRegion() {
+		return StringPool.BLANK;
 	}
 
 }
