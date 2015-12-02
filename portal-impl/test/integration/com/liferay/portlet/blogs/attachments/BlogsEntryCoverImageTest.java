@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.blogs.attachments;
 
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -68,18 +67,8 @@ public class BlogsEntryCoverImageTest extends BaseBlogsEntryImageTestCase {
 	}
 
 	@Override
-	protected BlogsEntry addBlogsEntry(String imageTitle) throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId());
-
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), imageTitle, serviceContext);
-
-		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId(), StringPool.BLANK, IMAGE_CROP_REGION);
-
-		return addBlogsEntry(imageSelector);
+	protected String getImageCropRegion() {
+		return _IMAGE_CROP_REGION;
 	}
 
 	@Override
@@ -104,21 +93,7 @@ public class BlogsEntryCoverImageTest extends BaseBlogsEntryImageTestCase {
 			serviceContext);
 	}
 
-	@Override
-	protected BlogsEntry updateBlogsEntry(long blogsEntryId, String imageTitle)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId());
-
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), imageTitle, serviceContext);
-
-		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId(), StringPool.BLANK, IMAGE_CROP_REGION);
-
-		return updateBlogsEntry(blogsEntryId, imageSelector);
-	}
+	private static final String _IMAGE_CROP_REGION =
+		"{\"height\": 10, \"width\": 10, \"x\": 0, \"y\": 0}";
 
 }

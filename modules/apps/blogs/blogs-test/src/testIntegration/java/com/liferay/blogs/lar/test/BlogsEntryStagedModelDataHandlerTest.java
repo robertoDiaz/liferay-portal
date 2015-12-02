@@ -14,12 +14,16 @@
 
 package com.liferay.blogs.lar.test;
 
-import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.lar.test.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
@@ -28,13 +32,22 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+
+import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.arquillian.junit.Arquillian;
+
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -50,6 +63,106 @@ public class BlogsEntryStagedModelDataHandlerTest
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
+	@Test
+	public void testCoverImageIsImported() throws Exception {
+		initExport();
+
+		BlogsEntry entry = addBlogsEntryWithCoverImage();
+
+		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
+
+		initImport();
+
+		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
+
+		long initialCoverImageFileEntryId =
+			exportedEntry.getCoverImageFileEntryId();
+
+		FileEntry initialFileEntry = DLAppLocalServiceUtil.getFileEntry(
+			initialCoverImageFileEntryId);
+
+		Assert.assertNotNull(exportedEntry);
+
+		StagedModelDataHandlerUtil.importStagedModel(
+			portletDataContext, exportedEntry);
+
+		BlogsEntry importedEntry = (BlogsEntry)getStagedModel(
+			entry.getUuid(), liveGroup);
+
+		long coverImageFileEntryId = importedEntry.getCoverImageFileEntryId();
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+			coverImageFileEntryId);
+
+		Assert.assertEquals(initialFileEntry.getUuid(), fileEntry.getUuid());
+	}
+
+	@Test
+	public void testSmallImageIsImported() throws Exception {
+		initExport();
+
+		BlogsEntry entry = addBlogsEntryWithSmallImage();
+
+		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
+
+		initImport();
+
+		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
+
+		long initialCoverImageFileEntryId =
+			exportedEntry.getCoverImageFileEntryId();
+
+		FileEntry initialFileEntry = DLAppLocalServiceUtil.getFileEntry(
+			initialCoverImageFileEntryId);
+
+		Assert.assertNotNull(exportedEntry);
+
+		StagedModelDataHandlerUtil.importStagedModel(
+			portletDataContext, exportedEntry);
+
+		BlogsEntry importedEntry = (BlogsEntry)getStagedModel(
+			entry.getUuid(), liveGroup);
+
+		long coverImageFileEntryId = importedEntry.getCoverImageFileEntryId();
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(
+			coverImageFileEntryId);
+
+		Assert.assertEquals(initialFileEntry.getUuid(), fileEntry.getUuid());
+	}
+
+	protected BlogsEntry addBlogsEntryWithCoverImage() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		InputStream inputStream = getInputStream();
+
+		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
+
+		ImageSelector imageSelector = new ImageSelector(
+			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
+			StringPool.BLANK, IMAGE_CROP_REGION);
+
+		return addBlogsEntry(imageSelector, null, serviceContext);
+	}
+
+	protected BlogsEntry addBlogsEntryWithSmallImage() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		InputStream inputStream = getInputStream();
+
+		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
+
+		ImageSelector imageSelector = new ImageSelector(
+			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
+			StringPool.BLANK, StringPool.BLANK);
+
+		return addBlogsEntry(null, imageSelector, serviceContext);
+	}
+
 	@Override
 	protected StagedModel addStagedModel(
 			Group group,
@@ -60,9 +173,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 			ServiceContextTestUtil.getServiceContext(
 				group, TestPropsValues.getUserId());
 
-		return BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), serviceContext);
+		return addBlogsEntry(null, null, serviceContext);
 	}
 
 	@Override
@@ -75,9 +186,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 			ServiceContextTestUtil.getServiceContext(
 				group, TestPropsValues.getUserId());
 
-		BlogsEntry approvedEntry = BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), serviceContext);
+		BlogsEntry approvedEntry = addBlogsEntry(null, null, serviceContext);
 
 		stagedModels.add(approvedEntry);
 
@@ -110,5 +219,33 @@ public class BlogsEntryStagedModelDataHandlerTest
 	protected boolean isCommentableStagedModel() {
 		return true;
 	}
+
+	protected static final String IMAGE_CROP_REGION =
+		"{\"height\": 10, \"width\": 10, \"x\": 0, \"y\": 0}";
+
+	private BlogsEntry addBlogsEntry(
+			ImageSelector coverImageImageSelector,
+			ImageSelector smallImageImageSelector,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return BlogsEntryLocalServiceUtil.addEntry(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new Date(), true, true,
+			new String[0], StringPool.BLANK, coverImageImageSelector,
+			smallImageImageSelector, serviceContext);
+	}
+
+	private InputStream getInputStream() {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		return classLoader.getResourceAsStream(
+			"com/liferay/blogs/dependencies/test.jpg");
+	}
+
+	private static final String _IMAGE_TITLE = "test.jpg";
 
 }
