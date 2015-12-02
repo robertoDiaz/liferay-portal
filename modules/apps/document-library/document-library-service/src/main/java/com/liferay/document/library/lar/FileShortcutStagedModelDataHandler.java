@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.capabilities.ExportImportCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -133,26 +134,19 @@ public class FileShortcutStagedModelDataHandler
 			PortletDataContext portletDataContext, FileShortcut fileShortcut)
 		throws Exception {
 
-		if (fileShortcut.getFolderId() !=
-				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+		if (fileShortcut.isRepositoryCapabilityProvided(
+				ExportImportCapability.class)) {
+
+			FileEntry fileEntry = _dlAppLocalService.getFileEntry(
+					fileShortcut.getToFileEntryId());
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, fileShortcut, fileShortcut.getFolder(),
-				PortletDataContext.REFERENCE_TYPE_PARENT);
+				portletDataContext, fileShortcut, fileEntry,
+				PortletDataContext.REFERENCE_TYPE_STRONG);
 		}
-
-		FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-			fileShortcut.getToFileEntryId());
-
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, fileShortcut, fileEntry,
-			PortletDataContext.REFERENCE_TYPE_STRONG);
 
 		Element fileShortcutElement = portletDataContext.getExportDataElement(
 			fileShortcut);
-
-		fileShortcutElement.addAttribute(
-			"file-entry-uuid", fileEntry.getUuid());
 
 		portletDataContext.addClassedModel(
 			fileShortcutElement,

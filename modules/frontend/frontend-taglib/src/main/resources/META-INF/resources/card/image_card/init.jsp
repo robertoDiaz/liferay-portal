@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,25 +12,13 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package com.liferay.portal.kernel.repository.registry;
+<%@ include file="/init.jsp" %>
 
-import com.liferay.portal.kernel.repository.capabilities.Capability;
-
-/**
- * @author Adolfo Pérez
- */
-public interface CapabilityRegistry<T> {
-
-	public <S extends Capability> void addExportedCapability(
-		Class<S> capabilityClass);
-
-	public <S extends Capability> void addExportedCapability(
-		Class<S> capabilityClass, S capability);
-
-	public <S extends Capability> void addSupportedCapability(
-		Class<S> capabilityClass, S capability);
-
-	public T getTarget();
-
-}
+<%
+String cssClass = (String)request.getAttribute("liferay-frontend:image-card:cssClass");
+Map<String, Object> data = (Map<String, Object>)request.getAttribute("liferay-frontend:image-card:data");
+String imageCSSClass = (String)request.getAttribute("liferay-frontend:image-card:imageCSSClass");
+String imageUrl = (String)request.getAttribute("liferay-frontend:image-card:imageUrl");
+%>

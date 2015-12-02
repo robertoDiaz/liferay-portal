@@ -12,24 +12,10 @@
  * details.
  */
 
-package com.liferay.portal.kernel.repository.registry;
-
-import com.liferay.portal.kernel.repository.capabilities.Capability;
+package com.liferay.portal.kernel.repository.capabilities;
 
 /**
- * @author Adolfo Pérez
+ * @author Roberto Díaz
  */
-public interface CapabilityRegistry<T> {
-
-	public <S extends Capability> void addExportedCapability(
-		Class<S> capabilityClass);
-
-	public <S extends Capability> void addExportedCapability(
-		Class<S> capabilityClass, S capability);
-
-	public <S extends Capability> void addSupportedCapability(
-		Class<S> capabilityClass, S capability);
-
-	public T getTarget();
-
+public interface ExportImportCapability extends Capability {
 }

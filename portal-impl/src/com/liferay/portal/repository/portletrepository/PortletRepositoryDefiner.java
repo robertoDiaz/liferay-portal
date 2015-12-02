@@ -16,6 +16,7 @@ package com.liferay.portal.repository.portletrepository;
 
 import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
+import com.liferay.portal.kernel.repository.capabilities.ExportImportCapability;
 import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
 import com.liferay.portal.kernel.repository.capabilities.RelatedModelCapability;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
@@ -60,6 +61,8 @@ public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 
 		DLFileEntryServiceAdapter dlFileEntryServiceAdapter =
 			DLFileEntryServiceAdapter.create(documentRepository);
+
+		capabilityRegistry.addExportedCapability(ExportImportCapability.class);
 
 		capabilityRegistry.addExportedCapability(
 			RelatedModelCapability.class,

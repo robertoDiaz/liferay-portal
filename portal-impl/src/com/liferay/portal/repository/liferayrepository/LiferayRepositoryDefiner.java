@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.capabilities.BulkOperationCapability;
 import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
+import com.liferay.portal.kernel.repository.capabilities.ExportImportCapability;
 import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
 import com.liferay.portal.kernel.repository.capabilities.RelatedModelCapability;
 import com.liferay.portal.kernel.repository.capabilities.SyncCapability;
@@ -90,6 +91,8 @@ public class LiferayRepositoryDefiner extends BaseRepositoryDefiner {
 
 		capabilityRegistry.addExportedCapability(
 			BulkOperationCapability.class, bulkOperationCapability);
+
+		capabilityRegistry.addExportedCapability(ExportImportCapability.class);
 
 		RepositoryEntryConverter repositoryEntryConverter =
 			new RepositoryEntryConverter();
