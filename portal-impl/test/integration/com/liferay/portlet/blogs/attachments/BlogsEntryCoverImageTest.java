@@ -14,27 +14,21 @@
 
 package com.liferay.portlet.blogs.attachments;
 
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 
-import java.io.InputStream;
 import java.util.Date;
 
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
-import com.liferay.portlet.documentlibrary.util.test.DLTestUtil;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -73,6 +67,11 @@ public class BlogsEntryCoverImageTest extends BaseBlogsEntryImageTestCase {
 	}
 
 	@Override
+	protected String getImageCropRegion() {
+		return _IMAGE_CROP_REGION;
+	}
+
+	@Override
 	protected long getImageFileEntry(BlogsEntry blogsEntry) {
 		return blogsEntry.getCoverImageFileEntryId();
 	}
@@ -92,11 +91,6 @@ public class BlogsEntryCoverImageTest extends BaseBlogsEntryImageTestCase {
 			RandomTestUtil.randomString(), new Date(), true, true,
 			new String[0], StringPool.BLANK, imageSelector, null,
 			serviceContext);
-	}
-
-	@Override
-	protected String getCropRegion() {
-		return _IMAGE_CROP_REGION;
 	}
 
 	private static final String _IMAGE_CROP_REGION =

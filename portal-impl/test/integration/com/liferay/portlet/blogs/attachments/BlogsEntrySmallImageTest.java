@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.blogs.attachments;
 
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -68,6 +67,11 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 	}
 
 	@Override
+	protected String getImageCropRegion() {
+		return StringPool.BLANK;
+	}
+
+	@Override
 	protected long getImageFileEntry(BlogsEntry blogsEntry) {
 		return blogsEntry.getSmallImageFileEntryId();
 	}
@@ -87,11 +91,6 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 			RandomTestUtil.randomString(), new Date(), true, true,
 			new String[0], StringPool.BLANK, null, imageSelector,
 			serviceContext);
-	}
-
-	@Override
-	protected String getCropRegion() {
-		return StringPool.BLANK;
 	}
 
 }
