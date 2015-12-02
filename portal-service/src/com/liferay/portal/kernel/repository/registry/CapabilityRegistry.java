@@ -22,6 +22,9 @@ import com.liferay.portal.kernel.repository.capabilities.Capability;
 public interface CapabilityRegistry<T> {
 
 	public <S extends Capability> void addExportedCapability(
+		Class<S> capabilityClass);
+
+	public <S extends Capability> void addExportedCapability(
 		Class<S> capabilityClass, S capability);
 
 	public <S extends Capability> void addSupportedCapability(
