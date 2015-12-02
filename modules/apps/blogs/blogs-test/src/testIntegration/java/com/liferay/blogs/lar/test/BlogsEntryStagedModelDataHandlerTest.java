@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.lar.test.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
@@ -64,21 +63,17 @@ public class BlogsEntryStagedModelDataHandlerTest
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
-	private static final String _IMAGE_TITLE = "test.jpg";
-
 	@Test
 	public void testCoverImageIsImported() throws Exception {
 		initExport();
 
 		BlogsEntry entry = addBlogsEntryWithCoverImage();
 
-		StagedModelDataHandlerUtil.exportStagedModel(
-			portletDataContext, entry);
+		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
 		initImport();
 
-		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(
-			entry);
+		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
 
 		long initialCoverImageFileEntryId =
 			exportedEntry.getCoverImageFileEntryId();
@@ -108,13 +103,11 @@ public class BlogsEntryStagedModelDataHandlerTest
 
 		BlogsEntry entry = addBlogsEntryWithSmallImage();
 
-		StagedModelDataHandlerUtil.exportStagedModel(
-			portletDataContext, entry);
+		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
 		initImport();
 
-		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(
-			entry);
+		BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(entry);
 
 		long initialCoverImageFileEntryId =
 			exportedEntry.getCoverImageFileEntryId();
@@ -154,16 +147,6 @@ public class BlogsEntryStagedModelDataHandlerTest
 		return addBlogsEntry(imageSelector, null, serviceContext);
 	}
 
-	private InputStream getInputStream() {
-
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		return classLoader.getResourceAsStream(
-			"com/liferay/blogs/dependencies/test.jpg");
-	}
-
 	protected BlogsEntry addBlogsEntryWithSmallImage() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -178,20 +161,6 @@ public class BlogsEntryStagedModelDataHandlerTest
 			StringPool.BLANK, StringPool.BLANK);
 
 		return addBlogsEntry(null, imageSelector, serviceContext);
-	}
-
-	private BlogsEntry addBlogsEntry(
-			ImageSelector coverImageImageSelector,
-			ImageSelector smallImageImageSelector,
-			ServiceContext serviceContext)
-		throws Exception {
-
-		return BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), new Date(), true, true,
-			new String[0], StringPool.BLANK, coverImageImageSelector,
-			smallImageImageSelector, serviceContext);
 	}
 
 	@Override
@@ -253,5 +222,30 @@ public class BlogsEntryStagedModelDataHandlerTest
 
 	protected static final String IMAGE_CROP_REGION =
 		"{\"height\": 10, \"width\": 10, \"x\": 0, \"y\": 0}";
+
+	private BlogsEntry addBlogsEntry(
+			ImageSelector coverImageImageSelector,
+			ImageSelector smallImageImageSelector,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return BlogsEntryLocalServiceUtil.addEntry(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new Date(), true, true,
+			new String[0], StringPool.BLANK, coverImageImageSelector,
+			smallImageImageSelector, serviceContext);
+	}
+
+	private InputStream getInputStream() {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		return classLoader.getResourceAsStream(
+			"com/liferay/blogs/dependencies/test.jpg");
+	}
+
+	private static final String _IMAGE_TITLE = "test.jpg";
 
 }
