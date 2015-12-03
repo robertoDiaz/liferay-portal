@@ -21,8 +21,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -31,6 +33,7 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Image;
+import com.liferay.portal.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ImageLocalService;
 import com.liferay.portal.service.ServiceContext;
@@ -293,6 +296,29 @@ public class BlogsEntryStagedModelDataHandler
 			}
 		}
 
+		Map<Long, Long> fileEntries =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Folder.class);
+
+		long oldCoverImageFileEntryId = entry.getCoverImageFileEntryId();
+
+		long coverImageFileEntryId = MapUtil.getLong(
+			fileEntries, oldCoverImageFileEntryId,
+			oldCoverImageFileEntryId);
+
+		if (coverImageFileEntryId != 0) {
+			PortletFileRepositoryUtil.getPortletFileEntry(
+				coverImageFileEntryId);
+		}
+
+		if (smallImageFileEntryId == 0) {
+			long oldSmallImageFileEntryId = entry.getSmallImageFileEntryId();
+
+			smallImageFileEntryId = MapUtil.getLong(
+				fileEntries, oldSmallImageFileEntryId,
+				oldSmallImageFileEntryId);
+		}
+
 		BlogsEntry importedEntry = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
@@ -333,8 +359,7 @@ public class BlogsEntryStagedModelDataHandler
 
 		importedEntry.setSmallImageId(smallImageFileEntryId);
 		importedEntry.setSmallImageURL(entry.getSmallImageURL());
-		importedEntry.setCoverImageFileEntryId(
-			entry.getCoverImageFileEntryId());
+		importedEntry.setCoverImageFileEntryId(coverImageFileEntryId);
 		importedEntry.setCoverImageURL(entry.getCoverImageURL());
 
 		_blogsEntryPersistece.update(importedEntry);
