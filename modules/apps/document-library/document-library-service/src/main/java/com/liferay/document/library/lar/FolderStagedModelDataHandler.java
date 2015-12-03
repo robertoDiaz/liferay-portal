@@ -17,7 +17,6 @@ package com.liferay.document.library.lar;
 import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.capabilities.ExportImportCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
