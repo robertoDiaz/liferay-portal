@@ -16,6 +16,7 @@ package com.liferay.blogs.lar.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
@@ -78,6 +79,9 @@ public class BlogsEntryStagedModelDataHandlerTest
 			DLAppLocalServiceUtil.getFileEntry(
 				exportedEntry.getCoverImageFileEntryId());
 
+		Folder initialCoverImageFileEntryFolder =
+			initialCoverImageFileEntry.getFolder();
+
 		Assert.assertNotNull(exportedEntry);
 
 		StagedModelDataHandlerUtil.importStagedModel(
@@ -92,6 +96,16 @@ public class BlogsEntryStagedModelDataHandlerTest
 		Assert.assertEquals(
 			initialCoverImageFileEntry.getUuid(),
 			coverImageFileEntry.getUuid());
+		Assert.assertEquals(
+			liveGroup.getGroupId(), coverImageFileEntry.getGroupId());
+
+		Folder coverImageFileEntryFolder = coverImageFileEntry.getFolder();
+
+		Assert.assertEquals(
+			initialCoverImageFileEntryFolder.getUuid(),
+			coverImageFileEntryFolder.getUuid());
+		Assert.assertEquals(
+			liveGroup.getGroupId(), coverImageFileEntryFolder.getGroupId());
 	}
 
 	@Test
@@ -110,6 +124,9 @@ public class BlogsEntryStagedModelDataHandlerTest
 			DLAppLocalServiceUtil.getFileEntry(
 				exportedEntry.getSmallImageFileEntryId());
 
+		Folder initialCoverImageFileEntryFolder =
+			initialSmallImageFileEntry.getFolder();
+
 		Assert.assertNotNull(exportedEntry);
 
 		StagedModelDataHandlerUtil.importStagedModel(
@@ -124,6 +141,16 @@ public class BlogsEntryStagedModelDataHandlerTest
 		Assert.assertEquals(
 			initialSmallImageFileEntry.getUuid(),
 			smallImageFileEntry.getUuid());
+		Assert.assertEquals(
+			liveGroup.getGroupId(), smallImageFileEntry.getGroupId());
+
+		Folder smallImageFileEntryFolder = smallImageFileEntry.getFolder();
+
+		Assert.assertEquals(
+			initialCoverImageFileEntryFolder.getUuid(),
+			smallImageFileEntryFolder.getUuid());
+		Assert.assertEquals(
+			liveGroup.getGroupId(), smallImageFileEntryFolder.getGroupId());
 	}
 
 	protected BlogsEntry addBlogsEntry(
