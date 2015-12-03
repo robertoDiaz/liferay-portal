@@ -155,6 +155,15 @@ public class BlogsEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_WEAK);
 		}
 
+		if (entry.getCoverImageFileEntryId() != 0) {
+			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
+				entry.getCoverImageFileEntryId());
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, entry, fileEntry,
+				PortletDataContext.REFERENCE_TYPE_WEAK);
+		}
+
 		String content =
 			_blogsEntryExportImportContentProcessor.
 				replaceExportContentReferences(
@@ -295,6 +304,14 @@ public class BlogsEntryStagedModelDataHandler
 				}
 			}
 		}
+
+		StagedModelDataHandlerUtil.importReferenceStagedModel(
+			portletDataContext, entry, DLFileEntry.class,
+			entry.getCoverImageFileEntryId());
+
+		StagedModelDataHandlerUtil.importReferenceStagedModel(
+			portletDataContext, entry, DLFileEntry.class,
+			entry.getSmallImageFileEntryId());
 
 		Map<Long, Long> fileEntries =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
