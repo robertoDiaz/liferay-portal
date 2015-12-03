@@ -77,7 +77,7 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 			user.getUserId(), imageTitle, serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId());
+			fileEntry.getFileEntryId(), StringPool.BLANK, StringPool.BLANK);
 
 		return addBlogsEntry(imageSelector);
 	}
@@ -117,7 +117,7 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 			user.getUserId(), coverImageTitle, serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId());
+			fileEntry.getFileEntryId(), StringPool.BLANK, StringPool.BLANK);
 
 		return updateBlogsEntry(blogsEntryId, imageSelector);
 	}

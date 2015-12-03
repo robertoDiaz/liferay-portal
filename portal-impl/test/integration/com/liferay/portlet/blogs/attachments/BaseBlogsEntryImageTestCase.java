@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.model.Group;
@@ -124,7 +125,8 @@ public abstract class BaseBlogsEntryImageTestCase {
 			PortletFileRepositoryUtil.getPortletFileEntry(
 				getImageFileEntry(blogsEntry));
 
-		ImageSelector imageSelector = new ImageSelector(0);
+		ImageSelector imageSelector = new ImageSelector(
+			0, StringPool.BLANK, StringPool.BLANK);
 
 		blogsEntry = updateBlogsEntry(blogsEntry.getEntryId(), imageSelector);
 
@@ -201,7 +203,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 			user.getUserId(), "existingimage1.jpg", serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
-			fileEntry.getFileEntryId(), IMAGE_CROP_REGION);
+			fileEntry.getFileEntryId(), StringPool.BLANK, IMAGE_CROP_REGION);
 
 		addBlogsEntry(imageSelector);
 
@@ -215,7 +217,8 @@ public abstract class BaseBlogsEntryImageTestCase {
 
 		BlogsEntry blogsEntry = addBlogsEntry("image1.jpg");
 
-		ImageSelector imageSelector = new ImageSelector(0);
+		ImageSelector imageSelector = new ImageSelector(
+			0, StringPool.BLANK, StringPool.BLANK);
 
 		updateBlogsEntry(blogsEntry.getEntryId(), imageSelector);
 

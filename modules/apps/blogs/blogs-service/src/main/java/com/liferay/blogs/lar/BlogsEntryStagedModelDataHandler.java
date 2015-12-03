@@ -24,11 +24,10 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Image;
@@ -38,7 +37,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalService;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
@@ -113,6 +111,15 @@ public class BlogsEntryStagedModelDataHandler
 		throws Exception {
 
 		Element entryElement = portletDataContext.getExportDataElement(entry);
+
+		if (entry.getCoverImageFileEntryId() != 0) {
+			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
+				entry.getCoverImageFileEntryId());
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, entry, fileEntry,
+					PortletDataContext.REFERENCE_TYPE_WEAK);
+		}
 
 		if (entry.isSmallImage()) {
 			Image smallImage = _imageLocalService.fetchImage(
@@ -220,90 +227,73 @@ public class BlogsEntryStagedModelDataHandler
 		boolean allowTrackbacks = entry.isAllowTrackbacks();
 		String[] trackbacks = StringUtil.split(entry.getTrackbacks());
 
-		long smallImageFileEntryId = 0;
-
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			entry);
 
-		if (entry.isSmallImage()) {
-			String smallImagePath = entryElement.attributeValue(
-				"small-image-path");
+		Map<Long, Long> fileEntryIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				FileEntry.class);
 
+		ImageSelector coverImageImageSelector = null;
+
+		long coverImageFileEntryId = MapUtil.getLong(
+			fileEntryIds, entry.getCoverImageFileEntryId());
+
+		String coverImageURL = null;
+
+		if (Validator.isNotNull(entry.getCoverImageURL())) {
+			coverImageURL =
+				_blogsEntryExportImportContentProcessor.
+					replaceImportContentReferences(
+						portletDataContext, entry, entry.getCoverImageURL());
+		}
+
+		if ((coverImageFileEntryId != 0) ||
+			Validator.isNotNull(coverImageURL)) {
+
+			coverImageImageSelector = new ImageSelector(
+				coverImageFileEntryId, coverImageURL, null);
+		}
+
+		ImageSelector smallImageImageSelector = null;
+
+		long smallImageFileEntryId = 0;
+		String smallImageURL = null;
+
+		if (entry.isSmallImage()) {
 			if (Validator.isNotNull(entry.getSmallImageURL())) {
-				String smallImageURL =
+				smallImageURL =
 					_blogsEntryExportImportContentProcessor.
 						replaceImportContentReferences(
 							portletDataContext, entry,
 							entry.getSmallImageURL());
-
-				entry.setSmallImageURL(smallImageURL);
 			}
-			else if (Validator.isNotNull(smallImagePath)) {
-				String smallImageFileName =
-					entry.getSmallImageId() + StringPool.PERIOD +
-						entry.getSmallImageType();
 
-				InputStream inputStream = null;
+			if (fileEntryIds.containsKey(entry.getSmallImageId())) {
+				smallImageFileEntryId = MapUtil.getLong(
+					fileEntryIds, entry.getSmallImageId());
 
-				try {
-					inputStream = portletDataContext.getZipEntryAsInputStream(
-						smallImagePath);
-
-					FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
-						serviceContext.getScopeGroupId(), userId,
-						BlogsEntry.class.getName(), smallImageFileName,
-						inputStream,
-						MimeTypesUtil.getContentType(smallImageFileName));
-
-					smallImageFileEntryId = fileEntry.getFileEntryId();
-				}
-				finally {
-					StreamUtil.cleanUp(inputStream);
-				}
+				smallImageImageSelector = new ImageSelector(
+					smallImageFileEntryId, smallImageURL, null);
 			}
-		}
+			else {
+				String smallImagePath = entryElement.attributeValue(
+					"small-image-path");
 
-		if (smallImageFileEntryId == 0) {
-			List<Element> attachmentElements =
-				portletDataContext.getReferenceDataElements(
-					entry, DLFileEntry.class,
-					PortletDataContext.REFERENCE_TYPE_WEAK);
+				if (Validator.isNotNull(smallImagePath)) {
+					String smallImageFileName =
+						entry.getSmallImageId() + StringPool.PERIOD +
+							entry.getSmallImageType();
 
-			for (Element attachmentElement : attachmentElements) {
-				InputStream inputStream = getSmallImageInputStream(
-					portletDataContext, attachmentElement);
+					byte[] bytes = FileUtil.getBytes(
+						portletDataContext.getZipEntryAsInputStream(
+							smallImagePath));
 
-				if (inputStream != null) {
-					String path = attachmentElement.attributeValue("path");
-
-					FileEntry fileEntry =
-						(FileEntry)portletDataContext.getZipEntryAsObject(path);
-
-					FileEntry smallImageFileEntry =
-						TempFileEntryUtil.addTempFileEntry(
-							serviceContext.getScopeGroupId(), userId,
-							BlogsEntry.class.getName(), fileEntry.getTitle(),
-							inputStream, fileEntry.getMimeType());
-
-					if (fileEntry != null) {
-						smallImageFileEntryId =
-							smallImageFileEntry.getFileEntryId();
-					}
+					smallImageImageSelector = new ImageSelector(
+						bytes, smallImageFileName, entry.getSmallImageType(),
+						smallImageURL, null);
 				}
 			}
-		}
-
-		ImageSelector coverImageImageSelector = new ImageSelector(
-			smallImageFileEntryId, entry.getCoverImageURL(), null);
-
-		ImageSelector smallImageImageSelector = null;
-
-		if (!entry.isSmallImage()) {
-			smallImageImageSelector = new ImageSelector(0);
-		}
-		else {
-			smallImageImageSelector = new ImageSelector(
-				smallImageFileEntryId, entry.getSmallImageURL(), null);
 		}
 
 		BlogsEntry importedEntry = null;
