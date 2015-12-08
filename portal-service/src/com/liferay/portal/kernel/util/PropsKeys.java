@@ -1141,7 +1141,6 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_VIEW_PAGE = "layout.view.page";
 
-	@Deprecated
 	public static final String LDAP_ATTRS_TRANSFORMER_IMPL = "ldap.attrs.transformer.impl";
 
 	public static final String LIBRARY_DOWNLOAD_URL = "library.download.url.";
@@ -1853,14 +1852,6 @@ public interface PropsKeys {
 	public static final String SANDBOX_DEPLOY_LISTENERS = "sandbox.deploy.listeners";
 
 	public static final String SANITIZER_IMPL = "sanitizer.impl";
-
-	public static final String SC_IMAGE_MAX_SIZE = "sc.image.max.size";
-
-	public static final String SC_IMAGE_THUMBNAIL_MAX_HEIGHT = "sc.image.thumbnail.max.height";
-
-	public static final String SC_IMAGE_THUMBNAIL_MAX_WIDTH = "sc.image.thumbnail.max.width";
-
-	public static final String SC_PRODUCT_COMMENTS_ENABLED = "sc.product.comments.enabled";
 
 	public static final String SCHEDULER_DESCRIPTION_MAX_LENGTH = "scheduler.description.max.length";
 
