@@ -46,7 +46,7 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 	}
 
 	@Test
-	public void testGetFailedJobMessage() throws Exception {
+	public void testGetGitHubJobMessage() throws Exception {
 		assertSamples();
 	}
 
@@ -112,7 +112,7 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 			runJSONObject.put("url", toURLString(runDir));
 		}
 
-		write(jobJSONFile, jobJSONObject.toString(4));
+		JenkinsResultsParserUtil.write(jobJSONFile, jobJSONObject.toString(4));
 	}
 
 	@Override

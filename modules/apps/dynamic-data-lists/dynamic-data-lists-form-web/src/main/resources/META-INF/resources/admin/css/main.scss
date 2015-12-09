@@ -91,6 +91,10 @@
 		font-size: 14px;
 		position: absolute;
 	}
+
+	.liferay-ddm-form-field-checkbox .toggle-switch-handle .toggle-switch-text {
+		margin-left: 6px;
+	}
 }
 
 @include sm {
@@ -195,6 +199,10 @@
 
 		.liferay-ddm-form-field-text textarea {
 			resize: none;
+		}
+
+		.liferay-ddm-form-field-paragraph p {
+			min-height: 65px;
 		}
 	}
 }
@@ -359,6 +367,10 @@
 			.lfr-ddm-form-field-repeatable-toolbar {
 				display: none;
 			}
+		}
+
+		.liferay-ddm-form-field-text textarea + .input-group-addon {
+			vertical-align: bottom;
 		}
 
 		.lfr-ddm-form-container {

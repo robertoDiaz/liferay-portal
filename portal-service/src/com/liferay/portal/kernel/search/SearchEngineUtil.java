@@ -166,6 +166,12 @@ public class SearchEngineUtil {
 		}
 	}
 
+	public static void commit(String searchEngineId) throws SearchException {
+		for (long companyId : _companyIds.keySet()) {
+			commit(searchEngineId, companyId);
+		}
+	}
+
 	public static void commit(String searchEngineId, long companyId)
 		throws SearchException {
 
@@ -173,7 +179,12 @@ public class SearchEngineUtil {
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
-		indexWriter.commit(companyId);
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
+
+		indexWriter.commit(searchContext);
 	}
 
 	/**

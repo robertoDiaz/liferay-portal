@@ -27,15 +27,16 @@ ProductMenuDisplayContext productMenuDisplayContext = new ProductMenuDisplayCont
 %>
 
 <div aria-controls="#<portlet:namespace /><%= AUIUtil.normalizeId(userPanelCategory.getKey()) %>Collapse" aria-expanded="<%= Validator.equals(userPanelCategory.getKey(), productMenuDisplayContext.getRootPanelCategoryKey()) %>" class="panel-toggler collapse-icon <%= Validator.equals(userPanelCategory.getKey(), productMenuDisplayContext.getRootPanelCategoryKey()) ? StringPool.BLANK : "collapsed" %>" class="collapsed" data-parent="#<portlet:namespace />Accordion" data-toggle="collapse" href="#<portlet:namespace /><%= AUIUtil.normalizeId(userPanelCategory.getKey()) %>Collapse" role="button">
-	<c:if test="<%= notificationsCount > 0 %>">
-		<span class="sticker sticker-right sticker-rounded sticker-sm sticker-warning"><%= notificationsCount %></span>
-	</c:if>
-
 	<liferay-ui:user-portrait
+		imageCssClass="user-icon-lg"
 		userId="<%= user.getUserId() %>"
 	/>
 
 	<span>
 		<%= HtmlUtil.escape(user.getFirstName()) %>
 	</span>
+
+	<c:if test="<%= notificationsCount > 0 %>">
+		<span class="panel-notifications-count sticker sticker-right sticker-rounded sticker-sm sticker-warning"><%= notificationsCount %></span>
+	</c:if>
 </div>

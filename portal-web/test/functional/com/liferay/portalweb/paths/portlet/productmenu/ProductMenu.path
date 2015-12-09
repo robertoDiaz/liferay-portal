@@ -65,7 +65,7 @@
 </tr>
 <tr>
 	<td>PORTLET</td>
-	<td>//div[a[@aria-expanded='true']]//a[contains(@id,'Portlet') and contains(.,'${key_portlet}')]</td>
+	<td>//div[a[@aria-expanded='true']]//a[contains(@id,'Portlet') and contains(@data-title,'${key_portlet}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -110,7 +110,7 @@
 </tr>
 <tr>
 	<td>USER_PROFILE</td>
-	<td>//div[contains(@class,'nameplate')]//a[contains(.,'Profile')]</td>
+	<td>//div[contains(@class,'list-group')]//a[contains(.,'Profile')]</td>
 	<td></td>
 </tr>
 <tr>
