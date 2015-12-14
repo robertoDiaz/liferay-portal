@@ -18,7 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -38,6 +38,7 @@ import com.liferay.portal.model.RecentLayoutSetBranch;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.RecentLayoutSetBranchLocalService;
+import com.liferay.portal.service.persistence.LayoutSetBranchPersistence;
 import com.liferay.portal.service.persistence.RecentLayoutSetBranchPersistence;
 import com.liferay.portal.util.PortalUtil;
 
@@ -375,6 +376,44 @@ public abstract class RecentLayoutSetBranchLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
+	/**
+	 * Returns the layout set branch local service.
+	 *
+	 * @return the layout set branch local service
+	 */
+	public com.liferay.portal.service.LayoutSetBranchLocalService getLayoutSetBranchLocalService() {
+		return layoutSetBranchLocalService;
+	}
+
+	/**
+	 * Sets the layout set branch local service.
+	 *
+	 * @param layoutSetBranchLocalService the layout set branch local service
+	 */
+	public void setLayoutSetBranchLocalService(
+		com.liferay.portal.service.LayoutSetBranchLocalService layoutSetBranchLocalService) {
+		this.layoutSetBranchLocalService = layoutSetBranchLocalService;
+	}
+
+	/**
+	 * Returns the layout set branch persistence.
+	 *
+	 * @return the layout set branch persistence
+	 */
+	public LayoutSetBranchPersistence getLayoutSetBranchPersistence() {
+		return layoutSetBranchPersistence;
+	}
+
+	/**
+	 * Sets the layout set branch persistence.
+	 *
+	 * @param layoutSetBranchPersistence the layout set branch persistence
+	 */
+	public void setLayoutSetBranchPersistence(
+		LayoutSetBranchPersistence layoutSetBranchPersistence) {
+		this.layoutSetBranchPersistence = layoutSetBranchPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.portal.model.RecentLayoutSetBranch",
 			recentLayoutSetBranchLocalService);
@@ -412,7 +451,7 @@ public abstract class RecentLayoutSetBranchLocalServiceBaseImpl
 		try {
 			DataSource dataSource = recentLayoutSetBranchPersistence.getDataSource();
 
-			DB db = DBFactoryUtil.getDB();
+			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
@@ -433,6 +472,10 @@ public abstract class RecentLayoutSetBranchLocalServiceBaseImpl
 	protected RecentLayoutSetBranchPersistence recentLayoutSetBranchPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.portal.service.LayoutSetBranchLocalService.class)
+	protected com.liferay.portal.service.LayoutSetBranchLocalService layoutSetBranchLocalService;
+	@BeanReference(type = LayoutSetBranchPersistence.class)
+	protected LayoutSetBranchPersistence layoutSetBranchPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }
