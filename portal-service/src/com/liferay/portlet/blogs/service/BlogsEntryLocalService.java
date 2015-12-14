@@ -61,6 +61,10 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public com.liferay.portlet.blogs.model.BlogsEntry addBlogsEntry(
 		com.liferay.portlet.blogs.model.BlogsEntry blogsEntry);
 
+	public void addCoverImage(long entryId,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector imageSelector)
+		throws PortalException;
+
 	public com.liferay.portlet.blogs.model.BlogsEntry addEntry(long userId,
 		java.lang.String title, java.lang.String content,
 		java.util.Date displayDate,
@@ -133,6 +137,10 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 
 	public long addOriginalImageFileEntry(long userId, long groupId,
 		long entryId,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector imageSelector)
+		throws PortalException;
+
+	public void addSmallImage(long entryId,
 		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector imageSelector)
 		throws PortalException;
 
@@ -634,7 +642,8 @@ public interface BlogsEntryLocalService extends BaseLocalService,
 	public void updateAsset(long userId,
 		com.liferay.portlet.blogs.model.BlogsEntry entry,
 		long[] assetCategoryIds, java.lang.String[] assetTagNames,
-		long[] assetLinkEntryIds) throws PortalException;
+		long[] assetLinkEntryIds, java.lang.Double priority)
+		throws PortalException;
 
 	/**
 	* Updates the blogs entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
