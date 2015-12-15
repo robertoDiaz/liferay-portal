@@ -184,8 +184,6 @@ public class DefaultWikiListPagesDisplayContext
 				themeDisplay.getUserId(), true,
 				WorkflowConstants.STATUS_APPROVED);
 
-			searchContainer.setTotal(total);
-
 			OrderByComparator<WikiPage> obc =
 				WikiPortletUtil.getPageOrderByComparator(
 					searchContainer.getOrderByCol(),
@@ -207,8 +205,6 @@ public class DefaultWikiListPagesDisplayContext
 
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
-			searchContainer.setTotal(total);
-
 			assetEntryQuery.setEnd(searchContainer.getEnd());
 			assetEntryQuery.setStart(searchContainer.getStart());
 
@@ -229,15 +225,14 @@ public class DefaultWikiListPagesDisplayContext
 		else if (navigation.equals("draft-pages") ||
 				 navigation.equals("pending-pages")) {
 
-			User user = themeDisplay.getUser();
-
-			long draftUserId = user.getUserId();
+			long draftUserId = themeDisplay.getUserId();
 
 			PermissionChecker permissionChecker =
 				themeDisplay.getPermissionChecker();
 
 			if (permissionChecker.isContentReviewer(
-					user.getCompanyId(), themeDisplay.getScopeGroupId())) {
+					themeDisplay.getCompanyId(),
+					themeDisplay.getScopeGroupId())) {
 
 				draftUserId = 0;
 			}
@@ -251,8 +246,6 @@ public class DefaultWikiListPagesDisplayContext
 			total = WikiPageServiceUtil.getPagesCount(
 				themeDisplay.getScopeGroupId(), draftUserId,
 				_wikiNode.getNodeId(), status);
-
-			searchContainer.setTotal(total);
 
 			results = WikiPageServiceUtil.getPages(
 				themeDisplay.getScopeGroupId(), draftUserId,
@@ -270,17 +263,13 @@ public class DefaultWikiListPagesDisplayContext
 				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId(),
 				wikiGroupServiceConfiguration.frontPageName());
 
-			results = new ArrayList<>();
-
-			searchContainer.setTotal(1);
+			total = 1;
 
 			results.add(wikiPage);
 		}
 		else if (navigation.equals("history")) {
 			total = WikiPageLocalServiceUtil.getPagesCount(
 				page.getNodeId(), page.getTitle());
-
-			searchContainer.setTotal(total);
 
 			results = WikiPageLocalServiceUtil.getPages(
 				page.getNodeId(), page.getTitle(), QueryUtil.ALL_POS,
@@ -292,8 +281,6 @@ public class DefaultWikiListPagesDisplayContext
 
 			total = links.size();
 
-			searchContainer.setTotal(total);
-
 			results = ListUtil.subList(
 				links, searchContainer.getStart(), searchContainer.getEnd());
 		}
@@ -302,8 +289,6 @@ public class DefaultWikiListPagesDisplayContext
 				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId());
 
 			total = orphans.size();
-
-			searchContainer.setTotal(total);
 
 			results = ListUtil.subList(
 				orphans, searchContainer.getStart(), searchContainer.getEnd());
@@ -314,8 +299,6 @@ public class DefaultWikiListPagesDisplayContext
 
 			total = links.size();
 
-			searchContainer.setTotal(total);
-
 			results = ListUtil.subList(
 				links, searchContainer.getStart(), searchContainer.getEnd());
 		}
@@ -323,13 +306,12 @@ public class DefaultWikiListPagesDisplayContext
 			total = WikiPageServiceUtil.getRecentChangesCount(
 				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId());
 
-			searchContainer.setTotal(total);
-
 			results = WikiPageServiceUtil.getRecentChanges(
 				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId(),
 				searchContainer.getStart(), searchContainer.getEnd());
 		}
 
+		searchContainer.setTotal(total);
 		searchContainer.setResults(results);
 	}
 
