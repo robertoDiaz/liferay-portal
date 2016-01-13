@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -19,45 +18,13 @@
 <%
 long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
 
-PortletURL checkinURL = PortalUtil.getControlPanelPortletURL(request, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, PortletRequest.ACTION_PHASE);
+FileEntry fileEntry = ActionUtil.getFileEntry(request);
 
-checkinURL.setParameter("javax.portlet.action", "/document_library/edit_file_entry");
-checkinURL.setParameter(Constants.CMD, Constants.CHECKIN);
-checkinURL.setParameter("redirect", currentURL);
-checkinURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
+FileVersion fileVersion = ActionUtil.getFileVersion(request, fileEntry);
 
-String taglibOnClick = renderResponse.getNamespace() + "showVersionDetailsDialog('" + checkinURL.toString() + "')";
+UIItemsBuilder uiItemsBuilder = new UIItemsBuilder(request, fileVersion);
+
+JavaScriptMenuItem javaScriptMenuItem = uiItemsBuilder.getCheckinItem();
 %>
 
-<liferay-ui:icon
-	message="checkin"
-	onClick="<%= taglibOnClick %>"
-	url="javascript:;"
-/>
-
-<aui:script>
-	Liferay.provide(
-		window,
-		'<portlet:namespace />showVersionDetailsDialog',
-		function(form) {
-			Liferay.Portlet.DocumentLibrary.Checkin.showDialog(
-				'<portlet:namespace />versionDetails',
-				'<%= UnicodeLanguageUtil.get(request, "describe-your-changes") %>',
-				function(event) {
-					var $ = AUI.$;
-
-					var majorVersionNode = $("input:radio[name='<portlet:namespace />versionDetailsMajorVersion']:checked");
-
-					form.fm('majorVersion').val(majorVersionNode.val());
-
-					var changeLogNode = $('#<portlet:namespace />versionDetailsChangeLog');
-
-					form.fm('changeLog').val(changeLogNode.val());
-
-					submitForm(form);
-				}
-			);
-		},
-		['document-library-checkin']
-	);
-</aui:script>
+<liferay-ui:menu-item menuItem="<%= javaScriptMenuItem %>" />

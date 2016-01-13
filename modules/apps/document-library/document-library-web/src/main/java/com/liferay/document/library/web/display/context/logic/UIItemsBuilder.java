@@ -118,11 +118,11 @@ public class UIItemsBuilder {
 			getSubmitFormJavaScript(Constants.CANCEL_CHECKOUT, null));
 	}
 
-	public void addCheckinMenuItem(List<MenuItem> menuItems)
+	public JavaScriptMenuItem addCheckinMenuItem(List<MenuItem> menuItems)
 		throws PortalException {
 
 		if (!_fileEntryDisplayContextHelper.isCheckinActionAvailable()) {
-			return;
+			return null;
 		}
 
 		PortletURL portletURL = _getActionURL(
@@ -160,6 +160,8 @@ public class UIItemsBuilder {
 		template.processTemplate(unsyncStringWriter);
 
 		javascriptMenuItem.setJavaScript(unsyncStringWriter.toString());
+
+		return javascriptMenuItem;
 	}
 
 	public void addCheckinToolbarItem(List<ToolbarItem> toolbarItems)
