@@ -326,7 +326,7 @@ if (portletTitleBasedNavigation) {
 							message="add-child-page"
 							method="get"
 							url="<%= addPageURL.toString() %>"
-						/>,
+						/>
 					</c:if>
 				</div>
 
