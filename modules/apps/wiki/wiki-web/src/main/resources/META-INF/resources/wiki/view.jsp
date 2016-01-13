@@ -108,11 +108,6 @@ PortletURL taggedPagesURL = renderResponse.createRenderURL();
 taggedPagesURL.setParameter("mvcRenderCommandName", "/wiki/view_tagged_pages");
 taggedPagesURL.setParameter("nodeId", String.valueOf(node.getNodeId()));
 
-PortletURL viewAttachmentsURL = PortletURLUtil.clone(viewPageURL, renderResponse);
-
-viewAttachmentsURL.setParameter("mvcRenderCommandName", "/wiki/view_page_attachments");
-viewAttachmentsURL.setParameter("redirect", currentURL);
-
 AssetEntryServiceUtil.incrementViewCounter(WikiPage.class.getName(), wikiPage.getResourcePrimKey());
 
 if (Validator.isNotNull(ParamUtil.getString(request, "title"))) {
@@ -333,14 +328,6 @@ if (portletTitleBasedNavigation) {
 							url="<%= addPageURL.toString() %>"
 						/>,
 					</c:if>
-
-					<liferay-ui:icon
-						iconCssClass="icon-paperclip"
-						label="<%= true %>"
-						message='<%= attachmentsFileEntriesCount + " " + LanguageUtil.get(request, (attachmentsFileEntriesCount == 1) ? "attachment" : "attachments") %>'
-						method="get"
-						url="<%= viewAttachmentsURL.toString() %>"
-					/>
 				</div>
 
 				<div class="stats">
@@ -358,6 +345,44 @@ if (portletTitleBasedNavigation) {
 						</c:when>
 					</c:choose>
 				</div>
+
+				<c:if test="<%= attachmentsFileEntriesCount > 0 %>">
+
+					<%
+					List<FileEntry> attachmentsFileEntries = wikiPage.getAttachmentsFileEntries();
+
+					DLCssClassFileMimeTypeProvider dlCssClassFileMimeTypeProvider = (DLCssClassFileMimeTypeProvider)request.getAttribute(WikiWebKeys.DL_CSS_CLASS_FILE_MIME_TYPE_PROVIDER);
+
+					for (FileEntry fileEntry : attachmentsFileEntries) {
+						String rowURL = PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED);
+					%>
+
+						<div class="col-md-4">
+							<liferay-frontend:horizontal-card
+								text="<%= HtmlUtil.escape(fileEntry.getTitle()) %>"
+								url="<%= rowURL %>"
+							>
+								<c:choose>
+									<c:when test="<%= dlCssClassFileMimeTypeProvider != null %>">
+										<liferay-frontend:horizontal-card-icon>
+											<span class="icon-monospaced <%= dlCssClassFileMimeTypeProvider.getCssClassFileMimeType(fileEntry.getMimeType()) %>" style="color:#fff"><%= StringUtil.upperCase(fileEntry.getExtension()) %></span>
+										</liferay-frontend:horizontal-card-icon>
+									</c:when>
+									<c:otherwise>
+										<liferay-frontend:horizontal-card-icon>
+											<span class="icon-monospaced file-icon-color-0" style="color:#fff"><%= StringUtil.upperCase(fileEntry.getExtension()) %></span>
+										</liferay-frontend:horizontal-card-icon>
+									</c:otherwise>
+								</c:choose>
+							</liferay-frontend:horizontal-card>
+						</div>
+
+					<%
+					}
+					%>
+
+				</c:if>
+
 			</div>
 
 			<c:if test="<%= wikiPortletInstanceSettingsHelper.isEnableRelatedAssets() %>">
