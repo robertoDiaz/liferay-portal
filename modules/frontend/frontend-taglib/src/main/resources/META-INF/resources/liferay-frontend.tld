@@ -279,11 +279,6 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>iconHTML</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<description>A CSS class for styling the card image</description>
 			<name>imageCSSClass</name>
 			<required>false</required>
@@ -324,6 +319,11 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+	</tag>
+	<tag>
+		<name>horizontal-card-icon</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.HorizontalCardIcon</tag-class>
+		<body-content>JSP</body-content>
 	</tag>
 	<tag>
 		<description>Creates a lexicon-based card component.</description>

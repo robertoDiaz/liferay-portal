@@ -65,7 +65,7 @@ public class HorizontalCardTag extends CardTag {
 		super.setAttributes(request);
 
 		request.setAttribute("liferay-frontend:card:icon", _icon);
-		request.setAttribute("liferay-frontend:card:icon", _iconHTML);
+		request.setAttribute("liferay-frontend:card:iconHTML", _iconHTML);
 		request.setAttribute("liferay-frontend:card:text", _text);
 	}
 
