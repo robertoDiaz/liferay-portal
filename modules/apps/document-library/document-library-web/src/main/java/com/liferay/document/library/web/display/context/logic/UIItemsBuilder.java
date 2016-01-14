@@ -60,31 +60,26 @@ import com.liferay.taglib.security.PermissionsURLTag;
 
 import java.util.List;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Iván Zaera
  */
 public class UIItemsBuilder {
 
-	public UIItemsBuilder(
-			HttpServletRequest request, HttpServletResponse response,
-			FileShortcut fileShortcut)
+	public UIItemsBuilder(HttpServletRequest request, FileShortcut fileShortcut)
 		throws PortalException {
 
-		this(request, response, fileShortcut.getFileVersion(), fileShortcut);
+		this(request, fileShortcut.getFileVersion(), fileShortcut);
 	}
 
-	public UIItemsBuilder(
-		HttpServletRequest request, HttpServletResponse response,
-		FileVersion fileVersion) {
-
-		this(request, response, fileVersion, null);
+	public UIItemsBuilder(HttpServletRequest request, FileVersion fileVersion) {
+		this(request, fileVersion, null);
 	}
 
 	public void addCancelCheckoutMenuItem(List<MenuItem> menuItems)
@@ -123,11 +118,11 @@ public class UIItemsBuilder {
 			getSubmitFormJavaScript(Constants.CANCEL_CHECKOUT, null));
 	}
 
-	public void addCheckinMenuItem(List<MenuItem> menuItems)
+	public JavaScriptMenuItem addCheckinMenuItem(List<MenuItem> menuItems)
 		throws PortalException {
 
 		if (!_fileEntryDisplayContextHelper.isCheckinActionAvailable()) {
-			return;
+			return null;
 		}
 
 		PortletURL portletURL = _getActionURL(
@@ -165,6 +160,8 @@ public class UIItemsBuilder {
 		template.processTemplate(unsyncStringWriter);
 
 		javascriptMenuItem.setJavaScript(unsyncStringWriter.toString());
+
+		return javascriptMenuItem;
 	}
 
 	public void addCheckinToolbarItem(List<ToolbarItem> toolbarItems)
@@ -620,6 +617,17 @@ public class UIItemsBuilder {
 			"view-original-file", portletURL.toString());
 	}
 
+	public boolean isOpenInMsOfficeActionAvailable() throws PortalException {
+		if (_fileEntryDisplayContextHelper.hasViewPermission() &&
+			_fileVersionDisplayContextHelper.isMsOffice() &&
+			_isWebDAVEnabled() && _isIEOnWin32()) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	protected String getNamespace() {
 		LiferayPortletResponse liferayPortletResponse =
 			_getLiferayPortletResponse();
@@ -678,20 +686,9 @@ public class UIItemsBuilder {
 		return false;
 	}
 
-	protected boolean isOpenInMsOfficeActionAvailable() throws PortalException {
-		if (_fileEntryDisplayContextHelper.hasViewPermission() &&
-			_fileVersionDisplayContextHelper.isMsOffice() &&
-			_isWebDAVEnabled() && _isIEOnWin32()) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private UIItemsBuilder(
-		HttpServletRequest request, HttpServletResponse response,
-		FileVersion fileVersion, FileShortcut fileShortcut) {
+		HttpServletRequest request, FileVersion fileVersion,
+		FileShortcut fileShortcut) {
 
 		try {
 			_request = request;
@@ -754,7 +751,8 @@ public class UIItemsBuilder {
 
 		PortletURL portletURL = liferayPortletResponse.createActionURL();
 
-		portletURL.setParameter("javax.portlet.action", mvcActionCommandName);
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, mvcActionCommandName);
 		portletURL.setParameter(Constants.CMD, cmd);
 		portletURL.setParameter("redirect", _getCurrentURL());
 
