@@ -271,8 +271,16 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 		}
 
 		if (containerModel) {
+			String mvcRenderCommandName = "/message_boards/view";
+
+			if (thread.getCategoryId() !=
+					MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
+
+				mvcRenderCommandName = "/message_boards/view_category";
+			}
+
 			portletURL.setParameter(
-				"mvcRenderCommandName", "/message_boards/view");
+				"mvcRenderCommandName", mvcRenderCommandName);
 		}
 		else {
 			portletURL.setParameter(
@@ -317,8 +325,8 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 		_trashRendererFactory = trashRendererFactory;
 	}
 
-	private volatile MBCategoryLocalService _mbCategoryLocalService;
-	private volatile MBThreadLocalService _mbThreadLocalService;
-	private volatile TrashRendererFactory _trashRendererFactory;
+	private MBCategoryLocalService _mbCategoryLocalService;
+	private MBThreadLocalService _mbThreadLocalService;
+	private TrashRendererFactory _trashRendererFactory;
 
 }

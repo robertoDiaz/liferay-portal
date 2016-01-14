@@ -16,6 +16,7 @@ package com.liferay.gradle.plugins;
 
 import aQute.bnd.osgi.Constants;
 
+import com.liferay.gradle.plugins.change.log.builder.ChangeLogBuilderPlugin;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.node.tasks.PublishNodeModuleTask;
 import com.liferay.gradle.plugins.patcher.PatchTask;
@@ -58,6 +59,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyResolveDetails;
+import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.ModuleVersionSelector;
 import org.gradle.api.artifacts.ResolutionStrategy;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
@@ -109,6 +111,9 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 
 	public static final String COPY_LIBS_TASK_NAME = "copyLibs";
 
+	public static final String DEFAULT_REPOSITORY_URL =
+		"http://cdn.repository.liferay.com/nexus/content/groups/public";
+
 	public static final String JAR_SOURCES_TASK_NAME = "jarSources";
 
 	public static final String PORTAL_TEST_CONFIGURATION_NAME = "portalTest";
@@ -135,11 +140,21 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 
 	protected void addDependenciesTestCompile(Project project) {
 		GradleUtil.addDependency(
-			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-			"org.powermock", "powermock-api-mockito", "1.6.1");
-		GradleUtil.addDependency(
-			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-			"org.powermock", "powermock-core", "1.6.1");
+			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME, "org.mockito",
+			"mockito-core", "1.10.8");
+
+		ModuleDependency moduleDependency =
+			(ModuleDependency)GradleUtil.addDependency(
+				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
+				"org.powermock", "powermock-api-mockito", "1.6.1");
+
+		Map<String, String> excludeArgs = new HashMap<>();
+
+		excludeArgs.put("group", "org.mockito");
+		excludeArgs.put("module", "mockito-all");
+
+		moduleDependency.exclude(excludeArgs);
+
 		GradleUtil.addDependency(
 			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
 			"org.powermock", "powermock-module-junit4", "1.6.1");
@@ -268,6 +283,7 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 	}
 
 	protected void applyPlugins(Project project) {
+		GradleUtil.applyPlugin(project, ChangeLogBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, EclipsePlugin.class);
 		GradleUtil.applyPlugin(project, FindBugsPlugin.class);
 		GradleUtil.applyPlugin(project, IdeaPlugin.class);
@@ -976,8 +992,7 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 		"maven.local.ignore");
 
 	private static final String _REPOSITORY_URL = System.getProperty(
-		"repository.url",
-		"http://cdn.repository.liferay.com/nexus/content/groups/public");
+		"repository.url", DEFAULT_REPOSITORY_URL);
 
 	private static final String _SNAPSHOT_PROPERTY_NAME = "snapshot";
 
