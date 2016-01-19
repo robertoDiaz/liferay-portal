@@ -73,15 +73,14 @@ int nodesCount = WikiNodeServiceUtil.getNodesCount(scopeGroupId);
 %>
 
 <liferay-frontend:management-bar
-	checkBoxDisabled="<%= nodesCount == 0 %>"
+	disabled="<%= nodesCount == 0 %>"
 	includeCheckBox="<%= true %>"
 	searchContainerId="wikiNodes"
 >
 	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-button cssClass="infoPanelToggler" href="javascript:;" icon="info-circle" label="info" />
+		<liferay-frontend:management-bar-button cssClass="infoPanelToggler" disabled="<%= false %>" href="javascript:;" icon="info-circle" label="info" />
 
 		<liferay-frontend:management-bar-display-buttons
-			disabled="<%= nodesCount == 0 %>"
 			displayViews='<%= new String[] {"descriptive", "list"} %>'
 			portletURL="<%= portletURL %>"
 			selectedDisplayStyle="<%= displayStyle %>"
@@ -156,7 +155,7 @@ int nodesCount = WikiNodeServiceUtil.getNodesCount(scopeGroupId);
 					<c:choose>
 						<c:when test='<%= displayStyle.equals("descriptive") %>'>
 							<liferay-ui:search-container-column-icon
-								icon="folder"
+								icon="wiki"
 								toggleRowChecker="<%= true %>"
 							/>
 
