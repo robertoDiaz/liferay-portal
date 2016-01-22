@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
@@ -61,7 +62,8 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
 		"mvc.render.command.name=-",
-		"mvc.render.command.name=/document_library/view"
+		"mvc.render.command.name=/document_library/view",
+		"mvc.render.command.name=/document_library/view_folder"
 	},
 	service = {DLPortletToolbarContributor.class, PortletToolbarContributor.class}
 )
@@ -355,7 +357,7 @@ public class DLPortletToolbarContributor extends BasePortletToolbarContributor {
 
 	@Override
 	protected List<MenuItem> getPortletTitleMenuItems(
-		PortletRequest portletRequest) {
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
