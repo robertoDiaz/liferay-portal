@@ -436,7 +436,7 @@ if (portletTitleBasedNavigation) {
 		toc.find('a.toc-trigger').on(
 			'click',
 			function(event) {
-				index.toggleClass('hide');F
+				index.toggleClass('hide');
 			}
 		);
 	</aui:script>
