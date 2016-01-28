@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.util.FileUtil;
@@ -130,63 +131,59 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return leadingTabCount;
 	}
 
-	protected static boolean isExcludedFile(
-		List<String> exclusionFiles, String absolutePath) {
+	protected static boolean isExcludedPath(
+		List<String> excludes, String path) {
 
-		return isExcludedFile(exclusionFiles, absolutePath, -1);
-	}
-
-	protected static boolean isExcludedFile(
-		List<String> exclusionFiles, String absolutePath, int lineCount) {
-
-		return isExcludedFile(exclusionFiles, absolutePath, lineCount, null);
-	}
-
-	protected static boolean isExcludedFile(
-		List<String> exclusionFiles, String absolutePath, int lineCount,
-		String javaTermName) {
-
-		if (ListUtil.isEmpty(exclusionFiles)) {
-			return false;
-		}
-
-		String absolutePathWithJavaTermName = null;
-
-		if (Validator.isNotNull(javaTermName)) {
-			absolutePathWithJavaTermName =
-				absolutePath + StringPool.AT + javaTermName;
-		}
-
-		String absolutePathWithLineCount = null;
-
-		if (lineCount > 0) {
-			absolutePathWithLineCount =
-				absolutePath + StringPool.AT + lineCount;
-		}
-
-		for (String exclusionFile : exclusionFiles) {
-			if (absolutePath.endsWith(exclusionFile) ||
-				((absolutePathWithJavaTermName != null) &&
-				 absolutePathWithJavaTermName.endsWith(exclusionFile)) ||
-				((absolutePathWithLineCount != null) &&
-				 absolutePathWithLineCount.endsWith(exclusionFile))) {
-
-				return true;
-			}
-		}
-
-		return false;
+		return isExcludedPath(excludes, path, -1);
 	}
 
 	protected static boolean isExcludedPath(
-		List<String> exclusionPaths, String absolutePath) {
+		List<String> excludes, String path, int lineCount) {
 
-		if (ListUtil.isEmpty(exclusionPaths)) {
+		return isExcludedPath(excludes, path, lineCount, null);
+	}
+
+	protected static boolean isExcludedPath(
+		List<String> excludes, String path, int lineCount,
+		String javaTermName) {
+
+		if (ListUtil.isEmpty(excludes)) {
 			return false;
 		}
 
-		for (String exclusionPath : exclusionPaths) {
-			if (absolutePath.contains(exclusionPath)) {
+		String pathWithJavaTermName = null;
+
+		if (Validator.isNotNull(javaTermName)) {
+			pathWithJavaTermName = path + StringPool.AT + javaTermName;
+		}
+
+		String pathWithLineCount = null;
+
+		if (lineCount > 0) {
+			pathWithLineCount = path + StringPool.AT + lineCount;
+		}
+
+		for (String exclude : excludes) {
+			if (exclude.startsWith("**")) {
+				exclude = exclude.substring(2);
+			}
+
+			if (exclude.endsWith("**")) {
+				exclude = exclude.substring(0, exclude.length() - 2);
+
+				if (path.contains(exclude)) {
+					return true;
+				}
+
+				continue;
+			}
+
+			if (path.endsWith(exclude) ||
+				((pathWithJavaTermName != null) &&
+				 pathWithJavaTermName.endsWith(exclude)) ||
+				((pathWithLineCount != null) &&
+				 pathWithLineCount.endsWith(exclude))) {
+
 				return true;
 			}
 		}
@@ -353,9 +350,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected void checkInefficientStringMethods(
 		String line, String fileName, String absolutePath, int lineCount) {
 
-		if (isExcludedPath(getRunOutsidePortalExclusionPaths(), absolutePath) ||
-			fileName.endsWith("GetterUtil.java")) {
-
+		if (isExcludedPath(getRunOutsidePortalExcludes(), absolutePath)) {
 			return;
 		}
 
@@ -384,7 +379,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected void checkLanguageKeys(
-			String fileName, String content, Pattern pattern)
+			String fileName, String absolutePath, String content,
+			Pattern pattern)
 		throws Exception {
 
 		String fileExtension = FilenameUtils.getExtension(fileName);
@@ -437,7 +433,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				}
 
 				Properties moduleLangLanguageProperties =
-					getModuleLangLanguageProperties(fileName);
+					getModuleLangLanguageProperties(absolutePath);
 
 				if ((moduleLangLanguageProperties != null) &&
 					moduleLangLanguageProperties.containsKey(languageKey)) {
@@ -870,10 +866,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			String javaClassName, String packagePath, File file,
 			String fileName, String absolutePath, String content,
 			String javaClassContent, int javaClassLineCount,
-			List<String> checkJavaFieldTypesExclusionFiles,
-			List<String> javaTermAccessLevelModifierExclusionFiles,
-			List<String> javaTermSortExclusionFiles,
-			List<String> testAnnotationsExclusionFiles)
+			List<String> checkJavaFieldTypesExcludes,
+			List<String> javaTermAccessLevelModifierExcludes,
+			List<String> javaTermSortExcludes,
+			List<String> testAnnotationsExcludes)
 		throws Exception {
 
 		JavaSourceProcessor javaSourceProcessor = null;
@@ -890,12 +886,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		JavaClass javaClass = new JavaClass(
 			javaClassName, packagePath, file, fileName, absolutePath,
 			javaClassContent, javaClassLineCount, StringPool.TAB, null,
-			javaTermAccessLevelModifierExclusionFiles, javaSourceProcessor);
+			javaTermAccessLevelModifierExcludes, javaSourceProcessor);
 
 		String newJavaClassContent = javaClass.formatJavaTerms(
 			getAnnotationsExclusions(), getImmutableFieldTypes(),
-			checkJavaFieldTypesExclusionFiles, javaTermSortExclusionFiles,
-			testAnnotationsExclusionFiles);
+			checkJavaFieldTypesExcludes, javaTermSortExcludes,
+			testAnnotationsExcludes);
 
 		if (!javaClassContent.equals(newJavaClassContent)) {
 			return StringUtil.replaceFirst(
@@ -1118,35 +1114,23 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected Properties getBNDFileLanguageProperties(String fileName)
 		throws Exception {
 
-		Properties properties = _bndFileLanguageProperties.get(fileName);
+		Tuple bndFileLocationAndContentTuple =
+			getBNDFileLocationAndContentTuple(fileName);
+
+		if (bndFileLocationAndContentTuple == null) {
+			return null;
+		}
+
+		String bndFileLocation =
+			(String)bndFileLocationAndContentTuple.getObject(0);
+
+		Properties properties = _bndLanguagePropertiesMap.get(bndFileLocation);
 
 		if (properties != null) {
 			return properties;
 		}
 
-		String bndContent = null;
-		String bndFileLocation = fileName;
-
-		while (true) {
-			int pos = bndFileLocation.lastIndexOf(StringPool.SLASH);
-
-			if (pos == -1) {
-				return null;
-			}
-
-			bndFileLocation = bndFileLocation.substring(0, pos + 1);
-
-			File file = new File(bndFileLocation + "bnd.bnd");
-
-			if (file.exists()) {
-				bndContent = FileUtil.read(file);
-
-				break;
-			}
-
-			bndFileLocation = StringUtil.replaceLast(
-				bndFileLocation, StringPool.SLASH, StringPool.BLANK);
-		}
+		String bndContent = (String)bndFileLocationAndContentTuple.getObject(1);
 
 		Matcher matcher = bndContentDirPattern.matcher(bndContent);
 
@@ -1164,12 +1148,52 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 			properties.load(inputStream);
 
-			_bndFileLanguageProperties.put(fileName, properties);
+			_bndLanguagePropertiesMap.put(bndFileLocation, properties);
 
 			return properties;
 		}
 
 		return null;
+	}
+
+	protected Tuple getBNDFileLocationAndContentTuple(String fileName)
+		throws Exception {
+
+		Tuple bndFileLocationAndContentTuple =
+			_bndFileLocationAndContentMap.get(fileName);
+
+		if (bndFileLocationAndContentTuple != null) {
+			return bndFileLocationAndContentTuple;
+		}
+
+		String bndFileLocation = fileName;
+
+		while (true) {
+			int pos = bndFileLocation.lastIndexOf(StringPool.SLASH);
+
+			if (pos == -1) {
+				return null;
+			}
+
+			bndFileLocation = bndFileLocation.substring(0, pos + 1);
+
+			File file = new File(bndFileLocation + "bnd.bnd");
+
+			if (file.exists()) {
+				String bndContent = FileUtil.read(file);
+
+				bndFileLocationAndContentTuple = new Tuple(
+					bndFileLocation, bndContent);
+
+				_bndFileLocationAndContentMap.put(
+					fileName, bndFileLocationAndContentTuple);
+
+				return bndFileLocationAndContentTuple;
+			}
+
+			bndFileLocation = StringUtil.replaceLast(
+				bndFileLocation, StringPool.SLASH, StringPool.BLANK);
+		}
 	}
 
 	protected Map<String, String> getCompatClassNamesMap() throws Exception {
@@ -1423,17 +1447,30 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return _mainReleaseVersion;
 	}
 
-	protected Properties getModuleLangLanguageProperties(String fileName)
+	protected String getModuleLangDir(String moduleLocation) {
+		int x = moduleLocation.lastIndexOf(StringPool.SLASH);
+
+		String baseModuleName = moduleLocation.substring(0, x);
+
+		int y = baseModuleName.lastIndexOf(StringPool.SLASH);
+
+		baseModuleName = baseModuleName.substring(
+			y + 1, baseModuleName.length());
+
+		return moduleLocation.substring(0, x + 1) + baseModuleName + "-lang";
+	}
+
+	protected Properties getModuleLangLanguageProperties(String absolutePath)
 		throws Exception {
 
-		Properties properties = _moduleLangLanguageProperties.get(fileName);
+		Properties properties = _moduleLangLanguageProperties.get(absolutePath);
 
 		if (properties != null) {
 			return properties;
 		}
 
 		String buildGradleContent = null;
-		String buildGradleFileLocation = fileName;
+		String buildGradleFileLocation = absolutePath;
 
 		while (true) {
 			int pos = buildGradleFileLocation.lastIndexOf(StringPool.SLASH);
@@ -1466,19 +1503,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		String moduleLocation = StringUtil.replaceLast(
 			buildGradleFileLocation, StringPool.SLASH, StringPool.BLANK);
 
-		int x = moduleLocation.lastIndexOf(StringPool.SLASH);
+		String moduleLangDir = getModuleLangDir(moduleLocation);
 
-		int y = moduleLocation.indexOf(StringPool.DASH, x);
+		String moduleLangLanguagePropertiesFileName =
+			moduleLangDir + "/src/main/resources/content/Language.properties";
 
-		String baseModuleName = moduleLocation.substring(x + 1, y);
-
-		String moduleLangName = baseModuleName.concat("-lang");
-
-		String moduleLangLanguagePath =
-			moduleLocation.substring(0, x + 1) + moduleLangName +
-				"/src/main/resources/content/Language.properties";
-
-		File file = new File(moduleLangLanguagePath);
+		File file = new File(moduleLangLanguagePropertiesFileName);
 
 		if (!file.exists()) {
 			return null;
@@ -1490,7 +1520,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		properties.load(inputStream);
 
-		_moduleLangLanguageProperties.put(fileName, properties);
+		_moduleLangLanguageProperties.put(absolutePath, properties);
 
 		return properties;
 	}
@@ -1552,17 +1582,17 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			GetterUtil.getString(getProperty(key)), StringPool.COMMA);
 	}
 
-	protected List<String> getRunOutsidePortalExclusionPaths() {
-		if (_runOutsidePortalExclusionPaths != null) {
-			return _runOutsidePortalExclusionPaths;
+	protected List<String> getRunOutsidePortalExcludes() {
+		if (_runOutsidePortalExcludes != null) {
+			return _runOutsidePortalExcludes;
 		}
 
-		List<String> runOutsidePortalExclusionPaths = getPropertyList(
-			"run.outside.portal.excludes.paths");
+		List<String> runOutsidePortalExcludes = getPropertyList(
+			"run.outside.portal.excludes");
 
-		_runOutsidePortalExclusionPaths = runOutsidePortalExclusionPaths;
+		_runOutsidePortalExcludes = runOutsidePortalExcludes;
 
-		return _runOutsidePortalExclusionPaths;
+		return _runOutsidePortalExcludes;
 	}
 
 	protected boolean hasMissingParentheses(String s) {
@@ -1668,6 +1698,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected void postFormat() throws Exception {
+	}
+
+	protected void printError(String fileName, String message) {
+		_sourceFormatterHelper.printError(fileName, message);
 	}
 
 	protected void processErrorMessage(String fileName, String message) {
@@ -2175,8 +2209,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	private Set<String> _annotationsExclusions;
-	private Map<String, Properties> _bndFileLanguageProperties =
-		new HashMap<>();
+	private Map<String, Tuple> _bndFileLocationAndContentMap = new HashMap<>();
+	private Map<String, Properties> _bndLanguagePropertiesMap = new HashMap<>();
 	private Map<String, String> _compatClassNamesMap;
 	private String _copyright;
 	private Map<String, List<String>> _errorMessagesMap = new HashMap<>();
@@ -2191,7 +2225,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	private String _oldCopyright;
 	private Properties _portalLanguageProperties;
 	private Properties _properties;
-	private List<String> _runOutsidePortalExclusionPaths;
+	private List<String> _runOutsidePortalExcludes;
 	private SourceFormatterHelper _sourceFormatterHelper;
 	private boolean _usePortalCompatImport;
 

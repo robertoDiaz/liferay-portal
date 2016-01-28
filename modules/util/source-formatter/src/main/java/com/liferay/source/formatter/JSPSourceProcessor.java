@@ -292,13 +292,12 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		newContent = StringUtil.replace(
 			newContent,
 			new String[] {
-				"<br/>", "\"/>", "\" >", ">'/>", ">' >", "@page import", "\"%>",
-				")%>", "function (", "javascript: ", "){\n", ";;\n", "\n\n\n"
+				"<br/>", "@page import", "\"%>", ")%>", "function (",
+				"javascript: ", "){\n", ";;\n", "\n\n\n"
 			},
 			new String[] {
-				"<br />", "\" />", "\">", ">' />", ">'>", "@ page import",
-				"\" %>", ") %>", "function(", "javascript:", ") {\n", ";\n",
-				"\n\n"
+				"<br />", "@ page import", "\" %>", ") %>", "function(",
+				"javascript:", ") {\n", ";\n", "\n\n"
 			});
 
 		newContent = fixRedirectBackURL(newContent);
@@ -365,10 +364,14 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		newContent = fixSessionKey(
 			fileName, newContent, taglibSessionKeyPattern);
 
-		checkLanguageKeys(fileName, newContent, languageKeyPattern);
-		checkLanguageKeys(fileName, newContent, _taglibLanguageKeyPattern1);
-		checkLanguageKeys(fileName, newContent, _taglibLanguageKeyPattern2);
-		checkLanguageKeys(fileName, newContent, _taglibLanguageKeyPattern3);
+		checkLanguageKeys(
+			fileName, absolutePath, newContent, languageKeyPattern);
+		checkLanguageKeys(
+			fileName, absolutePath, newContent, _taglibLanguageKeyPattern1);
+		checkLanguageKeys(
+			fileName, absolutePath, newContent, _taglibLanguageKeyPattern2);
+		checkLanguageKeys(
+			fileName, absolutePath, newContent, _taglibLanguageKeyPattern3);
 
 		checkXSS(fileName, newContent);
 
@@ -382,6 +385,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		newContent = checkPrincipalException(newContent);
 
 		newContent = formatLogFileName(absolutePath, newContent);
+
+		newContent = formatDefineObjects(newContent);
 
 		// LPS-59076
 
@@ -420,8 +425,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 	protected List<String> doGetFileNames() throws Exception {
 		_moveFrequentlyUsedImportsToCommonInit = GetterUtil.getBoolean(
 			getProperty("move.frequently.used.imports.to.common.init"));
-		_unusedVariablesExclusionFiles = getPropertyList(
-			"jsp.unused.variables.excludes.files");
+		_unusedVariablesExcludes = getPropertyList(
+			"jsp.unused.variables.excludes");
 
 		String[] excludes = new String[] {"**/null.jsp", "**/tools/**"};
 
@@ -537,6 +542,39 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		return newContent;
 	}
 
+	protected String formatDefineObjects(String content) {
+		Matcher matcher = _missingEmptyLineBetweenDefineOjbectsPattern.matcher(
+			content);
+
+		if (matcher.find()) {
+			content = StringUtil.replaceFirst(
+				content, "\n", "\n\n", matcher.start());
+		}
+
+		String previousDefineObjectsTag = null;
+
+		matcher = _defineObjectsPattern.matcher(content);
+
+		while (matcher.find()) {
+			String defineObjectsTag = matcher.group(1);
+
+			if (Validator.isNotNull(previousDefineObjectsTag) &&
+				(previousDefineObjectsTag.compareTo(defineObjectsTag) > 0)) {
+
+				content = StringUtil.replaceFirst(
+					content, previousDefineObjectsTag, defineObjectsTag);
+				content = StringUtil.replaceLast(
+					content, defineObjectsTag, previousDefineObjectsTag);
+
+				return content;
+			}
+
+			previousDefineObjectsTag = defineObjectsTag;
+		}
+
+		return content;
+	}
+
 	protected String formatJSP(
 			String fileName, String absolutePath, String content)
 		throws Exception {
@@ -620,8 +658,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 				if (javaSource) {
 					if (portalSource &&
-						!isExcludedFile(
-							_unusedVariablesExclusionFiles, absolutePath,
+						!isExcludedPath(
+							_unusedVariablesExcludes, absolutePath,
 							lineCount) &&
 						!_jspContents.isEmpty() &&
 						hasUnusedVariable(fileName, trimmedLine)) {
@@ -634,6 +672,20 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					!trimmedLine.startsWith(StringPool.STAR)) {
 
 					line = formatWhitespace(line, trimmedLine, javaSource);
+
+					if (line.endsWith(">")) {
+						if (line.endsWith("/>")) {
+							if (!trimmedLine.equals("/>") &&
+								!line.endsWith(" />")) {
+
+								line = StringUtil.replaceLast(
+									line, "/>", " />");
+							}
+						}
+						else if (line.endsWith(" >")) {
+							line = StringUtil.replaceLast(line, " >", ">");
+						}
+					}
 				}
 
 				// LPS-47179
@@ -1709,13 +1761,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"**/*.jsp", "**/*.jspf", "**/*.vm"
 	};
 
-	private static final String[] _TAG_LIBRARIES = new String[] {
-		"aui", "c", "html", "jsp", "liferay-portlet", "liferay-security",
-		"liferay-theme", "liferay-ui", "liferay-util", "portlet", "struts",
-		"tiles"
-	};
-
 	private Set<String> _checkedForIncludesFileNames = new HashSet<>();
+	private final Pattern _defineObjectsPattern = Pattern.compile(
+		"\n\t*(<.*:defineObjects />)\n");
 	private final List<String> _duplicateImportClassNames = new ArrayList<>();
 	private final Pattern _emptyLineInNestedTagsPattern1 = Pattern.compile(
 		"\n(\t*)<[a-z-]*:.*[^/]>\n\n(\t*)<[a-z-]*:.*>\n");
@@ -1746,6 +1794,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"(<.*\n*taglib uri=\".*>\n*)+", Pattern.MULTILINE);
 	private final Pattern _logPattern = Pattern.compile(
 		"Log _log = LogFactoryUtil\\.getLog\\(\"(.*?)\"\\)");
+	private final Pattern _missingEmptyLineBetweenDefineOjbectsPattern =
+		Pattern.compile("<.*:defineObjects />\n<.*:defineObjects />\n");
 	private boolean _moveFrequentlyUsedImportsToCommonInit;
 	private Set<String> _primitiveTagAttributeDataTypes;
 	private final Pattern _redirectBackURLPattern = Pattern.compile(
@@ -1765,7 +1815,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 	private final Pattern _taglibLanguageKeyPattern3 = Pattern.compile(
 		"(liferay-ui:)(?:input-resource) .*id=\"([^<=%\\[\\s]+)\"(?!.*title=" +
 			"(?:'|\").+(?:'|\"))");
-	private List<String> _unusedVariablesExclusionFiles;
+	private List<String> _unusedVariablesExcludes;
 	private String _utilTaglibDirName;
 	private final Pattern _xssPattern = Pattern.compile(
 		"\\s+([^\\s]+)\\s*=\\s*(Bean)?ParamUtil\\.getString\\(");
