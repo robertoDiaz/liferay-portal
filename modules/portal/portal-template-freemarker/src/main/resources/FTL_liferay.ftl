@@ -105,33 +105,14 @@ ${languageUtil.format(locale, key, arguments)}</#macro>
 
 <#macro navigation_menu
 	default_preferences = ""
+	instance_id = ""
 >
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
+		instanceId=instance_id
 		portletProviderAction=portletProviderAction.VIEW
 		portletProviderClassName="com.liferay.portal.theme.NavItem"
 	/>
-</#macro>
-
-<#macro product_menu>
-	<#if themeDisplay.isImpersonated() || (is_setup_complete && is_signed_in)>
-		<@liferay_portlet["runtime"]
-			portletProviderAction=portletProviderAction.VIEW
-			portletProviderClassName="com.liferay.admin.kernel.util.PortalProductMenuApplicationType$ProductMenu"
-		/>
-	</#if>
-</#macro>
-
-<#macro product_menu_sidebar
-	state
->
-	<#if themeDisplay.isImpersonated() || (is_setup_complete && is_signed_in)>
-		<div class="${state} lfr-product-menu-panel sidenav-fixed sidenav-menu-slider" id="sidenavSliderId">
-			<div class="product-menu sidebar sidenav-menu">
-				<@liferay.product_menu />
-			</div>
-		</div>
-	</#if>
 </#macro>
 
 <#macro search

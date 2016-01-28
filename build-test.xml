@@ -1255,13 +1255,14 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 		<sequential>
 			<echo file="${liferay.home}/osgi/portal/com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration.cfg">
 				additionalConfigurations=\
-					cluster.routing.allocation.disk.threshold_enabled: false,\
-					cluster.service.slow_task_logging_threshold: 600s, \
-					index.indexing.slowlog.threshold.index.warn: 600s,\
-					index.search.slowlog.threshold.fetch.warn: 600s,\
-					index.search.slowlog.threshold.query.warn: 600s,\
-					monitor.jvm.gc.old.warn: 600s,\
+					cluster.routing.allocation.disk.threshold_enabled: false\n\
+					cluster.service.slow_task_logging_threshold: 600s\n\
+					index.indexing.slowlog.threshold.index.warn: 600s\n\
+					index.search.slowlog.threshold.fetch.warn: 600s\n\
+					index.search.slowlog.threshold.query.warn: 600s\n\
+					monitor.jvm.gc.old.warn: 600s\n\
 					monitor.jvm.gc.young.warn: 600s
+				logExceptionsOnly=false
 			</echo>
 		</sequential>
 	</macrodef>
@@ -2676,6 +2677,18 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<record action="stop" name="${project.dir}/log" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-test-smtp-server">
+ 		<sequential>
+			<mirrors-get dest="MockMock.jar" src="${test.smtp.server.url}" />
+
+			<parallel>
+				<daemons>
+					<java jar="MockMock.jar" fork="true" />
+				</daemons>
+			</parallel>
 		</sequential>
 	</macrodef>
 
@@ -7245,9 +7258,20 @@ jdbc.default.password=${database.mysql.password}</echo>
 			</then>
 		</if>
 
+		<get-testcase-property property.name="test.smtp.server.enabled" />
+
+ 		<if>
+ 			<equals arg1="${test.smtp.server.enabled}" arg2="true" />
+ 			<then>
+ 				<start-test-smtp-server />
+ 			</then>
+ 		</if>
+
 		<antcall target="deploy-osgi-modules" />
 
-		<antcall target="deploy-specified-plugins" />
+		<antcall target="deploy-specified-plugins">
+			<param name="test.class" value="${test.class}" />
+		</antcall>
 
 		<antcall target="deploy-extra-apps" />
 

@@ -46,6 +46,7 @@ page import="com.liferay.document.library.web.search.EntriesMover" %><%@
 page import="com.liferay.document.library.web.settings.internal.DLPortletInstanceSettings" %><%@
 page import="com.liferay.document.library.web.util.DLBreadcrumbUtil" %><%@
 page import="com.liferay.document.library.web.util.DLWebComponentProvider" %><%@
+page import="com.liferay.document.library.web.util.IGUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.DDMFormValues" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.DDMStructure" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.DDMStructureManager" %><%@
@@ -107,7 +108,6 @@ page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.Menu" %><%@
-page import="com.liferay.portal.kernel.servlet.taglib.ui.MenuItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem" %><%@
 page import="com.liferay.portal.kernel.upload.LiferayFileItemException" %><%@
@@ -227,7 +227,6 @@ page import="com.liferay.portlet.documentlibrary.util.PDFProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.RawMetadataProcessor" %><%@
 page import="com.liferay.portlet.documentlibrary.util.VideoProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator" %><%@
-page import="com.liferay.portlet.imagegallerydisplay.util.IGUtil" %><%@
 page import="com.liferay.portlet.trash.model.TrashEntry" %><%@
 page import="com.liferay.portlet.trash.util.TrashUtil" %><%@
 page import="com.liferay.portlet.usersadmin.search.GroupSearch" %><%@
@@ -252,11 +251,11 @@ page import="java.util.Map" %>
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
-
 <liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
+
+<portlet:defineObjects />
 
 <%
 WindowState windowState = liferayPortletRequest.getWindowState();
