@@ -57,7 +57,6 @@ page import="com.liferay.portal.service.LayoutSetBranchLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.permission.GroupPermissionUtil" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portal.util.PortletKeys" %><%@
-page import="com.liferay.portlet.PortletURLUtil" %><%@
 page import="com.liferay.portlet.exportimport.lar.ExportImportDateUtil" %><%@
 page import="com.liferay.portlet.exportimport.lar.ExportImportHelperUtil" %><%@
 page import="com.liferay.portlet.exportimport.lar.ManifestSummary" %><%@
@@ -85,30 +84,22 @@ page import="java.util.Set" %>
 
 <%@ page import="javax.portlet.PortletMode" %><%@
 page import="javax.portlet.PortletRequest" %><%@
-page import="javax.portlet.PortletResponse" %><%@
-page import="javax.portlet.PortletURL" %>
-
-<portlet:defineObjects />
+page import="javax.portlet.PortletResponse" %>
 
 <liferay-frontend:defineObjects />
 
+<liferay-staging:defineObjects />
+
 <liferay-theme:defineObjects />
 
-<liferay-staging:defineObjects />
+<portlet:defineObjects />
 
 <%
 PortletRequest portletRequest = (PortletRequest)request.getAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
 
 PortletResponse portletResponse = (PortletResponse)request.getAttribute(JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-String currentURL = null;
-
-if ((portletRequest != null) && (portletResponse != null)) {
-	PortletURL currentURLObj = PortletURLUtil.getCurrent(PortalUtil.getLiferayPortletRequest(portletRequest), PortalUtil.getLiferayPortletResponse(portletResponse));
-
-	currentURL = currentURLObj.toString();
-}
-else {
+if ((portletRequest == null) || (portletResponse == null)) {
 	currentURL = PortalUtil.getCurrentURL(request);
 }
 %>

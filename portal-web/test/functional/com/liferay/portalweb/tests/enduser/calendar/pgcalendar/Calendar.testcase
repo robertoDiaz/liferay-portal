@@ -1970,8 +1970,6 @@
 	</command>
 
 	<command name="ConfigureDisplayTimeZone" priority="5">
-		<property name="portal.acceptance" value="true" />
-
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
@@ -2005,9 +2003,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="CalendarScheduler#selectEvent">
+		<execute macro="CalendarScheduler#selectSpecificEvent">
 			<var name="eventTitle" value="Calendar Event Title" />
-			<var name="eventType" value="Regular" />
 		</execute>
 
 		<execute macro="CalendarScheduler#viewEventTimesViaDialogBox">
@@ -3697,7 +3694,7 @@
 			<return from="defaultSiteName" name="defaultSiteName" />
 		</execute>
 
-		<var name="calendarName" value="Liferay" />
+		<var name="calendarName" value="${defaultSiteName}" />
 		<var name="calendarType" value="Current Site Calendars" />
 		<var name="eventComment" value="Calendar Event Regular Comment" />
 		<var name="eventTitle" value="Calendar Event Regular Title" />
@@ -4500,9 +4497,8 @@
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="${siteName}" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">

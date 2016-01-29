@@ -249,6 +249,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DATA_PROVIDERS</td>
+	<td>//a[@role='menuitem']//span[contains(.,'Data Providers')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DEACTIVATE</td>
 	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Deactivate')]</td>
 	<td></td>
@@ -265,7 +270,12 @@
 </tr>
 <tr>
 	<td>DELETE_VERSION</td>
-	<td>//a[@role='menuitem' and contains(.,'Delete Version')]</td>
+	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Delete Version')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'Details')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -479,6 +489,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>METADATA</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'Metadata')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>METADATA_SETS</td>
 	<td>//a[@role='menuitem']//span[contains(.,'Metadata Sets')]</td>
 	<td></td>
@@ -564,6 +579,11 @@
 	<td></td>
 </tr>
 <tr>
+ 	<td>PUBLISH</td>
+ 	<td>//a[@role='menuitem']//span[contains(.,'Publish')]</td>
+ 	<td></td>
+</tr>
+<tr>
 	<td>PUBLISH_TO_LIVE</td>
 	<td>//a[@role='menuitem' and contains(.,'Publish to Live')]</td>
 	<td></td>
@@ -635,7 +655,7 @@
 </tr>
 <tr>
 	<td>REVERT</td>
-	<td>//a[@role='menuitem' and contains(.,'Revert')]</td>
+	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Revert')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -666,6 +686,11 @@
 <tr>
 	<td>SCOPE_SELECTION</td>
 	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'${key_scopeSelection}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECTED_ASSET</td>
+	<td>//a[@role='menuitem' and contains(.,'${key_selectedAsset}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -726,6 +751,11 @@
 <tr>
 	<td>SORT_BY_TITLE</td>
 	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPLIT_THREAD</td>
+	<td>//a[@role='menuitem' and contains(.,'Split Thread')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -821,6 +851,11 @@
 <tr>
 	<td>VERSION</td>
 	<td>//span[@class='workflow-version']/strong</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VERSIONS</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'Versions')]</td>
 	<td></td>
 </tr>
 <tr>
