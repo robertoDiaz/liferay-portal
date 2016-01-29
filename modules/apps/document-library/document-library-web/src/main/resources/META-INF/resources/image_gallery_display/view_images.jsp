@@ -96,28 +96,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 							imageUrl="<%= imageURL %>"
 							resultRow="<%= row %>"
 							title="<%= fileEntry.getTitle() %>"
-						>
-
-							<%
-							List assetTags = AssetTagServiceUtil.getTags(DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
-							%>
-
-							<liferay-frontend:vertical-card-footer>
-								<div id="<portlet:namespace />categorizationContainer_<%= fileEntry.getFileEntryId() %>" style="display: none;">
-									<span <%= !assetTags.isEmpty() ? "class=\"has-tags\"" : "" %>>
-										<liferay-ui:asset-categories-summary
-											className="<%= DLFileEntryConstants.getClassName() %>"
-											classPK="<%= fileEntry.getFileEntryId() %>"
-										/>
-									</span>
-
-									<liferay-ui:asset-tags-summary
-										className="<%= DLFileEntryConstants.getClassName() %>"
-										classPK="<%= fileEntry.getFileEntryId() %>"
-									/>
-								</div>
-							</liferay-frontend:vertical-card-footer>
-						</liferay-frontend:vertical-card>
+						/>
 					</div>
 				</liferay-ui:search-container-column-text>
 			</c:when>
