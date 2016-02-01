@@ -22,7 +22,7 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 SocialActivity socialActivity = null;
 
 if (row == null) {
-	socialActivity = (SocialActivity)request.getAttribute("info_panel.jsp-socialActivity");
+	socialActivity = (SocialActivity)request.getAttribute("page_info_panel.jsp-socialActivity");
 }
 else {
 	socialActivity = (SocialActivity)row.getObject();
@@ -77,3 +77,5 @@ WikiPage socialActivityWikiPage = WikiPageLocalServiceUtil.fetchPage(wikiPage.ge
 		/>
 	</liferay-ui:icon-menu>
 </c:if>
+
+<%@ include file="/wiki/compare_versions_pop_up.jspf" %>

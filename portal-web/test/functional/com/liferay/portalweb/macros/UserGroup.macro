@@ -18,21 +18,24 @@
 		<if>
 			<equals arg1="${userGroupNameVariation}" arg2="Asterik" />
 			<then>
-				<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-				<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
+				<execute macro="Alert#viewRequestFailedToComplete" />
+
+				<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
 			</then>
 			<elseif>
 				<equals arg1="${userGroupNameVariation}" arg2="Comma" />
 				<then>
-					<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-					<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
+					<execute macro="Alert#viewRequestFailedToComplete" />
+
+					<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
 				</then>
 			</elseif>
 			<elseif>
 				<equals arg1="${userGroupNameVariation}" arg2="Duplicate" />
 				<then>
-					<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-					<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="Please enter a unique name." />
+					<execute macro="Alert#viewRequestFailedToComplete" />
+
+					<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="Please enter a unique name." />
 				</then>
 			</elseif>
 			<elseif>
@@ -44,8 +47,9 @@
 			<elseif>
 				<equals arg1="${userGroupNameVariation}" arg2="Number" />
 				<then>
-					<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-					<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
+					<execute macro="Alert#viewRequestFailedToComplete" />
+
+					<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="The User Group Name cannot be blank, numeric or a reserved word such as null. The User Group Name cannot contain the following invalid characters: , *." />
 				</then>
 			</elseif>
 			<else>
@@ -237,8 +241,9 @@
 
 		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
 
-		<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-		<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="You cannot delete user groups that have users." />
+		<execute macro="Alert#viewRequestFailedToComplete" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="You cannot delete user groups that have users." />
 	</command>
 
 	<command name="editCP">

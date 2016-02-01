@@ -47,7 +47,7 @@ String displayStyle = GetterUtil.getString((String)request.getAttribute("view.js
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
-portletURL.setParameter("mvcRenderCommandName", "/document_library/view");
+portletURL.setParameter("mvcRenderCommandName", (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) ? "/document_library/view" : "/document_library/view_folder");
 portletURL.setParameter("navigation", navigation);
 portletURL.setParameter("curFolder", currentFolder);
 portletURL.setParameter("deltaFolder", deltaFolder);
@@ -327,9 +327,17 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 									url="<%= rowURL != null ? rowURL.toString() : null %>"
 								>
 									<liferay-frontend:vertical-card-sticker-bottom>
-										<div class="sticker sticker-bottom <%= dlViewFileVersionDisplayContext.getCssClassFileMimeType() %>">
-											<%= StringUtil.shorten(StringUtil.upperCase(latestFileVersion.getExtension()), 3, StringPool.BLANK) %>
-										</div>
+										<c:if test="<%= Validator.isNotNull(latestFileVersion.getExtension()) %>">
+											<div class="sticker sticker-bottom <%= dlViewFileVersionDisplayContext.getCssClassFileMimeType() %>">
+												<%= StringUtil.shorten(StringUtil.upperCase(latestFileVersion.getExtension()), 3, StringPool.BLANK) %>
+											</div>
+										</c:if>
+
+										<c:if test="<%= fileEntry.hasLock() %>">
+											<div class="file-icon-color-0 sticker sticker-right">
+												<aui:icon cssClass="icon-monospaced" image="lock" markupView="lexicon" message="locked" />
+											</div>
+										</c:if>
 									</liferay-frontend:vertical-card-sticker-bottom>
 
 									<liferay-frontend:vertical-card-header>
@@ -354,10 +362,16 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 								%>
 
 								<liferay-ui:search-container-column-text
-									href="<%= rowURL %>"
 									name="title"
-									value="<%= latestFileVersion.getTitle() %>"
-								/>
+								>
+									<aui:a href="<%= rowURL.toString() %>"><%= latestFileVersion.getTitle() %></aui:a>
+
+									<c:if test="<%= fileEntry.hasLock() %>">
+										<span>
+											<aui:icon cssClass="icon-monospaced" image="lock" markupView="lexicon" message="locked" />
+										</span>
+									</c:if>
+								</liferay-ui:search-container-column-text>
 							</c:if>
 
 							<c:if test='<%= ArrayUtil.contains(entryColumns, "size") %>'>
@@ -457,7 +471,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 							PortletURL rowURL = liferayPortletResponse.createRenderURL();
 
-							rowURL.setParameter("mvcRenderCommandName", "/document_library/view");
+							rowURL.setParameter("mvcRenderCommandName", "/document_library/view_folder");
 							rowURL.setParameter("redirect", currentURL);
 							rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
 							%>
@@ -471,9 +485,11 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 									text="<%= HtmlUtil.escape(curFolder.getName()) %>"
 									url="<%= rowURL.toString() %>"
 								>
-									<liferay-frontend:horizontal-card-icon>
-										<span class="icon-monospaced <%= curFolder.isMountPoint() ? "icon-hdd" : "icon-folder-close-alt" %>"></span>
-									</liferay-frontend:horizontal-card-icon>
+									<liferay-frontend:horizontal-card-col>
+										<liferay-frontend:horizontal-card-icon
+											icon='<%= curFolder.isMountPoint() ? "repository" : "folder" %>'
+										/>
+									</liferay-frontend:horizontal-card-col>
 								</liferay-frontend:horizontal-card>
 							</liferay-ui:search-container-column-text>
 						</c:when>
@@ -483,7 +499,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 								<%
 								PortletURL rowURL = liferayPortletResponse.createRenderURL();
 
-								rowURL.setParameter("mvcRenderCommandName", "/document_library/view");
+								rowURL.setParameter("mvcRenderCommandName", "/document_library/view_folder");
 								rowURL.setParameter("redirect", currentURL);
 								rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
 								%>

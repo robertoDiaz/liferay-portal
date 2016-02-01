@@ -70,7 +70,7 @@ public class ThemeContributorExtender extends AbstractExtender {
 	protected Extension doCreateExtension(Bundle bundle) throws Exception {
 		Dictionary<String, String> headers = bundle.getHeaders();
 
-		String type = headers.get("Theme-Contributor-Type");
+		String type = headers.get("Liferay-Theme-Contributor-Type");
 
 		if (type == null) {
 			URL entryURL = bundle.getEntry("/package.json");
@@ -84,10 +84,12 @@ public class ThemeContributorExtender extends AbstractExtender {
 					JSONObject packageJsonObject = new JSONObject(jsonTokener);
 
 					JSONObject liferayThemeJSONObject =
-						packageJsonObject.getJSONObject("liferayTheme");
+						packageJsonObject.optJSONObject("liferayTheme");
 
-					type = liferayThemeJSONObject.getString(
-						"themeContributorType");
+					if (liferayThemeJSONObject != null) {
+						type = liferayThemeJSONObject.getString(
+							"themeContributorType");
+					}
 				}
 				catch (IOException ioe) {
 					throw new RuntimeException(ioe);

@@ -83,7 +83,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebAppPool;
 import com.liferay.portlet.PortletBagFactory;
 import com.liferay.portlet.PortletConfigFactoryUtil;
-import com.liferay.portlet.PortletContextFactory;
+import com.liferay.portlet.PortletContextFactoryUtil;
 import com.liferay.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletQNameUtil;
@@ -328,6 +328,17 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		resourceActionLocalService.checkResourceActions(
 			portlet.getPortletId(), portletActions);
+
+		List<String> modelNames = ResourceActionsUtil.getPortletModelResources(
+			portlet.getPortletId());
+
+		for (String modelName : modelNames) {
+			List<String> modelActions =
+				ResourceActionsUtil.getModelResourceActions(modelName);
+
+			resourceActionLocalService.checkResourceActions(
+				modelName, modelActions);
+		}
 
 		PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
 			portlet.getCompanyId(), WebKeys.PORTLET_CATEGORY);
@@ -852,14 +863,14 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					PortletInstanceFactoryUtil.clear(portlet);
 
 					PortletConfigFactoryUtil.destroy(portlet);
-					PortletContextFactory.destroy(portlet);
+					PortletContextFactoryUtil.destroy(portlet);
 				}
 
 				portlet = entry.getValue();
 
 				_portletsMap.put(entry.getKey(), portlet);
 
-				portletBagFactory.create(portlet);
+				portletBagFactory.create(portlet, true);
 			}
 
 			// Sprite images
@@ -882,7 +893,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					PortletInstanceFactoryUtil.clear(portlet);
 
 					PortletConfigFactoryUtil.destroy(portlet);
-					PortletContextFactory.destroy(portlet);
+					PortletContextFactoryUtil.destroy(portlet);
 				}
 			}
 

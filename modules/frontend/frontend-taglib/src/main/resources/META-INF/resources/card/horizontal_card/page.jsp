@@ -34,11 +34,11 @@
 	</c:otherwise>
 </c:choose>
 
-<div class="card card-horizontal <%= Validator.isNotNull(cssClass) ? cssClass : StringPool.BLANK %>" <%= AUIUtil.buildData(data) %> >
+<div class="card card-horizontal <%= Validator.isNotNull(cssClass) ? cssClass : StringPool.BLANK %>" <%= AUIUtil.buildData(data) %>>
 	<div class="card-row card-row-padded <%= showCheckbox ? "selectable" : StringPool.BLANK %>">
-		<c:if test="<%= Validator.isNotNull(iconHTML) %>">
+		<c:if test="<%= Validator.isNotNull(colHTML) %>">
 			<div class="card-col-field">
-				<%= iconHTML %>
+				<%= colHTML %>
 			</div>
 		</c:if>
 

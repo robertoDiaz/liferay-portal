@@ -59,7 +59,6 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-trash",
 		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.icon=/icons/trash.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",
@@ -89,8 +88,8 @@ public class TrashPortlet extends MVCPortlet {
 			return;
 		}
 
-		long[] deleteEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "deleteThrashEntryIds"), 0L);
+		long[] deleteEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIds");
 
 		if (deleteEntryIds.length > 0) {
 			for (int i = 0; i < deleteEntryIds.length; i++) {

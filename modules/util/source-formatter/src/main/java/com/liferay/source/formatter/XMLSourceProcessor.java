@@ -33,7 +33,6 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,7 +296,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			File file, String fileName, String absolutePath, String content)
 		throws Exception {
 
-		if (isExcludedFile(_xmlExclusionFiles, absolutePath)) {
+		if (isExcludedPath(_xmlExcludes, absolutePath)) {
 			return content;
 		}
 
@@ -377,9 +376,9 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			"**/tools/node**"
 		};
 
-		_numericalPortletNameElementExclusionFiles = getPropertyList(
-			"numerical.portlet.name.element.excludes.files");
-		_xmlExclusionFiles = getPropertyList("xml.excludes.files");
+		_numericalPortletNameElementExcludes = getPropertyList(
+			"numerical.portlet.name.element.excludes");
+		_xmlExcludes = getPropertyList("xml.excludes");
 
 		return getFileNames(excludes, getIncludes());
 	}
@@ -759,8 +758,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 		sortAttributes(rootElement, true);
 
-		boolean checkNumericalPortletNameElement = !isExcludedFile(
-			_numericalPortletNameElementExclusionFiles, absolutePath);
+		boolean checkNumericalPortletNameElement = !isExcludedPath(
+			_numericalPortletNameElementExcludes, absolutePath);
 
 		List<Element> portletElements = rootElement.elements("portlet");
 
@@ -1315,7 +1314,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		"[\t ]-->\n[\t<]");
 
 	private List<String> _columnNames;
-	private List<String> _numericalPortletNameElementExclusionFiles;
+	private List<String> _numericalPortletNameElementExcludes;
 	private final Pattern _poshiClosingTagPattern = Pattern.compile(
 		"</[^>/]*>");
 	private final Pattern _poshiCommandsPattern = Pattern.compile(
@@ -1354,7 +1353,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	private final Map<String, String> _tablesContentMap = new HashMap<>();
 	private final Pattern _whereNotInSQLPattern = Pattern.compile(
 		"WHERE[ \t\n]+\\(*[a-zA-z0-9.]+ NOT IN");
-	private List<String> _xmlExclusionFiles;
+	private List<String> _xmlExcludes;
 
 	private class CustomSQLElementComparator extends ElementComparator {
 
@@ -1396,7 +1395,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class ElementComparator extends NaturalOrderStringComparator {
+	private static class ElementComparator
+		extends NaturalOrderStringComparator {
 
 		public int compare(Element element1, Element element2) {
 			String elementName1 = getElementName(element1);
@@ -1417,7 +1417,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class ResourceActionActionKeyElementComparator
+	private static class ResourceActionActionKeyElementComparator
 		extends ElementComparator {
 
 		@Override
@@ -1427,7 +1427,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class ResourceActionPortletResourceElementComparator
+	private static class ResourceActionPortletResourceElementComparator
 		extends ElementComparator {
 
 		@Override
@@ -1440,7 +1440,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class ServiceExceptionElementComparator extends ElementComparator {
+	private static class ServiceExceptionElementComparator
+		extends ElementComparator {
 
 		@Override
 		protected String getElementName(Element exceptionElement) {
@@ -1515,7 +1516,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class ServiceReferenceElementComparator extends ElementComparator {
+	private static class ServiceReferenceElementComparator
+		extends ElementComparator {
 
 		@Override
 		public int compare(
@@ -1579,7 +1581,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class StrutsActionElementComparator extends ElementComparator {
+	private static class StrutsActionElementComparator
+		extends ElementComparator {
 
 		@Override
 		public int compare(Element actionElement1, Element actionElement2) {
@@ -1606,7 +1609,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	}
 
-	private class TilesDefinitionElementComparator extends ElementComparator {
+	private static class TilesDefinitionElementComparator
+		extends ElementComparator {
 
 		@Override
 		public int compare(
