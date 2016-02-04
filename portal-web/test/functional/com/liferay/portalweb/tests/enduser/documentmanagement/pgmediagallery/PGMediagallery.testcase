@@ -94,6 +94,10 @@
 			<var name="mgFolderName" value="${mgFolderName}" />
 		</execute>
 
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
 		<execute macro="DMFolder#gotoPGViaMG">
 			<var name="mgFolderName" value="${mgFolderName}" />
 		</execute>
@@ -288,6 +292,10 @@
 			<var name="mgFolderName" value="${mgFolderName}" />
 		</execute>
 
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
 		<execute macro="DMFolder#gotoPGViaMG">
 			<var name="mgFolderName" value="${mgFolderName}" />
 		</execute>
@@ -366,6 +374,10 @@
 		<execute macro="DMFolder#addPGViaMG">
 			<var name="mgFolderDescription" value="${mgFolderDescription}" />
 			<var name="mgFolderName" value="${mgFolderName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="DMFolder#gotoPGViaMG">
