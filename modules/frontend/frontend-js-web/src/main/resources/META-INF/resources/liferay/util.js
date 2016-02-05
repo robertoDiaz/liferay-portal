@@ -148,7 +148,7 @@
 				var allBoxNodes = $(allBox);
 
 				if (!allBoxNodes.length) {
-					allBoxNodes = $('input[name="' + allBox + '"]');
+					allBoxNodes = form.find('input[name="' + allBox + '"]');
 				}
 
 				var totalBoxes = 0;
@@ -830,19 +830,23 @@
 				'click',
 				'.selector-button',
 				function(event) {
-					var currentTarget = $(event.currentTarget);
+					var target = $(event.target);
 
-					if (disableButton !== false) {
-						selectorButtons.prop('disabled', false);
+					if (!target.attr('data-prevent-selection')) {
+						var currentTarget = $(event.currentTarget);
 
-						currentTarget.prop('disabled', true);
+						if (disableButton !== false) {
+							selectorButtons.prop('disabled', false);
+
+							currentTarget.prop('disabled', true);
+						}
+
+						var result = Util.getAttributes(currentTarget, 'data-');
+
+						openingLiferay.fire(selectEventName, result);
+
+						Util.getWindow().hide();
 					}
-
-					var result = Util.getAttributes(currentTarget, 'data-');
-
-					openingLiferay.fire(selectEventName, result);
-
-					Util.getWindow().hide();
 				}
 			);
 

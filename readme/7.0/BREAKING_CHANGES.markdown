@@ -3229,13 +3229,11 @@ Portal by means of an OSGi container.
 #### What changed?
 
 The `${theme}` variable previously injected in the FreeMarker context providing
-access to various tags and utilities no longer provides them. Only the
-`${theme.include}` method is preserved for performance reasons.
+access to various tags and utilities is no longer available.
 
 #### Who is affected?
 
-This affects FreeMarker templates that are using the `${theme}` variable to
-access tags.
+This affects FreeMarker templates that are using the `${theme}` variable.
 
 #### How should I update my code?
 
@@ -3441,7 +3439,17 @@ else.
 
 **Example**
 
+- `com.liferay.counter` &rarr; `com.liferay.counter.kernel`
+
+- `com.liferay.mail.model` &rarr; `com.liferay.mail.kernel.model`
+
+- `com.liferay.mail.service` &rarr; `com.liferay.mail.kernel.service`
+
+- `com.liferay.mail.util` &rarr; `com.liferay.mail.kernel.util`
+
 - `com.liferay.portal.jdbc.pool.metrics` &rarr; `com.liferay.portal.kernel.jdbc.pool.metrics`
+
+- `com.liferay.portal.kernel.mail` &rarr; `com.liferay.mail.kernel.model`
 
 - `com.liferay.portal.layoutconfiguration.util` &rarr; `com.liferay.portal.kernel.layoutconfiguration.util`
 
@@ -3467,21 +3475,59 @@ else.
 
 - `com.liferay.portal.security.xml` &rarr; `com.liferay.portal.kernel.security.xml`
 
+- `com.liferay.portal.theme` &rarr; `com.liferay.portal.kernel.theme`
+
+- `com.liferay.portal.util.comparator` &rarr; `com.liferay.portal.kernel.util.comparator`
+
 - `com.liferay.portal.verify.model` &rarr; `com.liferay.portal.kernel.verify.model`
 
 - `com.liferay.portal.webserver` &rarr; `com.liferay.portal.kernel.webserver`
 
+- `com.liferay.portlet.admin.util` &rarr; `com.liferay.admin.kernel.util`
+
 - `com.liferay.portlet.announcements` &rarr; `com.liferay.announcements.kernel`
 
-- `com.liferay.portlet.backgroundtask` &rarr; `com.liferay.background.task.kernel`
+- `com.liferay.portlet.backgroundtask.util.comparator` &rarr; `com.liferay.background.task.kernel.util.comparator`
+
+- `com.liferay.portlet.blogs` &rarr; `com.liferay.blogs.kernel`
+
+- `com.liferay.portlet.blogs.exception` &rarr; `com.liferay.blogs.kernel.exception`
+
+- `com.liferay.portlet.blogs.model` &rarr; `com.liferay.blogs.kernel.model`
+
+- `com.liferay.portlet.blogs.service` &rarr; `com.liferay.blogs.kernel.service`
+
+- `com.liferay.portlet.blogs.service.persistence` &rarr; `com.liferay.blogs.service.persistence`
+
+- `com.liferay.portlet.blogs.util.comparator` &rarr; `com.liferay.blogs.kernel.util.comparator`
 
 - `com.liferay.portlet.dynamicdatamapping` &rarr; `com.liferay.dynamic.data.mapping.kernel`
+
+- `com.liferay.portlet.expando` &rarr; `com.liferay.expando.kernel`
+
+- `com.liferay.portlet.exportimport` &rarr; `com.liferay.exportimport.kernel`
 
 - `com.liferay.portlet.imagegallerydisplay.display.context` &rarr; `com.liferay.image.gallery.display.kernel.display.context`
 
 - `com.liferay.portlet.journal.util` &rarr; `com.liferay.journal.kernel.util`
 
 - `com.liferay.portlet.layoutsadmin.util` &rarr; `com.liferay.layouts.admin.kernel.util`
+
+- `com.liferay.portlet.messageboards` &rarr; `com.liferay.message.boards.kernel`
+
+- `com.liferay.portlet.messageboards.constants` &rarr; `com.liferay.message.boards.kernel.constants`
+
+- `com.liferay.portlet.messageboards.exception` &rarr; `com.liferay.message.boards.kernel.exception`
+
+- `com.liferay.portlet.messageboards.model` &rarr; `com.liferay.message.boards.kernel.model`
+
+- `com.liferay.portlet.messageboards.service` &rarr; `com.liferay.message.boards.kernel.service`
+
+- `com.liferay.portlet.messageboards.service.persistence` &rarr; `com.liferay.message.boards.kernel.service.persistence`
+
+- `com.liferay.portlet.messageboards.util` &rarr; `com.liferay.message.boards.kernel.util`
+
+- `com.liferay.portlet.messageboards.util.comparator` &rarr; `com.liferay.message.boards.kernel.util.comparator`
 
 - `com.liferay.portlet.mobiledevicerules` &rarr; `com.liferay.mobile.device.rules`
 
@@ -3491,7 +3537,27 @@ else.
 
 - `com.liferay.portlet.sites.util` &rarr; `com.liferay.sites.kernel.util`
 
+- `com.liferay.portlet.social` &rarr; `com.liferay.social.kernel`
+
+- `com.liferay.portlet.trash` &rarr; `com.liferay.trash.kernel`
+
 - `com.liferay.portlet.useradmin.util` &rarr; `com.liferay.users.admin.kernel.util`
+
+- `com.liferay.portlet.ratings` &rarr; `com.liferay.ratings.kernel`
+
+- `com.liferay.portlet.ratings.definition` &rarr; `com.liferay.ratings.kernel.definition`
+
+- `com.liferay.portlet.ratings.display.context` &rarr; `com.liferay.ratings.kernel.display.context`
+
+- `com.liferay.portlet.ratings.exception` &rarr; `com.liferay.ratings.kernel.exception`
+
+- `com.liferay.portlet.ratings.model` &rarr; `com.liferay.ratings.kernel.model`
+
+- `com.liferay.portlet.ratings.service` &rarr; `com.liferay.ratings.kernel.service`
+
+- `com.liferay.portlet.ratings.service.persistence` &rarr; `com.liferay.ratings.kernel.service.persistence`
+
+- `com.liferay.portlet.ratings.transformer` &rarr; `com.liferay.ratings.kernel.transformer`
 
 #### Why was this change made?
 
@@ -3525,3 +3591,59 @@ You should pass a non-null, non-empty string for the `title` parameter of the
 The `title` field was marked as mandatory, but it was possible to create a
 document without filling it, as the backend would infer a value from the source
 file name automatically. This was considered confusing from a UX perspective.
+
+---------------------------------------
+
+### DLUtil.getImagePreviewURL and DLUtil.getThumbnailSrc can return blank
+- **Date:** 2016-Jan-28
+- **JIRA Ticket:** LPS-62643
+
+#### What changed?
+
+DLUtil.getImagePreviewURL and DLUtil.getThumbnailSrc will return a blank
+string if there are not previews or thumbnails for the specific image, video or
+document.
+
+Before, if there was no previews or thumbnail it would return a url to a image
+based on the document.
+
+#### Who is affected?
+
+Any developer invoking DLUtil.getImagePreviewURL or DLUtil.getThumbnailSrc.
+
+#### How should I update my code?
+
+You should take into account that the method could return a blank string and act
+accordingly. For example, you could display the `documents-and-media` lexicon
+icon instead.
+
+#### Why was this change made?
+
+In order to display the `documents-and-media` lexicon icon in Documents and
+Media this change was necessary.
+
+---------------------------------------
+
+### The aui:column taglib has been removed and replaced with aui:col taglib
+- **Date:** 2016-Jan-19
+- **JIRA Ticket:** LPS-62208
+
+#### What changed?
+
+The `aui:column` taglib has been removed and replaced with
+`aui:col` taglib.
+
+#### Who is affected?
+
+Plugins or templates that are using the `aui:column` tag need
+to update their usage of the tag.
+
+#### How should I update my code?
+
+You should import the `aui` tag library if it isn't already and
+update the tag namespace from `aui:column` to `aui:col`.
+
+#### Why was this change made?
+
+This change was made as a part of the ongoing strategy to modularize Liferay
+Portal by means of an OSGi container.

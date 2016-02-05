@@ -18,7 +18,7 @@ task buildLiferayAMDLoader(type: Copy)
 task buildLodash(type: Copy)
 task buildSvg4everybody(type: Copy)
 
-String alloyUIVersion = "3.0.3-deprecated.10"
+String alloyUIVersion = "3.0.3-deprecated.11"
 String jqueryPluginsFormVersion = "3.51"
 String jQueryVersion = "2.1.4"
 String lexiconVersion = "0.2.1"
@@ -167,13 +167,13 @@ classes {
 }
 
 dependencies {
-	alloyUI group: "org.webjars.bower", name: "alloy-ui", transitive: false, version: alloyUIVersion
+	alloyUI group: "com.liferay.webjars", name: "alloy-ui", transitive: false, version: alloyUIVersion
 
 	jQuery group: "org.webjars.npm", name: "jquery", transitive: false, version: jQueryVersion
 
-	lexicon group: "org.webjars.bower", name: "lexicon", transitive: false, version: lexiconVersion
+	lexicon group: "com.liferay.webjars", name: "lexicon", transitive: false, version: lexiconVersion
 
-	liferayAMDLoader group: "org.webjars.npm", name: "liferay-amd-loader", transitive: false, version: liferayAMDLoaderVersion
+	liferayAMDLoader group: "com.liferay.webjars", name: "liferay-amd-loader", transitive: false, version: liferayAMDLoaderVersion
 
 	lodash group: "org.webjars.bower", name: "lodash", transitive: false, version: lodashVersion
 

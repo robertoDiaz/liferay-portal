@@ -303,7 +303,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*
 	* @return the custom attribute display instances of the portlet
 	*/
-	public java.util.List<com.liferay.portlet.expando.model.CustomAttributesDisplay> getCustomAttributesDisplayInstances();
+	public java.util.List<com.liferay.expando.kernel.model.CustomAttributesDisplay> getCustomAttributesDisplayInstances();
 
 	/**
 	* Get the default plugin settings of the portlet.
@@ -642,7 +642,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*
 	* @return the portlet data handler instance of the portlet
 	*/
-	public com.liferay.portlet.exportimport.lar.PortletDataHandler getPortletDataHandlerInstance();
+	public com.liferay.exportimport.kernel.lar.PortletDataHandler getPortletDataHandlerInstance();
 
 	/**
 	* Returns the filters of the portlet.
@@ -921,7 +921,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*
 	* @return the social activity interpreter instances of the portlet
 	*/
-	public java.util.List<com.liferay.portlet.social.model.SocialActivityInterpreter> getSocialActivityInterpreterInstances();
+	public java.util.List<com.liferay.social.kernel.model.SocialActivityInterpreter> getSocialActivityInterpreterInstances();
 
 	/**
 	* Returns the name of the social request interpreter class of the portlet.
@@ -937,7 +937,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return the name of the social request interpreter instance of the
 	portlet
 	*/
-	public com.liferay.portlet.social.model.SocialRequestInterpreter getSocialRequestInterpreterInstance();
+	public com.liferay.social.kernel.model.SocialRequestInterpreter getSocialRequestInterpreterInstance();
 
 	/**
 	* Returns the names of the classes that represent staged model data
@@ -953,7 +953,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*
 	* @return the staged model data handler instances of the portlet
 	*/
-	public java.util.List<com.liferay.portlet.exportimport.lar.StagedModelDataHandler<?>> getStagedModelDataHandlerInstances();
+	public java.util.List<com.liferay.exportimport.kernel.lar.StagedModelDataHandler<?>> getStagedModelDataHandlerInstances();
 
 	/**
 	* Returns <code>true</code> if the portlet is a static portlet that is

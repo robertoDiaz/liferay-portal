@@ -42,8 +42,7 @@ import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PortalUtil;
 
-import com.liferay.portlet.social.service.persistence.SocialActivityPersistence;
-
+import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.networking.model.WallEntry;
 import com.liferay.social.networking.service.WallEntryLocalService;
 import com.liferay.social.networking.service.persistence.MeetupsEntryPersistence;
@@ -456,7 +455,7 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -466,7 +465,7 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -606,7 +605,7 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the social activity local service
 	 */
-	public com.liferay.portlet.social.service.SocialActivityLocalService getSocialActivityLocalService() {
+	public com.liferay.social.kernel.service.SocialActivityLocalService getSocialActivityLocalService() {
 		return socialActivityLocalService;
 	}
 
@@ -616,7 +615,7 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param socialActivityLocalService the social activity local service
 	 */
 	public void setSocialActivityLocalService(
-		com.liferay.portlet.social.service.SocialActivityLocalService socialActivityLocalService) {
+		com.liferay.social.kernel.service.SocialActivityLocalService socialActivityLocalService) {
 		this.socialActivityLocalService = socialActivityLocalService;
 	}
 
@@ -705,8 +704,8 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected WallEntryPersistence wallEntryPersistence;
 	@BeanReference(type = WallEntryFinder.class)
 	protected WallEntryFinder wallEntryFinder;
-	@ServiceReference(type = com.liferay.counter.service.CounterLocalService.class)
-	protected com.liferay.counter.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@ServiceReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
 	@ServiceReference(type = ClassNamePersistence.class)
@@ -721,8 +720,8 @@ public abstract class WallEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected com.liferay.portal.service.UserLocalService userLocalService;
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@ServiceReference(type = com.liferay.portlet.social.service.SocialActivityLocalService.class)
-	protected com.liferay.portlet.social.service.SocialActivityLocalService socialActivityLocalService;
+	@ServiceReference(type = com.liferay.social.kernel.service.SocialActivityLocalService.class)
+	protected com.liferay.social.kernel.service.SocialActivityLocalService socialActivityLocalService;
 	@ServiceReference(type = SocialActivityPersistence.class)
 	protected SocialActivityPersistence socialActivityPersistence;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)

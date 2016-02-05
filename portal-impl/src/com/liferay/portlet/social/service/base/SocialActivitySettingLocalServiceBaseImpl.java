@@ -41,9 +41,9 @@ import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
 import com.liferay.portal.util.PortalUtil;
 
-import com.liferay.portlet.social.model.SocialActivitySetting;
-import com.liferay.portlet.social.service.SocialActivitySettingLocalService;
-import com.liferay.portlet.social.service.persistence.SocialActivitySettingPersistence;
+import com.liferay.social.kernel.model.SocialActivitySetting;
+import com.liferay.social.kernel.service.SocialActivitySettingLocalService;
+import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
 
 import java.io.Serializable;
 
@@ -60,7 +60,7 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portlet.social.service.impl.SocialActivitySettingLocalServiceImpl
- * @see com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil
+ * @see com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil
  * @generated
  */
 @ProviderType
@@ -70,7 +70,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil} to access the social activity setting local service.
+	 * Never modify or reference this class directly. Always use {@link com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil} to access the social activity setting local service.
 	 */
 
 	/**
@@ -233,7 +233,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	public ActionableDynamicQuery getActionableDynamicQuery() {
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil.getService());
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(SocialActivitySetting.class);
 
@@ -246,7 +246,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil.getService());
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(SocialActivitySetting.class);
 
@@ -258,7 +258,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil.getService());
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(SocialActivitySetting.class);
 
@@ -363,7 +363,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
 		return counterLocalService;
 	}
 
@@ -373,7 +373,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -471,13 +471,13 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.portlet.social.model.SocialActivitySetting",
+		persistedModelLocalServiceRegistry.register("com.liferay.social.kernel.model.SocialActivitySetting",
 			socialActivitySettingLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.portlet.social.model.SocialActivitySetting");
+			"com.liferay.social.kernel.model.SocialActivitySetting");
 	}
 
 	/**
@@ -522,12 +522,12 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portlet.social.service.SocialActivitySettingLocalService.class)
+	@BeanReference(type = com.liferay.social.kernel.service.SocialActivitySettingLocalService.class)
 	protected SocialActivitySettingLocalService socialActivitySettingLocalService;
 	@BeanReference(type = SocialActivitySettingPersistence.class)
 	protected SocialActivitySettingPersistence socialActivitySettingPersistence;
-	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
-	protected com.liferay.counter.service.CounterLocalService counterLocalService;
+	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
 	@BeanReference(type = ClassNamePersistence.class)

@@ -16,11 +16,12 @@ package com.liferay.portal.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
+
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceContext;
-
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -1507,8 +1508,8 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public boolean isPortletEmbedded(java.lang.String portletId) {
-		return _layout.isPortletEmbedded(portletId);
+	public boolean isPortletEmbedded(java.lang.String portletId, long groupId) {
+		return _layout.isPortletEmbedded(portletId, groupId);
 	}
 
 	/**

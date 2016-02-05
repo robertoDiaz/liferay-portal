@@ -1297,7 +1297,7 @@
 	</command>
 
 	<command name="viewDisabledSocialBookmarkSites">
-		<execute function="AssertElementNotPresent" locator1="Button#SHARE" value1="Share" />
+		<execute function="AssertElementNotPresent" locator1="Icon#SHARE" />
 	</command>
 
 	<command name="viewEditLinkPG">
@@ -1309,7 +1309,7 @@
 	</command>
 
 	<command name="viewEnabledSocialBookmarkSites">
-		<execute function="AssertClick" locator1="Button#SHARE" value1="Share" />
+		<execute function="Click" locator1="Icon#SHARE" />
 
 		<for list="${socialBookmarkSites}" param="socialBookmarkSite">
 			<var name="key_socialBookmarkSite" value="${socialBookmarkSite}" />
@@ -1338,9 +1338,7 @@
 		<if>
 			<isset var="uploadFileName" />
 			<then>
-				<execute macro="BlogsEntry#viewInlineImage">
-					<var name="uploadFileName" value="${uploadFileName}" />
-				</execute>
+				<execute function="AssertElementPresent" locator1="BlogsEntry#ENTRY_COVER_IMAGE" />
 			</then>
 		</if>
 
@@ -1364,14 +1362,6 @@
 				<execute function="AssertTextEquals#assertPartialText" locator1="BlogsEntry#CONTENT_HTML_ITALICS" value1="${entryContentItalics}" />
 			</then>
 		</if>
-	</command>
-
-	<command name="viewEntryAsGuestViaBlogsAggregatorPG">
-		<execute function="AssertClick#assertPartialTextClickAt" locator1="PGBlogsAggregator#ENTRY_READ_MORE" value1="Read More" />
-
-		<execute function="AssertTextEquals" locator1="PGBlogs#PORTLET_TITLE" value1="Blogs" />
-		<execute function="AssertElementPresent" locator1="PGBlogsEntry#ENTRY_TITLE" value1="${entryTitle}" />
-		<execute function="AssertElementPresent" locator1="PGBlogsEntry#ENTRY_CONTENT" value1="${entryContent}" />
 	</command>
 
 	<command name="viewEntryAsWorkflowAsset">
@@ -1416,18 +1406,14 @@
 	</command>
 
 	<command name="viewEntryViaBlogsAggregatorPG">
-		<execute function="AssertTextEquals" locator1="BlogsAggregator#ENTRY_ABSTRACT_DESCRIPTION" value1="${entryAbstractDescription}" />
+		<execute function="AssertClick#assertPartialTextClickAt" locator1="Link#READ_MORE" value1="Read More" />
 
-		<execute function="AssertClick#assertPartialTextClickAt" locator1="BlogsAggregator#ENTRY_READ_MORE" value1="Read More" />
-
-		<execute function="AssertTextEquals" locator1="Portlet#H2_HEADER" value1="Blogs" />
-
-		<var name="key_entryTitle" value="${entryTitle}" />
-
-		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
+		<execute function="AssertTextEquals" locator1="Portlet#H2_HEADER" value1="Blogs Aggregator" />
 
 		<var name="key_entryContent" value="${entryContent}" />
+		<var name="key_entryTitle" value="${entryTitle}" />
 
+		<execute function="AssertTextEquals" locator1="BlogsAggregator#ENTRY_TITLE" value1="${entryTitle}" />
 		<execute function="AssertTextEquals" locator1="BlogsEntry#CONTENT" value1="${entryContent}" />
 	</command>
 
@@ -1482,10 +1468,6 @@
 		<execute function="AssertElementNotPresent" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 	</command>
 
-	<command name="viewNoEntryAsGuestViaBlogsAggregatorPG">
-		<execute function="AssertElementPresent" locator1="PGBlogsAggregator#NO_ENTRY_MESSAGE" value1="There are no blogs." />
-	</command>
-
 	<command name="viewNoEntryViaAPPG">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
@@ -1494,7 +1476,7 @@
 	</command>
 
 	<command name="viewNoEntryViaBlogsAggregatorPG">
-		<execute function="AssertElementPresent" locator1="PGBlogsAggregator#NO_ENTRY_MESSAGE" value1="There are no blogs." />
+		<execute function="AssertElementPresent" locator1="BlogsAggregator#NO_ENTRY_MESSAGE" value1="There are no blogs." />
 	</command>
 
 	<command name="viewNoPG">

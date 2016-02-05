@@ -14,6 +14,13 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.expando.kernel.exception.ValueDataException;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
+import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.kernel.model.MBThread;
 import com.liferay.portal.RSSFeedException;
 import com.liferay.portal.comment.action.EditDiscussionStrutsAction;
 import com.liferay.portal.comment.action.GetCommentsStrutsAction;
@@ -77,6 +84,8 @@ import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbUtil;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -169,8 +178,6 @@ import com.liferay.portal.service.permission.UserPermissionUtil;
 import com.liferay.portal.servlet.filters.i18n.I18nFilter;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.struts.StrutsUtil;
-import com.liferay.portal.theme.PortletDisplay;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.upload.UploadPortletRequestImpl;
 import com.liferay.portal.upload.UploadServletRequestImpl;
 import com.liferay.portal.webserver.WebServerServlet;
@@ -192,17 +199,9 @@ import com.liferay.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portlet.StateAwareResponseImpl;
 import com.liferay.portlet.UserAttributes;
 import com.liferay.portlet.admin.util.OmniadminUtil;
-import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.documentlibrary.exception.ImageSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.expando.exception.ValueDataException;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
-import com.liferay.portlet.exportimport.staging.StagingUtil;
-import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.model.MBThread;
-import com.liferay.portlet.social.model.SocialRelationConstants;
 import com.liferay.portlet.social.util.FacebookUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -211,6 +210,7 @@ import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
+import com.liferay.social.kernel.model.SocialRelationConstants;
 import com.liferay.util.Encryptor;
 import com.liferay.util.JS;
 
@@ -701,10 +701,7 @@ public class PortalImpl implements Portal {
 			groupId = getScopeGroupId(layout, portlet.getPortletId());
 		}
 
-		addDefaultResource(
-			themeDisplay.getCompanyId(), groupId, layout, portlet, true);
-		addDefaultResource(
-			themeDisplay.getCompanyId(), groupId, layout, portlet, false);
+		addRootModelResource(themeDisplay.getCompanyId(), groupId, portlet);
 	}
 
 	@Override
@@ -712,8 +709,9 @@ public class PortalImpl implements Portal {
 			long companyId, Layout layout, Portlet portlet)
 		throws PortalException {
 
-		addDefaultResource(companyId, layout, portlet, true);
-		addDefaultResource(companyId, layout, portlet, false);
+		long groupId = getScopeGroupId(layout, portlet.getPortletId());
+
+		addRootModelResource(companyId, groupId, portlet);
 	}
 
 	@Override
@@ -7112,6 +7110,10 @@ public class PortalImpl implements Portal {
 		return windowState;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	protected void addDefaultResource(
 			long companyId, Layout layout, Portlet portlet,
 			boolean portletActions)
@@ -7119,36 +7121,35 @@ public class PortalImpl implements Portal {
 
 		long groupId = getScopeGroupId(layout, portlet.getPortletId());
 
-		addDefaultResource(companyId, groupId, layout, portlet, portletActions);
+		addRootModelResource(companyId, groupId, portlet);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	protected void addDefaultResource(
 			long companyId, long groupId, Layout layout, Portlet portlet,
 			boolean portletActions)
 		throws PortalException {
 
+		addRootModelResource(companyId, groupId, portlet);
+	}
+
+	protected void addRootModelResource(
+			long companyId, long groupId, Portlet portlet)
+		throws PortalException {
+
 		String rootPortletId = portlet.getRootPortletId();
 
-		String portletPrimaryKey = PortletPermissionUtil.getPrimaryKey(
-			layout.getPlid(), portlet.getPortletId());
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
-		String name = null;
-		String primaryKey = null;
-
-		if (portletActions) {
-			name = rootPortletId;
-			primaryKey = portletPrimaryKey;
+		if ((group != null) && group.isStagingGroup()) {
+			groupId = group.getLiveGroupId();
 		}
-		else {
-			Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
-			if ((group != null) && group.isStagingGroup()) {
-				groupId = group.getLiveGroupId();
-			}
-
-			name = ResourceActionsUtil.getPortletBaseResource(rootPortletId);
-			primaryKey = String.valueOf(groupId);
-		}
+		String name = ResourceActionsUtil.getPortletBaseResource(rootPortletId);
+		String primaryKey = String.valueOf(groupId);
 
 		if (Validator.isNull(name)) {
 			return;
@@ -7163,21 +7164,8 @@ public class PortalImpl implements Portal {
 			return;
 		}
 
-		boolean addGuestPermissions = true;
-
-		if (portletActions) {
-			Group layoutGroup = layout.getGroup();
-
-			if (layout.isPrivateLayout() && !layoutGroup.isLayoutPrototype() &&
-				!layoutGroup.isLayoutSetPrototype()) {
-
-				addGuestPermissions = false;
-			}
-		}
-
 		ResourceLocalServiceUtil.addResources(
-			companyId, groupId, 0, name, primaryKey, portletActions, true,
-			addGuestPermissions);
+			companyId, groupId, 0, name, primaryKey, false, true, true);
 	}
 
 	protected String buildI18NPath(Locale locale) {

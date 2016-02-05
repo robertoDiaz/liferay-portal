@@ -40,6 +40,8 @@ import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.template.URLTemplateResource;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -47,8 +49,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.PortletDisplay;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletURLUtil;
@@ -383,20 +383,20 @@ public class UIItemsBuilder {
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/move_entry");
 
+		PortletURL redirectURL = liferayPortletResponse.createRenderURL();
+
 		long folderId = _fileEntry.getFolderId();
 
 		if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			portletURL.setParameter(
+			redirectURL.setParameter(
 				"mvcRenderCommandName", "/document_library/view");
 		}
 		else {
-			portletURL.setParameter(
+			redirectURL.setParameter(
 				"mvcRenderCommandName", "/document_library/view_folder");
 		}
 
-		portletURL.setParameter("folderId", String.valueOf(folderId));
-
-		PortletURL redirectURL = liferayPortletResponse.createRenderURL();
+		redirectURL.setParameter("folderId", String.valueOf(folderId));
 
 		portletURL.setParameter("redirect", redirectURL.toString());
 

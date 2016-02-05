@@ -28,6 +28,9 @@ import ${apiPackagePath}.service.${entity.name}LocalServiceUtil;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.exception.NoSuchModelException;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
@@ -54,12 +57,8 @@ import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.trash.kernel.model.TrashEntry;
 import com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil;
-
-import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -114,7 +113,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 	<#compress>
 		public static final Object[][] TABLE_COLUMNS = {
 			<#list entity.getRegularColList() as column>
-				<#assign sqlType = serviceBuilder.getSqlType(apiPackagePath + ".model." + entity.getName(), column.getName(), column.getType())>
+				<#assign sqlType = serviceBuilder.getSqlType(entity.getName(), column.getName(), column.getType())>
 
 				{"${column.DBName}", Types.${sqlType}}
 
@@ -128,7 +127,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 		static {
 			<#list entity.getRegularColList() as column>
-				<#assign sqlType = serviceBuilder.getSqlType(apiPackagePath + ".model." + entity.getName(), column.getName(), column.getType())>
+				<#assign sqlType = serviceBuilder.getSqlType(entity.getName(), column.getName(), column.getType())>
 
 				TABLE_COLUMNS_MAP.put("${column.DBName}", Types.${sqlType});
 			</#list>

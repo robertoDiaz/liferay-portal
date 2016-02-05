@@ -174,9 +174,9 @@ BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 </liferay-util:include>
 
 <div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
-	<portlet:resourceURL id="/bookmarks/info_panel" var="sidebarPanelURL">
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/bookmarks/info_panel" var="sidebarPanelURL">
 		<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-	</portlet:resourceURL>
+	</liferay-portlet:resourceURL>
 
 	<liferay-frontend:sidebar-panel
 		resourceURL="<%= sidebarPanelURL %>"
@@ -225,19 +225,6 @@ else {
 	PortalUtil.setPageSubtitle(LanguageUtil.get(request, StringUtil.replace(navigation, StringPool.UNDERLINE, StringPool.DASH)), request);
 }
 %>
-
-<aui:script>
-	$('#<portlet:namespace />infoPanelId').sideNavigation(
-		{
-			gutter: 15,
-			position: 'right',
-			toggler: '.infoPanelToggler',
-			type: 'relative',
-			typeMobile: 'fixed',
-			width: 320
-		}
-	);
-</aui:script>
 
 <aui:script use="liferay-bookmarks">
 	var bookmarks = new Liferay.Portlet.Bookmarks(

@@ -7,6 +7,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
+	<bean id="com.liferay.expando.kernel.service.permission.ExpandoColumnPermissionUtil" class="com.liferay.expando.kernel.service.permission.ExpandoColumnPermissionUtil">
+		<property name="expandoColumnPermission">
+			<bean class="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil" class="com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil">
+		<property name="expandoBridgeFactory">
+			<bean class="com.liferay.portlet.expando.util.ExpandoBridgeFactoryImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.expando.kernel.util.ExpandoBridgeIndexerUtil" class="com.liferay.expando.kernel.util.ExpandoBridgeIndexerUtil">
+		<property name="expandoBridgeIndexer">
+			<bean class="com.liferay.portlet.expando.util.ExpandoBridgeIndexerImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.mail.util.DummyHook" class="com.liferay.mail.util.DummyHook" />
 	<bean class="com.liferay.portal.convert.database.DatabaseConvertProcess" />
 	<bean class="com.liferay.portal.convert.database.PortalDatabaseConverter" >
@@ -261,6 +276,11 @@
 	<bean id="com.liferay.portal.kernel.spring.util.SpringFactoryUtil" class="com.liferay.portal.kernel.spring.util.SpringFactoryUtil">
 		<property name="springFactory" ref="com.liferay.portal.kernel.spring.util.SpringFactory" />
 	</bean>
+	<bean id="com.liferay.portal.kernel.theme.PortletDecoratorFactoryUtil" class="com.liferay.portal.kernel.theme.PortletDecoratorFactoryUtil">
+		<property name="portletDecoratorFactory">
+			<bean class="com.liferay.portal.theme.PortletDecoratorFactoryImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil" class="com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil">
 		<property name="upgradeTableFactory">
 			<bean class="com.liferay.portal.upgrade.util.DefaultUpgradeTableFactoryImpl" />
@@ -353,7 +373,7 @@
 					<constructor-arg name="value" value="_serviceContextThreadLocal" />
 				</bean>
 				<bean class="com.liferay.portal.kernel.util.KeyValuePair">
-					<constructor-arg name="key" value="com.liferay.portlet.exportimport.staging.MergeLayoutPrototypesThreadLocal" />
+					<constructor-arg name="key" value="com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal" />
 					<constructor-arg name="value" value="_inProgress" />
 				</bean>
 			</list>
@@ -488,11 +508,6 @@
 		</property>
 	</bean>
 	<bean id="com.liferay.portal.struts.DoIncludeJSPDynamicInclude" class="com.liferay.portal.struts.DoIncludeJSPDynamicInclude" />
-	<bean id="com.liferay.portal.theme.PortletDecoratorFactoryUtil" class="com.liferay.portal.theme.PortletDecoratorFactoryUtil">
-		<property name="portletDecoratorFactory">
-			<bean class="com.liferay.portal.theme.PortletDecoratorFactoryImpl" />
-		</property>
-	</bean>
 	<bean id="com.liferay.portal.util.CustomJspRegistryUtil" class="com.liferay.portal.util.CustomJspRegistryUtil">
 		<property name="customJspRegistry">
 			<bean class="com.liferay.portal.util.CustomJspRegistryImpl" />
@@ -567,40 +582,6 @@
 			<bean class="com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionUtil" class="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionUtil">
-		<property name="expandoColumnPermission">
-			<bean class="com.liferay.portlet.expando.service.permission.ExpandoColumnPermissionImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil" class="com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil">
-		<property name="expandoBridgeFactory">
-			<bean class="com.liferay.portlet.expando.util.ExpandoBridgeFactoryImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil" class="com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil">
-		<property name="expandoBridgeIndexer">
-			<bean class="com.liferay.portlet.expando.util.ExpandoBridgeIndexerImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.social.service.permission.SocialActivityPermissionUtil" class="com.liferay.portlet.social.service.permission.SocialActivityPermissionUtil">
-		<property name="socialActivityPermission">
-			<bean class="com.liferay.portlet.social.service.permission.SocialActivityPermissionImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.social.util.SocialRelationTypesUtil" class="com.liferay.portlet.social.util.SocialRelationTypesUtil">
-		<property name="socialRelationTypes">
-			<bean class="com.liferay.portlet.social.util.SocialRelationTypesImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.social.service.permission.SocialRequestPermissionUtil" class="com.liferay.portlet.social.service.permission.SocialRequestPermissionUtil">
-		<property name="socialRequestPermission">
-			<bean class="com.liferay.portlet.social.service.permission.SocialRequestPermissionImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.social.util.SocialConfiguration" class="com.liferay.portlet.social.util.SocialConfigurationImpl" />
-	<bean id="com.liferay.portlet.social.util.SocialConfigurationUtil" class="com.liferay.portlet.social.util.SocialConfigurationUtil">
-		<property name="socialConfiguration" ref="com.liferay.portlet.social.util.SocialConfiguration" />
-	</bean>
 	<bean id="com.liferay.portlet.trash.util.TrashIndexer" class="com.liferay.portlet.trash.util.TrashIndexer" />
 	<bean id="com.liferay.portlet.usersadmin.util.ContactIndexer" class="com.liferay.portlet.usersadmin.util.ContactIndexer" />
 	<bean id="com.liferay.portlet.usersadmin.util.OrganizationIndexer" class="com.liferay.portlet.usersadmin.util.OrganizationIndexer" />
@@ -612,6 +593,25 @@
 	<bean id="com.liferay.sites.kernel.util.Sites" class="com.liferay.portlet.sites.util.SitesImpl" />
 	<bean id="com.liferay.sites.kernel.util.SitesUtil" class="com.liferay.sites.kernel.util.SitesUtil">
 		<property name="sites" ref="com.liferay.sites.kernel.util.Sites" />
+	</bean>
+	<bean id="com.liferay.social.kernel.service.permission.SocialActivityPermissionUtil" class="com.liferay.social.kernel.service.permission.SocialActivityPermissionUtil">
+		<property name="socialActivityPermission">
+			<bean class="com.liferay.portlet.social.service.permission.SocialActivityPermissionImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.social.kernel.util.SocialRelationTypesUtil" class="com.liferay.social.kernel.util.SocialRelationTypesUtil">
+		<property name="socialRelationTypes">
+			<bean class="com.liferay.portlet.social.util.SocialRelationTypesImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.social.kernel.service.permission.SocialRequestPermissionUtil" class="com.liferay.social.kernel.service.permission.SocialRequestPermissionUtil">
+		<property name="socialRequestPermission">
+			<bean class="com.liferay.portlet.social.service.permission.SocialRequestPermissionImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.social.kernel.util.SocialConfiguration" class="com.liferay.portlet.social.util.SocialConfigurationImpl" />
+	<bean id="com.liferay.social.kernel.util.SocialConfigurationUtil" class="com.liferay.social.kernel.util.SocialConfigurationUtil">
+		<property name="socialConfiguration" ref="com.liferay.social.kernel.util.SocialConfiguration" />
 	</bean>
 	<bean id="com.liferay.trash.kernel.util.Trash" class="com.liferay.portlet.trash.util.TrashImpl" />
 	<bean id="com.liferay.trash.kernel.util.TrashUtil" class="com.liferay.trash.kernel.util.TrashUtil">

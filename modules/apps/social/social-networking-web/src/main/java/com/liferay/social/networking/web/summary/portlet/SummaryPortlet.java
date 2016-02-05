@@ -14,11 +14,13 @@
 
 package com.liferay.social.networking.web.summary.portlet;
 
+import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -37,12 +39,10 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.permission.UserPermissionUtil;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.expando.service.ExpandoValueLocalService;
-import com.liferay.portlet.social.model.SocialRelationConstants;
-import com.liferay.portlet.social.service.SocialRelationLocalService;
-import com.liferay.portlet.social.service.SocialRequestLocalService;
+import com.liferay.social.kernel.model.SocialRelationConstants;
+import com.liferay.social.kernel.service.SocialRelationLocalService;
+import com.liferay.social.kernel.service.SocialRequestLocalService;
 import com.liferay.social.networking.friends.social.FriendsRequestKeys;
 import com.liferay.social.networking.members.social.MembersRequestKeys;
 import com.liferay.social.networking.service.MeetupsEntryLocalService;
