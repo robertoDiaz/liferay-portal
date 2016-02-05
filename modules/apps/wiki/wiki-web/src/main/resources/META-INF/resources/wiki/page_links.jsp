@@ -41,7 +41,7 @@ boolean hasOutgoingLinkPages = ListUtil.isNotEmpty(outgoingLinkPages);
 
 							PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
-							portletURL.setParameter("mvcRenderCommandName", "/wiki/view");
+							portletURL.setParameter("mvcRenderCommandName", "/wiki/view_page");
 							portletURL.setParameter("redirect", currentURL);
 							portletURL.setParameter("nodeName", wikiNode.getName());
 							portletURL.setParameter("title", incomingLinkPage.getTitle());
@@ -78,7 +78,7 @@ boolean hasOutgoingLinkPages = ListUtil.isNotEmpty(outgoingLinkPages);
 
 							PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
-							portletURL.setParameter("mvcRenderCommandName", "/wiki/view");
+							portletURL.setParameter("mvcRenderCommandName", "/wiki/view_page");
 							portletURL.setParameter("redirect", currentURL);
 							portletURL.setParameter("nodeName", wikiNode.getName());
 							portletURL.setParameter("title", outgoingLinkPage.getTitle());
