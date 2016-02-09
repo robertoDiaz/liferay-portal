@@ -116,7 +116,9 @@ if (portletTitleBasedNavigation) {
 	</liferay-frontend:info-bar>
 </c:if>
 
-<portlet:actionURL name="/wiki/edit_page" var="editPageActionURL" />
+<portlet:actionURL name="/wiki/edit_page" var="editPageActionURL">
+	<portlet:param name="mvcRenderCommandName" value="/wiki/edit_page" />
+</portlet:actionURL>
 
 <portlet:renderURL var="editPageRenderURL">
 	<portlet:param name="mvcRenderCommandName" value="/wiki/edit_page" />

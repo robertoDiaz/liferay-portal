@@ -150,8 +150,6 @@
 	</command>
 
 	<command name="AddWCWithTranslation" priority="5">
-		<property name="portal.acceptance" value="true" />
-
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -212,7 +210,10 @@
 			<var name="webContentContent" value="WC Contenido" />
 		</execute>
 
-		<execute macro="WebContentNavigator#gotoEditPGViaWCD" />
+		<execute macro="Portlet#gotoPortletOptions">
+			<var name="portletName" value="Visualización de contenido web" />
+			<var name="portletOption" value="Editar contenido Web" />
+		</execute>
 
 		<execute macro="WebContent#viewTranslationPGViaWCD">
 			<var name="localizedTitle" value="WC Titulo" />
