@@ -1022,17 +1022,17 @@
 
 		<execute function="Click" locator1="MenuItem#EDIT" value1="Edit" />
 
-		<execute function="Type" locator1="TextInput#NAME" value1="${mgDocumentTitleEdit}" />
+		<execute function="Type" locator1="TextInput#TITLE" value1="${mgDocumentTitleEdit}" />
 
 		<execute function="Type" locator1="TextArea#DESCRIPTION" value1="${mgDocumentDescriptionEdit}" />
 
-		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 
 		<var name="key_mgDocumentTitle" value="${mgDocumentTitleEdit}" />
 
-		<execute function="AssertTextEquals" locator1="Portlet#H3_HEADER" value1="${mgDocumentTitleEdit}" />
+		<execute function="AssertTextEquals" locator1="MediaGallery#IMAGE_TITLE" value1="${mgDocumentTitleEdit}" />
 	</command>
 
 	<command name="editPublishPG">
@@ -1782,7 +1782,7 @@
 		<execute function="AssertClick" locator1="AP#ASSET_ABSTRACT_TITLE" value1="${assetTitle}" />
 
 		<execute function="Click" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_DROPDOWN" />
-	
+
 		<execute function="AssertClick" locator1="MenuItem#DM_DOCUMENT_TYPE" value1="Document Type" />
 
 		<var name="key_marketingSelect" value="${marketingSelect}" />
@@ -2310,6 +2310,7 @@
 		<var name="key_mgDocumentTitle" value="${mgDocumentTitle}" />
 
 		<execute function="AssertElementPresent" locator1="MediaGallery#ENTRY_THUMBNAIL" />
+
 		<execute function="AssertElementPresent" locator1="MediaGallery#IMAGE_TITLE" value1="${mgDocumentTitle}" />
 	</command>
 

@@ -46,12 +46,11 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_role_assignments.
 
 	<liferay-ui:user-group-search-container-results
 		searchTerms="<%= searchTerms %>"
-		useIndexer="<%= false %>"
 		userGroupParams="<%= userGroupParams %>"
 	/>
 
 	<liferay-ui:search-container-row
-		className="com.liferay.portal.model.UserGroup"
+		className="com.liferay.portal.kernel.model.UserGroup"
 		escapedModel="<%= true %>"
 		keyProperty="group.groupId"
 		modelVar="userGroup"
