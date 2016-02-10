@@ -18,9 +18,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.resource.manager.ClassLoaderResourceManager;
 import com.liferay.portal.kernel.resource.manager.ResourceManager;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.settings.ConfigurationBeanSettings;
 import com.liferay.portal.kernel.settings.LocationVariableResolver;
 import com.liferay.portal.kernel.settings.PortletPreferencesSettings;
@@ -33,11 +38,6 @@ import com.liferay.portal.kernel.settings.definition.ConfigurationPidMapping;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.PortletConstants;
-import com.liferay.portal.service.GroupLocalService;
-import com.liferay.portal.service.PortalPreferencesLocalService;
-import com.liferay.portal.service.PortletPreferencesLocalService;
 
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,13 +79,13 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 
 	@Override
 	public Settings getConfigurationBeanSettings(
-		String settingsId, Settings parentSettings) {
+		String configurationPid, Settings parentSettings) {
 
 		return new ConfigurationBeanSettings(
 			new LocationVariableResolver(
-				getResourceManager(settingsId),
+				getResourceManager(configurationPid),
 				SettingsFactoryUtil.getSettingsFactory()),
-			getConfigurationBean(settingsId), parentSettings);
+			getConfigurationBean(configurationPid), parentSettings);
 	}
 
 	public PortletPreferences getGroupPortletPreferences(
@@ -192,11 +192,9 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 		}
 	}
 
-	protected Object getConfigurationBean(String settingsId) {
-		settingsId = PortletConstants.getRootPortletId(settingsId);
-
+	protected Object getConfigurationBean(String configurationPid) {
 		Class<?> configurationBeanClass = _configurationBeanClasses.get(
-			settingsId);
+			configurationPid);
 
 		if (configurationBeanClass == null) {
 			return null;
@@ -208,11 +206,9 @@ public class SettingsLocatorHelperImpl implements SettingsLocatorHelper {
 		return configurationBeanManagedService.getConfigurationBean();
 	}
 
-	protected ResourceManager getResourceManager(String settingsId) {
-		settingsId = PortletConstants.getRootPortletId(settingsId);
-
+	protected ResourceManager getResourceManager(String configurationPid) {
 		Class<?> configurationBeanClass = _configurationBeanClasses.get(
-			settingsId);
+			configurationPid);
 
 		if (configurationBeanClass == null) {
 			return new ClassLoaderResourceManager(

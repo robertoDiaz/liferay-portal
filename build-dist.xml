@@ -653,10 +653,6 @@
 	<target name="build-dist-wildfly">
 		<app-server-properties-update>
 			app.server.type=wildfly
-			app.server.wildfly.version=9.0.1
-			app.server.wildfly.dir=${app.server.parent.dir}/wildfly-9.0.1
-			app.server.wildfly.zip.name=wildfly-9.0.1.Final.zip
-			app.server.wildfly.zip.url=http://download.jboss.org/wildfly/9.0.1.Final/wildfly-9.0.1.Final.zip
 		</app-server-properties-update>
 
 		<antcall target="update-sdk-properties" inheritAll="false" />
@@ -2818,7 +2814,7 @@ plugins.includes=</echo>
 		<zip destfile="dist/liferay-portal-doc-${lp.version}.zip">
 			<zipfileset
 				dir="api"
-				includes="**/*.css,**/*.gif,**/*.html"
+				includes="**/*.css,**/*.gif,**/*.html,**/*.jpeg,**/*.jpg,**/*.png,**/*.svg"
 				prefix="liferay-portal-doc-${lp.version}"
 			/>
 		</zip>

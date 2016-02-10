@@ -16,10 +16,10 @@ package com.liferay.portal.kernel.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.PortletConstants;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -290,13 +290,31 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 	 * Returns the portlet ID, including the instance ID if applicable, from the
 	 * parameter map.
 	 *
+	 * @deprecated As of 7.0.0, replaced by {@link #getPortletInstanceKey(Map)}
 	 * @param  routeParameters the parameter map. For an instanceable portlet,
 	 *         this must contain either <code>p_p_id</code> or
 	 *         <code>instanceId</code>.
 	 * @return the portlet ID, including the instance ID if applicable, or
 	 *         <code>null</code> if it cannot be determined
 	 */
+	@Deprecated
 	protected String getPortletId(Map<String, String> routeParameters) {
+		return getPortletInstanceKey(routeParameters);
+	}
+
+	/**
+	 * Returns the portlet instance key, including the instance ID if
+	 * applicable, from the parameter map.
+	 *
+	 * @param  routeParameters the parameter map. For an instanceable portlet,
+	 *         this must contain either <code>p_p_id</code> or
+	 *         <code>instanceId</code>.
+	 * @return the portlet instance key, including the instance ID if
+	 *         applicable, or <code>null</code> if it cannot be determined
+	 */
+	protected String getPortletInstanceKey(
+		Map<String, String> routeParameters) {
+
 		if (!isPortletInstanceable()) {
 			return getPortletId();
 		}

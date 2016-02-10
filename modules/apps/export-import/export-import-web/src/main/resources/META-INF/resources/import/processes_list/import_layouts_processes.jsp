@@ -19,24 +19,22 @@
 <%
 long groupId = ParamUtil.getLong(request, "groupId");
 boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
+String displayStyle = ParamUtil.getString(request, "displayStyle");
+String navigation = ParamUtil.getString(request, "navigation");
+String orderByCol = ParamUtil.getString(request, "orderByCol");
+String orderByType = ParamUtil.getString(request, "orderByType");
+String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "importLayoutsView");
 portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("privateLayout", String.valueOf(privateLayout));
-
-String orderByCol = ParamUtil.getString(request, "orderByCol");
-String orderByType = ParamUtil.getString(request, "orderByType");
-
-if (Validator.isNotNull(orderByCol) && Validator.isNotNull(orderByType)) {
-	portalPreferences.setValue(PortletKeys.BACKGROUND_TASK, "entries-order-by-col", orderByCol);
-	portalPreferences.setValue(PortletKeys.BACKGROUND_TASK, "entries-order-by-type", orderByType);
-}
-else {
-	orderByCol = portalPreferences.getValue(PortletKeys.BACKGROUND_TASK, "entries-order-by-col", "create-date");
-	orderByType = portalPreferences.getValue(PortletKeys.BACKGROUND_TASK, "entries-order-by-type", "desc");
-}
+portletURL.setParameter("displayStyle", displayStyle);
+portletURL.setParameter("navigation", navigation);
+portletURL.setParameter("orderByCol", orderByCol);
+portletURL.setParameter("orderByType", orderByType);
+portletURL.setParameter("searchContainerId", searchContainerId);
 
 OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
 %>
@@ -44,15 +42,39 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 <div id="<portlet:namespace />importProcessesSearchContainer">
 	<liferay-ui:search-container
 		emptyResultsMessage="no-import-processes-were-found"
+		id="<%= searchContainerId %>"
 		iteratorURL="<%= portletURL %>"
 		orderByCol="<%= orderByCol %>"
 		orderByComparator="<%= orderByComparator %>"
 		orderByType="<%= orderByType %>"
-		total="<%= BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR) %>"
+		rowChecker="<%= new EmptyOnClickRowChecker(liferayPortletResponse) %>"
 	>
-		<liferay-ui:search-container-results
-			results="<%= BackgroundTaskManagerUtil.getBackgroundTasks(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator()) %>"
-		/>
+		<liferay-ui:search-container-results>
+
+			<%
+			int backgroundTasksCount = 0;
+			List<BackgroundTask> backgroundTasks = null;
+
+			if (navigation.equals("all")) {
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR);
+				backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			}
+			else {
+				boolean completed = false;
+
+				if (navigation.equals("completed")) {
+					completed = true;
+				}
+
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, completed);
+				backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, completed, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			}
+
+			searchContainer.setResults(backgroundTasks);
+			searchContainer.setTotal(backgroundTasksCount);
+			%>
+
+		</liferay-ui:search-container-results>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.backgroundtask.BackgroundTask"
@@ -112,7 +134,7 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator markupView="lexicon" />
+		<liferay-ui:search-iterator markupView="lexicon" resultRowSplitter="<%= new ExportImportResultRowSplitter() %>" />
 	</liferay-ui:search-container>
 </div>
 
