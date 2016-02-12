@@ -33,9 +33,14 @@ String productMenuState = SessionClicks.get(request, ProductNavigationProductMen
 	</h4>
 
 	<div class="sidebar-body">
-		<c:if test='<%= Validator.equals(productMenuState, "open") %>'>
-			<liferay-util:include page="/portlet/product_menu.jsp" servletContext="<%= application %>" />
-		</c:if>
+		<c:choose>
+			<c:when test='<%= Validator.equals(productMenuState, "open") %>'>
+				<liferay-util:include page="/portlet/product_menu.jsp" servletContext="<%= application %>" />
+			</c:when>
+			<c:otherwise>
+				<div class="loading-animation"></div>
+			</c:otherwise>
+		</c:choose>
 	</div>
 </div>
 
@@ -45,9 +50,6 @@ String productMenuState = SessionClicks.get(request, ProductNavigationProductMen
 	sidenavToggle.sideNavigation();
 
 	var sidenavSlider = $('#sidenavSliderId');
-
-	sidenavSlider.off('closed.lexicon.sidenav');
-	sidenavSlider.off('open.lexicon.sidenav');
 
 	sidenavSlider.on(
 		'closed.lexicon.sidenav',
@@ -63,6 +65,13 @@ String productMenuState = SessionClicks.get(request, ProductNavigationProductMen
 		}
 	);
 
+	sidenavSlider.on(
+		'urlLoaded.lexicon.sidenav',
+		function() {
+			sidenavSlider.find('.loading-animation').remove();
+		}
+	);
+
 	<c:if test="<%= productMenuDisplayContext.hasUserPanelCategory() %>">
 		Liferay.on(
 			'ProductMenu:openUserMenu',
@@ -72,10 +81,12 @@ String productMenuState = SessionClicks.get(request, ProductNavigationProductMen
 				var showUserCollapse = function() {
 					var userCollapse = $(userCollapseSelector);
 
-					userCollapse.collapse({
-						show: true,
-						parent: '#<portlet:namespace />Accordion'
-					});
+					userCollapse.collapse(
+						{
+							parent: '#<portlet:namespace />Accordion',
+							show: true
+						}
+					);
 
 					userCollapse.collapse('show');
 				};

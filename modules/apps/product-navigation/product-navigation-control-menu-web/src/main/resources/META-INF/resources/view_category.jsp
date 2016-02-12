@@ -149,19 +149,21 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 								%>
 
 								<li class="lfr-content-item" role="presentation">
-									<aui:icon cssClass="<%= cssClass %>" data="<%= data %>" image='<%= portletInstanceable ? "grid" : "live" %>' label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" markupView="lexicon" />
+									<a href="javascript:;">
+										<aui:icon cssClass="<%= cssClass %>" data="<%= data %>" image='<%= portletInstanceable ? "grid" : "live" %>' label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" markupView="lexicon" />
 
-									<%
-									data.remove("draggable");
-									%>
+										<%
+										data.remove("draggable");
+										%>
 
-									<span <%= AUIUtil.buildData(data) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
-										<liferay-ui:message key="add" />
-									</span>
+										<span <%= AUIUtil.buildData(data) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
+											<liferay-ui:message key="add" />
+										</span>
+									</a>
 								</li>
 
 								<%
-								List<PortletItem> portletItems = PortletItemLocalServiceUtil.getPortletItems(themeDisplay.getScopeGroupId(), portlet.getPortletId(), com.liferay.portal.model.PortletPreferences.class.getName());
+								List<PortletItem> portletItems = PortletItemLocalServiceUtil.getPortletItems(themeDisplay.getScopeGroupId(), portlet.getPortletId(), com.liferay.portal.kernel.model.PortletPreferences.class.getName());
 								%>
 
 								<c:if test="<%= ListUtil.isNotEmpty(portletItems) %>">
@@ -195,15 +197,17 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 										%>
 
 											<li class="lfr-archived-setup lfr-content-item" role="presentation">
-												<aui:icon cssClass="<%= cssClass %>" data="<%= portletItemData %>" image='<%= portletInstanceable ? "grid" : "live" %>' label="<%= HtmlUtil.escape(portletItem.getName()) %>" markupView="lexicon" />
+												<a href="javascript:;">
+													<aui:icon cssClass="<%= cssClass %>" data="<%= portletItemData %>" image='<%= portletInstanceable ? "grid" : "live" %>' label="<%= HtmlUtil.escape(portletItem.getName()) %>" markupView="lexicon" />
 
-												<%
-												portletItemData.remove("draggable");
-												%>
+													<%
+													portletItemData.remove("draggable");
+													%>
 
-												<span <%= AUIUtil.buildData(portletItemData) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
-													<liferay-ui:message key="add" />
-												</span>
+													<span <%= AUIUtil.buildData(portletItemData) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
+														<liferay-ui:message key="add" />
+													</span>
+												</a>
 											</li>
 
 										<%

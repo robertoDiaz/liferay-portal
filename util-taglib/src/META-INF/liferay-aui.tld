@@ -144,54 +144,6 @@
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 	<tag>
-		<name>audio</name>
-		<tag-class>com.liferay.taglib.aui.AudioTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<name>boundingBox</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>cssClass</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>id</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>oggURL</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>swfURL</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>type</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>url</name>
-			<required>true</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<dynamic-attributes>true</dynamic-attributes>
-	</tag>
-	<tag>
 		<description><![CDATA[Creates a fully configurable button that offers portlet namespacing and custom icons.]]></description>
 		<name>button</name>
 		<tag-class>com.liferay.taglib.aui.ButtonTag</tag-class>
@@ -1091,20 +1043,6 @@
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 	<tag>
-		<description><![CDATA[Deprecated as of 6.2, with no replacement.]]></description>
-		<name>layout</name>
-		<tag-class>com.liferay.taglib.aui.LayoutTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<description><![CDATA[A CSS class for styling the component]]></description>
-			<name>cssClass</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<dynamic-attributes>true</dynamic-attributes>
-	</tag>
-	<tag>
 		<description><![CDATA[Creates a configurable model context object that can be used as a model for other components.]]></description>
 		<name>model-context</name>
 		<tag-class>com.liferay.taglib.aui.ModelContextTag</tag-class>
@@ -1799,6 +1737,7 @@
 			<type>java.util.Locale[]</type>
 		</attribute>
 		<attribute>
+			<description><![CDATA[Whether to make the translation manager default language changeable. The default value is <code>true</code>.]]></description>
 			<name>changeableDefaultLanguage</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1858,72 +1797,6 @@
 			<rtexprvalue>true</rtexprvalue>
 			<type>java.lang.String</type>
 		</attribute>
-	</tag>
-	<tag>
-		<name>video</name>
-		<tag-class>com.liferay.taglib.aui.VideoTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<name>boundingBox</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>cssClass</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>flashPlayerVersion</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>height</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.Object</type>
-		</attribute>
-		<attribute>
-			<name>id</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>ogvURL</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>poster</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>swfURL</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>url</name>
-			<required>true</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<name>width</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.Object</type>
-		</attribute>
-		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 	<tag>
 		<description><![CDATA[Creates a UI component that displays the current status of its associated workflow.]]></description>

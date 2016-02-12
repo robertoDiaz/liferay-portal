@@ -2164,7 +2164,7 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="BlogsEntry#viewNoEditLinkPG">
+		<execute macro="BlogsEntry#editNoPermissionPG">
 			<var name="entryContent" value="Blogs Entry Content" />
 			<var name="entryTitle" value="Blogs Entry Title" />
 		</execute>
@@ -2179,10 +2179,8 @@
 			<var name="portlet" value="Staging" />
 		</execute>
 
-		<execute macro="Staging#activateStagingCP">
-			<var name="editActivateStaging" value="true" />
+		<execute macro="Staging#editStagingConfiguration">
 			<var name="isNotEditable" value="Blogs" />
-			<var name="siteName" value="Site Name" />
 		</execute>
 	</command>
 
@@ -2636,13 +2634,15 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="Portlet#addPG">
-			<var name="portletName" value="Documents and Media" />
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="Staging Test Page" />
 		</execute>
 
-		<execute macro="Portlet#dragAndDropPortletToColumnPG">
-			<var name="columnNumberFrom" value="1" />
-			<var name="columnNumberTo" value="2" />
+		<execute macro="Page#editPageLayoutColumn">
+			<var name="columnName" value="1_column" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Documents and Media" />
 		</execute>
 
@@ -3081,7 +3081,9 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="Navigator#gotoStagedView" />
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
+		</execute>
 
 		<execute macro="Staging#viewPublishContentCountViaPortletStagingCP">
 			<var name="contentCount" value="1" />

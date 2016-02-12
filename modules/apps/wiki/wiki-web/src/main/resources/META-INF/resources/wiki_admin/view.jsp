@@ -98,12 +98,20 @@ int nodesCount = WikiNodeServiceUtil.getNodesCount(scopeGroupId);
 	</liferay-frontend:management-bar-filters>
 
 	<liferay-frontend:management-bar-action-buttons>
+		<liferay-frontend:management-bar-sidenav-toggler-button
+			disabled="<%= false %>"
+			href="javascript:;"
+			icon="info-circle"
+			label="info"
+			sidenavId='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+		/>
+
 		<liferay-frontend:management-bar-button href='<%= "javascript:" + renderResponse.getNamespace() + "deleteNodes();" %>' icon='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "trash" : "times" %>' label='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "recycle-bin" : "delete" %>' />
 	</liferay-frontend:management-bar-action-buttons>
 </liferay-frontend:management-bar>
 
 <div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
-	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/wiki/info_panel" var="sidebarPanelURL" />
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/wiki/node_info_panel" var="sidebarPanelURL" />
 
 	<liferay-frontend:sidebar-panel
 		resourceURL="<%= sidebarPanelURL %>"
@@ -114,7 +122,7 @@ int nodesCount = WikiNodeServiceUtil.getNodesCount(scopeGroupId);
 		request.removeAttribute(WikiWebKeys.WIKI_NODE);
 		%>
 
-		<liferay-util:include page="/wiki_admin/info_panel.jsp" servletContext="<%= application %>" />
+		<liferay-util:include page="/wiki_admin/node_info_panel.jsp" servletContext="<%= application %>" />
 	</liferay-frontend:sidebar-panel>
 
 	<div class="sidenav-content">

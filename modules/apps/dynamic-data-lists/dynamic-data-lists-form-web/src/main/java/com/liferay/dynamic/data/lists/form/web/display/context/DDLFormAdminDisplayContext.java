@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -59,7 +60,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowEngineManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
-import com.liferay.portal.model.Group;
 
 import java.util.List;
 import java.util.Locale;
@@ -148,6 +148,20 @@ public class DDLFormAdminDisplayContext {
 
 	public String[] getDisplayViews() {
 		return _DISPLAY_VIEWS;
+	}
+
+	public String getOrderByCol() {
+		String orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "modified-date");
+
+		return orderByCol;
+	}
+
+	public String getOrderByType() {
+		String orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
+
+		return orderByType;
 	}
 
 	public PortletURL getPortletURL() {

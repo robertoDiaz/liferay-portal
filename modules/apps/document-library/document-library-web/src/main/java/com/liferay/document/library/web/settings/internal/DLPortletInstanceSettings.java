@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.web.constants.DLPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.settings.FallbackKeys;
 import com.liferay.portal.kernel.settings.ParameterMapSettings;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.model.Layout;
 
 import java.util.Map;
 
@@ -62,6 +62,11 @@ public class DLPortletInstanceSettings {
 			parameterMap, settings);
 
 		return new DLPortletInstanceSettings(parameterMapSettings);
+	}
+
+	public static void registerSettingsMetadata() {
+		SettingsFactoryUtil.registerSettingsMetadata(
+			DLPortletInstanceSettings.class, null, _getFallbackKeys());
 	}
 
 	public DLPortletInstanceSettings(Settings settings) {
@@ -130,10 +135,6 @@ public class DLPortletInstanceSettings {
 		return _typedSettings.getBooleanValue("showActions");
 	}
 
-	public boolean isShowFolderMenu() {
-		return _typedSettings.getBooleanValue("showFolderMenu");
-	}
-
 	public boolean isShowFoldersSearch() {
 		return _typedSettings.getBooleanValue("showFoldersSearch");
 	}
@@ -168,7 +169,6 @@ public class DLPortletInstanceSettings {
 			"fileEntriesPerPage",
 			PropsKeys.SEARCH_CONTAINER_PAGE_DEFAULT_DELTA);
 		fallbackKeys.add("showActions", PropsKeys.DL_ACTIONS_VISIBLE);
-		fallbackKeys.add("showFolderMenu", PropsKeys.DL_FOLDER_MENU_VISIBLE);
 		fallbackKeys.add(
 			"showFoldersSearch", PropsKeys.DL_FOLDERS_SEARCH_VISIBLE);
 		fallbackKeys.add("showSubfolders", PropsKeys.DL_SUBFOLDERS_VISIBLE);
