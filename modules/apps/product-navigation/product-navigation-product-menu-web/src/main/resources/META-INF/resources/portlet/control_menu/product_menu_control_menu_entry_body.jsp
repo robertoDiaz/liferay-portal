@@ -14,10 +14,9 @@
  */
 --%>
 
-<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
-
 <%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
+<%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.kernel.util.SessionClicks" %>
 <%@ page import="com.liferay.product.navigation.product.menu.web.constants.ProductNavigationProductMenuPortletKeys" %>
@@ -25,14 +24,14 @@
 
 <liferay-theme:defineObjects />
 
-<portlet:defineObjects />
-
 <%
 String productMenuState = SessionClicks.get(request, ProductNavigationProductMenuWebKeys.PRODUCT_NAVIGATION_PRODUCT_MENU_STATE, "closed");
 %>
 
-<div class="<%= productMenuState %> lfr-product-menu-panel sidenav-fixed sidenav-menu-slider" id="sidenavSliderId">
-	<div class="product-menu sidebar sidenav-menu">
-		<liferay-portlet:runtime portletName="<%= ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU %>" />
+<liferay-util:body-bottom outputKey="productMenu">
+	<div class="<%= productMenuState %> lfr-product-menu-panel sidenav-fixed sidenav-menu-slider" id="sidenavSliderId">
+		<div class="product-menu sidebar sidenav-menu">
+			<liferay-portlet:runtime portletName="<%= ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU %>" />
+		</div>
 	</div>
-</div>
+</liferay-util:body-bottom>

@@ -14,6 +14,14 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="${pageName}" />
+		</execute>
+
+		<execute macro="Page#editPageLayoutColumn">
+			<var name="columnName" value="1_column" />
+		</execute>
+
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
@@ -152,6 +160,7 @@
 			<var name="categoryName" value="${categoryName}" />
 			<var name="subCategoryDescription" value="${subCategoryDescription}" />
 			<var name="subCategoryName" value="${subCategoryName}" />
+			<var name="threadsNumber" value="0" />
 		</execute>
 	</command>
 
@@ -184,6 +193,8 @@
 
 		<execute macro="MessageboardsCategory#viewCategoryDefaultPG">
 			<var name="categoryName" value="${categoryName}" />
+			<var name="subcategoriesNumber" value="0" />
+			<var name="threadsNumber" value="0" />
 		</execute>
 	</command>
 
@@ -585,30 +596,6 @@
 		<execute macro="MessageboardsThread#viewNoPG">
 			<var name="threadSubject" value="Thread Subject" />
 		</execute>
-	</command>
-
-	<command name="DeleteMBCategories" priority="4">
-		<var name="categoryNameList" value="MB Category1 Name,MB Category2 Name,MB Category3 Name" />
-
-		<for list="${categoryNameList}" param="categoryName" >
-			<execute macro="Page#gotoPG">
-				<var name="pageName" value="${pageName}" />
-			</execute>
-
-			<execute macro="MessageboardsCategory#addPG">
-				<var name="categoryName" value="${categoryName}" />
-			</execute>
-		</for>
-
-		<execute macro="MessageboardsCategory#tearDownCP">
-			<var name="assetType" value="3 items" />
-		</execute>
-
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute macro="MessageboardsCategory#viewDefaultPG" />
 	</command>
 
 	<command name="DeleteMBCategory" priority="5">
@@ -1205,8 +1192,8 @@
 		<var name="key_threadSubject" value="MB Thread Message Subject" />
 
 		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_LIST_THREAD" value1="MB Thread Message Subject" />
-		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_TABLE_STARTED_BY" value1="Test Test" />
-		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_TABLE_POSTS" value1="2" />
+		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_LIST_LAST_POST" value1="Test Test" />
+		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_TABLE_POSTS" value1="2 Posts" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="MessageBoards#THREAD_TABLE_LAST_POST" value1="userfn userln" />
 		<execute function="Click" locator1="MessageBoards#THREAD_LIST_THREAD" value1="MB Thread Message Subject" />
 
@@ -1248,7 +1235,11 @@
 			<var name="pageName" value="Message Boards Page" />
 		</execute>
 
-		<execute macro="MessageboardsCategory#addSubcategoryToSubcategoryPG">
+		<execute macro="MessageboardsCategory#gotoPG">
+			<var name="categoryName" value="MB Category Name" />
+		</execute>
+
+		<execute macro="MessageboardsCategory#addSubcategoryPG">
 			<var name="categoryName" value="MB Subcategory Name" />
 			<var name="subCategoryDescription" value="MB Subcategory Description" />
 			<var name="subCategoryName" value="MB Subcategory Name 2" />
@@ -1262,12 +1253,22 @@
 			<var name="categoryName" value="MB Category Name" />
 			<var name="subCategoryDescription" value="MB Subcategory Description" />
 			<var name="subCategoryName" value="MB Subcategory Name" />
+			<var name="threadsNumber" value="0" />
 		</execute>
 
-		<execute macro="MessageboardsCategory#viewSubcategoryFromSubcategoryPG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Message Boards Page" />
+		</execute>
+
+		<execute macro="MessageboardsCategory#gotoPG">
+			<var name="categoryName" value="MB Category Name" />
+		</execute>
+
+		<execute macro="MessageboardsCategory#viewSubcategoryPG">
 			<var name="categoryName" value="MB Subcategory Name" />
 			<var name="subCategoryDescription" value="MB Subcategory Description" />
 			<var name="subCategoryName" value="MB Subcategory Name 2" />
+			<var name="threadsNumber" value="0" />
 		</execute>
 
 		<execute macro="Page#gotoPG">

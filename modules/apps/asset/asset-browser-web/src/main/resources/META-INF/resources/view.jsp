@@ -24,6 +24,7 @@ String typeSelection = ParamUtil.getString(request, "typeSelection");
 long subtypeSelectionId = ParamUtil.getLong(request, "subtypeSelectionId");
 boolean showNonindexable = ParamUtil.getBoolean(request, "showNonindexable");
 boolean showScheduled = ParamUtil.getBoolean(request, "showScheduled");
+String toolbarItem = ParamUtil.getString(request, "toolbarItem", "browse");
 
 Boolean listable = null;
 
@@ -95,11 +96,7 @@ else {
 
 <aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
 	<aui:nav cssClass="navbar-nav" searchContainer="<%= assetBrowserSearch %>">
-		<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-			<liferay-util:param name="typeSelection" value="<%= typeSelection %>" />
-			<liferay-util:param name="subtypeSelectionId" value="<%= String.valueOf(subtypeSelectionId) %>" />
-		</liferay-util:include>
+		<aui:nav-item href="<%= portletURL %>" label="browse" selected='<%= toolbarItem.equals("browse") %>' />
 	</aui:nav>
 
 	<aui:nav-bar-search>
@@ -195,6 +192,12 @@ else {
 		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
 	</liferay-ui:search-container>
 </aui:form>
+
+<liferay-util:include page="/add_button.jsp" servletContext="<%= application %>">
+	<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+	<liferay-util:param name="typeSelection" value="<%= typeSelection %>" />
+	<liferay-util:param name="subtypeSelectionId" value="<%= String.valueOf(subtypeSelectionId) %>" />
+</liferay-util:include>
 
 <aui:script>
 	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectAssetFm', '<%= HtmlUtil.escapeJS(eventName) %>');

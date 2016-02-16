@@ -18,37 +18,11 @@
 
 <%
 Group group = layoutsAdminDisplayContext.getGroup();
-long groupId = layoutsAdminDisplayContext.getGroupId();
-long liveGroupId = layoutsAdminDisplayContext.getLiveGroupId();
-boolean privateLayout = layoutsAdminDisplayContext.isPrivateLayout();
 Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
 String rootNodeName = layoutsAdminDisplayContext.getRootNodeName();
 
 PortletURL redirectURL = layoutsAdminDisplayContext.getRedirectURL();
-
-Theme selTheme = null;
-ColorScheme selColorScheme = null;
-
-LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(groupId, privateLayout);
-
-if (selLayout != null) {
-	selTheme = selLayout.getTheme();
-	selColorScheme = selLayout.getColorScheme();
-}
-else {
-	selTheme = layoutSet.getTheme();
-	selColorScheme = layoutSet.getColorScheme();
-}
-
-String cssText = null;
-
-if ((selLayout != null) && !selLayout.isInheritLookAndFeel()) {
-	cssText = selLayout.getCssText();
-}
-else {
-	cssText = layoutSet.getCss();
-}
 %>
 
 <liferay-ui:error-marker key="<%= WebKeys.ERROR_SECTION %>" value="look-and-feel" />
@@ -79,7 +53,21 @@ else {
 }
 %>
 
-<%@ include file="/layout/look_and_feel_regular_browser.jspf" %>
+<aui:input checked="<%= selLayout.isInheritLookAndFeel() %>" id="regularInheritLookAndFeel" label="<%= taglibLabel %>" name="regularInheritLookAndFeel" type="radio" value="<%= true %>" />
+
+<aui:input checked="<%= !selLayout.isInheritLookAndFeel() %>" id="regularUniqueLookAndFeel" label="define-a-specific-look-and-feel-for-this-page" name="regularInheritLookAndFeel" type="radio" value="<%= false %>" />
+
+<c:if test="<%= !group.isLayoutPrototype() %>">
+	<div class="lfr-inherit-theme-options" id="<portlet:namespace />inheritThemeOptions">
+		<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>">
+			<liferay-util:param name="editable" value="<%= Boolean.FALSE.toString() %>" />
+		</liferay-util:include>
+	</div>
+</c:if>
+
+<div class="lfr-theme-options" id="<portlet:namespace />themeOptions">
+	<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>" />
+</div>
 
 <aui:script>
 	Liferay.Util.toggleRadio('<portlet:namespace />regularInheritLookAndFeel', '<portlet:namespace />inheritThemeOptions', '<portlet:namespace />themeOptions');

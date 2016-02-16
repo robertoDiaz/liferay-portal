@@ -25,14 +25,11 @@ portletURL.setParameter("displayStyle", displayStyle);
 
 RecordSetSearch recordSetSearch = new RecordSetSearch(renderRequest, portletURL);
 
-String orderByCol = ParamUtil.getString(request, "orderByCol", "modified-date");
-String orderByType = ParamUtil.getString(request, "orderByType", "asc");
+OrderByComparator<DDLRecordSet> orderByComparator = DDLFormAdminPortletUtil.getDDLRecordSetOrderByComparator(ddlFormAdminDisplayContext.getOrderByCol(), ddlFormAdminDisplayContext.getOrderByType());
 
-OrderByComparator<DDLRecordSet> orderByComparator = DDLFormAdminPortletUtil.getDDLRecordSetOrderByComparator(orderByCol, orderByType);
-
-recordSetSearch.setOrderByCol(orderByCol);
+recordSetSearch.setOrderByCol(ddlFormAdminDisplayContext.getOrderByCol());
 recordSetSearch.setOrderByComparator(orderByComparator);
-recordSetSearch.setOrderByType(orderByType);
+recordSetSearch.setOrderByType(ddlFormAdminDisplayContext.getOrderByType());
 
 if (recordSetSearch.isSearch()) {
 	recordSetSearch.setEmptyResultsMessage("no-forms-were-found");
@@ -49,9 +46,12 @@ else {
 <div class="container-fluid-1280" id="<portlet:namespace />formContainer">
 	<aui:form action="<%= portletURL.toString() %>" method="post" name="searchContainerForm">
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+		<aui:input name="deleteRecordSetIds" type="hidden" />
 
 		<liferay-ui:search-container
-			id="searchContainer"
+			emptyResultsMessage="no-forms-were-found"
+			id="ddlRecordSet"
+			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
 			searchContainer="<%= recordSetSearch %>"
 		>
 
@@ -80,9 +80,9 @@ else {
 
 				<c:choose>
 					<c:when test='<%= displayStyle.equals("descriptive") %>'>
-						<liferay-ui:search-container-column-image
-							src='<%= themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
-							toggleRowChecker="<%= true %>"
+						<liferay-ui:search-container-column-icon
+							cssClass="asset-icon"
+							icon="forms"
 						/>
 
 						<liferay-ui:search-container-column-jsp

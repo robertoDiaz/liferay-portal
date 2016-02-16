@@ -18,7 +18,6 @@ import com.liferay.blogs.kernel.model.BlogsEntry;
 import com.liferay.blogs.kernel.service.BlogsEntryLocalService;
 import com.liferay.blogs.web.constants.BlogsPortletKeys;
 import com.liferay.portal.kernel.portlet.PortletLayoutFinder;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.struts.BaseFindActionHelper;
 import com.liferay.portal.struts.FindActionHelper;
 
@@ -75,40 +74,19 @@ public class BlogsFindEntryHelper extends BaseFindActionHelper {
 	protected void addRequiredParameters(
 		HttpServletRequest request, String portletId, PortletURL portletURL) {
 
-		boolean showAllEntries = ParamUtil.getBoolean(
-			request, "showAllEntries");
+		String mvcRenderCommandName = null;
 
-		if (showAllEntries) {
-			String mvcPath = null;
-
-			if (portletId.equals(BlogsPortletKeys.BLOGS)) {
-				mvcPath += "/blogs/view.jsp";
-			}
-			else if (portletId.equals(BlogsPortletKeys.BLOGS_ADMIN)) {
-				mvcPath += "/blogs_admin/view.jsp";
-			}
-			else {
-				mvcPath += "/blogs_aggregator/view.jsp";
-			}
-
-			portletURL.setParameter("mvcPath", mvcPath);
+		if (portletId.equals(BlogsPortletKeys.BLOGS)) {
+			mvcRenderCommandName = "/blogs/view_entry";
+		}
+		else if (portletId.equals(BlogsPortletKeys.BLOGS_ADMIN)) {
+			mvcRenderCommandName = "/blogs_admin/view_entry";
 		}
 		else {
-			String mvcRenderCommandName = null;
-
-			if (portletId.equals(BlogsPortletKeys.BLOGS)) {
-				mvcRenderCommandName = "/blogs/view_entry";
-			}
-			else if (portletId.equals(BlogsPortletKeys.BLOGS_ADMIN)) {
-				mvcRenderCommandName = "/blogs_admin/view_entry";
-			}
-			else {
-				mvcRenderCommandName = "/blogs_aggregator/view";
-			}
-
-			portletURL.setParameter(
-				"mvcRenderCommandName", mvcRenderCommandName);
+			mvcRenderCommandName = "/blogs_aggregator/view";
 		}
+
+		portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
 	}
 
 	@Override

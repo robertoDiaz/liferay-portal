@@ -79,6 +79,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 					<%@ include file="/asset_export.jspf" %>
 				</div>
 			</c:if>
+
 			<c:if test="<%= assetPublisherDisplayContext.isShowAvailableLocales() && assetRenderer.isLocalizable() && !print %>">
 
 				<%
@@ -149,7 +150,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 
 		<c:if test="<%= assetPublisherDisplayContext.isEnableFlags() %>">
 			<div class="asset-flag">
-				<liferay-ui:flags
+				<liferay-flags:flags
 					className="<%= assetEntry.getClassName() %>"
 					classPK="<%= assetEntry.getClassPK() %>"
 					contentTitle="<%= title %>"

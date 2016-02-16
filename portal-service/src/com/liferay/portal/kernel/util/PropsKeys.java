@@ -101,9 +101,7 @@ public interface PropsKeys {
 
 	public static final String ASSET_VOCABULARY_DEFAULT = "asset.vocabulary.default";
 
-	public static final String AUDIT_MESSAGE_COM_LIFERAY_PORTAL_MODEL_LAYOUT_VIEW = "audit.message.com.liferay.portal.model.Layout.VIEW";
-
-	public static final String AUDIT_MESSAGE_SCHEDULER_JOB = "audit.message.scheduler.job";
+	public static final String AUDIT_MESSAGE_COM_LIFERAY_PORTAL_MODEL_LAYOUT_VIEW = "audit.message.com.liferay.portal.kernel.model.Layout.VIEW";
 
 	public static final String AUTH_FAILURE = "auth.failure";
 
@@ -699,8 +697,6 @@ public interface PropsKeys {
 
 	public static final String DL_FOLDER_ICON_CHECK_COUNT = "dl.folder.icon.check.count";
 
-	public static final String DL_FOLDER_MENU_VISIBLE = "dl.folder.menu.visible";
-
 	public static final String DL_FOLDERS_SEARCH_VISIBLE = "dl.folders.search.visible";
 
 	public static final String DL_NAME_BLACKLIST = "dl.name.blacklist";
@@ -783,25 +779,13 @@ public interface PropsKeys {
 
 	public static final String FIELD_EDITABLE_USER_TYPES = "field.editable.user.types";
 
-	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_CONTACT_BIRTHDAY = "field.enable.com.liferay.portal.model.Contact.birthday";
+	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_CONTACT_BIRTHDAY = "field.enable.com.liferay.portal.kernel.model.Contact.birthday";
 
-	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_CONTACT_MALE = "field.enable.com.liferay.portal.model.Contact.male";
+	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_CONTACT_MALE = "field.enable.com.liferay.portal.kernel.model.Contact.male";
 
-	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_ORGANIZATION_STATUS = "field.enable.com.liferay.portal.model.Organization.status";
+	public static final String FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_ORGANIZATION_STATUS = "field.enable.com.liferay.portal.kernel.model.Organization.status";
 
 	public static final String FINALIZE_MANAGER_THREAD_ENABLED = "finalize.manager.thread.enabled";
-
-	public static final String FLAGS_EMAIL_BODY = "flags.email.body";
-
-	public static final String FLAGS_EMAIL_FROM_ADDRESS = "flags.email.from.address";
-
-	public static final String FLAGS_EMAIL_FROM_NAME = "flags.email.from.name";
-
-	public static final String FLAGS_EMAIL_SUBJECT = "flags.email.subject";
-
-	public static final String FLAGS_GUEST_USERS_ENABLED = "flags.guest.users.enabled";
-
-	public static final String FLAGS_REASONS = "flags.reasons";
 
 	public static final String FULL_PAGE_DISPLAYABLE = "full.page.displayable";
 
@@ -1304,8 +1288,6 @@ public interface PropsKeys {
 	public static final String MESSAGE_BOARDS_SUBSCRIBE_BY_DEFAULT = "message.boards.subscribe.by.default";
 
 	public static final String MESSAGE_BOARDS_THREAD_AS_QUESTION_BY_DEFAULT = "message.boards.thread.as.question.by.default";
-
-	public static final String MESSAGE_BOARDS_THREAD_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "message.boards.thread.previous.and.next.navigation.enabled";
 
 	public static final String MESSAGE_BOARDS_THREAD_PRIORITIES = "message.boards.thread.priorities";
 
@@ -2075,17 +2057,17 @@ public interface PropsKeys {
 
 	public static final String SPRITE_ROOT_DIR = "sprite.root.dir";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_COUNTRY_COUNTRY_ID = "sql.data.com.liferay.portal.model.Country.country.id";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_COUNTRY_COUNTRY_ID = "sql.data.com.liferay.portal.kernel.model.Country.country.id";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS = "sql.data.com.liferay.portal.model.ListType.account.address";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS = "sql.data.com.liferay.portal.kernel.model.ListType.account.address";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_EMAIL_ADDRESS = "sql.data.com.liferay.portal.model.ListType.account.email.address";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_EMAIL_ADDRESS = "sql.data.com.liferay.portal.kernel.model.ListType.account.email.address";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_CONTACT_EMAIL_ADDRESS = "sql.data.com.liferay.portal.model.ListType.contact.email.address";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_CONTACT_EMAIL_ADDRESS = "sql.data.com.liferay.portal.kernel.model.ListType.contact.email.address";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ORGANIZATION_STATUS = "sql.data.com.liferay.portal.model.ListType.organization.status";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ORGANIZATION_STATUS = "sql.data.com.liferay.portal.kernel.model.ListType.organization.status";
 
-	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_REGION_REGION_ID = "sql.data.com.liferay.portal.model.Region.region.id";
+	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_REGION_REGION_ID = "sql.data.com.liferay.portal.kernel.model.Region.region.id";
 
 	public static final String SQL_DATA_MAX_PARAMETERS = "sql.data.max.parameters";
 
