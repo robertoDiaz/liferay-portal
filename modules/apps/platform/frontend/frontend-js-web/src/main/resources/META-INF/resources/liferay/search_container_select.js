@@ -214,8 +214,10 @@ AUI.add(
 					_onSurfaceStartNavigate: function(event) {
 						var instance = this;
 
-						instance._addRestoreTask();
-						instance._addRestoreTaskState();
+						if (!config.get(urlRegex) || config.get(urlRegex).test(event.path)) {
+							instance._addRestoreTask();
+							instance._addRestoreTaskState();
+						}
 					}
 				},
 
