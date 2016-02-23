@@ -480,6 +480,7 @@ public class JournalDisplayContext {
 			_liferayPortletRequest, _liferayPortletResponse);
 
 		entriesChecker.setCssClass("entry-selector");
+		entriesChecker.setSelectionCache("/folderId=/");
 
 		articleSearchContainer.setRowChecker(entriesChecker);
 

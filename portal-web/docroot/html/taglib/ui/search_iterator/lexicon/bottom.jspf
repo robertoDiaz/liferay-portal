@@ -29,6 +29,7 @@
 	<%
 	String modules = "liferay-search-container";
 	String rowCheckerRowSelector = StringPool.BLANK;
+	String rowCheckerSelectionCacheInvalidateUrlRegex = StringPool.BLANK;
 
 	if (rowMover != null) {
 		modules += ",liferay-search-container-move";
@@ -38,6 +39,7 @@
 		modules += ",liferay-search-container-select";
 
 		rowCheckerRowSelector = rowChecker.getRowSelector();
+		rowCheckerSelectionCacheInvalidateUrlRegex = rowChecker.get...();
 
 		if (Validator.isNull(rowCheckerRowSelector)) {
 			rowCheckerRowSelector = "[data-selectable=\"true\"]";
@@ -54,7 +56,8 @@
 			plugins.push(
 				{
 					cfg: {
-						rowSelector: rowSelector
+						rowSelector: rowSelector,
+						invalidateCacheUrlRegx: '<%= rowCheckerSelectionCacheInvalidateUrlRegex %>'
 					},
 					fn: A.Plugin.SearchContainerSelect
 				}
