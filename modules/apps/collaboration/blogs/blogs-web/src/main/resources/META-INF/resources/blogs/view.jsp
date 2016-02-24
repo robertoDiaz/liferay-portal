@@ -80,7 +80,7 @@ searchContainer.setResults(results);
 %>
 
 <c:if test="<%= notPublishedEntriesCount > 0 %>">
-	<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
+	<aui:nav-bar markupView="lexicon">
 		<aui:nav cssClass="navbar-nav">
 			<aui:nav-item
 				href="<%= portletURL %>"
@@ -108,6 +108,8 @@ searchContainer.setResults(results);
 		</div>
 	</c:when>
 	<c:otherwise>
+
 		<%@ include file="/blogs/view_entries.jspf" %>
+
 	</c:otherwise>
 </c:choose>
