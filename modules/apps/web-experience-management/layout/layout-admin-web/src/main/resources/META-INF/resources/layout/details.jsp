@@ -89,7 +89,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		<aui:input name="name" />
 
 		<div class="form-group">
-			<aui:input helpMessage="if-this-is-checked-this-page-does-not-show-up-in-the-navigation-menu" label="hide-from-navigation-menu" name="hidden" type="toggle-switch" value="<%= selLayout.isHidden() %>" />
+			<aui:input helpMessage="if-enabled-this-page-does-not-show-up-in-the-navigation-menu" label="hide-from-navigation-menu" name="hidden" type="toggle-switch" value="<%= selLayout.isHidden() %>" />
 		</div>
 
 		<c:choose>
@@ -135,9 +135,13 @@ StringBuilder friendlyURLBase = new StringBuilder();
 
 	<aui:input name="layoutPrototypeUuid" type="hidden" value="<%= selLayout.getLayoutPrototypeUuid() %>" />
 
-	<aui:input label='<%= LanguageUtil.format(request, "automatically-apply-changes-done-to-the-page-template-x", HtmlUtil.escape(layoutPrototype.getName(user.getLocale())), false) %>' name="layoutPrototypeLinkEnabled" type="checkbox" value="<%= selLayout.isLayoutPrototypeLinkEnabled() %>" />
+	<aui:input helpMessage='<%= LanguageUtil.format(request, "if-enabled-this-page-will-inherit-changes-made-to-the-x-page-template", HtmlUtil.escape(layoutPrototype.getName(user.getLocale())), false) %>' label="inherit-changes" name="layoutPrototypeLinkEnabled" type="toggle-switch" value="<%= selLayout.isLayoutPrototypeLinkEnabled() %>" />
 
-	<div class='<%= selLayout.isLayoutPrototypeLinkEnabled() ? "" : "hide" %>' id="<portlet:namespace/>layoutPrototypeMergeAlert">
+	<div class="alert alert-warning layout-prototype-info-message <%= selLayout.isLayoutPrototypeLinkActive() ? StringPool.BLANK : "hide" %>">
+		<liferay-ui:message arguments='<%= new String[] {LanguageUtil.get(request, "inherit-changes"), "General"} %>' key="some-page-settings-are-unavailable-because-x-is-enabled" translateArguments="<%= false %>" />
+	</div>
+
+	<div class="<%= selLayout.isLayoutPrototypeLinkEnabled() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace/>layoutPrototypeMergeAlert">
 
 		<%
 		request.setAttribute("edit_layout_prototype.jsp-layoutPrototype", layoutPrototype);
@@ -149,7 +153,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	</div>
 </c:if>
 
-<div class="<%= selLayout.isLayoutPrototypeLinkEnabled() ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />typeOptions">
+<div class="<%= selLayout.isLayoutPrototypeLinkActive() ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />typeOptions">
 	<aui:select name="type">
 
 		<%
@@ -190,7 +194,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 			}
 		%>
 
-			<div class="layout-type-form layout-type-form-<%= type %> <%= selLayout.getType().equals(type) ? "" : "hide" %>">
+			<div class="layout-type-form layout-type-form-<%= type %> <%= selLayout.getType().equals(type) ? StringPool.BLANK : "hide" %>">
 
 				<%
 				request.setAttribute(WebKeys.SEL_LAYOUT, selLayout);
@@ -259,4 +263,18 @@ StringBuilder friendlyURLBase = new StringBuilder();
 			}
 		);
 	}
+
+	$('#<portlet:namespace />layoutPrototypeLinkEnabled').on(
+		'change',
+		function(event) {
+			var layoutPrototypeLinkChecked = event.currentTarget.checked;
+
+			$('.layout-prototype-info-message').toggleClass('hide', !layoutPrototypeLinkChecked);
+
+			var propagatableFields = $('#<portlet:namespace />fm .propagatable-field');
+
+			propagatableFields.prop('disabled', layoutPrototypeLinkChecked);
+			propagatableFields.toggleClass('disabled', layoutPrototypeLinkChecked);
+		}
+	);
 </aui:script>

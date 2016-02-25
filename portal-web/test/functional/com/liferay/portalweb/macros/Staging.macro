@@ -89,7 +89,6 @@
 		</if>
 
 		<execute function="Pause" locator1="5000" />
-		<execute function="Refresh" />
 	</command>
 
 	<command name="addEventRepeatDaily">
@@ -113,7 +112,7 @@
 
 		<var name="key_siteName" value="${siteName}" />
 
-		<execute macro="ProductMenu#gotoSitesPublishingTools">
+		<execute macro="ProductMenu#gotoSitesPublishing">
 			<var name="portlet" value="Staging" />
 		</execute>
 
@@ -448,7 +447,7 @@
 		<execute function="Click" locator1="StagingManageVariations#SITE_PAGES_VARIATIONS_TABLE_ACTIONS" />
 		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
 		<execute function="Type" locator1="StagingManageVariations#MANAGE_VARIATION" value1="${sitePagesVariationName} Edit" />
-		<execute function="AssertClick" locator1="Button#UPDATE" value1="Update" />
+		<execute function="AssertClick" locator1="StagingManageVariations#UPDATE_BUTTON" value1="Update" />
 		<execute function="SelectFrameTop" value1="relative=top" />
 		<execute function="SelectFrame" locator1="IFrame#SITE_VARIATION_IFRAME" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Site page variation was updated." />
@@ -473,7 +472,7 @@
 			<then>
 				<var name="key_contentName" value="${isNotEditable}" />
 
-				<execute function="AssertNotEditable" locator1="SiteSettingsStaging#CONTENT_CHECKBOX" />
+				<execute function="AssertNotEditable" locator1="Checkbox#STAGED_CONTENT" />
 			</then>
 		</if>
 
@@ -488,8 +487,7 @@
 		<execute function="AssertTextEquals#assertPartialText" locator1="Staging#STAGING_MENU_REVISION_DETAILS_MESSAGE" value1="The page ${pageName} is not enabled in ${sitePagesVariationName}, but is available for other pages variations." />
 		<execute function="AssertClick" locator1="Staging#STAGING_MENU_ENABLE_PAGE_BUTTON" value1="Enable in ${sitePagesVariationName}" />
 
-		<execute macro="Page#viewPG">
-			<var name="liferaySite" value="${liferaySite}" />
+		<execute macro="Page#view">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 	</command>
@@ -640,7 +638,7 @@
 
 		<var name="key_siteName" value="${siteName}" />
 
-		<execute macro="ProductMenu#gotoSitesPublishingTools">
+		<execute macro="ProductMenu#gotoSitesPublishing">
 			<var name="portlet" value="Staging" />
 		</execute>
 
@@ -681,7 +679,7 @@
 			<var name="site" value="${siteName}" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesPublishingTools">
+		<execute macro="ProductMenu#gotoSitesPublishing">
 			<var name="portlet" value="Staging" />
 		</execute>
 
@@ -840,6 +838,14 @@
 		</if>
 
 		<execute function="Click" locator1="Icon#CLOSE" />
+	</command>
+
+	<command name="viewIncompletePageViaStagingPageVariation">
+		<var name="key_page" value="${pageName}" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="SitePages#INCOMPLETE_STAGING_PAGE_VARIATION_INFO_MESSAGE" value1="The page ${pageName} is not enabled in ${sitePagesVariationName}, but is available for other pages variations." />
+		<execute function="AssertTextEquals" locator1="SitePages#INCOMPLETE_STAGING_PAGE_VARIATION_ENABLE_BUTTON" value1="Enable in ${sitePagesVariationName}" />
+		<execute function="AssertTextEquals" locator1="SitePages#INCOMPLETE_STAGING_PAGE_VARIATION_DELETE_BUTTON" value1="Delete in All Pages Variations" />
 	</command>
 
 	<command name="viewNoPublishContentCountViaPortletStagingCP">

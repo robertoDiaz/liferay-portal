@@ -108,6 +108,8 @@ if (portletTitleBasedNavigation) {
 
 	renderResponse.setTitle(headerTitle);
 }
+
+WikiEngineRenderer wikiEngineRenderer = (WikiEngineRenderer)request.getAttribute(WikiWebKeys.WIKI_ENGINE_RENDERER);
 %>
 
 <c:if test="<%= portletTitleBasedNavigation && !newPage %>">
@@ -231,7 +233,7 @@ if (portletTitleBasedNavigation) {
 						<div>
 
 							<%
-							WikiUtil.renderEditPageHTML(selectedFormat, pageContext, wikiPage);
+							wikiEngineRenderer.renderEditPageHTML(selectedFormat, pageContext, node, wikiPage);
 							%>
 
 						</div>
@@ -292,7 +294,7 @@ if (portletTitleBasedNavigation) {
 						<aui:input label="Summary" name="summary" />
 
 						<%
-						Collection<String> formats = WikiUtil.getFormats();
+						Collection<String> formats = wikiEngineRenderer.getFormats();
 						%>
 
 						<c:choose>
@@ -303,7 +305,7 @@ if (portletTitleBasedNavigation) {
 									for (String format : formats) {
 									%>
 
-										<aui:option label="<%= WikiUtil.getFormatLabel(format, locale) %>" selected="<%= selectedFormat.equals(format) %>" value="<%= format %>" />
+										<aui:option label="<%= wikiEngineRenderer.getFormatLabel(format, locale) %>" selected="<%= selectedFormat.equals(format) %>" value="<%= format %>" />
 
 									<%
 									}
@@ -324,21 +326,9 @@ if (portletTitleBasedNavigation) {
 					<c:if test="<%= wikiPage != null %>">
 						<liferay-ui:custom-attributes-available className="<%= WikiPage.class.getName() %>">
 							<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
-
-								<%
-								classPK = 0;
-
-								if (templatePage != null) {
-									classPK = templatePage.getPrimaryKey();
-								}
-								else if (page != null) {
-									classPK = wikiPage.getPrimaryKey();
-								}
-								%>
-
 								<liferay-ui:custom-attribute-list
 									className="<%= WikiPage.class.getName() %>"
-									classPK="<%= classPK %>"
+									classPK="<%= (templatePage != null) ? templatePage.getPrimaryKey() : wikiPage.getPrimaryKey() %>"
 									editable="<%= true %>"
 									label="<%= true %>"
 								/>
@@ -346,11 +336,13 @@ if (portletTitleBasedNavigation) {
 						</liferay-ui:custom-attributes-available>
 					</c:if>
 
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= WikiPage.class.getName() %>"
-						/>
-					</aui:fieldset>
+					<c:if test="<%= wikiPage == null %>">
+						<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
+							<liferay-ui:input-permissions
+								modelName="<%= WikiPage.class.getName() %>"
+							/>
+						</aui:fieldset>
+					</c:if>
 				</aui:fieldset-group>
 
 				<%
