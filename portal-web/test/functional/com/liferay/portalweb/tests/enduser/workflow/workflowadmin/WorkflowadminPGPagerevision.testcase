@@ -35,7 +35,7 @@
 			<var name="site" value="${siteName}" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesPublishingTools">
+		<execute macro="ProductMenu#gotoSitesPublishing">
 			<var name="portlet" value="Staging" />
 		</execute>
 
@@ -172,7 +172,7 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="Page#viewPG">
+		<execute macro="Page#view">
 			<var name="pageName" value="${pageName}" />
 			<var name="siteName" value="${siteName}" />
 			<var name="siteURL" value="true" />
@@ -186,7 +186,7 @@
 			<var name="workflowAssetTitle" value="${pageName}" />
 		</execute>
 
-		<execute macro="Page#viewPG">
+		<execute macro="Page#view">
 			<var name="pageName" value="${pageName}" />
 			<var name="siteName" value="${siteName}" />
 			<var name="siteURL" value="true" />

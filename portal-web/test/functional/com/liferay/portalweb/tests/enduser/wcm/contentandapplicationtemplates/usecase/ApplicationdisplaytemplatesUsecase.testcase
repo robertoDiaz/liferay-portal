@@ -270,6 +270,8 @@
 	</command>
 
 	<command name="ADTCategoriesNavigation" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Test Site Name" />
 		</execute>
@@ -531,12 +533,6 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="ADT Test Page" />
-			<var name="siteName" value="Test Site Name" />
-			<var name="siteURL" value="true" />
-		</execute>
-
 		<execute macro="SiteMapPortlet#viewCustomADTMultiColumnPG">
 			<var name="listChildPageName" value="ADT Child Page Name" />
 			<var name="listPageName" value="ADT Test Page,ADT Test Page 2,ADT Test Page 3" />
@@ -567,7 +563,7 @@
 			<var name="siteName" value="Test Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesPublishingTools">
+		<execute macro="ProductMenu#gotoSitesPublishing">
 			<var name="portlet" value="Staging" />
 		</execute>
 
