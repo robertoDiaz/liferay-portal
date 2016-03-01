@@ -229,18 +229,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>COG</td>
-	<td>//button[contains(@id,'settingsIcon')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>COMPARE_VERSIONS</td>
 	<td>//button[contains(@id,'compare')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CONFIRM</td>
-	<td>//button[contains(.,'Confirms')]</td>
+	<td>//button[contains(.,'Confirm')]</td>
 	<td></td>
 </tr>
 <tr>
