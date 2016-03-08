@@ -1,3 +1,4 @@
+<%@ taglib prefix="aui" uri="http://liferay.com/tld/aui" %>
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -147,6 +148,8 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 				<aui:input name="invitedTeamId" type="hidden" value="" />
 
 				<aui:button id="submit" type="submit" value="send-invitations" />
+				<aui:button cssClass="btn-lg" id="submit" type="submit" value="send-invitations" />
+				<aui:button type="cancel" />
 			</aui:form>
 		</div>
 	</div>
