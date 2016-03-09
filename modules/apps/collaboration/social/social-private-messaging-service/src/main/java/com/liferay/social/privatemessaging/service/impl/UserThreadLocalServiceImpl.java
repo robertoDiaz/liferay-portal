@@ -47,8 +47,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.social.privatemessaging.configuration.PrivateMessagingConfiguration;
-import com.liferay.social.privatemessaging.constants.PrivateMessagingConstants;
 import com.liferay.social.privatemessaging.constants.PrivateMessagingPortletKeys;
+import com.liferay.social.privatemessaging.model.PrivateMessagingConstants;
 import com.liferay.social.privatemessaging.model.UserThread;
 import com.liferay.social.privatemessaging.service.base.UserThreadLocalServiceBaseImpl;
 import com.liferay.util.ContentUtil;
@@ -485,8 +485,7 @@ public class UserThreadLocalServiceImpl extends UserThreadLocalServiceBaseImpl {
 				new String[] {
 					dateFormatDateTime.format(mbMessage.getCreateDate()),
 					threadURL
-				}
-			);
+				});
 
 			MailMessage mailMessage = new MailMessage(
 				from, to, subject, userThreadBody, true);
