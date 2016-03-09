@@ -177,14 +177,7 @@ if ((article != null) && (version > 0) && workflowEnabled) {
 
 <c:if test="<%= (article != null) && !article.isNew() && (classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
 	<liferay-frontend:info-bar>
-		<c:choose>
-			<c:when test="<%= classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
-				<aui:workflow-status helpMessage='<%= pending ? "there-is-a-publication-workflow-in-process" : null %>' id="<%= String.valueOf(article.getArticleId()) %>" markupView="lexicon" showHelpMessage="<%= true %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= article.getStatus() %>" version="<%= String.valueOf(article.getVersion()) %>" />
-			</c:when>
-			<c:otherwise>
-				<aui:workflow-status id="<%= String.valueOf(article.getArticleId()) %>" markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= article.getStatus() %>" version="<%= String.valueOf(article.getVersion()) %>" />
-			</c:otherwise>
-		</c:choose>
+		<aui:workflow-status helpMessage='<%= pending ? "there-is-a-publication-workflow-in-process" : null %>' id="<%= String.valueOf(article.getArticleId()) %>" markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= article.getStatus() %>" version="<%= String.valueOf(article.getVersion()) %>" />
 	</liferay-frontend:info-bar>
 </c:if>
 
