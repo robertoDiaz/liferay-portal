@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 
@@ -95,7 +96,15 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 		portletURL.setParameter(
 			"folderId", String.valueOf(getFolderId(request)));
 
+		if (ArrayUtil.isNotEmpty(getValidExtensions())) {
+			portletURL.setParameter("validExtensions", getValidExtensions());
+		}
+
 		return portletURL;
+	}
+
+	public String[] getValidExtensions() {
+		return _dlItemSelectorView.getValidExtensions();
 	}
 
 	public boolean isSearch() {

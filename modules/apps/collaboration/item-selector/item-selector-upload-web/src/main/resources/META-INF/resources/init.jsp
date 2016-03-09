@@ -24,7 +24,8 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.item.selector.criteria.UploadableFileReturnType" %><%@
 page import="com.liferay.item.selector.upload.web.ItemSelectorUploadView" %><%@
 page import="com.liferay.item.selector.upload.web.display.context.ItemSelectorUploadViewDisplayContext" %><%@
-page import="com.liferay.portal.kernel.util.HtmlUtil" %>
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %>
 
 <portlet:defineObjects />
 

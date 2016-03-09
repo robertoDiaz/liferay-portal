@@ -28,4 +28,6 @@ public interface DLItemSelectorView<T extends ItemSelectorCriterion>
 
 	public String[] getMimeTypes();
 
+	public String[] getValidExtensions();
+
 }

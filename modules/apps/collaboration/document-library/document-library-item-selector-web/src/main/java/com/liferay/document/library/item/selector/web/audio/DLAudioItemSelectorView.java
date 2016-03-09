@@ -56,6 +56,11 @@ public class DLAudioItemSelectorView
 	}
 
 	@Override
+	public String[] getValidExtensions() {
+		return new String[] {".mp3", ".mid", ".ogg", ".wav"};
+	}
+
+	@Override
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.document.library.item.selector.web)",
 		unbind = "-"

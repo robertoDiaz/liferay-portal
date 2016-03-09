@@ -56,6 +56,13 @@ public class DLVideoItemSelectorView
 	}
 
 	@Override
+	public String[] getValidExtensions() {
+		return new String[] {
+			".avi", ".divx", ".mov", ".mpeg", ".mpg", ".m4p", ".wmv"
+		};
+	}
+
+	@Override
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.document.library.item.selector.web)",
 		unbind = "-"

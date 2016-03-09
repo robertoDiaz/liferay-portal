@@ -56,6 +56,11 @@ public class DLImageItemSelectorView
 	}
 
 	@Override
+	public String[] getValidExtensions() {
+		return new String[] {".gif", ".jpeg", ".jpg", ".png"};
+	}
+
+	@Override
 	@Reference(
 		target ="(osgi.web.symbolicname=com.liferay.document.library.item.selector.web)",
 		unbind = "-"
