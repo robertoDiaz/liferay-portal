@@ -94,7 +94,6 @@
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="portletName" value="Documents and Media" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Documents and Media Page" />
 			<var name="siteURLTemp" value="true" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userFirstName" value="userfn" />
@@ -125,7 +124,7 @@
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />
@@ -156,7 +155,7 @@
 			<var name="userLoginFullName" value="Test Test" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />
@@ -192,7 +191,6 @@
 			<var name="roleName" value="Roles Siterole Name" />
 			<var name="roleType" value="Site" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Documents and Media Page" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userFirstName" value="userfn" />
 			<var name="userLastName" value="userln" />
@@ -201,7 +199,7 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />

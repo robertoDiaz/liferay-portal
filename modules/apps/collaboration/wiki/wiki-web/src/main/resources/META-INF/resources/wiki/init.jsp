@@ -16,7 +16,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<%@ page import="com.liferay.frontend.taglib.servlet.taglib.AddMenuItem" %><%@
+<%@ page import="com.liferay.frontend.taglib.web.servlet.taglib.AddMenuItem" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.Menu" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem" %><%@
@@ -58,6 +58,7 @@ page import="com.liferay.wiki.util.WikiCacheUtil" %><%@
 page import="com.liferay.wiki.util.WikiPageAttachmentsUtil" %><%@
 page import="com.liferay.wiki.util.WikiUtil" %><%@
 page import="com.liferay.wiki.util.comparator.PageVersionComparator" %><%@
+page import="com.liferay.wiki.validator.WikiPageTitleValidator" %><%@
 page import="com.liferay.wiki.web.configuration.WikiPortletInstanceOverriddenConfiguration" %><%@
 page import="com.liferay.wiki.web.display.context.WikiDisplayContextProvider" %><%@
 page import="com.liferay.wiki.web.display.context.logic.MailTemplatesHelper" %><%@

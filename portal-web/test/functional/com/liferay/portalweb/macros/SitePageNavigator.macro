@@ -9,7 +9,10 @@
 		<execute macro="ProductMenuHelper#expandPageTree" />
 
 		<if>
-			<condition function="IsElementNotPresent" locator1="ProductMenu#PUBLIC_PAGES" />
+			<and>
+				<condition function="IsElementNotPresent" locator1="ProductMenu#PUBLIC_PAGES" />
+				<condition function="IsElementNotPresent" locator1="ProductMenu#PRIVATE_PAGES" />
+			</and>
 			<then>
 				<execute macro="ProductMenuHelper#addFirstPage">
 					<var name="sitePagePrivacy" value="${sitePagePrivacy}" />
@@ -63,7 +66,7 @@
 			</then>
 		</if>
 
-		<var name="key_pageName" value="${page}" />
+		<var name="key_page" value="${page}" />
 
 		<execute function="Click#mouseOverClick" locator1="SitePages#SPECIFIC_PAGE_ELLIPSIS" />
 

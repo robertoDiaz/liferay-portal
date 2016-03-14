@@ -53,13 +53,49 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return _INCLUDES;
 	}
 
-	protected static String checkAnnotationParameterProperties(
+	protected String applyDiamondOperator(String content) {
+		Matcher matcher = _diamondOperatorPattern.matcher(content);
+
+		while (matcher.find()) {
+			String match = matcher.group();
+			String whitespace = matcher.group(4);
+			String parameterType = matcher.group(5);
+
+			String replacement = StringUtil.replaceFirst(
+				match, whitespace + "<" + parameterType + ">", "<>");
+
+			content = StringUtil.replace(content, match, replacement);
+		}
+
+		return content;
+	}
+
+	protected String checkAnnotationMetaTypeProperties(
+		String content, String annotation) {
+
+		if (!annotation.contains("@Meta.")) {
+			return content;
+		}
+
+		Matcher matcher = _annotationMetaTypePattern.matcher(annotation);
+
+		if (!matcher.find()) {
+			return content;
+		}
+
+		String newAnnotation = StringUtil.replaceFirst(
+			annotation, StringPool.PERCENT, StringPool.BLANK, matcher.start());
+
+		return StringUtil.replace(content, annotation, newAnnotation);
+	}
+
+	protected String checkAnnotationParameterProperties(
 		String content, String annotation) {
 
 		int x = annotation.indexOf("property = {");
 
 		if (x == -1) {
-			return null;
+			return content;
 		}
 
 		int y = x;
@@ -100,7 +136,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			}
 
 			if ((x == -1) || (y == -1) || (z == -1)) {
-				return null;
+				return content;
 			}
 
 			String propertyName = parameterProperty.substring(x + 1, y);
@@ -121,23 +157,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			previousPropertyName = propertyName;
 			previousPropertyNameAndValue = propertyNameAndValue;
-		}
-
-		return null;
-	}
-
-	protected String applyDiamondOperator(String content) {
-		Matcher matcher = _diamondOperatorPattern.matcher(content);
-
-		while (matcher.find()) {
-			String match = matcher.group();
-			String whitespace = matcher.group(4);
-			String parameterType = matcher.group(5);
-
-			String replacement = StringUtil.replaceFirst(
-				match, whitespace + "<" + parameterType + ">", "<>");
-
-			content = StringUtil.replace(content, match, replacement);
 		}
 
 		return content;
@@ -321,11 +340,19 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				"_log.is" + StringUtil.upperCaseFirstLetter(matcher.group(2)) +
 					"Enabled()";
 
-			if (!codeBlock.contains(s)) {
+			if (codeBlock.contains(s) ^ !s.equals("_log.isErrorEnabled()")) {
 				int lineCount = getLineCount(content, matcher.start(1));
 
-				processErrorMessage(
-					fileName, "Use " + s + ": " + fileName + " " + lineCount);
+				if (codeBlock.contains(s)) {
+					processErrorMessage(
+						fileName,
+						"Do not use _log.isErrorEnabled(): " + fileName + " " +
+							lineCount);
+				}
+				else {
+					processErrorMessage(
+						fileName, "Use " + s + ": " + fileName + " " + lineCount);
+				}
 			}
 		}
 	}
@@ -603,6 +630,31 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				}
 			}
 
+			matcher = _incorrectLineBreakPattern5.matcher(newContent);
+
+			if (matcher.find()) {
+				String tabs = matcher.group(2);
+
+				Pattern pattern = Pattern.compile(
+					"\n" + tabs + "([^\t]{2})(?!.*\n" + tabs + "[^\t])",
+					Pattern.DOTALL);
+
+				Matcher matcher2 = pattern.matcher(
+					newContent.substring(0, matcher.start(2)));
+
+				if (matcher2.find()) {
+					String match = matcher2.group(1);
+
+					if (!match.equals(").")) {
+						newContent = StringUtil.replaceFirst(
+							newContent, "\n" + matcher.group(2), StringPool.BLANK,
+							matcher.end(1));
+
+						continue;
+					}
+				}
+			}
+
 			matcher = _redundantCommaPattern.matcher(newContent);
 
 			if (matcher.find()) {
@@ -619,14 +671,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		Matcher matcher = _incorrectLineBreakPattern3.matcher(newContent);
 
 		while (matcher.find()) {
-			String match = matcher.group();
-
-			int closeParenthesesCount = StringUtil.count(
-				match, StringPool.CLOSE_PARENTHESIS);
-			int openParenthesesCount = StringUtil.count(
-				match, StringPool.OPEN_PARENTHESIS);
-
-			if (closeParenthesesCount == openParenthesesCount) {
+			if (getLevel(matcher.group()) == 0) {
 				int lineCount = getLineCount(newContent, matcher.start());
 
 				processErrorMessage(
@@ -902,9 +947,28 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					"DatabaseMetaData.supportsBatchUpdates: " + fileName);
 		}
 
+		// LPS-64056
+
+		if (newContent.contains("Configurable.createConfigurable(") &&
+			!fileName.endsWith("ConfigurableUtil.java")) {
+
+			processErrorMessage(
+				fileName,
+				"Use ConfigurableUtil.createConfigurable instead of " +
+					"Configurable.createConfigurable: " + fileName);
+		}
+
 		// LPS-62786
 
 		checkPropertyUtils(fileName, newContent);
+
+		// LPS-63953
+
+		if (!absolutePath.contains("poshi") &&
+			!fileName.endsWith("StringUtilTest.java")) {
+
+			checkStringUtilReplace(fileName, newContent);
+		}
 
 		newContent = getCombinedLinesContent(
 			newContent, _combinedLinesPattern1);
@@ -1084,7 +1148,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				String codeBlock = content.substring(pos + 1, matcher1.end());
 
 				String firstLine = codeBlock.substring(
-					0, codeBlock.indexOf(CharPool.NEW_LINE));
+					0, codeBlock.indexOf(CharPool.NEW_LINE) + 1);
 
 				Matcher matcher2 = _incorrectCloseCurlyBracePattern2.matcher(
 					firstLine);
@@ -1105,14 +1169,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		Matcher matcher = _missingEmptyLinePattern1.matcher(content);
 
 		while (matcher.find()) {
-			String match = matcher.group();
-
-			int closeParenthesesCount = StringUtil.count(
-				match, StringPool.CLOSE_PARENTHESIS);
-			int openParenthesesCount = StringUtil.count(
-				match, StringPool.OPEN_PARENTHESIS);
-
-			if (closeParenthesesCount == openParenthesesCount) {
+			if (getLevel(matcher.group()) == 0) {
 				content = StringUtil.replaceFirst(
 					content, "\n", "\n\n", matcher.start());
 			}
@@ -1235,12 +1292,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					if (matcher.find()) {
 						String match = matcher.group();
 
-						int closeParenthesesCount = StringUtil.count(
-							match, StringPool.CLOSE_PARENTHESIS);
-						int openParenthesesCount = StringUtil.count(
-							match, StringPool.OPEN_PARENTHESIS);
-
-						if ((closeParenthesesCount == openParenthesesCount) &&
+						if ((getLevel(match) == 0) &&
 							!match.endsWith("\n)\n") &&
 							!match.endsWith("\t)\n")) {
 
@@ -1257,7 +1309,10 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					String newContent = checkAnnotationParameterProperties(
 						content, annotation);
 
-					if (newContent != null) {
+					newContent = checkAnnotationMetaTypeProperties(
+						newContent, annotation);
+
+					if (!newContent.equals(content)) {
 						return formatAnnotations(
 							fileName, javaTermName, newContent, indent);
 					}
@@ -1579,9 +1634,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		String previousLine = null;
 		int previousLineLength = 0;
 
-		int previousLineCloseParenthesesCount = 0;
 		int previousLineLeadingWhitespace = 0;
-		int previousLineOpenParenthesesCount = 0;
+		int previousLineLevel = 0;
 
 		int baseLeadingWhitespace = 0;
 		int insideMethodCallExpectedWhitespace = 0;
@@ -1607,12 +1661,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			line = StringUtil.replace(
 				line, StringPool.TAB, StringPool.FOUR_SPACES);
 
-			String strippedQuotesLine = stripQuotes(trimmedLine);
-
-			int closeParenthesesCount = StringUtil.count(
-				strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
-			int openParenthesesCount = StringUtil.count(
-				strippedQuotesLine, StringPool.OPEN_PARENTHESIS);
+			int lineLevel = getLevel(trimmedLine);
 
 			if ((previousLineLength > 0) &&
 				(line.endsWith("|") || line.endsWith("&&") ||
@@ -1620,9 +1669,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				(previousLine.endsWith("|") || previousLine.endsWith("&&")) &&
 				(previousLineLength + trimmedLine.length() <
 					_MAX_LINE_LENGTH) &&
-				(openParenthesesCount <= closeParenthesesCount) &&
-				(previousLineCloseParenthesesCount <=
-					previousLineOpenParenthesesCount)) {
+				(lineLevel <= 0) && (previousLineLevel >= 0)) {
 
 				return StringUtil.replace(
 					ifClause, previousLine + "\n" + originalLine,
@@ -1662,9 +1709,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				if (previousLine.endsWith(StringPool.COMMA) &&
 					(insideMethodCallExpectedWhitespace > 0)) {
 
-					if (previousLineCloseParenthesesCount >
-							previousLineOpenParenthesesCount) {
-
+					if (previousLineLevel < 0) {
 						insideMethodCallExpectedWhitespace -= 4;
 					}
 
@@ -1694,14 +1739,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				return ifClause;
 			}
 
-			level = level + openParenthesesCount - closeParenthesesCount;
+			level += lineLevel;
 
 			previousLine = originalLine;
 			previousLineLength = line.length();
 
-			previousLineCloseParenthesesCount = closeParenthesesCount;
+			previousLineLevel = lineLevel;
 			previousLineLeadingWhitespace = leadingWhitespace;
-			previousLineOpenParenthesesCount = openParenthesesCount;
 		}
 
 		return ifClause;
@@ -1846,8 +1890,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							lineCount);
 				}
 
-				checkChaining(trimmedLine, fileName, lineCount);
-
 				checkStringBundler(trimmedLine, fileName, lineCount);
 
 				checkEmptyCollection(trimmedLine, fileName, lineCount);
@@ -1958,9 +2000,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 					String strippedQuotesLine = stripQuotes(trimmedLine);
 
-					int strippedQuotesLineCloseParenthesisCount =
-						StringUtil.count(
-							strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
 					int strippedQuotesLineOpenParenthesisCount =
 						StringUtil.count(
 							strippedQuotesLine, StringPool.OPEN_PARENTHESIS);
@@ -1968,8 +2007,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					if (!trimmedLine.startsWith(StringPool.OPEN_PARENTHESIS) &&
 						trimmedLine.endsWith(") {") &&
 						(strippedQuotesLineOpenParenthesisCount > 0) &&
-						(strippedQuotesLineOpenParenthesisCount >
-							strippedQuotesLineCloseParenthesisCount)) {
+						(getLevel(trimmedLine) > 0)) {
 
 						processErrorMessage(
 							fileName,
@@ -1989,18 +2027,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							String linePart = strippedQuotesLine.substring(
 								0, pos);
 
-							int closeBracketCount = StringUtil.count(
-								linePart, StringPool.CLOSE_BRACKET);
-							int closeParenthesisCount = StringUtil.count(
-								linePart, StringPool.CLOSE_PARENTHESIS);
-							int openBracketCount = StringUtil.count(
-								linePart, StringPool.OPEN_BRACKET);
-							int openParenthesisCount = StringUtil.count(
-								linePart, StringPool.OPEN_PARENTHESIS);
-
-							if ((openBracketCount == closeBracketCount) &&
-								(openParenthesisCount ==
-									closeParenthesisCount)) {
+							if ((getLevel(linePart, "(", ")") == 0) &&
+								(getLevel(linePart, "[", "]") == 0)) {
 
 								processErrorMessage(
 									fileName,
@@ -2016,12 +2044,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 						strippedQuotesLine.contains(
 							StringPool.CLOSE_CURLY_BRACE)) {
 
-						int closeCurlyBraceCount = StringUtil.count(
-							strippedQuotesLine, StringPool.CLOSE_CURLY_BRACE);
-						int openCurlyBraceCount = StringUtil.count(
-							strippedQuotesLine, StringPool.OPEN_CURLY_BRACE);
-
-						if ((closeCurlyBraceCount > openCurlyBraceCount) &&
+						if ((getLevel(strippedQuotesLine, "{", "}") < 0) &&
 							(lineLeadingTabCount > 0)) {
 
 							for (int i = 0; i < lineLeadingTabCount - 1; i++) {
@@ -2061,39 +2084,18 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 							linePart = stripQuotes(linePart);
 
-							int closeParenthesesCount = StringUtil.count(
-								linePart, StringPool.CLOSE_PARENTHESIS);
-							int greaterThanCount = StringUtil.count(
-								linePart, StringPool.GREATER_THAN);
-							int lessThanCount = StringUtil.count(
-								linePart, StringPool.LESS_THAN);
-							int openParenthesesCount = StringUtil.count(
-								linePart, StringPool.OPEN_PARENTHESIS);
-
-							if ((closeParenthesesCount !=
-									openParenthesesCount) ||
-								(greaterThanCount != lessThanCount)) {
+							if ((getLevel(linePart, "(", ")") != 0) ||
+								(getLevel(linePart, "<", ">") != 0)) {
 
 								continue;
 							}
 
 							linePart = previousLine.substring(x);
 
-							linePart = BaseSourceProcessor.stripQuotes(
-								linePart, CharPool.QUOTE);
+							linePart = stripQuotes(linePart, CharPool.QUOTE);
 
-							closeParenthesesCount = StringUtil.count(
-								linePart, StringPool.CLOSE_PARENTHESIS);
-							greaterThanCount = StringUtil.count(
-								linePart, StringPool.GREATER_THAN);
-							lessThanCount = StringUtil.count(
-								linePart, StringPool.LESS_THAN);
-							openParenthesesCount = StringUtil.count(
-								linePart, StringPool.OPEN_PARENTHESIS);
-
-							if ((closeParenthesesCount !=
-									openParenthesesCount) ||
-								(greaterThanCount != lessThanCount)) {
+							if ((getLevel(linePart, "(", ")") != 0) ||
+								(getLevel(linePart, "<", ">") != 0)) {
 
 								continue;
 							}
@@ -2127,20 +2129,14 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 								break;
 							}
 
-							int closeParenthesisCount = StringUtil.count(
-								strippedQuotesLine.substring(0, x),
-								StringPool.CLOSE_PARENTHESIS);
-							int openParenthesisCount = StringUtil.count(
-								strippedQuotesLine.substring(0, x),
-								StringPool.OPEN_PARENTHESIS);
+							int level = getLevel(
+								strippedQuotesLine.substring(0, x));
 
 							if ((previousLine.endsWith(
 									StringPool.OPEN_PARENTHESIS) &&
-								 (openParenthesisCount <
-									 closeParenthesisCount)) ||
+								 (level < 0)) ||
 								(previousLine.endsWith(StringPool.PLUS) &&
-								 (openParenthesisCount <=
-									 closeParenthesisCount))) {
+								 (level <= 0))) {
 
 								processErrorMessage(
 									fileName,
@@ -2155,12 +2151,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					if (x != -1) {
 						String linePart = strippedQuotesLine.substring(0, x);
 
-						int closeParenthesisCount = StringUtil.count(
-							linePart, StringPool.CLOSE_PARENTHESIS);
-						int openParenthesisCount = StringUtil.count(
-							linePart, StringPool.OPEN_PARENTHESIS);
-
-						if (closeParenthesisCount > openParenthesisCount) {
+						if (getLevel(linePart) < 0) {
 							processErrorMessage(
 								fileName,
 								"line break: " + fileName + " " + lineCount);
@@ -2169,9 +2160,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					else if (trimmedLine.endsWith(StringPool.COMMA) &&
 							 !trimmedLine.startsWith("for (")) {
 
-						if (strippedQuotesLineCloseParenthesisCount <
-								strippedQuotesLineOpenParenthesisCount) {
-
+						if (getLevel(trimmedLine) > 0) {
 							processErrorMessage(
 								fileName,
 								"line break: " + fileName + " " + lineCount);
@@ -2256,6 +2245,17 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 						ifClause = StringPool.BLANK;
 					}
 					else if (line.endsWith(StringPool.SEMICOLON)) {
+						String trimmedIfClause = StringUtil.trim(ifClause);
+
+						if (!trimmedIfClause.startsWith("while ") &&
+							!trimmedIfClause.contains("{\t")) {
+
+							processErrorMessage(
+								fileName,
+								"Incorrect if statement: " + fileName + " " +
+									lineCount);
+						}
+
 						ifClause = StringPool.BLANK;
 					}
 				}
@@ -2917,6 +2917,21 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					}
 				}
 			}
+
+			if (trimmedPreviousLine.equals("return") &&
+				line.endsWith(StringPool.OPEN_PARENTHESIS)) {
+
+				for (int i = 0;; i++) {
+					String nextLine = getNextLine(content, lineCount + i);
+
+					if (nextLine.endsWith(StringPool.SEMICOLON)) {
+						return getCombinedLinesContent(
+							content, fileName, line, trimmedLine,
+							lineLength, lineCount, previousLine, null,
+							tabDiff, false, true, i + 1);
+					}
+				}
+			}
 		}
 
 		if (((trimmedLine.length() + previousLineLength) <= _MAX_LINE_LENGTH) &&
@@ -2964,12 +2979,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				String linePart = tempLine.substring(0, pos);
 
-				int openParenthesisCount = StringUtil.count(
-					linePart, StringPool.OPEN_PARENTHESIS);
-				int closeParenthesisCount = StringUtil.count(
-					linePart, StringPool.CLOSE_PARENTHESIS);
-
-				if (openParenthesisCount == closeParenthesisCount) {
+				if (getLevel(linePart) == 0) {
 					return null;
 				}
 
@@ -3033,14 +3043,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				String linePart = trimmedLine.substring(0, x + 2);
 
-				String strippedQuotesLinePart = stripQuotes(linePart);
-
-				int closeParenthesesCount = StringUtil.count(
-					strippedQuotesLinePart, StringPool.CLOSE_PARENTHESIS);
-				int openParenthesesCount = StringUtil.count(
-					strippedQuotesLinePart, StringPool.OPEN_PARENTHESIS);
-
-				if (closeParenthesesCount != openParenthesesCount) {
+				if (getLevel(linePart) != 0) {
 					continue;
 				}
 
@@ -3113,12 +3116,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							0);
 					}
 
-					int openParenthesisCount = StringUtil.count(
-						line, StringPool.OPEN_PARENTHESIS);
-					int closeParenthesisCount = StringUtil.count(
-						line, StringPool.CLOSE_PARENTHESIS);
-
-					if (openParenthesisCount != closeParenthesisCount) {
+					if (getLevel(line) != 0) {
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
 							lineCount, previousLine, null, tabDiff, false, true,
@@ -3158,14 +3156,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		}
 
 		if (line.endsWith(StringPool.COMMA)) {
-			String strippedQuotesLine = stripQuotes(trimmedLine);
-
-			int openParenthesisCount = StringUtil.count(
-				strippedQuotesLine, StringPool.OPEN_PARENTHESIS);
-			int closeParenthesisCount = StringUtil.count(
-				strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
-
-			if (closeParenthesisCount > openParenthesisCount) {
+			if (getLevel(trimmedLine) < 0) {
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
 					previousLine, null, tabDiff, false, false, 0);
@@ -3233,8 +3224,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				String linePart = newLine.substring(0, x);
 
-				if ((StringUtil.count(linePart, StringPool.GREATER_THAN) ==
-						StringUtil.count(linePart, StringPool.LESS_THAN)) &&
+				if ((getLevel(linePart, "<", ">") == 0) &&
 					(getLineLength(linePart) <= _MAX_LINE_LENGTH)) {
 
 					if (lines.isEmpty()) {
@@ -3270,8 +3260,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				String linePart = newLine.substring(0, x + 1);
 
-				if ((StringUtil.count(linePart, StringPool.GREATER_THAN) ==
-						StringUtil.count(linePart, StringPool.LESS_THAN)) &&
+				if ((getLevel(linePart, "<", ">") == 0) &&
 					(getLineLength(linePart) <= _MAX_LINE_LENGTH)) {
 
 					lines.add(linePart);
@@ -3353,9 +3342,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			String linePart = line.substring(0, x);
 
-			if (StringUtil.count(linePart, StringPool.CLOSE_PARENTHESIS) ==
-					StringUtil.count(linePart, StringPool.OPEN_PARENTHESIS)) {
-
+			if (getLevel(linePart) == 0) {
 				return x + 1;
 			}
 		}
@@ -3414,31 +3401,17 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				continue;
 			}
 
-			if (Validator.isNotNull(previousLine)) {
-				String linePart1 = stripQuotes(line.substring(0, x));
+			if (Validator.isNotNull(previousLine) &&
+				(getLevel(line.substring(0, x)) < 0)) {
 
-				int closeParenthesesCount = StringUtil.count(
-					linePart1, StringPool.CLOSE_PARENTHESIS);
-				int openParenthesesCount = StringUtil.count(
-					linePart1, StringPool.OPEN_PARENTHESIS);
-
-				if (closeParenthesesCount > openParenthesesCount) {
-					return x + 3;
-				}
+				return x + 3;
 			}
 
 			if (!line.endsWith(" ||") && !line.endsWith(" &&")) {
 				continue;
 			}
 
-			String linePart2 = stripQuotes(line.substring(x));
-
-			int closeParenthesesCount = StringUtil.count(
-				linePart2, StringPool.CLOSE_PARENTHESIS);
-			int openParenthesesCount = StringUtil.count(
-				linePart2, StringPool.OPEN_PARENTHESIS);
-
-			if (openParenthesesCount > closeParenthesesCount) {
+			if (getLevel(line.substring(x)) > 0) {
 				return x + 3;
 			}
 		}
@@ -3920,24 +3893,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			return false;
 		}
 
-		javaParameter = stripQuotes(javaParameter);
-
-		int openParenthesisCount = StringUtil.count(
-			javaParameter, StringPool.OPEN_PARENTHESIS);
-		int closeParenthesisCount = StringUtil.count(
-			javaParameter, StringPool.CLOSE_PARENTHESIS);
-		int lessThanCount = StringUtil.count(
-			javaParameter, StringPool.LESS_THAN);
-		int greaterThanCount = StringUtil.count(
-			javaParameter, StringPool.GREATER_THAN);
-		int openCurlyBraceCount = StringUtil.count(
-			javaParameter, StringPool.OPEN_CURLY_BRACE);
-		int closeCurlyBraceCount = StringUtil.count(
-			javaParameter, StringPool.CLOSE_CURLY_BRACE);
-
-		if ((openParenthesisCount == closeParenthesisCount) &&
-			(lessThanCount == greaterThanCount) &&
-			(openCurlyBraceCount == closeCurlyBraceCount)) {
+		if ((getLevel(javaParameter, "(", ")") == 0) &&
+			(getLevel(javaParameter, "<", ">") == 0) &&
+			(getLevel(javaParameter, "{", "}") == 0)) {
 
 			return true;
 		}
@@ -4028,6 +3986,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 	private boolean _addMissingDeprecationReleaseVersion;
 	private boolean _allowUseServiceUtilInServiceImpl;
+	private Pattern _annotationMetaTypePattern = Pattern.compile(
+		"\\s(name|description) = \"%");
 	private Map<String, Tuple> _bndInheritRequiredTupleMap = new HashMap<>();
 	private Pattern _catchExceptionPattern = Pattern.compile(
 		"\n(\t+)catch \\((.+Exception) (.+)\\) \\{\n");
@@ -4053,7 +4013,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private Pattern _incorrectCloseCurlyBracePattern1 = Pattern.compile(
 		"\n(.+)\n\n(\t+)}\n");
 	private Pattern _incorrectCloseCurlyBracePattern2 = Pattern.compile(
-		"(\t| )@?(class |enum |interface |new )");
+		"(\t| )@?(class|enum|interface|new)\\s");
 	private Pattern _incorrectLineBreakPattern1 = Pattern.compile(
 		"\t(catch |else |finally |for |if |try |while ).*\\{\n\n\t+\\w");
 	private Pattern _incorrectLineBreakPattern2 = Pattern.compile(
@@ -4062,6 +4022,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		", new .*\\(.*\\) \\{\n");
 	private Pattern _incorrectLineBreakPattern4 = Pattern.compile(
 		"\n(\t*)(.*\\) \\{)([\t ]*\\}\n)");
+	private Pattern _incorrectLineBreakPattern5 = Pattern.compile(
+		"\n(\t*).*\\}\n(\t*)\\);");
 	private Pattern[] _javaSerializationVulnerabilityPatterns = new Pattern[] {
 		Pattern.compile(
 			".*(new [a-z\\.\\s]*ObjectInputStream).*", Pattern.DOTALL),
@@ -4072,7 +4034,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private List<String> _javaTermSortExcludes;
 	private List<String> _lineLengthExcludes;
 	private Pattern _logLevelPattern = Pattern.compile(
-		"\n(\t+)_log.(debug|info|trace|warn)\\(");
+		"\n(\t+)_log.(debug|error|info|trace|warn)\\(");
 	private Pattern _logPattern = Pattern.compile(
 		"\n\tprivate static final Log _log = LogFactoryUtil.getLog\\(\n*" +
 			"\t*(.+)\\.class\\)");

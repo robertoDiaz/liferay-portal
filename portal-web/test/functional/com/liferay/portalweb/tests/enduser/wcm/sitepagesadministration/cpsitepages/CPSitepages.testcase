@@ -75,9 +75,9 @@
 
 			<execute macro="Page#addChild">
 				<var name="page" value="Public Pages" />
+				<var name="pageName" value="Site Page" />
 				<var name="siteChildPageName" value="${childPageName}" />
 				<var name="siteName" value="Site Name" />
-				<var name="sitePageName" value="Site Page" />
 			</execute>
 		</for>
 
@@ -118,9 +118,9 @@
 
 		<execute macro="Page#addChild">
 			<var name="page" value="Private Pages" />
+			<var name="pageName" value="Site Page" />
 			<var name="siteChildPageName" value="Site Child Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Site Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoSpecificURLPage">
@@ -178,16 +178,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="pageName" value="Site Page" />
-			<var name="siteName" value="Site Name" />
-			<var name="sitePagePrivacy" value="Private" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelSites">
-			<var name="portlet" value="Sites" />
-		</execute>
-
-		<execute macro="Page#add">
 			<var name="pageName" value="Blogs Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="sitePagePrivacy" value="Private" />
@@ -233,9 +223,9 @@
 
 		<execute macro="Page#addChild">
 			<var name="page" value="Public Pages" />
+			<var name="pageName" value="Site Page" />
 			<var name="siteChildPageName" value="Site Child Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Site Page" />
 		</execute>
 
 		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
@@ -289,16 +279,6 @@
 
 		<execute macro="Site#addBlankCP">
 			<var name="siteName" value="Site Name" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelSites">
-			<var name="portlet" value="Sites" />
-		</execute>
-
-		<execute macro="Page#add">
-			<var name="pageName" value="Site Page" />
-			<var name="siteName" value="Site Name" />
-			<var name="sitePagePrivacy" value="Private" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelSites">
@@ -390,7 +370,7 @@
 
 		<execute macro="Page#copyApplicationsFromPageToPage">
 			<var name="pageName" value="Blog Page" />
-			<var name="sitePageName" value="Site Page" />
+			<var name="pageName" value="Site Page" />
 		</execute>
 	</command>
 
@@ -567,6 +547,10 @@
 		<execute macro="User#firstLoginPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Navigator#openSiteURL">
+			<var name="siteName" value="Site Name" />
 		</execute>
 
 		<execute macro="Page#viewDefaultSiteTemplatePagesPG">

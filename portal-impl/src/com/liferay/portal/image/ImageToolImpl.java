@@ -84,7 +84,9 @@ public class ImageToolImpl implements ImageTool {
 	}
 
 	public void afterPropertiesSet() {
-		ClassLoader classLoader = getClass().getClassLoader();
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
 
 		try {
 			InputStream is = classLoader.getResourceAsStream(
@@ -230,9 +232,7 @@ public class ImageToolImpl implements ImageTool {
 			}
 		}
 		catch (Exception e) {
-			if (_log.isErrorEnabled()) {
-				_log.error(e, e);
-			}
+			_log.error(e, e);
 		}
 		finally {
 			_fileUtil.delete(inputFile);

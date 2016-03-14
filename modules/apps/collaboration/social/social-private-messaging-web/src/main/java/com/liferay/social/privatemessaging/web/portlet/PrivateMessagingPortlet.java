@@ -14,8 +14,7 @@
 
 package com.liferay.social.privatemessaging.web.portlet;
 
-import aQute.bnd.annotation.metatype.Configurable;
-
+import com.liferay.bnd.util.ConfigurableUtil;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
@@ -94,7 +93,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.display-category=category.collaboration",
 		"com.liferay.portlet.footer-portlet-javascript=/js/main.js",
 		"com.liferay.portlet.friendly-url-mapping=private_messaging",
-		"com.liferay.portlet.header-portlet-css=/css/main.scss",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.icon=/icons/icon.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",
@@ -318,7 +317,7 @@ public class PrivateMessagingPortlet extends MVCPortlet {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_privateMessagingConfiguration = Configurable.createConfigurable(
+		_privateMessagingConfiguration = ConfigurableUtil.createConfigurable(
 			PrivateMessagingConfiguration.class, properties);
 	}
 

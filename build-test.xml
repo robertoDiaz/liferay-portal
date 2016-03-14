@@ -2671,9 +2671,18 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						</then>
 					</if>
 
-					<antcall target="delete-liferay-home">
-						<param name="keep.hypersonicdb" value="true" />
-					</antcall>
+					<get-testcase-property property.name="portal.version" />
+
+					<if>
+						<not>
+							<isset property="portal.version" />
+						</not>
+						<then>
+							<antcall target="delete-liferay-home">
+								<param name="keep.hypersonicdb" value="true" />
+							</antcall>
+						</then>
+					</if>
 
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
@@ -3554,6 +3563,8 @@ go]]></replacevalue>
 	</target>
 
 	<target name="clean-up-mobile-device">
+		<get-testcase-property property.name="browser.type" />
+
 		<if>
 			<equals arg1="${browser.type}" arg2="android" />
 			<then>
@@ -4693,14 +4704,9 @@ osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</
 	</target>
 
 	<target name="prepare-mobile-device">
-		<if>
-			<equals arg1="${browser.type}" arg2="android" />
-			<then>
-				<stop-android-device />
+		<stop-android-device />
 
-				<start-android-device />
-			</then>
-		</if>
+		<start-android-device />
 	</target>
 
 	<target name="prepare-portal-ext-properties">
@@ -5388,6 +5394,13 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 					mobile.android.home=${mobile.android.home}
 					mobile.browser=true
 				</echo>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${browser.type}" arg2="android" />
+			<then>
+				<antcall target="prepare-mobile-device" />
 			</then>
 		</if>
 
@@ -6954,8 +6967,6 @@ if (ppstate.equals("normal")) {
 	</target>
 
 	<target name="run-selenium-test" depends="prepare-selenium">
-		<antcall target="prepare-mobile-device" />
-
 		<if>
 			<and>
 				<equals arg1="${test.class}" arg2="PortalWebTestSuite" />
@@ -7135,8 +7146,9 @@ jdbc.default.password=${database.mysql.password}</echo>
 				<if>
 					<and>
 						<available file="${jenkins.results.xml.file}" />
-						<isset property="env.BUILD_FLOW_BUILD_NUMBER" />
-						<isset property="env.BUILD_FLOW_JOB_NAME" />
+						<not>
+							<isset property="env.JENKINS_GITHUB_PULL_REQUEST_USERNAME" />
+						</not>
 					</and>
 					<then>
 						<copy
@@ -7287,6 +7299,7 @@ jdbc.default.password=${database.mysql.password}</echo>
 			<or>
 				<equals arg1="${cmis.repository.type}" arg2="documentum6" />
 				<equals arg1="${cmis.repository.type}" arg2="sharepoint2010" />
+				<equals arg1="${cmis.repository.type}" arg2="sharepoint2013" />
 			</or>
 			<then>
 				<if>
@@ -7444,6 +7457,7 @@ jdbc.default.password=${database.mysql.password}</echo>
 			<or>
 				<equals arg1="${cmis.repository.type}" arg2="documentum6" />
 				<equals arg1="${cmis.repository.type}" arg2="sharepoint2010" />
+				<equals arg1="${cmis.repository.type}" arg2="sharepoint2013" />
 			</or>
 			<then>
 				<property file="${project.dir}/${test.ext.properties.file}" />

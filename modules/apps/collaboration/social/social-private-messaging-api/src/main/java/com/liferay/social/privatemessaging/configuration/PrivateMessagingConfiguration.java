@@ -27,12 +27,12 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 @Meta.OCD(
 	id = "com.liferay.social.privatemessaging.configuration.PrivateMessagingConfiguration",
 	localization = "content/Language",
-	name = "%privatemessaging.service.configuration.name"
+	name = "privatemessaging.service.configuration.name"
 )
 public interface PrivateMessagingConfiguration {
 
 	@Meta.AD(
-		deflt = "com.liferay.social.privatemessaging/dependencies/notification_message_subject.tmpl",
+		deflt = "com/liferay/social/privatemessaging/dependencies/notification_message_subject.tmpl",
 		required = false
 	)
 	public String emailBody();
@@ -44,7 +44,7 @@ public interface PrivateMessagingConfiguration {
 	public String[] autocompleteRecipientSiteExcludes();
 
 	@Meta.AD(
-		deflt = "com.liferay.social.privatemessaging/dependencies/notification_message_subject.tmpl",
+		deflt = "com/liferay/social/privatemessaging/dependencies/notification_message_subject.tmpl",
 		required = false
 	)
 	public String emailSubject();

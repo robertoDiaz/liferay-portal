@@ -5,7 +5,6 @@ Export-Package:\
 	com.liferay.social.privatemessaging.hook,\
 	com.liferay.social.privatemessaging.hook.listeners,\
 	com.liferay.social.privatemessaging.model.impl,\
-	com.liferay.social.privatemessaging.notifications,\
 	com.liferay.social.privatemessaging.service.base,\
 	com.liferay.social.privatemessaging.service.http,\
 	com.liferay.social.privatemessaging.service.impl,\
@@ -18,9 +17,4 @@ Include-Resource:\
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Social Private Messaging
 Liferay-Service: true
-Liferay-Spring-Context: META-INF/spring
-Require-Capability:\
-	liferay.extender;\
-	filter:="(&(liferay.extender=spring.extender)(version>=1.0)(!(version>=2.0)))"
--include: ../../../../../marketplace/collaboration/bnd.bnd
--liferay-spring-dependency: com.liferay.portal.spring.extender.service.ServiceReference
+-include: ../../app.bnd
