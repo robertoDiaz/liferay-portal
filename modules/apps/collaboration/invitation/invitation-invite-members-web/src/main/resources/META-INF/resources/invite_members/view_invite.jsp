@@ -1,3 +1,4 @@
+<%@ taglib prefix="aui" uri="http://liferay.com/tld/aui" %>
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -27,7 +28,7 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 %>
 
 <div id="<portlet:namespace />inviteMembersContainer">
-	<div class="user-search-wrapper">
+	<div class="user-search-wrapper col-md-3">
 		<h2>
 			<liferay-ui:message key="find-members" />
 		</h2>
@@ -46,7 +47,7 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 		/>
 	</div>
 
-	<div class="invited-users-wrapper">
+	<div class="invited-users-wrapper col-md-9">
 		<div class="user-invited">
 			<h2>
 				<liferay-ui:message key="members-to-invite" />
@@ -146,7 +147,8 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 				<aui:input name="invitedRoleId" type="hidden" value="" />
 				<aui:input name="invitedTeamId" type="hidden" value="" />
 
-				<aui:button id="submit" type="submit" value="send-invitations" />
+				<aui:button cssClass="btn-lg" id="submit" type="submit" value="send-invitations" />
+				<aui:button type="cancel" />
 			</aui:form>
 		</div>
 	</div>

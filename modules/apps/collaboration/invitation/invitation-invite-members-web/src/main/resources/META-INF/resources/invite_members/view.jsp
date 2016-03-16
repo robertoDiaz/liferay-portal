@@ -29,7 +29,7 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 			<portlet:param name="mvcPath" value="/invite_members/view_invite.jsp" />
 		</portlet:renderURL>
 
-		<a class="invite-members" href="javascript:;" onClick="<portlet:namespace />openInviteMembers('<%= inviteURL %>');"><liferay-ui:message key="invite-members-to-this-site" /></a>
+		<a class="btn btn-default" href="javascript:;" onClick="<portlet:namespace />openInviteMembers('<%= inviteURL %>');"><liferay-ui:message key="invite-members-to-this-site" /></a>
 
 		<aui:script position="inline" use="aui-base,aui-io-plugin-deprecated,liferay-so-invite-members,liferay-util-window">
 			Liferay.provide(
@@ -54,7 +54,6 @@ Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 								destroyOnClose: true,
 								modal: true,
 								resizable: false,
-								width: 700
 							},
 							title: title
 						}
