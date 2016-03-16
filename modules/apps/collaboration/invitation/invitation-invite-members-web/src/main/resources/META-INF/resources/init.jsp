@@ -43,6 +43,3 @@ page import="com.liferay.users.admin.kernel.util.UsersAdminUtil" %>
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
-
-<%
-%>
