@@ -21,6 +21,7 @@ import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = {"service.ranking:Integer=100"}, service = ItemSelectorView.class
+	property = {"item.selector.view.order:Integer=100"}, service = ItemSelectorView.class
 )
 public class DLFileItemSelectorView
 	extends BaseDLItemSelectorView<FileItemSelectorCriterion> {
@@ -47,6 +48,11 @@ public class DLFileItemSelectorView
 	@Override
 	public List<ItemSelectorReturnType> getSupportedItemSelectorReturnTypes() {
 		return _supportedItemSelectorReturnTypes;
+	}
+
+	@Override
+	public String[] getValidExtensions() {
+		return PropsValues.DL_FILE_EXTENSIONS;
 	}
 
 	@Override

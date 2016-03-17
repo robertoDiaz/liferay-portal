@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upload.BaseUploadHandler;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.wiki.service.WikiPageServiceUtil;
@@ -34,12 +35,19 @@ import java.io.InputStream;
  */
 public class PageAttachmentWikiUploadHandler extends BaseUploadHandler {
 
-	public PageAttachmentWikiUploadHandler(long classPK) {
+	private long _maxFileSize;
+	private String[] _validExtensions;
+
+	public PageAttachmentWikiUploadHandler(
+		long classPK, long maxFileSize, String[] validExtensions) {
+
 		_classPK = classPK;
+		_maxFileSize = maxFileSize;
+		_validExtensions = validExtensions;
 	}
 
-	protected PageAttachmentWikiUploadHandler() {
-		this(0);
+	private PageAttachmentWikiUploadHandler() {
+		this(0, 0, null);
 	}
 
 	@Override
@@ -86,13 +94,18 @@ public class PageAttachmentWikiUploadHandler extends BaseUploadHandler {
 	}
 
 	@Override
-	protected String getParameterName() {
-		return "imageSelectorFileName";
+	protected long getMaxFileSize() {
+		return _maxFileSize;
 	}
 
 	@Override
-	protected void validateFile(String fileName, String contentType, long size)
-		throws PortalException {
+	protected String[] getValidExtensions() {
+		return _validExtensions;
+	}
+
+	@Override
+	protected String getParameterName() {
+		return "imageSelectorFileName";
 	}
 
 	private final long _classPK;

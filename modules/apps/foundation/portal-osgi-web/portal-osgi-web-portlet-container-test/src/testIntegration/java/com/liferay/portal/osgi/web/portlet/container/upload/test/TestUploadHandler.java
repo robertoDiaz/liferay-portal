@@ -15,7 +15,6 @@
 package com.liferay.portal.osgi.web.portlet.container.upload.test;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -24,9 +23,6 @@ import com.liferay.portal.kernel.upload.BaseUploadHandler;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 
 import java.io.InputStream;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 
 /**
  * @author Manuel de la Peña
@@ -57,12 +53,6 @@ public class TestUploadHandler extends BaseUploadHandler {
 	}
 
 	@Override
-	protected void doHandleUploadException(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		PortalException pe, JSONObject jsonObject) {
-	}
-
-	@Override
 	protected FileEntry fetchFileEntry(
 		long userId, long groupId, long folderId, String fileName) {
 
@@ -89,6 +79,16 @@ public class TestUploadHandler extends BaseUploadHandler {
 	@Override
 	protected void validateFile(
 		String fileName, String contentType, long size) {
+	}
+
+	@Override
+	protected String[] getValidExtensions() {
+		return new String[0];
+	}
+
+	@Override
+	protected long getMaxFileSize() {
+		return 0;
 	}
 
 	private final TestUploadPortlet _testUploadPortlet;

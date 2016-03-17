@@ -14,7 +14,6 @@
 
 package com.liferay.document.library.web.upload;
 
-import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.kernel.util.DLUtil;
@@ -30,9 +29,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.BaseUploadHandler;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 
 import java.io.InputStream;
@@ -42,6 +39,19 @@ import java.io.InputStream;
  * @author Sergio González
  */
 public class FileEntryDLUploadHandler extends BaseUploadHandler {
+
+	private long _maxFileSize;
+	private String[] _validExtensions;
+
+	private FileEntryDLUploadHandler() {
+	}
+
+	public FileEntryDLUploadHandler(
+		long maxFileSize, String[] validExtensions) {
+
+		_maxFileSize = maxFileSize;
+		_validExtensions = validExtensions;
+	}
 
 	@Override
 	protected FileEntry addFileEntry(
@@ -79,6 +89,16 @@ public class FileEntryDLUploadHandler extends BaseUploadHandler {
 	}
 
 	@Override
+	protected long getMaxFileSize() {
+		return _maxFileSize;
+	}
+
+	@Override
+	protected String[] getValidExtensions() {
+		return _validExtensions;
+	}
+
+	@Override
 	protected long getFolderId(UploadPortletRequest uploadPortletRequest) {
 		return ParamUtil.getLong(uploadPortletRequest, "folderId");
 	}
@@ -113,18 +133,6 @@ public class FileEntryDLUploadHandler extends BaseUploadHandler {
 		}
 
 		return StringPool.BLANK;
-	}
-
-	@Override
-	protected void validateFile(String fileName, String contentType, long size)
-		throws PortalException {
-
-		long maxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);
-
-		if ((maxSize > 0) && (size > maxSize)) {
-			throw new FileSizeException(
-				size + " exceeds its maximum permitted size of " + maxSize);
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

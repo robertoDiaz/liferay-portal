@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = {"service.ranking:Integer=100"}, service = ItemSelectorView.class
+	property = {"item.selector.view.order:Integer=100"}, service = ItemSelectorView.class
 )
 public class DLAudioItemSelectorView
 	extends BaseDLItemSelectorView<AudioItemSelectorCriterion> {
@@ -53,6 +53,11 @@ public class DLAudioItemSelectorView
 	@Override
 	public List<ItemSelectorReturnType> getSupportedItemSelectorReturnTypes() {
 		return _supportedItemSelectorReturnTypes;
+	}
+
+	@Override
+	public String[] getValidExtensions() {
+		return new String[] {".mp3", ".mid", ".ogg", ".wav"};
 	}
 
 	@Override

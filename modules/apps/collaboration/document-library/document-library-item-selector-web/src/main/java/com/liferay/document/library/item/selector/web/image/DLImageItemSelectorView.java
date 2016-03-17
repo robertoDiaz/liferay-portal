@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = {"service.ranking:Integer=100"}, service = ItemSelectorView.class
+	property = {"item.selector.view.order:Integer=100"}, service = ItemSelectorView.class
 )
 public class DLImageItemSelectorView
 	extends BaseDLItemSelectorView<ImageItemSelectorCriterion> {
@@ -53,6 +53,11 @@ public class DLImageItemSelectorView
 	@Override
 	public List<ItemSelectorReturnType> getSupportedItemSelectorReturnTypes() {
 		return _supportedItemSelectorReturnTypes;
+	}
+
+	@Override
+	public String[] getValidExtensions() {
+		return new String[] {".gif", ".jpeg", ".jpg", ".png"};
 	}
 
 	@Override

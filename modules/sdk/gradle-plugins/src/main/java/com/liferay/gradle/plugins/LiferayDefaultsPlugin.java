@@ -89,6 +89,7 @@ import org.gradle.api.artifacts.maven.Conf2ScopeMapping;
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer;
 import org.gradle.api.artifacts.maven.MavenDeployer;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
+import org.gradle.api.execution.TaskExecutionGraph;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileTree;
@@ -624,6 +625,10 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 					List<String> publishCommands = _getPublishCommands(
 						gradleRelativePath, gradleDaemon, false);
 
+					publishCommands.add(0, "git add --all");
+					publishCommands.add(
+						1, _getGitCommitCommand("packageinfo", false));
+
 					commands.add(
 						"(git diff-index --quiet HEAD || (" +
 							CollectionUtils.join(" && ", publishCommands) +
@@ -1036,6 +1041,15 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 				"Git-SHA", "${system-allow-fail;git rev-list -1 HEAD}");
 		}
 
+		File appDir = getRootDir(project, _APP_BND_FILE_NAME);
+
+		if (appDir != null) {
+			File appFile = new File(appDir, _APP_BND_FILE_NAME);
+
+			bundleDefaultInstructions.put(
+				Constants.INCLUDE, FileUtil.getRelativePath(project, appFile));
+		}
+
 		liferayOSGiExtension.bundleDefaultInstructions(
 			bundleDefaultInstructions);
 	}
@@ -1261,8 +1275,28 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 						project, recordArtifactTask, updateFileVersionsTask);
 
 					if (hasPlugin(project, BundlePlugin.class)) {
-						configureBundleInstructions(project);
 						configureProjectBndProperties(project);
+					}
+				}
+
+			});
+
+		Gradle gradle = project.getGradle();
+
+		TaskExecutionGraph taskExecutionGraph = gradle.getTaskGraph();
+
+		taskExecutionGraph.whenReady(
+			new Closure<Void>(null) {
+
+				@SuppressWarnings("unused")
+				public void doCall(TaskExecutionGraph taskExecutionGraph) {
+					Task jarTask = GradleUtil.getTask(
+						project, JavaPlugin.JAR_TASK_NAME);
+
+					if (hasPlugin(project, BundlePlugin.class) &&
+						taskExecutionGraph.hasTask(jarTask)) {
+
+						configureBundleInstructions(project);
 					}
 				}
 
@@ -2010,6 +2044,8 @@ public class LiferayDefaultsPlugin extends BaseDefaultsPlugin<LiferayPlugin> {
 
 		return false;
 	}
+
+	private static final String _APP_BND_FILE_NAME = "app.bnd";
 
 	private static final String _GROUP = "com.liferay";
 

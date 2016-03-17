@@ -15,28 +15,52 @@
 package com.liferay.item.selector.criteria.upload.criterion;
 
 import com.liferay.item.selector.BaseItemSelectorCriterion;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
+
+import javax.portlet.PortletURL;
 
 /**
  * @author Ambrín Chaudhary
+ * @author Roberto Díaz
  */
 public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 
 	public UploadItemSelectorCriterion() {
 	}
 
-	public UploadItemSelectorCriterion(String url, String repositoryName) {
+	public UploadItemSelectorCriterion(
+		PortletURL portletURL, String repositoryName) {
+
 		this(
-			url, repositoryName,
-			PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+			StringPool.BLANK, portletURL, repositoryName,
+			PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE,
+			new String[] {StringPool.STAR});
 	}
 
 	public UploadItemSelectorCriterion(
-		String url, String repositoryName, long maxFileSize) {
+		PortletURL portletURL, String repositoryName, long maxFileSize,
+		String[] validExtensions) {
 
-		_url = url;
-		_repositoryName = repositoryName;
-		_maxFileSize = maxFileSize;
+		this(
+			StringPool.BLANK, portletURL, repositoryName, maxFileSize,
+			validExtensions);
+	}
+
+	public UploadItemSelectorCriterion(String url, String repositoryName) {
+		this(
+			url, repositoryName,
+			PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE,
+			new String[] {StringPool.STAR});
+	}
+
+	public UploadItemSelectorCriterion(
+		String url, String repositoryName, long maxFileSize,
+		String[] validExtensions) {
+
+		this(url, null, repositoryName, maxFileSize, validExtensions);
 	}
 
 	public long getMaxFileSize() {
@@ -51,6 +75,10 @@ public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 		return _url;
 	}
 
+	public String[] getValidExtensions() {
+		return _validExtensions;
+	}
+
 	public void setMaxFileSize(long maxFileSize) {
 		_maxFileSize = maxFileSize;
 	}
@@ -63,8 +91,43 @@ public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 		_url = url;
 	}
 
+	public void setValidExtensions(String[] validExtensions) {
+		_validExtensions = validExtensions;
+	}
+
+	private UploadItemSelectorCriterion(
+		String url, PortletURL portletURL, String repositoryName,
+		long maxFileSize, String[] validExtensions) {
+
+		if (Validator.isNotNull(url)) {
+			_url = url;
+		}
+		else {
+			_url = populatePortletURL(portletURL, maxFileSize, validExtensions);
+		}
+
+		_repositoryName = repositoryName;
+		_maxFileSize = maxFileSize;
+		_validExtensions = validExtensions;
+	}
+
+	private String populatePortletURL(
+		PortletURL portletURL, long maxFileSize, String[] validExtensions) {
+
+		if (maxFileSize != 0) {
+			portletURL.setParameter("maxFileSize", String.valueOf(maxFileSize));
+		}
+
+		if (ArrayUtil.isNotEmpty(validExtensions)) {
+			portletURL.setParameter("validExtensions", validExtensions);
+		}
+
+		return portletURL.toString();
+	}
+
 	private long _maxFileSize;
 	private String _repositoryName;
 	private String _url;
+	private String[] _validExtensions;
 
 }

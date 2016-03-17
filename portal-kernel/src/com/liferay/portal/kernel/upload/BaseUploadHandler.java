@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.upload;
 
 import com.liferay.document.library.kernel.antivirus.AntivirusScannerException;
+import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.portal.kernel.editor.EditorConstants;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -29,6 +31,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -121,14 +124,6 @@ public abstract class BaseUploadHandler implements UploadHandler {
 	protected abstract void checkPermission(
 			long groupId, long folderId, PermissionChecker permissionChecker)
 		throws PortalException;
-
-	protected void doHandleUploadException(
-			PortletRequest portletRequest, PortletResponse portletResponse,
-			PortalException pe, JSONObject jsonObject)
-		throws PortalException {
-
-		throw pe;
-	}
 
 	protected abstract FileEntry fetchFileEntry(
 			long userId, long groupId, long folderId, String fileName)
@@ -251,12 +246,16 @@ public abstract class BaseUploadHandler implements UploadHandler {
 
 		jsonObject.put("success", Boolean.FALSE);
 
+		String errorMessage = StringPool.BLANK;
+
+		JSONObject errorJSONObject = JSONFactoryUtil.createJSONObject();
+
 		if (pe instanceof AntivirusScannerException ||
+			pe instanceof FileExtensionException ||
 			pe instanceof FileNameException ||
 			pe instanceof FileSizeException ||
 			pe instanceof UploadRequestSizeException) {
 
-			String errorMessage = StringPool.BLANK;
 			int errorType = 0;
 
 			ThemeDisplay themeDisplay =
@@ -270,6 +269,10 @@ public abstract class BaseUploadHandler implements UploadHandler {
 
 				errorMessage = themeDisplay.translate(ase.getMessageKey());
 			}
+			else if (pe instanceof FileExtensionException) {
+				errorType =
+					ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
+			}
 			else if (pe instanceof FileNameException) {
 				errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
 			}
@@ -281,17 +284,18 @@ public abstract class BaseUploadHandler implements UploadHandler {
 					ServletResponseConstants.SC_UPLOAD_REQUEST_SIZE_EXCEPTION;
 			}
 
-			JSONObject errorJSONObject = JSONFactoryUtil.createJSONObject();
-
 			errorJSONObject.put("errorType", errorType);
-			errorJSONObject.put("message", errorMessage);
 
-			jsonObject.put("error", errorJSONObject);
 		}
 		else {
-			doHandleUploadException(
-				portletRequest, portletResponse, pe, jsonObject);
+			errorMessage = LanguageUtil.get(
+				portletRequest.getLocale(),
+				"an-unexpected-error-occurred-while-uploading-your-file");
 		}
+
+		errorJSONObject.put("message", errorMessage);
+
+		jsonObject.put("error", errorJSONObject);
 
 		try {
 			JSONPortletResponseUtil.writeJSON(
@@ -302,9 +306,32 @@ public abstract class BaseUploadHandler implements UploadHandler {
 		}
 	}
 
-	protected abstract void validateFile(
+	protected void validateFile(
 			String fileName, String contentType, long size)
-		throws PortalException;
+		throws PortalException {
+
+		long maxFileSize = getMaxFileSize();
+
+		if ((maxFileSize > 0) && (size > maxFileSize)) {
+			throw new FileSizeException();
+		}
+
+		String extension = FileUtil.getExtension(fileName);
+
+		String[] validExtensions = getValidExtensions();
+
+		if (!ArrayUtil.contains(validExtensions, StringPool.STAR) &&
+			!ArrayUtil.contains(
+				validExtensions, StringPool.PERIOD + extension)) {
+
+			throw new FileExtensionException(
+				fileName + " has an invalid extension");
+		}
+	}
+
+	protected abstract String[] getValidExtensions();
+
+	protected abstract long getMaxFileSize();
 
 	protected static final String TEMP_FOLDER_NAME =
 		BaseUploadHandler.class.getName();

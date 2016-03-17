@@ -15,8 +15,14 @@
 package com.liferay.item.selector.taglib.servlet.taglib;
 
 import com.liferay.item.selector.taglib.servlet.ServletContextUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.util.IncludeTag;
 
+import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
@@ -25,6 +31,8 @@ import javax.servlet.jsp.PageContext;
  * @author Roberto Díaz
  */
 public class ImageSelectorTag extends IncludeTag {
+
+	private PortletURL _uploadURLObj;
 
 	public void setDraggableImage(String draggableImage) {
 		_draggableImage = draggableImage;
@@ -61,7 +69,7 @@ public class ImageSelectorTag extends IncludeTag {
 		_uploadURL = uploadURL;
 	}
 
-	public void setValidExtensions(String validExtensions) {
+	public void setValidExtensions(String[] validExtensions) {
 		_validExtensions = validExtensions;
 	}
 
@@ -74,7 +82,7 @@ public class ImageSelectorTag extends IncludeTag {
 		_maxFileSize = 0;
 		_paramName = "imageSelectorFileEntryId";
 		_uploadURL = null;
-		_validExtensions = null;
+		_validExtensions = PropsValues.DL_FILE_EXTENSIONS;
 	}
 
 	@Override
@@ -96,9 +104,32 @@ public class ImageSelectorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:image-selector:maxFileSize", _maxFileSize);
 		request.setAttribute("liferay-ui:image-selector:paramName", _paramName);
-		request.setAttribute("liferay-ui:image-selector:uploadURL", _uploadURL);
+		request.setAttribute(
+			"liferay-ui:image-selector:uploadURL", getUploadURL());
 		request.setAttribute(
 			"liferay-ui:image-selector:validExtensions", _validExtensions);
+	}
+
+	protected String getUploadURL() {
+		PortletResponse portletResponse =
+			(PortletResponse)request.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		String namespace = portletResponse.getNamespace();
+
+		if (_maxFileSize != 0) {
+			_uploadURL = HttpUtil.addParameter(
+				_uploadURL, namespace + "maxFileSize", _maxFileSize);
+		}
+
+		if (ArrayUtil.isNotEmpty(_validExtensions)) {
+			for (String validExtension : _validExtensions) {
+				_uploadURL = HttpUtil.addParameter(
+					_uploadURL, namespace + "validExtensions", validExtension);
+			}
+		}
+
+		return _uploadURL;
 	}
 
 	private static final String _PAGE = "/image_selector/page.jsp";
@@ -110,6 +141,6 @@ public class ImageSelectorTag extends IncludeTag {
 	private long _maxFileSize;
 	private String _paramName = "imageSelectorFileEntry";
 	private String _uploadURL;
-	private String _validExtensions;
+	private String[] _validExtensions = PropsValues.DL_FILE_EXTENSIONS;
 
 }
