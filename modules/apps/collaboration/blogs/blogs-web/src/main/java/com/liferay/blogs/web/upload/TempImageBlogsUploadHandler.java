@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.InputStream;
 
@@ -29,6 +30,16 @@ import java.io.InputStream;
  * @author Roberto Díaz
  */
 public class TempImageBlogsUploadHandler extends BaseBlogsUploadHandler {
+
+	private TempImageBlogsUploadHandler() {
+		super(0, null);
+	}
+
+	public TempImageBlogsUploadHandler(
+		long maxFileSize, String[] validExceptions) {
+
+		super(maxFileSize, validExceptions);
+	}
 
 	@Override
 	protected FileEntry addFileEntry(

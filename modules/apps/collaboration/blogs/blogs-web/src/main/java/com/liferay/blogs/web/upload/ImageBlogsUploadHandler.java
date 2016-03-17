@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.blogs.constants.BlogsConstants;
 
 import java.io.InputStream;
@@ -31,6 +32,14 @@ import java.io.InputStream;
  * @author Roberto Díaz
  */
 public class ImageBlogsUploadHandler extends BaseBlogsUploadHandler {
+
+	private ImageBlogsUploadHandler() {
+		super(0, null);
+	}
+
+	public ImageBlogsUploadHandler(long maxFileSize, String[] validExceptions) {
+		super(maxFileSize, validExceptions);
+	}
 
 	@Override
 	protected FileEntry addFileEntry(

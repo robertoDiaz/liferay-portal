@@ -17,7 +17,9 @@ package com.liferay.wiki.web.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.upload.UploadHandler;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.web.upload.PageAttachmentWikiUploadHandler;
 
@@ -46,9 +48,15 @@ public class UploadPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 
 		long resourcePrimKey = ParamUtil.getLong(
 			actionRequest, "resourcePrimKey");
+		long maxFileSize = GetterUtil.getLong(
+			actionRequest.getParameter("maxFileSize"),
+			PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+		String[] validExtensions = GetterUtil.getStringValues(
+			actionRequest.getParameterValues("validExtensions"),
+			PropsValues.DL_FILE_EXTENSIONS);
 
 		UploadHandler uploadHandler = new PageAttachmentWikiUploadHandler(
-			resourcePrimKey);
+			resourcePrimKey, maxFileSize, validExtensions);
 
 		uploadHandler.upload(actionRequest, actionResponse);
 	}

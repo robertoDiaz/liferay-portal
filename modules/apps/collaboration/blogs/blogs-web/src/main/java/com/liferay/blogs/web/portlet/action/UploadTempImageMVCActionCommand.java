@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.upload.UploadHandler;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.util.PropsValues;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -44,10 +46,17 @@ public class UploadTempImageMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		_uploadHandler.upload(actionRequest, actionResponse);
-	}
+		long maxFileSize = GetterUtil.getLong(
+			actionRequest.getParameter("maxFileSize"),
+			PropsValues.BLOGS_IMAGE_MAX_SIZE);
+		String[] validExtensions = GetterUtil.getStringValues(
+			actionRequest.getParameterValues("validExtensions"),
+			PropsValues.BLOGS_IMAGE_EXTENSIONS);
 
-	private final UploadHandler _uploadHandler =
-		new TempImageBlogsUploadHandler();
+		UploadHandler uploadHandler = new TempImageBlogsUploadHandler(
+			maxFileSize, validExtensions);
+
+		uploadHandler.upload(actionRequest, actionResponse);
+	}
 
 }
