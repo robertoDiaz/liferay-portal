@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dynamic Data Lists Service
 Bundle-SymbolicName: com.liferay.dynamic.data.lists.service
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.5
 Export-Package:\
 	com.liferay.dynamic.data.lists.configuration,\
 	com.liferay.dynamic.data.lists.exporter.impl,\
@@ -14,4 +14,3 @@ Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Dynamic Data Lists
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true
--liferay-includeresource: @com.liferay.util.java-*.jar!/com/liferay/util/ContentUtil.class

@@ -36,6 +36,8 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 
 UserGroupDisplayTerms searchTerms = (UserGroupDisplayTerms)userGroupSearch.getSearchTerms();
 
+userGroupSearch.setEmptyResultsMessageCssClass(searchTerms.isSearch() ? StringPool.BLANK : "taglib-empty-result-message-header-has-plus-btn");
+
 LinkedHashMap<String, Object> userGroupParams = new LinkedHashMap<String, Object>();
 
 userGroupParams.put("userGroupsGroups", Long.valueOf(siteMembershipsDisplayContext.getGroupId()));
@@ -154,7 +156,6 @@ userGroupSearch.setResults(userGroups);
 	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.ASSIGN_USER_ROLES) %>">
 		<portlet:renderURL var="selectSiteRoleURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 			<portlet:param name="mvcPath" value="/site_roles.jsp" />
-			<portlet:param name="className" value="<%= UserGroup.class.getName() %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(siteMembershipsDisplayContext.getGroupId()) %>" />
 		</portlet:renderURL>
 

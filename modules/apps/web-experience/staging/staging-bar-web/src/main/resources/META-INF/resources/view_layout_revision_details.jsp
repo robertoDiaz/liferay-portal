@@ -187,7 +187,7 @@ else {
 	request.setAttribute("view_layout_revision_details.jsp-layoutRevision", layoutRevision);
 	%>
 
-	<liferay-staging:menu cssClass="branching-enabled col-md-4" extended="<%= false %>" layoutSetBranchId="<%= layoutRevision.getLayoutSetBranchId() %>" onlyActions="<%= true %>" />
+	<liferay-staging:menu cssClass="branching-enabled col-md-4" layoutSetBranchId="<%= layoutRevision.getLayoutSetBranchId() %>" onlyActions="<%= true %>" />
 
 	<li class="control-menu-nav-item">
 		<div class="dropdown hidden-xs">
@@ -201,13 +201,13 @@ else {
 
 			<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<li>
-					<a href="javascript:;" id="manageLayoutSetRevisions" onclick='<%= renderResponse.getNamespace() + "openSitePagesVariationsDialog();" %>'>
+					<a href="javascript:;" id="manageLayoutSetRevisions" onclick="<%= renderResponse.getNamespace() + "openSitePagesVariationsDialog();" %>">
 						<liferay-ui:message key="site-pages-variation" />
 					</a>
 				</li>
 
 				<li>
-					<a href="javascript:;" id="manageLayoutRevisions" onclick='<%= renderResponse.getNamespace() + "openPageVariationsDialog();" %>'>
+					<a href="javascript:;" id="manageLayoutRevisions" onclick="<%= renderResponse.getNamespace() + "openPageVariationsDialog();" %>">
 						<liferay-ui:message key="page-variations" />
 					</a>
 				</li>

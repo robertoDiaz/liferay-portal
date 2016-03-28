@@ -14,6 +14,7 @@
 
 package com.liferay.asset.categories.admin.web.display.context;
 
+import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
@@ -31,6 +32,8 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortalPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
@@ -161,7 +164,13 @@ public class AssetCategoriesDisplayContext {
 			"there-are-no-categories.-you-can-add-a-category-by-clicking-the" +
 				"-plus-button-on-the-bottom-right-corner");
 
-		categoriesSearchContainer.setSearch(Validator.isNotNull(getKeywords()));
+		if (Validator.isNull(getKeywords())) {
+			categoriesSearchContainer.setEmptyResultsMessageCssClass(
+				"taglib-empty-result-message-header-has-plus-btn");
+		}
+		else {
+			categoriesSearchContainer.setSearch(true);
+		}
 
 		categoriesSearchContainer.setOrderByCol(getOrderByCol());
 
@@ -287,7 +296,12 @@ public class AssetCategoriesDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(_request, "displayStyle", "list");
+		PortalPreferences portalPreferences =
+			PortletPreferencesFactoryUtil.getPortalPreferences(_request);
+
+		_displayStyle = portalPreferences.getValue(
+			AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN,
+			"display-style", "list");
 
 		return _displayStyle;
 	}
@@ -354,7 +368,13 @@ public class AssetCategoriesDisplayContext {
 
 		String keywords = getKeywords();
 
-		vocabulariesSearchContainer.setSearch(Validator.isNotNull(keywords));
+		if (Validator.isNull(keywords)) {
+			vocabulariesSearchContainer.setEmptyResultsMessageCssClass(
+				"taglib-empty-result-message-header-has-plus-btn");
+		}
+		else {
+			vocabulariesSearchContainer.setSearch(true);
+		}
 
 		vocabulariesSearchContainer.setOrderByCol(getOrderByCol());
 

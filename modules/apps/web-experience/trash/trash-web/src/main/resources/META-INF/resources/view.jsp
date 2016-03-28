@@ -83,7 +83,13 @@ request.setAttribute("view.jsp-recycleBinEntrySearch", entrySearch);
 	<c:if test="<%= ree.getType() == RestoreEntryException.INVALID_CONTAINER %>">
 		<liferay-ui:message key="the-destination-you-selected-is-an-invalid-container.-please-select-a-different-destination" />
 	</c:if>
+
+	<c:if test="<%= ree.getType() == RestoreEntryException.INVALID_STATUS %>">
+		<liferay-ui:message key="unable-to-restore-this-item" />
+	</c:if>
 </liferay-ui:error>
+
+<liferay-ui:error exception="<%= TrashEntryException.class %>" message="unable-to-move-this-item-to-the-recycle-bin" />
 
 <liferay-ui:error exception="<%= TrashPermissionException.class %>">
 
@@ -243,7 +249,7 @@ request.setAttribute("view.jsp-recycleBinEntrySearch", entrySearch);
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
-						cssClass="type-column"
+						cssClass="text-column type-column"
 						name="type"
 						value="<%= ResourceActionsUtil.getModelResource(locale, trashEntry.getClassName()) %>"
 					/>
@@ -280,7 +286,7 @@ request.setAttribute("view.jsp-recycleBinEntrySearch", entrySearch);
 							%>
 
 							<liferay-ui:search-container-column-jsp
-								cssClass="list-group-item-field"
+								cssClass="entry-action-column"
 								path="/view_content_action.jsp"
 							/>
 						</c:otherwise>

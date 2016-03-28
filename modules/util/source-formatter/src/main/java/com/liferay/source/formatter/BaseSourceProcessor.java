@@ -812,6 +812,176 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		processFormattedFile(file, fileName, content, newContent);
 	}
 
+	protected String formatAttributes(
+			String fileName, String line, String tag, int lineCount,
+			boolean escapeQuotes)
+		throws Exception {
+
+		String s = tag;
+
+		int y = s.indexOf(CharPool.SPACE);
+
+		if (y == -1) {
+			return line;
+		}
+
+		String tagName = s.substring(1, y);
+
+		s = s.substring(y + 1);
+
+		String previousAttribute = null;
+		String previousAttributeAndValue = null;
+
+		boolean wrongOrder = false;
+
+		for (int x = 0;;) {
+			x = s.indexOf(CharPool.EQUAL);
+
+			if ((x == -1) || (s.length() <= (x + 1))) {
+				return line;
+			}
+
+			String attribute = s.substring(0, x);
+
+			if (!isAttributName(attribute)) {
+				return line;
+			}
+
+			if (Validator.isNotNull(previousAttribute) &&
+				(previousAttribute.compareToIgnoreCase(attribute) > 0)) {
+
+				wrongOrder = true;
+			}
+
+			s = s.substring(x + 1);
+
+			char delimeter = s.charAt(0);
+
+			if ((delimeter != CharPool.APOSTROPHE) &&
+				(delimeter != CharPool.QUOTE)) {
+
+				if (delimeter != CharPool.AMPERSAND) {
+					processErrorMessage(
+						fileName, "delimeter: " + fileName + " " + lineCount);
+				}
+
+				return line;
+			}
+
+			s = s.substring(1);
+
+			String value = null;
+
+			y = -1;
+
+			while (true) {
+				y = s.indexOf(delimeter, y + 1);
+
+				if ((y == -1) || (s.length() <= (y + 1))) {
+					return line;
+				}
+
+				value = s.substring(0, y);
+
+				if (value.startsWith("<%")) {
+					if (getLevel(value, "<%", "%>") == 0) {
+						break;
+					}
+				}
+				else if (getLevel(
+							value, StringPool.LESS_THAN,
+							StringPool.GREATER_THAN) ==
+								0) {
+
+					break;
+				}
+			}
+
+			if (delimeter == CharPool.APOSTROPHE) {
+				if (escapeQuotes) {
+					String newValue = StringUtil.replace(
+						value, StringPool.QUOTE, "&quot;");
+
+					return StringUtil.replace(
+						line,
+						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
+						StringPool.QUOTE + newValue + StringPool.QUOTE);
+				}
+
+				if (!value.contains(StringPool.QUOTE) ||
+					!tagName.contains(StringPool.COLON)) {
+
+					return StringUtil.replace(
+						line,
+						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
+						StringPool.QUOTE + value + StringPool.QUOTE);
+				}
+			}
+
+			if ((delimeter == CharPool.QUOTE) &&
+				value.contains(StringPool.QUOTE) &&
+				tagName.contains(StringPool.COLON)) {
+
+				return StringUtil.replace(
+					line, StringPool.QUOTE + value + StringPool.QUOTE,
+					StringPool.APOSTROPHE + value + StringPool.APOSTROPHE);
+			}
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(attribute);
+			sb.append(StringPool.EQUAL);
+			sb.append(delimeter);
+			sb.append(value);
+			sb.append(delimeter);
+
+			String currentAttributeAndValue = sb.toString();
+
+			if (!tagName.contains(StringPool.COLON)) {
+				String newLine = sortHTMLAttributes(
+					line, value, currentAttributeAndValue);
+
+				if (!newLine.equals(line)) {
+					return newLine;
+				}
+			}
+
+			String newLine = formatTagAttributeType(
+				line, tagName, currentAttributeAndValue);
+
+			if (!newLine.equals(line)) {
+				return newLine;
+			}
+
+			if (wrongOrder) {
+				if ((StringUtil.count(line, currentAttributeAndValue) == 1) &&
+					(StringUtil.count(line, previousAttributeAndValue) == 1)) {
+
+					line = StringUtil.replaceFirst(
+						line, previousAttributeAndValue,
+						currentAttributeAndValue);
+
+					return StringUtil.replaceLast(
+						line, currentAttributeAndValue,
+						previousAttributeAndValue);
+				}
+
+				return line;
+			}
+
+			s = s.substring(y + 1);
+
+			if (s.startsWith(StringPool.GREATER_THAN)) {
+				return line;
+			}
+
+			s = StringUtil.trimLeading(s);
+
+			previousAttribute = attribute;
+			previousAttributeAndValue = currentAttributeAndValue;
+		}
+	}
+
 	protected String formatEmptyArray(String line) {
 		int pos = line.indexOf("[] {}");
 
@@ -989,7 +1159,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected String formatTagAttributeType(
-			String line, String tag, String attributeAndValue)
+			String line, String tagName, String attributeAndValue)
 		throws Exception {
 
 		return line;
@@ -2055,184 +2225,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				"Double.valueOf(", "Float.valueOf(", "Integer.valueOf(",
 				"Long.valueOf(", "Short.valueOf("
 			});
-	}
-
-	protected String sortAttributes(
-			String fileName, String line, int lineCount,
-			boolean allowApostropheDelimeter)
-		throws Exception {
-
-		String s = line;
-
-		int x = s.indexOf(CharPool.LESS_THAN);
-		int y = s.indexOf(CharPool.SPACE);
-
-		if ((x == -1) || (x >= y)) {
-			return line;
-		}
-
-		String tag = s.substring(x + 1, y);
-
-		s = s.substring(y + 1);
-
-		String previousAttribute = null;
-		String previousAttributeAndValue = null;
-
-		boolean wrongOrder = false;
-
-		for (x = 0;;) {
-			x = s.indexOf(CharPool.EQUAL);
-
-			if ((x == -1) || (s.length() <= (x + 1))) {
-				return line;
-			}
-
-			String attribute = s.substring(0, x);
-
-			if (!isAttributName(attribute)) {
-				return line;
-			}
-
-			if (Validator.isNotNull(previousAttribute) &&
-				(previousAttribute.compareToIgnoreCase(attribute) > 0)) {
-
-				wrongOrder = true;
-			}
-
-			s = s.substring(x + 1);
-
-			char delimeter = s.charAt(0);
-
-			if ((delimeter != CharPool.APOSTROPHE) &&
-				(delimeter != CharPool.QUOTE)) {
-
-				if (delimeter != CharPool.AMPERSAND) {
-					processErrorMessage(
-						fileName, "delimeter: " + fileName + " " + lineCount);
-				}
-
-				return line;
-			}
-
-			s = s.substring(1);
-
-			String value = null;
-
-			y = -1;
-
-			while (true) {
-				y = s.indexOf(delimeter, y + 1);
-
-				if ((y == -1) || (s.length() <= (y + 1))) {
-					return line;
-				}
-
-				value = s.substring(0, y);
-
-				if (value.startsWith("<%")) {
-					if (getLevel(value, "<%", "%>") == 0) {
-						break;
-					}
-				}
-				else if (getLevel(
-							value, StringPool.LESS_THAN,
-							StringPool.GREATER_THAN) ==
-								0) {
-
-					break;
-				}
-			}
-
-			if (delimeter == CharPool.APOSTROPHE) {
-				if (!value.contains(StringPool.QUOTE)) {
-					line = StringUtil.replace(
-						line,
-						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
-						StringPool.QUOTE + value + StringPool.QUOTE);
-
-					return sortAttributes(
-						fileName, line, lineCount, allowApostropheDelimeter);
-				}
-				else if (!allowApostropheDelimeter) {
-					String newValue = StringUtil.replace(
-						value, StringPool.QUOTE, "&quot;");
-
-					line = StringUtil.replace(
-						line,
-						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
-						StringPool.QUOTE + newValue + StringPool.QUOTE);
-
-					return sortAttributes(
-						fileName, line, lineCount, allowApostropheDelimeter);
-				}
-			}
-
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(attribute);
-			sb.append(StringPool.EQUAL);
-			sb.append(delimeter);
-			sb.append(value);
-			sb.append(delimeter);
-
-			String currentAttributeAndValue = sb.toString();
-
-			String newLine = sortHTMLAttributes(
-				line, value, currentAttributeAndValue);
-
-			if (!newLine.equals(line)) {
-				return sortAttributes(
-					fileName, newLine, lineCount, allowApostropheDelimeter);
-			}
-
-			newLine = formatTagAttributeType(
-				line, tag, currentAttributeAndValue);
-
-			if (!newLine.equals(line)) {
-				return sortAttributes(
-					fileName, newLine, lineCount, allowApostropheDelimeter);
-			}
-
-			if (wrongOrder) {
-				if ((StringUtil.count(line, currentAttributeAndValue) == 1) &&
-					(StringUtil.count(line, previousAttributeAndValue) == 1)) {
-
-					line = StringUtil.replaceFirst(
-						line, previousAttributeAndValue,
-						currentAttributeAndValue);
-
-					line = StringUtil.replaceLast(
-						line, currentAttributeAndValue,
-						previousAttributeAndValue);
-
-					return sortAttributes(
-						fileName, line, lineCount, allowApostropheDelimeter);
-				}
-
-				return line;
-			}
-
-			s = s.substring(y + 1);
-
-			if (s.startsWith(StringPool.GREATER_THAN)) {
-				x = s.indexOf(CharPool.SPACE);
-
-				if (x == -1) {
-					return line;
-				}
-
-				s = s.substring(x + 1);
-
-				previousAttribute = null;
-				previousAttributeAndValue = null;
-			}
-			else {
-				s = StringUtil.trimLeading(s);
-
-				previousAttribute = attribute;
-				previousAttributeAndValue = currentAttributeAndValue;
-			}
-		}
 	}
 
 	protected String sortHTMLAttributes(
