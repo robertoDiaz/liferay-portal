@@ -22,6 +22,15 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 FileEntry fileEntry = null;
 FileShortcut fileShortcut = null;
 
+if (row.getObject() instanceof SearchResult) {
+	SearchResult searchResult = (SearchResult)row.getObject();
+
+	String className = searchResult.getClassName();
+
+	if (className.equals(DLFileEntryConstants.getClassName()) || FileEntry.class.isAssignableFrom(Class.forName(className))) {
+		fileEntry = DLAppLocalServiceUtil.getFileEntry(searchResult.getClassPK());
+	}
+}
 if (row.getObject() instanceof FileEntry) {
 	fileEntry = (FileEntry)row.getObject();
 }

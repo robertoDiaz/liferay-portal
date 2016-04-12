@@ -24,7 +24,19 @@ String deltaFolder = ParamUtil.getString(request, "deltaFolder");
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
+Folder folder = null;
+
+if (folderId > 0) {
+	folder = DLAppServiceUtil.getFolder(folderId);
+}
+
 long repositoryId = GetterUtil.getLong((String)request.getAttribute("view.jsp-repositoryId"));
+
+long searchRepositoryId = ParamUtil.getLong(request, "searchRepositoryId");
+
+if (searchRepositoryId == 0) {
+	searchRepositoryId = scopeGroupId;
+}
 
 long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId", -1);
 
@@ -88,7 +100,43 @@ dlSearchContainer.setOrderByType(orderByType);
 List results = null;
 int total = 0;
 
-if (fileEntryTypeId >= 0) {
+String keywords = ParamUtil.getString(request, "keywords");
+
+if (Validator.isNotNull(keywords)) {
+	SearchContext searchContext = SearchContextFactory.getInstance(request);
+
+	searchContext.setAttribute("paginationType", "regular");
+
+	searchContext.setAttribute("searchRepositoryId", searchRepositoryId);
+	searchContext.setEnd(dlSearchContainer.getEnd());
+
+	long searchFolderId = ParamUtil.getLong(request, "searchFolderId");
+
+	if (searchFolderId > 0) {
+		folder = DLAppServiceUtil.getFolder(searchFolderId);
+	}
+
+	searchContext.setFolderIds(new long[] {searchFolderId});
+	searchContext.setIncludeDiscussions(true);
+	searchContext.setKeywords(keywords);
+
+	QueryConfig queryConfig = new QueryConfig();
+
+	queryConfig.setSearchSubfolders(true);
+
+	searchContext.setQueryConfig(queryConfig);
+
+	searchContext.setStart(dlSearchContainer.getStart());
+
+	Hits hits = DLAppServiceUtil.search(searchRepositoryId, searchContext);
+
+	total = hits.getLength();
+
+	dlSearchContainer.setTotal(total);
+
+	results = SearchResultUtil.getSearchResults(hits, locale);
+}
+else if (fileEntryTypeId >= 0) {
 	Indexer indexer = IndexerRegistryUtil.getIndexer(DLFileEntryConstants.getClassName());
 
 	if (fileEntryTypeId > 0) {
@@ -202,11 +250,114 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 		portletDisplay.setURLBack(redirect);
 	}
 
-	Folder folder = DLAppServiceUtil.getFolder(folderId);
-
 	renderResponse.setTitle(folder.getName());
 }
+
+boolean showSearchInfo = ParamUtil.getBoolean(request, "showSearchInfo");
+boolean showRepositoryTabs = ParamUtil.getBoolean(request, "showRepositoryTabs");
 %>
+
+<c:if test="<%= showSearchInfo %>">
+	<liferay-util:buffer var="searchInfo">
+		<div class="search-info">
+			<span class="keywords">
+
+				<%
+				boolean searchEverywhere = false;
+
+				if ((folder == null) || (folder.getFolderId() == rootFolderId)) {
+					searchEverywhere = true;
+				}
+				%>
+
+				<c:choose>
+					<c:when test="<%= !searchEverywhere %>">
+						<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(keywords), HtmlUtil.escape(folder.getName())} %>" key="searched-for-x-in-x" translateArguments="<%= false %>" />
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(keywords) %>" key="searched-for-x-everywhere" translateArguments="<%= false %>" />
+					</c:otherwise>
+				</c:choose>
+			</span>
+
+			<c:if test="<%= folderId != rootFolderId %>">
+				<span class="change-search-folder">
+					<portlet:renderURL var="changeSearchFolderURL">
+						<portlet:param name="mvcRenderCommandName" value="/document_library/search" />
+						<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
+						<portlet:param name="searchRepositoryId" value="<%= !searchEverywhere ? String.valueOf(scopeGroupId) : String.valueOf(repositoryId) %>" />
+						<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+						<portlet:param name="searchFolderId" value="<%= !searchEverywhere ? String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) : String.valueOf(folderId) %>" />
+						<portlet:param name="keywords" value="<%= keywords %>" />
+						<portlet:param name="showRepositoryTabs" value="<% (searchEverywhere) ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" />
+						<portlet:param name="showSearchInfo" value="<%= Boolean.TRUE.toString() %>" />
+					</portlet:renderURL>
+
+					<aui:button href="<%= changeSearchFolderURL %>" value='<%= !searchEverywhere ? "search-everywhere" : "search-in-the-current-folder" %>' />
+				</span>
+			</c:if>
+
+			<portlet:renderURL var="closeSearchURL">
+				<portlet:param name="mvcRenderCommandName" value="/document_library/view" />
+			</portlet:renderURL>
+
+			<liferay-ui:icon cssClass="close-search" iconCssClass="icon-remove" id="closeSearch" message="remove" url="<%= closeSearchURL %>" />
+		</div>
+
+		<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">
+			<aui:script>
+				Liferay.Util.focusFormField(document.getElementById('<portlet:namespace />keywords'));
+			</aui:script>
+		</c:if>
+	</liferay-util:buffer>
+
+	<div id="<portlet:namespace />searchInfo">
+		<%= searchInfo %>
+	</div>
+</c:if>
+
+<c:choose>
+	<c:when test="<%= showRepositoryTabs %>">
+
+		<%
+		PortletURL searchRepositoryURL = liferayPortletResponse.createRenderURL();
+
+		searchRepositoryURL.setParameter("mvcRenderCommandName", "/document_library/search");
+		searchRepositoryURL.setParameter("repositoryId", String.valueOf(scopeGroupId));
+		searchRepositoryURL.setParameter("searchRepositoryId", String.valueOf(scopeGroupId));
+		searchRepositoryURL.setParameter("keywords", keywords);
+		searchRepositoryURL.setParameter("showRepositoryTabs", Boolean.TRUE.toString());
+		searchRepositoryURL.setParameter("showSearchInfo", Boolean.TRUE.toString());
+
+		String[] tabsUrls = new String[] {searchRepositoryURL.toString()};
+
+		String selectedTab = LanguageUtil.get(request, "local");
+
+		List<Folder> mountFolders = DLAppServiceUtil.getMountFolders(scopeGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (Folder mountFolder : mountFolders) {
+			if (mountFolder.getRepositoryId() == searchRepositoryId) {
+				selectedTab = HtmlUtil.escape(mountFolder.getName());
+			}
+
+			searchRepositoryURL.setParameter("repositoryId", String.valueOf(mountFolder.getRepositoryId()));
+			searchRepositoryURL.setParameter("searchRepositoryId", String.valueOf(mountFolder.getRepositoryId()));
+
+			tabsUrls = ArrayUtil.append(tabsUrls, searchRepositoryURL.toString());
+		}
+		%>
+
+		<div class="search-results-container" id="<portlet:namespace />searchResultsContainer">
+			<liferay-ui:tabs
+				names='<%= LanguageUtil.get(request, "local") + "," + HtmlUtil.escape(ListUtil.toString(mountFolders, "name")) %>'
+				refresh="<%= true %>"
+				type="tabs nav-tabs-default"
+				urls="<%= tabsUrls %>"
+				value="<%= selectedTab %>"
+			/>
+		</div>
+	</c:when>
+</c:choose>
 
 <div class="document-container" id="<portlet:namespace />entriesContainer">
 
