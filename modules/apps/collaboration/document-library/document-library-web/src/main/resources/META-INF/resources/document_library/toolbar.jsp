@@ -45,9 +45,7 @@ boolean search = mvcRenderCommandName.equals("/document_library/search");
 			sidenavId='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
 		/>
 
-		<c:if test="<%= !search %>">
-			<liferay-util:include page="/document_library/display_style_buttons.jsp" servletContext="<%= application %>" />
-		</c:if>
+		<liferay-util:include page="/document_library/display_style_buttons.jsp" servletContext="<%= application %>" />
 	</liferay-frontend:management-bar-buttons>
 
 	<%
