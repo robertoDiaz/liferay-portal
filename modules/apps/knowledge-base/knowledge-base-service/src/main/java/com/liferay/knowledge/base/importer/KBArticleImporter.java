@@ -14,13 +14,14 @@
 
 package com.liferay.knowledge.base.importer;
 
+import com.liferay.knowledge.base.configuration.KBGroupServiceConfiguration;
 import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.exception.KBArticleImportException;
 import com.liferay.knowledge.base.importer.util.KBArticleMarkdownConverter;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
-import com.liferay.knowledge.base.service.util.PortletPropsValues;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -50,11 +51,18 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author James Hinkey
  * @author Sergio González
  * @author Jesse Rao
  */
+@Component(
+	configurationPid = "com.liferay.knowledge.base.configuration.KBGroupServiceConfiguration",
+	service = KBArticleImporter.class
+)
 public class KBArticleImporter {
 
 	public int processZipFile(
@@ -80,6 +88,12 @@ public class KBArticleImporter {
 		catch (IOException ioe) {
 			throw new KBArticleImportException(ioe);
 		}
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_kbGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
+			KBGroupServiceConfiguration.class, properties);
 	}
 
 	protected KBArticle addKBArticleMarkdown(
@@ -183,7 +197,8 @@ public class KBArticleImporter {
 			String extension = FileUtil.getExtension(zipEntry);
 
 			if (!ArrayUtil.contains(
-					PortletPropsValues.MARKDOWN_IMPORTER_ARTICLE_EXTENSIONS,
+					_kbGroupServiceConfiguration.
+						markdownImporterArticleExtensions(),
 					StringPool.PERIOD.concat(extension))) {
 
 				continue;
@@ -275,7 +290,8 @@ public class KBArticleImporter {
 
 			for (String fileEntryName : fileEntryNames) {
 				if (fileEntryName.endsWith(
-						PortletPropsValues.MARKDOWN_IMPORTER_ARTICLE_INTRO)) {
+						_kbGroupServiceConfiguration.
+							markdownImporterArticleIntro())) {
 
 					sectionIntroFileEntryName = fileEntryName;
 				}
@@ -349,5 +365,7 @@ public class KBArticleImporter {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleImporter.class);
+
+	private volatile KBGroupServiceConfiguration _kbGroupServiceConfiguration;
 
 }
