@@ -485,6 +485,118 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
+	protected void checkUpgradeClass(
+		String fileName, String absolutePath, String className,
+		String content) {
+
+		if (!fileName.contains("/upgrade/")) {
+			return;
+		}
+
+		// LPS-41205
+
+		int pos = content.indexOf("LocaleUtil.getDefault()");
+
+		if (pos != -1) {
+			processErrorMessage(
+				fileName,
+				"Use UpgradeProcessUtil.getDefaultLanguageId(companyId) " +
+					"instead of LocaleUtil.getDefault(): " + fileName + " " +
+						getLineCount(content, pos));
+		}
+
+		pos = content.indexOf("rs.getDate(");
+
+		if (pos != -1) {
+			processErrorMessage(
+				fileName,
+				"Use rs.getTimeStamp: " + fileName + " " +
+					getLineCount(content, pos));
+		}
+
+		// LPS-34911
+
+		if (portalSource &&
+			!isExcludedPath(_upgradeServiceUtilExcludes, absolutePath) &&
+			fileName.contains("/portal/upgrade/") &&
+			!fileName.contains("/test/") &&
+			!fileName.contains("/testIntegration/")) {
+
+			pos = content.indexOf("ServiceUtil.");
+
+			if (pos != -1) {
+				processErrorMessage(fileName, "ServiceUtil: " + fileName + " " +
+					getLineCount(content, pos));
+			}
+		}
+
+		if (!fileName.endsWith("Upgrade.java")) {
+			return;
+		}
+
+		// LPS-59828
+
+		if (content.contains("implements UpgradeStepRegistrator")) {
+			Matcher matcher = _componentAnnotationPattern.matcher(content);
+
+			if (matcher.find()) {
+				String componentAnnotation = matcher.group();
+
+				if (!componentAnnotation.contains("service =")) {
+					processErrorMessage(
+						fileName, "Missing service in @Component " + fileName);
+				}
+			}
+		}
+
+		// LPS-65685
+
+		Matcher matcher1 = _registryRegisterPattern.matcher(content);
+
+		while (matcher1.find()) {
+			List<String> parametersList = getParameterList(
+				content.substring(matcher1.start()));
+
+			if (parametersList.size() <= 4) {
+				continue;
+			}
+
+			String previousUpgradeClassName = null;
+
+			for (int i = 3; i < parametersList.size(); i++) {
+				String parameter = parametersList.get(i);
+
+				Matcher matcher2 = _upgradeClassNamePattern.matcher(parameter);
+
+				if (!matcher2.find()) {
+					break;
+				}
+
+				String upgradeClassName = matcher2.group(1);
+
+				if ((previousUpgradeClassName != null) &&
+					(previousUpgradeClassName.compareTo(
+						upgradeClassName) > 0)) {
+
+					StringBundler sb = new StringBundler(6);
+
+					sb.append("LPS-65685: Break up Upgrade classes with a ");
+					sb.append("minor version increment or order ");
+					sb.append("alphabetically: ");
+					sb.append(fileName);
+					sb.append(StringPool.SPACE);
+					sb.append(getLineCount(content, matcher1.start()));
+
+					processErrorMessage(fileName, sb.toString());
+
+					break;
+				}
+
+				previousUpgradeClassName = upgradeClassName;
+			}
+		}
+	}
+
 	protected void checkVerifyUpgradeConnection(
 		String fileName, String className, String content) {
 
@@ -679,18 +791,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			processErrorMessage(fileName, "ServiceUtil: " + fileName);
 		}
 
-		// LPS-34911
-
-		if (portalSource &&
-			!isExcludedPath(_upgradeServiceUtilExcludes, absolutePath) &&
-			fileName.contains("/portal/upgrade/") &&
-			!fileName.contains("/test/") &&
-			!fileName.contains("/testIntegration/") &&
-			newContent.contains("ServiceUtil.")) {
-
-			processErrorMessage(fileName, "ServiceUtil: " + fileName);
-		}
-
 		boolean isRunOutsidePortalExclusion = isExcludedPath(
 			getRunOutsidePortalExcludes(), absolutePath);
 
@@ -799,17 +899,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		checkSystemEventAnnotations(newContent, fileName);
 
-		// LPS-41205
-
-		if (fileName.contains("/upgrade/") &&
-			newContent.contains("LocaleUtil.getDefault()")) {
-
-			processErrorMessage(
-				fileName,
-				"Use UpgradeProcessUtil.getDefaultLanguageId(companyId) " +
-					"instead of LocaleUtil.getDefault(): " + fileName);
-		}
-
 		// LPS-46017
 
 		newContent = StringUtil.replace(
@@ -890,23 +979,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		newContent = checkPrincipalException(newContent);
 
-		// LPS-59828
-
-		if (fileName.endsWith("Upgrade.java") &&
-			newContent.contains("implements UpgradeStepRegistrator")) {
-
-			matcher = _componentAnnotationPattern.matcher(newContent);
-
-			if (matcher.find()) {
-				String componentAnnotation = matcher.group();
-
-				if (!componentAnnotation.contains("service =")) {
-					processErrorMessage(
-						fileName, "Missing service in @Component " + fileName);
-				}
-			}
-		}
-
 		// LPS-60473
 
 		if (newContent.contains(".supportsBatchUpdates()") &&
@@ -959,6 +1031,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		// LPS-65213
 
 		checkVerifyUpgradeConnection(fileName, className, newContent);
+
+		checkUpgradeClass(fileName, absolutePath, className, newContent);
 
 		newContent = formatAssertEquals(fileName, newContent);
 
@@ -2263,14 +2337,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							lineCount);
 				}
 
-				if (fileName.contains("/upgrade/") &&
-					line.contains("rs.getDate(")) {
-
-					processErrorMessage(
-						fileName,
-						"Use rs.getTimeStamp: " + fileName + " " + lineCount);
-				}
-
 				if (!trimmedLine.equals("{") && line.endsWith("{") &&
 					!line.endsWith(" {")) {
 
@@ -2491,7 +2557,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 						(previousLine.endsWith(
 							StringPool.OPEN_PARENTHESIS) &&
 						 line.contains(" throws ") &&
-						 line.endsWith(StringPool.OPEN_CURLY_BRACE))) {
+						 (line.endsWith(StringPool.OPEN_CURLY_BRACE) ||
+						  line.endsWith(StringPool.SEMICOLON)))) {
 
 						processErrorMessage(
 							fileName,
@@ -3048,7 +3115,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	protected String getCombinedLinesContent(
 		String content, String fileName, String line, String trimmedLine,
 		int lineLength, int lineCount, String previousLine, String linePart,
-		int tabDiff, boolean addToPreviousLine, boolean extraSpace,
+		boolean addToPreviousLine, boolean extraSpace,
 		int numNextLinesRemoveLeadingTab) {
 
 		int previousLineStartPos = getLineStartPos(content, lineCount - 1);
@@ -3066,15 +3133,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			if (nextLine == null) {
 				return null;
-			}
-
-			if (line.endsWith(StringPool.OPEN_CURLY_BRACE) &&
-				(tabDiff != 0) && !previousLine.contains(" class ") &&
-				Validator.isNull(nextLine)) {
-
-				return StringUtil.replaceFirst(
-					content, previousLine + "\n" + line + "\n", combinedLine,
-					previousLineStartPos);
 			}
 
 			if (numNextLinesRemoveLeadingTab > 0) {
@@ -3162,28 +3220,25 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			return null;
 		}
 
-		int tabDiff = lineTabCount - previousLineTabCount;
-
 		if (!trimmedPreviousLine.equals("return") &&
 			previousLine.matches(".*\\w") &&
 			trimmedLine.startsWith(StringPool.OPEN_PARENTHESIS)) {
 
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, StringPool.OPEN_PARENTHESIS, tabDiff, true, false,
-				0);
+				previousLine, StringPool.OPEN_PARENTHESIS, true, false, 0);
 		}
 
 		if (trimmedPreviousLine.matches("((else )?if|for|try|while) \\(")) {
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, null, tabDiff, false, false, 0);
+				previousLine, null, false, false, 0);
 		}
 
 		if (previousLine.endsWith("= new")) {
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, "new", tabDiff, false, true, 0);
+				previousLine, "new", false, true, 0);
 		}
 
 		if (trimmedLine.startsWith("+ ") || trimmedLine.startsWith("- ") ||
@@ -3195,13 +3250,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, linePart, tabDiff, true, true, 0);
+				previousLine, linePart, true, true, 0);
 		}
 
 		if (previousLine.endsWith("<") && !previousLine.endsWith(" <")) {
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, "<", tabDiff, false, false, 0);
+				previousLine, "<", false, false, 0);
 		}
 
 		int previousLineLength = getLineLength(previousLine);
@@ -3213,7 +3268,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, null, tabDiff, false, true, 0);
+					previousLine, null, false, true, 0);
 			}
 
 			if (previousLine.endsWith(">") &&
@@ -3227,7 +3282,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				if (!beforePrevousLine.endsWith(".")) {
 					return getCombinedLinesContent(
 						content, fileName, line, trimmedLine, lineLength,
-						lineCount, previousLine, null, tabDiff, false, true, 0);
+						lineCount, previousLine, null, false, true, 0);
 				}
 			}
 
@@ -3242,7 +3297,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, null, tabDiff, false, true, 0);
+					previousLine, null, false, true, 0);
 			}
 
 			if ((trimmedPreviousLine.startsWith("if ") ||
@@ -3252,7 +3307,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, null, tabDiff, false, true, 0);
+					previousLine, null, false, true, 0);
 			}
 
 			if (trimmedLine.startsWith("throws") &&
@@ -3262,7 +3317,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, null, tabDiff, false, true, 0);
+					previousLine, null, false, true, 0);
 			}
 
 			if (previousLine.endsWith(StringPool.EQUAL)) {
@@ -3297,7 +3352,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 							return getCombinedLinesContent(
 								content, fileName, line, trimmedLine,
 								lineLength, lineCount, previousLine, null,
-								tabDiff, false, true, i + 1);
+								false, true, i + 1);
 						}
 					}
 				}
@@ -3312,8 +3367,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					if (nextLine.endsWith(StringPool.SEMICOLON)) {
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
-							lineCount, previousLine, null, tabDiff, false, true,
-							i + 1);
+							lineCount, previousLine, null, false, true, i + 1);
 					}
 				}
 			}
@@ -3327,7 +3381,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, null, tabDiff, false, false, 0);
+				previousLine, null, false, false, 0);
 		}
 
 		if (previousLine.endsWith(StringPool.EQUAL) &&
@@ -3405,8 +3459,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
-							lineCount, previousLine, linePart, tabDiff, true,
-							true, 0);
+							lineCount, previousLine, linePart, true, true, 0);
 					}
 				}
 			}
@@ -3445,8 +3498,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, linePart + StringPool.SPACE, tabDiff, true,
-					true, 0);
+					previousLine, linePart + StringPool.SPACE, true, true, 0);
 			}
 		}
 
@@ -3472,14 +3524,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 								return getCombinedLinesContent(
 									content, fileName, line, trimmedLine,
 									lineLength, lineCount, previousLine, null,
-									tabDiff, false, true, 0);
+									false, true, 0);
 							}
 							else {
 								return getCombinedLinesContent(
 									content, fileName, line, trimmedLine,
 									lineLength, lineCount, previousLine,
-									linePart + StringPool.SPACE, tabDiff, true,
-									true, 0);
+									linePart + StringPool.SPACE, true, true, 0);
 							}
 						}
 
@@ -3502,15 +3553,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
-							lineCount, previousLine, null, tabDiff, false, true,
-							0);
+							lineCount, previousLine, null, false, true, 0);
 					}
 
 					if (getLevel(line) != 0) {
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
-							lineCount, previousLine, null, tabDiff, false, true,
-							0);
+							lineCount, previousLine, null, false, true, 0);
 					}
 				}
 			}
@@ -3529,7 +3578,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				return getCombinedLinesContent(
 					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, linePart, tabDiff, true, true, 0);
+					previousLine, linePart, true, true, 0);
 			}
 			else if (trimmedLine.endsWith(" =") &&
 					 ((trimmedLine.length() + previousLineLength) <
@@ -3541,8 +3590,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					if (nextLine.endsWith(StringPool.SEMICOLON)) {
 						return getCombinedLinesContent(
 							content, fileName, line, trimmedLine, lineLength,
-							lineCount, previousLine, null, tabDiff, false, true,
-							i + 1);
+							lineCount, previousLine, null, false, true, i + 1);
 					}
 				}
 			}
@@ -3567,8 +3615,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 					return getCombinedLinesContent(
 						content, fileName, line, trimmedLine, lineLength,
-						lineCount, previousLine, filePart, tabDiff, false,
-						false, 0);
+						lineCount, previousLine, filePart, false, false, 0);
 				}
 			}
 		}
@@ -3577,12 +3624,14 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			return null;
 		}
 
-		if (line.endsWith(StringPool.COMMA)) {
-			if (getLevel(trimmedLine) < 0) {
-				return getCombinedLinesContent(
-					content, fileName, line, trimmedLine, lineLength, lineCount,
-					previousLine, null, tabDiff, false, false, 0);
-			}
+		if ((getLevel(trimmedLine) < 0) &&
+			(line.endsWith(StringPool.COMMA) ||
+			 (trimmedPreviousLine.startsWith("new ") &&
+			  line.endsWith(") {")))) {
+
+			return getCombinedLinesContent(
+				content, fileName, line, trimmedLine, lineLength, lineCount,
+				previousLine, null, false, false, 0);
 		}
 
 		if (((line.endsWith(StringPool.OPEN_CURLY_BRACE) &&
@@ -3596,7 +3645,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			return getCombinedLinesContent(
 				content, fileName, line, trimmedLine, lineLength, lineCount,
-				previousLine, null, tabDiff, false, false, 0);
+				previousLine, null, false, false, 0);
 		}
 
 		return null;
@@ -4531,6 +4580,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			"\\s*([ ,<>\\w]+)\\s+\\w+\\) \\{\\s+([\\s\\S]*?)\\s*?\n\t\\}\n");
 	private final Pattern _registryImportPattern = Pattern.compile(
 		"\nimport (com\\.liferay\\.registry\\..+);");
+	private final Pattern _registryRegisterPattern = Pattern.compile(
+		"registry\\.register\\((.*?)\\);\n", Pattern.DOTALL);
 	private List<String> _secureDeserializationExcludes;
 	private List<String> _secureRandomExcludes;
 	private List<String> _secureXmlExcludes;
@@ -4544,6 +4595,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private List<String> _testAnnotationsExcludes;
 	private final Pattern _throwsSystemExceptionPattern = Pattern.compile(
 		"(\n\t+.*)throws(.*) SystemException(.*)( \\{|;\n)");
+	private final Pattern _upgradeClassNamePattern = Pattern.compile(
+		"new .*?(\\w+)\\(", Pattern.DOTALL);
 	private List<String> _upgradeDataAccessConnectionExcludes;
 	private List<String> _upgradeServiceUtilExcludes;
 

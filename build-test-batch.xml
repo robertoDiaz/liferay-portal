@@ -130,6 +130,10 @@
 					<echo file="/opt/sybase/interfaces">lportal
 		master tcp ether ${hostname} 5000
 		query tcp ether ${hostname} 5000
+
+lportal_BS
+		master tcp ether ${hostname} 5001
+		query tcp ether ${hotsname} 5001
 					</echo>
 				</then>
 				<else>
@@ -896,16 +900,16 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="tomcat" database.type="hypersonic" />
 	</target>
 
-	<target name="functional-tomcat8-mysql55-jdk7">
+	<target name="functional-tomcat8-mysql55-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="5.5" />
 	</target>
 
-	<target name="functional-tomcat8-mysql56-jdk7">
+	<target name="functional-tomcat8-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
-	<target name="functional-tomcat8-mysql56-jdk7-quarantine">
-		<antcall target="functional-tomcat8-mysql56-jdk7" />
+	<target name="functional-tomcat8-mysql56-jdk8-quarantine">
+		<antcall target="functional-tomcat8-mysql56-jdk8" />
 	</target>
 
 	<target name="functional-tomcat8-oracle12-jdk8">
