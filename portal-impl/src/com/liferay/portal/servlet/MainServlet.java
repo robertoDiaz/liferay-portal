@@ -601,8 +601,8 @@ public class MainServlet extends ActionServlet {
 	protected void checkTilesDefinitionsFactory() {
 		ServletContext servletContext = getServletContext();
 
-		if (servletContext.getAttribute(
-				TilesUtilImpl.DEFINITIONS_FACTORY) != null) {
+		if (servletContext.getAttribute(TilesUtilImpl.DEFINITIONS_FACTORY) !=
+				null) {
 
 			return;
 		}
@@ -756,8 +756,8 @@ public class MainServlet extends ActionServlet {
 	}
 
 	protected boolean hasAbsoluteRedirect(HttpServletRequest request) {
-		if (request.getAttribute(
-				AbsoluteRedirectsResponse.class.getName()) == null) {
+		if (request.getAttribute(AbsoluteRedirectsResponse.class.getName()) ==
+				null) {
 
 			return false;
 		}
@@ -865,19 +865,10 @@ public class MainServlet extends ActionServlet {
 			servletContext);
 	}
 
-	/**
-	 * @see SetupWizardUtil#_initPlugins
-	 */
 	protected void initPlugins() throws Exception {
+		HotDeployUtil.setCapturePrematureEvents(false);
 
-		// See LEP-2885. Don't flush hot deploy events until after the portal
-		// has initialized.
-
-		if (!PropsValues.SETUP_WIZARD_ENABLED) {
-			HotDeployUtil.setCapturePrematureEvents(false);
-
-			PortalLifecycleUtil.flushInits();
-		}
+		PortalLifecycleUtil.flushInits();
 	}
 
 	protected void initPortletApp(

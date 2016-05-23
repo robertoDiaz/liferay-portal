@@ -20,10 +20,6 @@
 String tabs2 = ParamUtil.getString(request, "tabs2", "general");
 
 String tabs2Names = "general,display-settings";
-
-if (PortalUtil.isRSSFeedsEnabled()) {
-	tabs2Names += ",rss";
-}
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -54,7 +50,7 @@ if (PortalUtil.isRSSFeedsEnabled()) {
 					<%
 					Map<String, String> sectionsMap = new TreeMap<String, String>();
 
-					for (String section : PortletPropsValues.ADMIN_KB_ARTICLE_SECTIONS) {
+					for (String section : kbSectionPortletInstanceConfiguration.adminKBArticleSections()) {
 						sectionsMap.put(LanguageUtil.get(request, section), section);
 					}
 
@@ -119,11 +115,6 @@ if (PortalUtil.isRSSFeedsEnabled()) {
 
 				<aui:input label="enable-ratings" name="preferences--enableKBArticleRatings--" type="checkbox" value="<%= enableKBArticleRatings %>" />
 
-				<div class="kb-ratings-type" id="<portlet:namespace />ratingsType">
-					<aui:input checked='<%= kbArticleRatingsType.equals("stars") %>' label="use-star-ratings" name="preferences--kbArticleRatingsType--" type="radio" value="stars" />
-					<aui:input checked='<%= kbArticleRatingsType.equals("thumbs") %>' label="use-thumbs-up-thumbs-down" name="preferences--kbArticleRatingsType--" type="radio" value="thumbs" />
-				</div>
-
 				<aui:input label="show-asset-entries" name="preferences--showKBArticleAssetEntries--" type="checkbox" value="<%= showKBArticleAssetEntries %>" />
 
 				<aui:input label="show-attachments" name="preferences--showKBArticleAttachments--" type="checkbox" value="<%= showKBArticleAttachments %>" />
@@ -145,14 +136,6 @@ if (PortalUtil.isRSSFeedsEnabled()) {
 					types="<%= socialBookmarksTypes %>"
 				/>
 			</c:when>
-			<c:when test='<%= tabs2.equals("rss") %>'>
-				<liferay-ui:rss-settings
-					delta="<%= rssDelta %>"
-					displayStyle="<%= rssDisplayStyle %>"
-					enabled="<%= enableRSS %>"
-					feedType="<%= rssFeedType %>"
-				/>
-			</c:when>
 		</c:choose>
 
 		<aui:button-row cssClass="kb-submit-buttons">
@@ -160,9 +143,3 @@ if (PortalUtil.isRSSFeedsEnabled()) {
 		</aui:button-row>
 	</aui:fieldset>
 </aui:form>
-
-<c:if test='<%= tabs2.equals("display-settings") %>'>
-	<aui:script>
-		Liferay.Util.toggleBoxes('<portlet:namespace />enableKBArticleRatingsCheckbox', '<portlet:namespace />ratingsType');
-	</aui:script>
-</c:if>
