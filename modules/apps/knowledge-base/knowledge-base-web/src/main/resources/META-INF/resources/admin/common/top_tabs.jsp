@@ -46,4 +46,9 @@ String mvcPath = ParamUtil.getString(request, "mvcPath");
 			/>
 		</c:if>
 	</aui:nav>
+	<aui:nav-bar-search>
+		<aui:form action="<%= currentURL %>" method="post" name="fm1">
+			<liferay-ui:input-search markupView="lexicon" />
+		</aui:form>
+	</aui:nav-bar-search>
 </aui:nav-bar>
