@@ -189,7 +189,7 @@ page import="java.util.TreeMap" %>
 page import="javax.portlet.PortletRequest" %><%@
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
-
+<%@ page import="com.liferay.knowledge.base.web.application.dao.search.KBResultRowSplitter" %>
 <liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />

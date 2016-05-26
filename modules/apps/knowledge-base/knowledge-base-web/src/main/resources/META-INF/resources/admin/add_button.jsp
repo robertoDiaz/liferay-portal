@@ -14,16 +14,18 @@
  */
 --%>
 
-<%@ include file="/admin/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
-<%
-long parentResourcePrimKey = ParamUtil.getLong(request, "parentResourcePrimKey");
-%>
+<liferay-frontend:add-menu>
+	<c:if test="true">
+		<liferay-util:include page="/admin/common/add_article_button.jsp" servletContext="<%= application %>" />
+	</c:if>
 
-<portlet:renderURL var="importURL">
-	<portlet:param name="mvcPath" value="/admin/import.jsp" />
-	<portlet:param name="redirect" value="<%= redirect %>" />
-	<portlet:param name="parentKBFolderId" value="<%= String.valueOf(parentResourcePrimKey) %>" />
-</portlet:renderURL>
+	<c:if test="true">
+		<liferay-util:include page="/admin/common/add_folder_button.jsp" servletContext="<%= application %>" />
+	</c:if>
 
-<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "import") %>' url="<%= importURL.toString() %>" />
+	<c:if test="true">
+		<liferay-util:include page="/admin/import_articles_button.jsp" servletContext="<%= application %>" />
+	</c:if>
+</liferay-frontend:add-menu>

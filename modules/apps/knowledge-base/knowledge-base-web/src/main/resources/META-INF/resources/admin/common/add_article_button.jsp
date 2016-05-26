@@ -34,18 +34,10 @@ long parentResourcePrimKey = ParamUtil.getLong(request, "parentResourcePrimKey",
 
 <c:choose>
 	<c:when test="<%= kbTemplates.isEmpty() %>">
-		<aui:nav-item
-			href="<%= addBasicKBArticleURL %>"
-			iconCssClass="icon-file"
-			label="basic-article"
-		/>
+		<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "basic-article") %>' url="<%= addBasicKBArticleURL.toString() %>" />
 	</c:when>
 	<c:otherwise>
-		<aui:nav-item
-			href="<%= addBasicKBArticleURL %>"
-			iconCssClass="icon-file"
-			label="basic-article"
-		/>
+		<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "basic-article") %>' url="<%= addBasicKBArticleURL.toString() %>" />
 
 		<%
 		for (KBTemplate kbTemplate : kbTemplates) {
@@ -59,11 +51,7 @@ long parentResourcePrimKey = ParamUtil.getLong(request, "parentResourcePrimKey",
 				<portlet:param name="kbTemplateId" value="<%= String.valueOf(kbTemplate.getKbTemplateId()) %>" />
 			</liferay-portlet:renderURL>
 
-			<aui:nav-item
-				href="<%= addKBArticleURL %>"
-				iconCssClass="icon-file"
-				label="<%= HtmlUtil.escape(kbTemplate.getTitle()) %>"
-			/>
+			<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, HtmlUtil.escape(kbTemplate.getTitle())) %>' url="<%= addKBArticleURL.toString() %>" />
 
 		<%
 		}
