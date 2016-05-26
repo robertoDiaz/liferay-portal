@@ -19,9 +19,9 @@
 <%
 KBSuggestionListDisplayContext kbSuggestionListDisplayContext = (KBSuggestionListDisplayContext)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_SUGGESTION_LIST_DISPLAY_CONTEXT);
 
-SearchContainer kbCommentsSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, null, "no-suggestions-were-found");
-
 String mvcPath = ParamUtil.getString(request, "mvcPath");
+
+SearchContainer kbCommentsSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, null, "no-suggestions-were-found");
 
 if (mvcPath.equals("/admin/view_suggestions.jsp")) {
 	kbCommentsSearchContainer.setRowChecker(new KBCommentsChecker(liferayPortletRequest, liferayPortletResponse));
@@ -36,6 +36,7 @@ List<KBComment> kbComments = kbSuggestionListDisplayContext.getKBComments(kbComm
 		includeCheckBox="<%= true %>"
 		searchContainerId="kbComments"
 	>
+
 		<liferay-frontend:management-bar-buttons>
 			<liferay-frontend:management-bar-display-buttons
 				displayViews='<%= new String[] {"descriptive"} %>'
@@ -43,6 +44,10 @@ List<KBComment> kbComments = kbSuggestionListDisplayContext.getKBComments(kbComm
 				selectedDisplayStyle="descriptive"
 			/>
 		</liferay-frontend:management-bar-buttons>
+
+		<liferay-frontend:management-bar-filters>
+			<liferay-util:include page="/admin/common/suggestions_filters.jsp" servletContext="<%= application %>" />
+		</liferay-frontend:management-bar-filters>
 
 		<liferay-frontend:management-bar-filters>
 
