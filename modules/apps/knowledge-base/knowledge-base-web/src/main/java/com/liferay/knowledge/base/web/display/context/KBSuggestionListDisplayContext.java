@@ -23,7 +23,7 @@ import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBCommentServiceUtil;
 import com.liferay.knowledge.base.service.KBFolderLocalServiceUtil;
-import com.liferay.knowledge.base.util.comparator.KBCommentStatusComparator;
+import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.knowledge.base.web.constants.KBWebKeys;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -84,25 +84,37 @@ public class KBSuggestionListDisplayContext {
 			if (status == KBCommentConstants.STATUS_ANY) {
 				return KBCommentServiceUtil.getKBComments(
 					_groupId, searchContainer.getStart(),
-					searchContainer.getEnd(), new KBCommentStatusComparator());
+					searchContainer.getEnd(),
+					KnowledgeBaseUtil.getKBCommentOrderByComparator(
+						searchContainer.getOrderByCol(),
+						searchContainer.getOrderByType()));
 			}
 
 			return KBCommentServiceUtil.getKBComments(
 				_groupId, status, searchContainer.getStart(),
-				searchContainer.getEnd());
+				searchContainer.getEnd(),
+				KnowledgeBaseUtil.getKBCommentOrderByComparator(
+					searchContainer.getOrderByCol(),
+					searchContainer.getOrderByType()));
 		}
 		else {
 			if (status == KBCommentConstants.STATUS_ANY) {
 				return KBCommentServiceUtil.getKBComments(
 					_groupId, KBArticleConstants.getClassName(),
 					_kbArticle.getClassPK(), searchContainer.getStart(),
-					searchContainer.getEnd(), new KBCommentStatusComparator());
+					searchContainer.getEnd(),
+					KnowledgeBaseUtil.getKBCommentOrderByComparator(
+						searchContainer.getOrderByCol(),
+						searchContainer.getOrderByType()));
 			}
 
 			return KBCommentServiceUtil.getKBComments(
 				_groupId, KBArticleConstants.getClassName(),
 				_kbArticle.getClassPK(), status, searchContainer.getStart(),
-				searchContainer.getEnd());
+				searchContainer.getEnd(),
+				KnowledgeBaseUtil.getKBCommentOrderByComparator(
+					searchContainer.getOrderByCol(),
+					searchContainer.getOrderByType()));
 		}
 	}
 
