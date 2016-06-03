@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
@@ -192,6 +193,10 @@ public interface KBFolderLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getKBFolderAndKBArticlesCount(long groupId,
+		long parentResourcePrimKey, QueryDefinition<?> queryDefinition);
+
 	/**
 	* Returns the number of k b folders.
 	*
@@ -249,6 +254,10 @@ public interface KBFolderLocalService extends BaseLocalService,
 	*/
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end, OrderByComparator<T> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<java.lang.Object> getKBFolderAndKBArticles(long groupId,
+		long parentResourcePrimKey, QueryDefinition<?> queryDefinition);
 
 	/**
 	* Returns a range of all the k b folders.

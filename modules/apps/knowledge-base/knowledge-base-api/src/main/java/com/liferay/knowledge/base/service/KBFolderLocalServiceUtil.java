@@ -215,6 +215,14 @@ public class KBFolderLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static int getKBFolderAndKBArticlesCount(long groupId,
+		long parentResourcePrimKey,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
+		return getService()
+				   .getKBFolderAndKBArticlesCount(groupId,
+			parentResourcePrimKey, queryDefinition);
+	}
+
 	/**
 	* Returns the number of k b folders.
 	*
@@ -286,6 +294,14 @@ public class KBFolderLocalServiceUtil {
 		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
+	}
+
+	public static java.util.List<java.lang.Object> getKBFolderAndKBArticles(
+		long groupId, long parentResourcePrimKey,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition<?> queryDefinition) {
+		return getService()
+				   .getKBFolderAndKBArticles(groupId, parentResourcePrimKey,
+			queryDefinition);
 	}
 
 	/**
