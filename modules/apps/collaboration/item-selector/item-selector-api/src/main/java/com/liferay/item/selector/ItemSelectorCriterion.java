@@ -23,11 +23,11 @@ import java.util.List;
  * entity type and return the specified {@link ItemSelectorReturnType}.
  *
  * <p>
- * Implementations of this interface can specify {@link ItemSelectorReturnType}s
- * that include additional fine-grained information. The information should
- * ideally be specified using primitive types (or very simple types that can be
- * serialized using JSON) in the {@link ItemSelectorReturnType} constructor.
- * Note that an empty constructor is mandatory.
+ * Implementations of this interface can provide additional information to have
+ * a fine grained detail about which entities can be selected. This should be
+ * done ideally using primitive types in the constructor (or very simple types
+ * that can be JSON serialized) and it is mandatory to have an empty
+ * constructor.
  * </p>
  *
  * <p>
