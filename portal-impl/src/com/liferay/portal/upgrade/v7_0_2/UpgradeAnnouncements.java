@@ -231,14 +231,15 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						long groupId = getLayoutGroupId(primKey);
 
 						String layoutRoleKey = _getKey(
-							companyId, scope, String.valueOf(groupId), roleId);
+							companyId, ResourceConstants.SCOPE_GROUP,
+							String.valueOf(groupId), roleId);
 
 						if (!_groupRoleSet.contains(layoutRoleKey)) {
 							addResourcePermission(
-								companyId, "com.liferay.announcements", scope,
+								companyId, "com.liferay.announcements",
+								ResourceConstants.SCOPE_GROUP,
 								String.valueOf(groupId), groupId, roleId,
-								ownerId,
-								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+								ownerId, _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 							_groupRoleSet.add(layoutRoleKey);
 						}
