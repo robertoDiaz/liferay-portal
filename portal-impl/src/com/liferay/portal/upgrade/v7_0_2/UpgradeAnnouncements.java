@@ -331,6 +331,19 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 							_companyRoleSet.add(companyRoleKey);
 						}
 					}
+					else if (scope == ResourceConstants.SCOPE_GROUP) {
+						String groupRoleKey = _getKey(
+							companyId, scope, primKey, roleId);
+
+						if (!_groupRoleSet.contains(groupRoleKey)) {
+							addResourcePermission(
+								companyId, "com.liferay.announcements", scope,
+								primKey, primKeyId, roleId, ownerId,
+								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+
+							_groupRoleSet.add(groupRoleKey);
+						}
+					}
 					else if (scope == ResourceConstants.SCOPE_GROUP_TEMPLATE) {
 						String groupTemplateRoleKey = _getKey(
 							companyId, ResourceConstants.SCOPE_GROUP_TEMPLATE,
