@@ -276,8 +276,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 					}
 
 					if (scope == ResourceConstants.SCOPE_INDIVIDUAL) {
-
-
 						if (primKey.contains("_LAYOUT_")) {
 							long groupId = getLayoutGroupId(primKey);
 
@@ -297,7 +295,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 							}
 						}
 						else {
-
 							long ownerRoleId = getOwnerRoleId(companyId);
 
 							String defaultRootModelResourceKey = _getKey(
