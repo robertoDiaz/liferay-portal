@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -39,7 +40,17 @@ import java.util.Set;
  */
 public class UpgradeAnnouncements extends UpgradeProcess {
 
-	protected void addResourceAction() {
+	protected void addNewResourceAction() {
+		addResourceAction(
+			ActionKeys.VIEW_ANNOUNCEMENTS_ADMINISTRATION,
+			_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+	}
+
+	protected void addPermissionsResourceAction() {
+		addResourceAction(ActionKeys.PERMISSIONS, _PERMISSIONS_VALUE);
+	}
+
+	protected void addResourceAction(String actionId, long bitwiseValue) {
 		PreparedStatement ps = null;
 
 		try {
@@ -58,8 +69,8 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 			ps.setLong(1, 0);
 			ps.setLong(2, resourceActionId);
 			ps.setString(3, "com.liferay.announcements");
-			ps.setString(4, "VIEW_ANNOUNCEMENTS_ADMINISTRATION");
-			ps.setLong(5, _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+			ps.setString(4, actionId);
+			ps.setLong(5, bitwiseValue);
 
 			ps.executeUpdate();
 		}
@@ -132,7 +143,8 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		addResourceAction();
+		addPermissionsResourceAction();
+		addNewResourceAction();
 
 		upgradeAlertsResourcePermission();
 		upgradeAnnouncementsResourcePermission();
