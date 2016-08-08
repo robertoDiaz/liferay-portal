@@ -56,23 +56,6 @@ public class AnnouncementsEntryServiceImpl
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (alert) {
-			String portletId = PortletProviderUtil.getPortletId(
-				AnnouncementsConstants.CLASS_NAME_ALERTS_ENTRY,
-				PortletProvider.Action.MANAGE);
-
-			AnnouncementsEntryPermission.check(
-				permissionChecker, plid, portletId, ActionKeys.ADD_ENTRY);
-		}
-		else {
-			String portletId = PortletProviderUtil.getPortletId(
-				AnnouncementsEntry.class.getName(),
-				PortletProvider.Action.MANAGE);
-
-			AnnouncementsEntryPermission.check(
-				permissionChecker, plid, portletId, ActionKeys.ADD_ENTRY);
-		}
-
 		if (classNameId == 0) {
 			if (!PortalPermissionUtil.contains(
 					permissionChecker, ActionKeys.ADD_GENERAL_ANNOUNCEMENTS)) {
