@@ -1587,6 +1587,20 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			kbArticle.getGroupId(), kbArticle.getResourcePrimKey(), true,
 			new KBArticlePriorityComparator(true));
 
+		if (firstChildKBArticle == null) {
+			return getNextAncestorKBArticle(
+				kbArticle.getKbArticleId(), nextKBArticle);
+		}
+
+		if (firstChildKBArticle.isApproved()) {
+			return firstChildKBArticle;
+		}
+
+		firstChildKBArticle = kbArticlePersistence.fetchByG_P_S_First(
+			kbArticle.getGroupId(), kbArticle.getResourcePrimKey(),
+			WorkflowConstants.STATUS_APPROVED,
+			new KBArticlePriorityComparator(true));
+
 		if (firstChildKBArticle != null) {
 			return firstChildKBArticle;
 		}
@@ -1633,7 +1647,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			return previousKBArticle;
 		}
 
-		return lastSiblingChildKBArticle;
+		if (lastSiblingChildKBArticle.isApproved()) {
+			return lastSiblingChildKBArticle;
+		}
+
+		return kbArticlePersistence.fetchByG_P_S_Last(
+			kbArticle.getGroupId(), previousKBArticle.getResourcePrimKey(),
+			WorkflowConstants.STATUS_APPROVED,
+			new KBArticlePriorityComparator(true));
 	}
 
 	protected double getPriority(long groupId, long parentResourcePrimKey)
