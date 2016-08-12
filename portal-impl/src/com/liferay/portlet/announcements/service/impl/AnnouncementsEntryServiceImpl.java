@@ -115,17 +115,17 @@ public class AnnouncementsEntryServiceImpl
 					ActionKeys.MANAGE_ANNOUNCEMENTS);
 			}
 
-			if (className.equals(Organization.class.getName()) &&
-				!OrganizationPermissionUtil.contains(
-					permissionChecker, classPK,
-					ActionKeys.MANAGE_ANNOUNCEMENTS)) {
+			else if (className.equals(Organization.class.getName()) &&
+					 !OrganizationPermissionUtil.contains(
+						 permissionChecker, classPK,
+						 ActionKeys.MANAGE_ANNOUNCEMENTS)) {
 
 				throw new PrincipalException.MustHavePermission(
 					permissionChecker, className, classPK,
 					ActionKeys.MANAGE_ANNOUNCEMENTS);
 			}
 
-			if (className.equals(Role.class.getName())) {
+			else if (className.equals(Role.class.getName())) {
 				Role role = roleLocalService.getRole(classPK);
 
 				if (role.isTeam()) {
@@ -153,14 +153,19 @@ public class AnnouncementsEntryServiceImpl
 				}
 			}
 
-			if (className.equals(UserGroup.class.getName()) &&
-				!UserGroupPermissionUtil.contains(
-					permissionChecker, classPK,
-					ActionKeys.MANAGE_ANNOUNCEMENTS)) {
+			else if (className.equals(UserGroup.class.getName()) &&
+					 !UserGroupPermissionUtil.contains(
+						 permissionChecker, classPK,
+						 ActionKeys.MANAGE_ANNOUNCEMENTS)) {
 
 				throw new PrincipalException.MustHavePermission(
 					permissionChecker, className, classPK,
 					ActionKeys.MANAGE_ANNOUNCEMENTS);
+			}
+
+			else {
+				throw new PortalException(
+					"Unsupported class name " + className);
 			}
 		}
 
