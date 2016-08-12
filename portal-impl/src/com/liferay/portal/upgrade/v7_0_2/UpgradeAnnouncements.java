@@ -238,61 +238,31 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						continue;
 					}
 
+					updateResourcePermission(
+						resourcePermissionId, (actionIds - bitwiseValue));
+
 					if (scope == ResourceConstants.SCOPE_INDIVIDUAL) {
 						if (primKey.contains("_LAYOUT_")) {
 							long groupId = getLayoutGroupId(primKey);
+
+							primKey = String.valueOf(groupId);
+							primKeyId = groupId;
 							scope = ResourceConstants.SCOPE_GROUP;
-
-							String key = _getKey(
-								companyId, scope, String.valueOf(groupId),
-								roleId);
-
-							if (!_rolesSet.contains(key)) {
-								addResourcePermission(
-									companyId, scope, String.valueOf(groupId),
-									groupId, roleId,
-									_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
-
-								_rolesSet.add(key);
-							}
 						}
-					}
-					else if (scope == ResourceConstants.SCOPE_COMPANY) {
-						String key = _getKey(companyId, scope, primKey, roleId);
-
-						if (!_rolesSet.contains(key)) {
-							addResourcePermission(
-								companyId, scope, primKey, primKeyId, roleId,
-								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
-
-							_rolesSet.add(key);
-						}
-					}
-					else if (scope == ResourceConstants.SCOPE_GROUP) {
-						String key = _getKey(companyId, scope, primKey, roleId);
-
-						if (!_rolesSet.contains(key)) {
-							addResourcePermission(
-								companyId, scope, primKey, primKeyId, roleId,
-								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
-
-							_rolesSet.add(key);
-						}
-					}
-					else if (scope == ResourceConstants.SCOPE_GROUP_TEMPLATE) {
-						String key = _getKey(companyId, scope, primKey, roleId);
-
-						if (!_rolesSet.contains(key)) {
-							addResourcePermission(
-								companyId, scope, primKey, primKeyId, roleId,
-								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
-
-							_rolesSet.add(key);
+						else {
+							continue;
 						}
 					}
 
-					updateResourcePermission(
-						resourcePermissionId, (actionIds - bitwiseValue));
+					String key = _getKey(companyId, scope, primKey, roleId);
+
+					if (!_rolesSet.contains(key)) {
+						addResourcePermission(
+							companyId, scope, primKey, primKeyId, roleId,
+							_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
+
+						_rolesSet.add(key);
+					}
 				}
 			}
 
