@@ -167,40 +167,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		return 0;
 	}
 
-	protected long getOwnerRoleId(long companyId) throws Exception {
-		Long roleId = null;
-
-		if (_ownerRoleId.containsKey(companyId)) {
-			roleId = _ownerRoleId.get(companyId);
-		}
-		else {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append("select roleId from ");
-			sb.append("Role_ where companyId = ");
-			sb.append(companyId);
-			sb.append(" and name = 'Owner'");
-
-			try (PreparedStatement ps = connection.prepareStatement(
-					sb.toString());
-
-				ResultSet rs = ps.executeQuery()) {
-
-				if (rs.next()) {
-					roleId = rs.getLong("roleId");
-				}
-
-				_ownerRoleId.put(companyId, roleId);
-			}
-		}
-
-		if (roleId == null) {
-			throw new Exception("Unable to get owner role ID");
-		}
-
-		return roleId;
-	}
-
 	protected void updateResourcePermission(
 			long resourcePermissionId, long bitwiseValue)
 		throws Exception {
@@ -292,26 +258,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 								_groupRoleSet.add(layoutRoleKey);
-							}
-						}
-						else {
-							long ownerRoleId = getOwnerRoleId(companyId);
-
-							String defaultRootModelResourceKey = _getKey(
-								companyId, scope, "com.liferay.announcements",
-								ownerRoleId);
-
-							if (!_companyDefaultRootModelResourceSet.contains(
-									defaultRootModelResourceKey)) {
-
-								addResourcePermission(
-									companyId, "com.liferay.announcements",
-									scope, "com.liferay.announcements", 0,
-									ownerRoleId, _PERMISSIONS_VALUE |
-									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
-
-								_companyDefaultRootModelResourceSet.add(
-									defaultRootModelResourceKey);
 							}
 						}
 					}
