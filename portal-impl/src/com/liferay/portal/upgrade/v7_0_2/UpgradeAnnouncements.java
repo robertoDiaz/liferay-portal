@@ -241,56 +241,53 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 					if (scope == ResourceConstants.SCOPE_INDIVIDUAL) {
 						if (primKey.contains("_LAYOUT_")) {
 							long groupId = getLayoutGroupId(primKey);
+							scope = ResourceConstants.SCOPE_GROUP;
 
-							String layoutRoleKey = _getKey(
-								companyId, ResourceConstants.SCOPE_GROUP,
-								String.valueOf(groupId), roleId);
+							String key = _getKey(
+								companyId, scope, String.valueOf(groupId),
+								roleId);
 
-							if (!_groupRoleSet.contains(layoutRoleKey)) {
+							if (!_rolesSet.contains(key)) {
 								addResourcePermission(
-									companyId, ResourceConstants.SCOPE_GROUP,
-									String.valueOf(groupId), groupId, roleId,
+									companyId, scope, String.valueOf(groupId),
+									groupId, roleId,
 									_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
-								_groupRoleSet.add(layoutRoleKey);
+								_rolesSet.add(key);
 							}
 						}
 					}
 					else if (scope == ResourceConstants.SCOPE_COMPANY) {
-						String companyRoleKey = _getKey(
-							companyId, scope, primKey, roleId);
+						String key = _getKey(companyId, scope, primKey, roleId);
 
-						if (!_companyRoleSet.contains(companyRoleKey)) {
+						if (!_rolesSet.contains(key)) {
 							addResourcePermission(
 								companyId, scope, primKey, primKeyId, roleId,
 								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
-							_companyRoleSet.add(companyRoleKey);
+							_rolesSet.add(key);
 						}
 					}
 					else if (scope == ResourceConstants.SCOPE_GROUP) {
-						String groupRoleKey = _getKey(
-							companyId, scope, primKey, roleId);
+						String key = _getKey(companyId, scope, primKey, roleId);
 
-						if (!_groupRoleSet.contains(groupRoleKey)) {
+						if (!_rolesSet.contains(key)) {
 							addResourcePermission(
 								companyId, scope, primKey, primKeyId, roleId,
 								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
-							_groupRoleSet.add(groupRoleKey);
+							_rolesSet.add(key);
 						}
 					}
 					else if (scope == ResourceConstants.SCOPE_GROUP_TEMPLATE) {
-						String groupTemplateRoleKey = _getKey(
-							companyId, ResourceConstants.SCOPE_GROUP_TEMPLATE,
-							primKey, roleId);
+						String key = _getKey(companyId, scope, primKey, roleId);
 
-						if (!_roleSet.contains(groupTemplateRoleKey)) {
+						if (!_rolesSet.contains(key)) {
 							addResourcePermission(
 								companyId, scope, primKey, primKeyId, roleId,
 								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
-							_roleSet.add(groupTemplateRoleKey);
+							_rolesSet.add(key);
 						}
 					}
 
@@ -343,8 +340,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE = nextBitwiseValue;
 	}
 
-	private final Set<String> _companyRoleSet = new HashSet<>();
-	private final Set<String> _groupRoleSet = new HashSet<>();
-	private final Set<String> _roleSet = new HashSet<>();
+	private final Set<String> _rolesSet = new HashSet<>();
 
 }
