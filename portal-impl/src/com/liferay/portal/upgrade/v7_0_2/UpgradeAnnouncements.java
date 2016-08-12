@@ -30,25 +30,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Roberto Díaz
  */
 public class UpgradeAnnouncements extends UpgradeProcess {
-
-	protected void addNewResourceAction() {
-		addResourceAction(
-			ActionKeys.VIEW_ANNOUNCEMENTS_ADMINISTRATION,
-			_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
-	}
-
-	protected void addPermissionsResourceAction() {
-		addResourceAction(ActionKeys.PERMISSIONS, _PERMISSIONS_VALUE);
-	}
 
 	protected void addResourceAction(String actionId, long bitwiseValue) {
 		PreparedStatement ps = null;
@@ -82,6 +70,14 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		finally {
 			DataAccess.cleanUp(ps);
 		}
+	}
+
+	protected void addResourceActions() {
+		addResourceAction(ActionKeys.PERMISSIONS, _PERMISSIONS_VALUE);
+
+		addResourceAction(
+			ActionKeys.VIEW_ANNOUNCEMENTS_ADMINISTRATION,
+			_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 	}
 
 	protected void addResourcePermission(
@@ -145,8 +141,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		addPermissionsResourceAction();
-		addNewResourceAction();
+		addResourceActions();
 
 		upgradeAlertsResourcePermission();
 		upgradeAnnouncementsResourcePermission();
@@ -212,16 +207,16 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 
 			ResultSet rs1 = ps1.executeQuery()) {
 
-			long resourceActionId = 0;
-			long bitwiseValue = 0;
+			if (!rs1.next()) {
+				_log.error(
+					"Unable to upgrade ADD_ENTRY action, ResourceAction for " +
+						name + " is not initialized");
 
-			if (rs1.next()) {
-				resourceActionId = rs1.getLong("resourceActionId");
-				bitwiseValue = rs1.getLong("bitwiseValue");
-			}
-			else {
 				return;
 			}
+
+			long resourceActionId = rs1.getLong("resourceActionId");
+			long bitwiseValue = rs1.getLong("bitwiseValue");
 
 			try (PreparedStatement ps2 = connection.prepareStatement(
 					sb2.toString());
@@ -255,7 +250,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 									companyId, "com.liferay.announcements",
 									ResourceConstants.SCOPE_GROUP,
 									String.valueOf(groupId), groupId, roleId,
-									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+									_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
 								_groupRoleSet.add(layoutRoleKey);
 							}
@@ -269,7 +264,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
 								primKey, primKeyId, roleId,
-								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
 							_companyRoleSet.add(companyRoleKey);
 						}
@@ -282,7 +277,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
 								primKey, primKeyId, roleId,
-								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
 							_groupRoleSet.add(groupRoleKey);
 						}
@@ -296,7 +291,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
 								primKey, primKeyId, roleId,
-								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
+								_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 
 							_roleSet.add(groupTemplateRoleKey);
 						}
@@ -327,11 +322,11 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		return sb.toString();
 	}
 
-	private static final long _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE;
-
 	private static final long _PERMISSIONS_VALUE;
 
 	private static final boolean _VIEW_ACTION_SUPPORTED = false;
+
+	private static final long _VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeAnnouncements.class);
@@ -348,14 +343,11 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 
 		nextBitwiseValue = nextBitwiseValue << 1;
 
-		_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE = nextBitwiseValue;
+		_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE = nextBitwiseValue;
 	}
 
-	private final Set<String> _companyDefaultRootModelResourceSet =
-		new HashSet<>();
 	private final Set<String> _companyRoleSet = new HashSet<>();
 	private final Set<String> _groupRoleSet = new HashSet<>();
-	private final Map<Long, Long> _ownerRoleId = new HashMap<>(2);
 	private final Set<String> _roleSet = new HashSet<>();
 
 }
