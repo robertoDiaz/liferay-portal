@@ -86,7 +86,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 
 	protected void addResourcePermission(
 			long companyId, String name, int scope, String primKey,
-			long primKeyId, long roleId, long ownerId, long actionBitwiseValue)
+			long primKeyId, long roleId, long actionBitwiseValue)
 		throws Exception {
 
 		PreparedStatement ps = null;
@@ -94,6 +94,8 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		try {
 			long resourcePermissionId = increment(
 				ResourcePermission.class.getName());
+
+			long ownerId = 0;
 
 			StringBundler sb = new StringBundler(4);
 
@@ -234,7 +236,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		StringBundler sb2 = new StringBundler(5);
 
 		sb2.append("select resourcePermissionId, companyId, scope, primKey, ");
-		sb2.append("primKeyId, roleId, ownerId, actionIds from ");
+		sb2.append("primKeyId, roleId, actionIds from ");
 		sb2.append("ResourcePermission where name = '");
 		sb2.append(name);
 		sb2.append("'");
@@ -268,7 +270,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 					String primKey = rs.getString("primKey");
 					long primKeyId = rs.getLong("primKeyId");
 					long roleId = rs.getLong("roleId");
-					long ownerId = rs.getLong("ownerId");
 					long actionIds = rs.getLong("actionIds");
 
 					if ((bitwiseValue & actionIds) == 0) {
@@ -287,7 +288,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 								addResourcePermission(
 									companyId, "com.liferay.announcements",
 									ResourceConstants.SCOPE_GROUP,
-									String.valueOf(groupId), groupId, roleId, 0,
+									String.valueOf(groupId), groupId, roleId,
 									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 								_groupRoleSet.add(layoutRoleKey);
@@ -306,7 +307,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 								addResourcePermission(
 									companyId, "com.liferay.announcements",
 									scope, "com.liferay.announcements", 0,
-									ownerRoleId, 0, _PERMISSIONS_VALUE |
+									ownerRoleId, _PERMISSIONS_VALUE |
 									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 								_companyDefaultRootModelResourceSet.add(
@@ -321,7 +322,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						if (!_companyRoleSet.contains(companyRoleKey)) {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
-								primKey, primKeyId, roleId, ownerId,
+								primKey, primKeyId, roleId,
 								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 							_companyRoleSet.add(companyRoleKey);
@@ -334,7 +335,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						if (!_groupRoleSet.contains(groupRoleKey)) {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
-								primKey, primKeyId, roleId, ownerId,
+								primKey, primKeyId, roleId,
 								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 							_groupRoleSet.add(groupRoleKey);
@@ -348,7 +349,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						if (!_roleSet.contains(groupTemplateRoleKey)) {
 							addResourcePermission(
 								companyId, "com.liferay.announcements", scope,
-								primKey, primKeyId, roleId, ownerId,
+								primKey, primKeyId, roleId,
 								_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 							_roleSet.add(groupTemplateRoleKey);
