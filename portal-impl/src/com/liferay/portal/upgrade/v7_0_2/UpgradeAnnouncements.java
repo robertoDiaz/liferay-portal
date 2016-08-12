@@ -116,7 +116,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 			ps.setLong(8, roleId);
 			ps.setLong(9, ownerId);
 			ps.setLong(10, actionBitwiseValue);
-			ps.setInt(11, 0);
+			ps.setBoolean(11, _VIEW_ACTION_SUPPORTED);
 
 			ps.executeUpdate();
 		}
@@ -384,6 +384,8 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 	private static final long _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE;
 
 	private static final long _PERMISSIONS_VALUE;
+
+	private static final boolean _VIEW_ACTION_SUPPORTED = false;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeAnnouncements.class);
