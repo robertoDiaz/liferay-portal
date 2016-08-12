@@ -381,12 +381,27 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		return sb.toString();
 	}
 
-	private static final long _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE = 4;
+	private static final long _NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE;
 
-	private static final long _PERMISSIONS_VALUE = 2;
+	private static final long _PERMISSIONS_VALUE;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeAnnouncements.class);
+
+	static {
+
+		// see ResourceActionLocalServiceImpl.checkResourceActions
+
+		long viewActionReservedBitwiseValue = 1;
+
+		long nextBitwiseValue = viewActionReservedBitwiseValue << 1;
+
+		_PERMISSIONS_VALUE = nextBitwiseValue;
+
+		nextBitwiseValue = nextBitwiseValue << 1;
+
+		_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE = nextBitwiseValue;
+	}
 
 	private final Set<String> _companyDefaultRootModelResourceSet =
 		new HashSet<>();
