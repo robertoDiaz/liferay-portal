@@ -80,10 +80,18 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 			_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
 	}
 
-	protected void addResourcePermission(
+	protected void addViewAnnouncementsAdministrationResourcePermission(
 			long companyId, int scope, String primKey, long primKeyId,
-			long roleId, long actionBitwiseValue)
+			long roleId)
 		throws Exception {
+
+		String key = _getKey(companyId, scope, primKey, roleId);
+
+		if (_resourcePermissions.contains(key)) {
+			return;
+		}
+
+		_resourcePermissions.add(key);
 
 		PreparedStatement ps = null;
 
@@ -91,6 +99,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 			long resourcePermissionId = increment(
 				ResourcePermission.class.getName());
 
+			long actionBitwiseValue = _VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE;
 			String name = "com.liferay.announcements";
 			long ownerId = 0;
 
@@ -254,15 +263,8 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 						}
 					}
 
-					String key = _getKey(companyId, scope, primKey, roleId);
-
-					if (!_rolesSet.contains(key)) {
-						addResourcePermission(
-							companyId, scope, primKey, primKeyId, roleId,
-							_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE);
-
-						_rolesSet.add(key);
-					}
+					addViewAnnouncementsAdministrationResourcePermission(
+						companyId, scope, primKey, primKeyId, roleId);
 				}
 			}
 
@@ -310,6 +312,6 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 		_VIEW_ANNOUNCEMENTS_ADMINISTRATION_VALUE = nextBitwiseValue;
 	}
 
-	private final Set<String> _rolesSet = new HashSet<>();
+	private final Set<String> _resourcePermissions = new HashSet<>();
 
 }
