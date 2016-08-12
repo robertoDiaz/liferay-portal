@@ -287,8 +287,7 @@ public class UpgradeAnnouncements extends UpgradeProcess {
 								addResourcePermission(
 									companyId, "com.liferay.announcements",
 									ResourceConstants.SCOPE_GROUP,
-									String.valueOf(groupId), groupId, roleId,
-									ownerId,
+									String.valueOf(groupId), groupId, roleId, 0,
 									_NEW_VIEW_ANNOUNCEMENTS_ADMIN_VALUE);
 
 								_groupRoleSet.add(layoutRoleKey);
