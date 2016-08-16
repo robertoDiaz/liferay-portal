@@ -14,6 +14,8 @@
 
 package com.liferay.journal.item.selector.web.internal.context;
 
+import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
+import com.liferay.item.selector.ItemSelectorReturnTypeResolverHandler;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion;
 import com.liferay.journal.item.selector.web.internal.JournalItemSelectorView;
@@ -22,6 +24,7 @@ import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 
 import java.util.Locale;
@@ -55,6 +58,18 @@ public class JournalItemSelectorViewDisplayContext {
 
 	public String getItemSelectedEventName() {
 		return _itemSelectedEventName;
+	}
+
+	public ItemSelectorReturnTypeResolver getItemSelectorReturnTypeResolver() {
+		ItemSelectorReturnTypeResolverHandler
+			itemSelectorReturnTypeResolverHandler =
+				_journalItemSelectorView.
+					getItemSelectorReturnTypeResolverHandler();
+
+		return itemSelectorReturnTypeResolverHandler.
+			getItemSelectorReturnTypeResolver(
+				_journalItemSelectorCriterion, _journalItemSelectorView,
+				FileEntry.class);
 	}
 
 	public JournalArticle getJournalArticle() throws PortalException {
