@@ -12,35 +12,42 @@
  * details.
  */
 
-package com.liferay.announcements.web.internal.portlet;
+package com.liferay.announcements.web.applications.list;
 
 import com.liferay.announcements.web.constants.AnnouncementsPortletKeys;
-import com.liferay.portal.kernel.model.Release;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-
-import javax.portlet.Portlet;
+import com.liferay.application.list.BasePanelApp;
+import com.liferay.application.list.PanelApp;
+import com.liferay.application.list.constants.PanelCategoryKeys;
+import com.liferay.portal.kernel.model.Portlet;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Roberto Díaz
+ * @author Stian Sigvartsen
  */
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.display-name=Announcements",
-		"javax.portlet.name=" + AnnouncementsPortletKeys.ANNOUNCEMENTS_ADMIN
+		"panel.app.order:Integer=100",
+		"panel.category.key=" + PanelCategoryKeys.CONTROL_PANEL_USERS
 	},
-	service = Portlet.class
+	service = PanelApp.class
 )
-public class AnnouncementsAdminPortlet extends MVCPortlet {
+public class AnnouncementsPanelApp extends BasePanelApp {
 
+	@Override
+	public String getPortletId() {
+		return AnnouncementsPortletKeys.ANNOUNCEMENTS_ADMIN;
+	}
+
+	@Override
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.announcements.web)(release.schema.version=1.0.2))",
+		target = "(javax.portlet.name=" + AnnouncementsPortletKeys.ANNOUNCEMENTS_ADMIN + ")",
 		unbind = "-"
 	)
-	protected void setRelease(Release release) {
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
 	}
 
 }
