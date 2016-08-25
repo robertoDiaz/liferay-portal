@@ -29,7 +29,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.display-name=Announcements",
+		"com.liferay.portlet.display-category=category.hidden",
+		"javax.portlet.display-name=Announcements",		
 		"javax.portlet.name=" + AnnouncementsPortletKeys.ANNOUNCEMENTS_ADMIN
 	},
 	service = Portlet.class
