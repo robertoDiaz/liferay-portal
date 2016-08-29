@@ -1583,7 +1583,7 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 			<if>
 				<and>
 					<equals arg1="${app.server.type}" arg2="tomcat" />
-					<matches pattern="http" string="${test.build.fix.pack.zip.url}" />
+					<matches pattern="https?://" string="${test.build.fix.pack.zip.url}" />
 				</and>
 				<then>
 					<mirrors-get
@@ -1793,7 +1793,7 @@ tell application "Safari" to quit
 		<attribute name="unit" />
 		<sequential>
 			<if>
-				<matches pattern="http" string="${test.build.bundle.glassfish.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.glassfish.zip.url}" />
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
 						<param name="app.server.type" value="glassfish" />
@@ -1821,7 +1821,7 @@ tell application "Safari" to quit
 			<if>
 				<and>
 					<equals arg1="${test.build.bundle.jbosseap6.1}" arg2="true" />
-					<matches pattern="http" string="${test.build.portal.war.url}" />
+					<matches pattern="https?://" string="${test.build.portal.war.url}" />
 				</and>
 				<then>
 					<app-server-properties-update>
@@ -1860,7 +1860,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.build.bundle.jetty.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.jetty.zip.url}" />
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
 						<param name="app.server.type" value="jetty" />
@@ -1877,7 +1877,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.build.bundle.jonas.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.jonas.zip.url}" />
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
 						<param name="app.server.type" value="jonas" />
@@ -1894,7 +1894,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.build.bundle.resin.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.resin.zip.url}" />
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
 						<param name="app.server.type" value="resin" />
@@ -1913,7 +1913,7 @@ tell application "Safari" to quit
 			<if>
 				<and>
 					<equals arg1="${test.build.bundle.tcserver}" arg2="true" />
-					<matches pattern="http" string="${test.build.portal.war.url}" />
+					<matches pattern="https?://" string="${test.build.portal.war.url}" />
 				</and>
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
@@ -1931,7 +1931,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.build.bundle.tomcat.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.tomcat.zip.url}" />
 				<then>
 					<set-tomcat-version-number liferay.portal.bundle="${liferay.portal.bundle}" />
 
@@ -1987,7 +1987,7 @@ tell application "Safari" to quit
 			<if>
 				<and>
 					<equals arg1="${test.build.bundle.weblogic}" arg2="true" />
-					<matches pattern="http" string="${test.build.portal.war.url}" />
+					<matches pattern="https?://" string="${test.build.portal.war.url}" />
 				</and>
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
@@ -2021,7 +2021,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.build.bundle.wildfly.zip.url}" />
+				<matches pattern="https?://" string="${test.build.bundle.wildfly.zip.url}" />
 				<then>
 					<antcall inheritAll="false" target="prepare-test-bundle">
 						<param name="app.server.type" value="wildfly" />
@@ -2040,7 +2040,7 @@ tell application "Safari" to quit
 			<antcall target="deploy-license-xml" />
 
 			<if>
-				<matches pattern="http" string="${test.build.plugins.war.zip.url}" />
+				<matches pattern="https?://" string="${test.build.plugins.war.zip.url}" />
 				<then>
 					<mirrors-get
 						dest="plugins.war.zip"
@@ -2057,7 +2057,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<matches pattern="http" string="${test.extra.apps.zip.urls}" />
+				<matches pattern="https?://" string="${test.extra.apps.zip.urls}" />
 				<then>
 					<mkdir dir="extraapps" />
 
@@ -4439,7 +4439,7 @@ go]]></replacevalue>
 
 	<target name="deploy-license-xml">
 		<if>
-			<matches pattern="http" string="${test.build.license.xml.zip.url}" />
+			<matches pattern="https?://" string="${test.build.license.xml.zip.url}" />
 			<then>
 				<mkdir dir="${liferay.home}/deploy" />
 
@@ -4461,7 +4461,8 @@ go]]></replacevalue>
 
 				<for list="${osgi.modules.includes}" param="osgi.module">
 					<sequential>
-						<var name="osgi.module.dir" unset="true" />
+						<local name="osgi.module.bnd.file" />
+						<local name="osgi.module.dir" />
 
 						<path id="osgi.module.bnd.file">
 							<fileset dir="${project.dir}/modules">
@@ -4473,24 +4474,7 @@ go]]></replacevalue>
 
 						<dirname file="${osgi.module.bnd.file}" property="osgi.module.dir" />
 
-						<if>
-							<contains string="${osgi.module.dir}" substring="modules" />
-							<then>
-								<gradle-execute dir="${osgi.module.dir}" task="deploy" />
-							</then>
-							<else>
-								<var name="osgi.module.dir" unset="true" />
-
-								<dirset dir="${project.dir}/modules" id="osgi.module.dir.id">
-									<exclude name=".releng/**" />
-									<include name="**/@{osgi.module}" />
-								</dirset>
-
-								<property name="osgi.module.dir" refid="osgi.module.dir.id" />
-
-								<gradle-execute dir="modules/${osgi.module.dir}" task="deploy" />
-							</else>
-						</if>
+						<gradle-execute dir="${osgi.module.dir}" task="deploy" />
 					</sequential>
 				</for>
 			</then>
@@ -4576,7 +4560,7 @@ go]]></replacevalue>
 
 	<target name="deploy-sql-zip">
 		<if>
-			<matches pattern="http" string="${test.sql.zip.url}" />
+			<matches pattern="https?://" string="${test.sql.zip.url}" />
 			<then>
 				<mirrors-get
 					dest="sql/release-sql.zip"
@@ -5904,14 +5888,9 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<delete file="${test.ext.properties.file}" />
 
-		<if>
-			<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
-			<then>
-				<antcall target="prepare-poshi-runner-properties">
-					<param name="test.class" value="${test.class}" />
-				</antcall>
-			</then>
-		</if>
+		<antcall target="prepare-poshi-runner-properties">
+			<param name="test.class" value="${test.class}" />
+		</antcall>
 
 		<antcall target="prepare-selenium-app-server-properties" />
 		<antcall target="prepare-selenium-browser" />
@@ -6014,19 +5993,9 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 				</echo>
 			</then>
 			<else>
-				<if>
-					<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
-					<then>
-						<echo append="true" file="${test.ext.properties.file}">
-							test.base.dir.name=${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/
-						</echo>
-					</then>
-					<else>
-						<echo append="true" file="${test.ext.properties.file}">
-							test.base.dir.name=${basedir.unix}/portal-web
-						</echo>
-					</else>
-				</if>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.base.dir.name=${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/
+				</echo>
 			</else>
 		</if>
 
@@ -6835,12 +6804,9 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<prepare-test-bundles unit="false" />
 
 		<if>
-			<and>
-				<not>
-					<equals arg1="${test.build.unit}" arg2="true" />
-				</not>
-				<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
-			</and>
+			<not>
+				<equals arg1="${test.build.unit}" arg2="true" />
+			</not>
 			<then>
 				<antcall target="record-test-case-method-names" />
 			</then>
@@ -6939,7 +6905,7 @@ liferay.home=${liferay.home}
 plugins.includes=marketplace-portlet</echo>
 
 				<if>
-					<matches pattern="http" string="${test.build.portal.war.url}" />
+					<matches pattern="https?://" string="${test.build.portal.war.url}" />
 					<then>
 						<mkdir dir="dist" />
 
@@ -6991,7 +6957,7 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 		</if>
 
 		<if>
-			<matches pattern="http" string="${test.build.bundle.zip.url}" />
+			<matches pattern="https?://" string="${test.build.bundle.zip.url}" />
 			<then>
 				<mkdir dir="${app.server.parent.dir}" />
 
@@ -7988,43 +7954,7 @@ jdbc.default.password=${database.mysql.password}</echo>
 			</then>
 		</if>
 
-		<if>
-			<equals arg1="${test.poshi.runner.enabled}" arg2="true" />
-			<then>
-				<antcall target="run-poshi-runner" />
-			</then>
-			<else>
-				<ant dir="portal-impl" inheritAll="false" target="compile-test" />
-
-				<if>
-					<contains string="${test.class}" substring="#" />
-					<then>
-						<get-test-method-name />
-
-						<get-test-simple-class-name />
-
-						<var name="test.class" unset="true" />
-						<var name="test.methods" unset="true" />
-
-						<ant dir="portal-web" target="test-method">
-							<property name="test.class" value="${test.simple.class.name}" />
-							<property name="test.dir" value="functional-generated" />
-							<property name="test.methods" value="${test.method.name}" />
-						</ant>
-					</then>
-					<else>
-						<get-test-simple-class-name />
-
-						<var name="test.class" unset="true" />
-
-						<ant dir="portal-web" inheritAll="false" target="test-class">
-							<property name="test.class" value="${test.simple.class.name}" />
-							<property name="test.dir" value="functional-generated" />
-						</ant>
-					</else>
-				</if>
-			</else>
-		</if>
+		<antcall target="run-poshi-runner" />
 
 		<property name="test.class" value="${test.simple.class.name}#${test.method.name}" />
 
@@ -8616,7 +8546,7 @@ jdbc.default.password=${database.mysql.password}</echo>
 		<if>
 			<equals arg1="${elastic.kibana.enabled}" arg2="true" />
 			<then>
-				<print-file file.name="${kibana.dir}/bin/kibana.log" />
+				<print-file file.name="${elastic.kibana.dir}/bin/kibana.log" />
 
 				<ant antfile="build-test-elasticsearch.xml" target="stop-kibana" />
 			</then>
