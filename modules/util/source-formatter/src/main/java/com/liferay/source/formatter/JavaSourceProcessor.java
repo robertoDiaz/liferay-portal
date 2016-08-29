@@ -43,9 +43,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -344,14 +345,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 					processMessage(fileName, "Use " + s, lineCount);
 				}
 			}
-		}
-	}
-
-	protected void checkMissingAuthor(
-		String content, String fileName, String className) {
-
-		if (!content.contains(" * @author ")) {
-			processMessage(fileName, "Missing author");
 		}
 	}
 
@@ -662,8 +655,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			processMessage(fileName, "UTF-8");
 		}
-
-		checkMissingAuthor(newContent, fileName, className);
 
 		newContent = fixDataAccessConnection(className, newContent);
 		newContent = fixSessionKey(fileName, newContent, sessionKeyPattern);
@@ -4457,7 +4448,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private final Pattern _annotationLineBreakPattern2 = Pattern.compile(
 		"=(\n\t*)\"");
 	private final Pattern _annotationMetaTypePattern = Pattern.compile(
-		"\\s(name|description) = \"%");
+		"[\\s\\(](name|description) = \"%");
 	private final Pattern _anonymousClassPattern = Pattern.compile(
 		"\n(\t+)(\\S.* )?new .*\\) \\{\n\n");
 	private final Pattern _arrayPattern = Pattern.compile(
@@ -4569,7 +4560,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	private List<String> _testAnnotationsExcludes;
 	private final Pattern _throwsSystemExceptionPattern = Pattern.compile(
 		"(\n\t+.*)throws(.*) SystemException(.*)( \\{|;\n)");
-	private final List<File> _ungeneratedFiles = new CopyOnWriteArrayList<>();
+	private final Set<File> _ungeneratedFiles = new CopyOnWriteArraySet<>();
 	private final Pattern _upgradeClassNamePattern = Pattern.compile(
 		"new .*?(\\w+)\\(", Pattern.DOTALL);
 	private List<String> _upgradeDataAccessConnectionExcludes;
