@@ -60,15 +60,16 @@ import groovy.json.JsonSlurper;
 
 import groovy.lang.Closure;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.io.UncheckedIOException;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,6 +82,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +106,9 @@ import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.artifacts.ResolutionStrategy;
+import org.gradle.api.artifacts.ResolveException;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
+import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 import org.gradle.api.artifacts.maven.Conf2ScopeMapping;
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer;
@@ -115,6 +119,7 @@ import org.gradle.api.execution.TaskExecutionGraph;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.FileCopyDetails;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.GradleInternal;
@@ -143,6 +148,7 @@ import org.gradle.api.tasks.SourceSetOutput;
 import org.gradle.api.tasks.StopActionException;
 import org.gradle.api.tasks.TaskCollection;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.VerificationTask;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
@@ -165,6 +171,8 @@ import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.gradle.plugins.ide.idea.model.IdeaModule;
 import org.gradle.process.ExecSpec;
+import org.gradle.util.CollectionUtils;
+import org.gradle.util.GUtil;
 
 /**
  * @author Andrea Di Giorgi
@@ -201,6 +209,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	public static final String SNAPSHOT_IF_STALE_PROPERTY_NAME =
 		"snapshotIfStale";
 
+	public static final String SYNC_RELEASE_PROPERTY_NAME = "syncRelease";
+
 	public static final String UPDATE_FILE_VERSIONS_TASK_NAME =
 		"updateFileVersions";
 
@@ -216,7 +226,17 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(final Project project) {
+		final File portalRootDir = GradleUtil.getRootDir(
+			project.getRootProject(), "portal-impl");
+
 		GradleUtil.applyPlugin(project, LiferayOSGiPlugin.class);
+
+		File versionOverridesFile = _getVersionOverridesFile(project);
+
+		boolean syncReleaseVersions = _syncReleaseVersions(
+			project, portalRootDir, versionOverridesFile);
+
+		_applyVersionOverrides(project, versionOverridesFile);
 
 		Gradle gradle = project.getGradle();
 
@@ -224,8 +244,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		List<String> taskNames = startParameter.getTaskNames();
 
-		final File portalRootDir = GradleUtil.getRootDir(
-			project.getRootProject(), "portal-impl");
 		final boolean publishing = isPublishing(project);
 		boolean testProject = isTestProject(project);
 
@@ -278,7 +296,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			baselineConfiguration = addConfigurationBaseline(project);
 		}
 
-		addTaskBaseline(project, baselineConfiguration);
+		Task baselineTask = addTaskBaseline(project, baselineConfiguration);
+
+		if (syncReleaseVersions) {
+			_configureTaskBaselineSyncReleaseVersions(
+				baselineTask, versionOverridesFile);
+		}
 
 		InstallCacheTask installCacheTask = addTaskInstallCache(project);
 
@@ -326,6 +349,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		configureTasksPmd(project);
 		configureTasksPublishNodeModule(project);
 
+		if (publishing) {
+			_configureTasksEnabledIfStaleSnapshot(
+				project, MavenPlugin.INSTALL_TASK_NAME,
+				BasePlugin.UPLOAD_ARCHIVES_TASK_NAME);
+		}
+
 		GradleUtil.withPlugin(
 			project, ServiceBuilderPlugin.class,
 			new Action<ServiceBuilderPlugin>() {
@@ -369,7 +398,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 					// configureTaskUploadArchives, because the latter one needs
 					// to know if we are publishing a snapshot or not.
 
-					_configureTaskInstall(project);
 					configureTaskUploadArchives(
 						project, updateFileVersionsTask, updateVersionTask);
 
@@ -486,11 +514,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 				"baselining.");
 		configuration.setVisible(false);
 
-		ResolutionStrategy resolutionStrategy =
-			configuration.getResolutionStrategy();
-
-		resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS);
-		resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS);
+		_configureConfigurationNoCache(configuration);
 
 		return configuration;
 	}
@@ -757,7 +781,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 				public void execute(Task task) {
 					Project project = task.getProject();
 
-					final String commitSubject = getGitResult(
+					final String commitSubject = GitUtil.getGitResult(
 						project, "log", "-1", "--pretty=%s");
 
 					project.exec(
@@ -831,7 +855,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(Task task) {
-					String result = getGitResult(
+					String result = GitUtil.getGitResult(
 						task.getProject(), "status", "--porcelain", ".");
 
 					if (Validator.isNotNull(result)) {
@@ -1041,7 +1065,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project, LiferayRelengPlugin.UPDATE_VERSION_TASK_NAME,
 			ReplaceRegexTask.class);
 
-		replaceRegexTask.match("Bundle-Version: (.+)(?:\\s|$)", "bnd.bnd");
+		replaceRegexTask.match(_BUNDLE_VERSION_REGEX, "bnd.bnd");
 
 		replaceRegexTask.onlyIf(
 			new Spec<Task>() {
@@ -1819,6 +1843,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		configureTaskJavadocFilter(javadoc);
 		configureTaskJavadocOptions(javadoc);
+		_configureTaskJavadocTitle(javadoc);
 
 		JavaVersion javaVersion = JavaVersion.current();
 
@@ -2119,14 +2144,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		Project project, ReplaceRegexTask updateFileVersionsTask,
 		ReplaceRegexTask updateVersionTask) {
 
-		Task uploadArchivesTask = GradleUtil.getTask(
-			project, BasePlugin.UPLOAD_ARCHIVES_TASK_NAME);
-
 		if (GradleUtil.isSnapshot(project)) {
-			_configureTaskEnabledIfStaleSnapshot(uploadArchivesTask);
-
 			return;
 		}
+
+		Task uploadArchivesTask = GradleUtil.getTask(
+			project, BasePlugin.UPLOAD_ARCHIVES_TASK_NAME);
 
 		TaskContainer taskContainer = project.getTasks();
 
@@ -2227,25 +2250,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		return (Map<String, String>)bundleExtension.getInstructions();
 	}
 
+	/**
+	 * @deprecated As of 1.2.0
+	 */
+	@Deprecated
 	protected String getGitResult(Project project, final Object... args) {
-		final ByteArrayOutputStream byteArrayOutputStream =
-			new ByteArrayOutputStream();
-
-		project.exec(
-			new Action<ExecSpec>() {
-
-				@Override
-				public void execute(ExecSpec execSpec) {
-					execSpec.args(args);
-					execSpec.setExecutable("git");
-					execSpec.setStandardOutput(byteArrayOutputStream);
-				}
-
-			});
-
-		String result = byteArrayOutputStream.toString();
-
-		return result.trim();
+		return GitUtil.getGitResult(project, args);
 	}
 
 	protected File getLibDir(Project project) {
@@ -2380,73 +2390,344 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		return false;
 	}
 
-	private void _configureTaskEnabledIfStaleSnapshot(Task task) {
-		boolean snapshotIfStale = false;
+	private void _applyVersionOverrides(
+		Project project, File versionOverridesFile) {
 
-		Project project = task.getProject();
+		if ((versionOverridesFile == null) || !versionOverridesFile.exists()) {
+			return;
+		}
+
+		final Properties versionOverrides = GUtil.loadProperties(
+			versionOverridesFile);
+
+		String bundleVersion = versionOverrides.getProperty(
+			Constants.BUNDLE_VERSION);
+
+		if (Validator.isNotNull(bundleVersion)) {
+			Map<String, String> bundleInstructions = getBundleInstructions(
+				project);
+
+			bundleInstructions.put(Constants.BUNDLE_VERSION, bundleVersion);
+
+			project.setVersion(bundleVersion);
+		}
+
+		final Copy copy = (Copy)GradleUtil.getTask(
+			project, JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+
+		copy.filesMatching(
+			"**/packageinfo",
+			new Action<FileCopyDetails>() {
+
+				@Override
+				public void execute(final FileCopyDetails fileCopyDetails) {
+					fileCopyDetails.filter(
+						new Closure<Void>(copy) {
+
+							@SuppressWarnings("unused")
+							public String doCall(String line) {
+								if (Validator.isNull(line)) {
+									return line;
+								}
+
+								String packagePath = fileCopyDetails.getPath();
+
+								packagePath = packagePath.substring(
+									0, packagePath.lastIndexOf('/'));
+
+								packagePath = packagePath.replace('/', '.');
+
+								return _getPackageInfoOverride(
+									packagePath, line, versionOverrides);
+							}
+
+						});
+				}
+
+			});
+	}
+
+	private void _configureConfigurationNoCache(Configuration configuration) {
+		ResolutionStrategy resolutionStrategy =
+			configuration.getResolutionStrategy();
+
+		resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS);
+		resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS);
+	}
+
+	private void _configureTaskBaselineSyncReleaseVersions(
+		Task task, final File versionOverridesFile) {
+
+		Action<Task> action = new Action<Task>() {
+
+			@Override
+			public void execute(Task task) {
+				try {
+					Project project = task.getProject();
+
+					if (versionOverridesFile != null) {
+						Properties versions = _getVersions(
+							project.getProjectDir(), null);
+
+						_saveVersions(
+							project.getProjectDir(), versions,
+							versionOverridesFile);
+
+						GitUtil.executeGit(
+							project, "add",
+							project.relativePath(versionOverridesFile));
+					}
+					else if (_hasPackageInfoFiles(project)) {
+						GitUtil.executeGit(
+							project, "add", "bnd.bnd", "**/packageinfo");
+					}
+					else {
+						GitUtil.executeGit(project, "add", "bnd.bnd");
+					}
+
+					String message = project.getName() + " packageinfo";
+
+					GitUtil.commit(project, message, true);
+				}
+				catch (IOException ioe) {
+					throw new UncheckedIOException(ioe);
+				}
+			}
+
+			private boolean _hasPackageInfoFiles(Project project) {
+				Map<String, Object> args = new HashMap<>();
+
+				args.put("dir", project.getProjectDir());
+				args.put("include", "src/main/resources/**/packageinfo");
+
+				FileTree fileTree = project.fileTree(args);
+
+				if (!fileTree.isEmpty()) {
+					return true;
+				}
+
+				return false;
+			}
+
+		};
+
+		task.doLast(action);
+
+		if (task instanceof VerificationTask) {
+			VerificationTask verificationTask = (VerificationTask)task;
+
+			verificationTask.setIgnoreFailures(true);
+		}
+	}
+
+	private void _configureTaskJavadocTitle(Javadoc javadoc) {
+		Project project = javadoc.getProject();
+
+		String bundleName = getBundleInstruction(
+			project, Constants.BUNDLE_NAME);
+
+		if (Validator.isNull(bundleName)) {
+			return;
+		}
+
+		String title = String.format(
+			"%s %s API", bundleName, project.getVersion());
+
+		javadoc.setTitle(title);
+	}
+
+	private void _configureTasksEnabledIfStaleSnapshot(
+		Project project, String... taskNames) {
+
+		boolean snapshotIfStale = false;
 
 		if (project.hasProperty(SNAPSHOT_IF_STALE_PROPERTY_NAME)) {
 			snapshotIfStale = GradleUtil.getProperty(
 				project, SNAPSHOT_IF_STALE_PROPERTY_NAME, true);
 		}
 
-		if (!snapshotIfStale) {
+		if (!snapshotIfStale || _isSnapshotStale(project)) {
 			return;
 		}
 
-		task.onlyIf(
-			new Spec<Task>() {
+		for (String taskName : taskNames) {
+			Task task = GradleUtil.getTask(project, taskName);
+
+			task.setDependsOn(Collections.emptySet());
+			task.setEnabled(false);
+			task.setFinalizedBy(Collections.emptySet());
+		}
+	}
+
+	private long _getArtifactLastModifiedTime(Project project) {
+		DependencyHandler dependencyHandler = project.getDependencies();
+
+		Map<String, Object> dependencyNotation = new HashMap<>();
+
+		dependencyNotation.put("group", project.getGroup());
+		dependencyNotation.put("name", GradleUtil.getArchivesBaseName(project));
+		dependencyNotation.put("version", "latest.integration");
+
+		Dependency dependency = dependencyHandler.create(dependencyNotation);
+
+		ConfigurationContainer configurationContainer =
+			project.getConfigurations();
+
+		Configuration configuration =
+			configurationContainer.detachedConfiguration(dependency);
+
+		_configureConfigurationNoCache(configuration);
+
+		File file = CollectionUtils.single(configuration.resolve());
+
+		if (GradleUtil.isFromMavenLocal(project, file)) {
+			throw new GradleException(
+				"Please delete " + file.getParent() + " and try again");
+		}
+
+		try (JarFile jarFile = new JarFile(file)) {
+			Manifest manifest = jarFile.getManifest();
+
+			Attributes attributes = manifest.getMainAttributes();
+
+			String lastModified = attributes.getValue(
+				Constants.BND_LASTMODIFIED);
+
+			return Long.valueOf(lastModified);
+		}
+		catch (IOException ioe) {
+			throw new UncheckedIOException(ioe);
+		}
+	}
+
+	private String _getPackageInfoOverride(
+		String packagePath, String packageInfo, Properties versionOverrides) {
+
+		String versionNumberOverride = versionOverrides.getProperty(
+			packagePath);
+
+		if (Validator.isNull(versionNumberOverride)) {
+			return packageInfo;
+		}
+
+		String versionNumber = packageInfo.substring(8);
+
+		Version version = Version.parseVersion(versionNumber);
+		Version versionOverride = Version.parseVersion(versionNumberOverride);
+
+		if (versionOverride.compareTo(version) > 0) {
+			return "version " + versionNumberOverride;
+		}
+
+		return packageInfo;
+	}
+
+	private File _getVersionOverridesFile(Project project) {
+		File gitRepoDir = GradleUtil.getRootDir(
+			project.getProjectDir(), ".gitrepo");
+
+		if (gitRepoDir == null) {
+			return null;
+		}
+
+		String gitRepo;
+
+		try {
+			File gitRepoFile = new File(gitRepoDir, ".gitrepo");
+
+			gitRepo = new String(
+				Files.readAllBytes(gitRepoFile.toPath()),
+				StandardCharsets.UTF_8);
+		}
+		catch (IOException ioe) {
+			throw new UncheckedIOException(ioe);
+		}
+
+		if (!gitRepo.contains("mode = pull")) {
+			return null;
+		}
+
+		String fileName =
+			".version-overrides-" + project.getName() + ".properties";
+
+		return new File(gitRepoDir.getParentFile(), fileName);
+	}
+
+	private Properties _getVersions(
+			File projectDir, Properties versionOverrides)
+		throws IOException {
+
+		final Properties versions = new Properties();
+
+		if (versionOverrides != null) {
+			versions.putAll(versionOverrides);
+		}
+
+		String bundleVersion = versions.getProperty(Constants.BUNDLE_VERSION);
+
+		if (Validator.isNull(bundleVersion)) {
+			Properties bundleProperties = GUtil.loadProperties(
+				new File(projectDir, "bnd.bnd"));
+
+			bundleVersion = bundleProperties.getProperty(
+				Constants.BUNDLE_VERSION);
+
+			if (Validator.isNotNull(bundleVersion)) {
+				versions.setProperty(Constants.BUNDLE_VERSION, bundleVersion);
+			}
+		}
+
+		File packageInfoRootDir = new File(projectDir, "src/main/resources");
+
+		final Path packageInfoRootDirPath = packageInfoRootDir.toPath();
+
+		if (Files.notExists(packageInfoRootDirPath)) {
+			return versions;
+		}
+
+		Files.walkFileTree(
+			packageInfoRootDirPath,
+			new SimpleFileVisitor<Path>() {
 
 				@Override
-				public boolean isSatisfiedBy(Task task) {
-					return _isSnapshotStale(task.getProject());
+				public FileVisitResult preVisitDirectory(
+						Path dirPath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					Path packageInfoPath = dirPath.resolve("packageinfo");
+
+					if (Files.notExists(packageInfoPath)) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					Path relativePath = packageInfoRootDirPath.relativize(
+						dirPath);
+
+					String packagePath = relativePath.toString();
+
+					packagePath = packagePath.replace(File.separatorChar, '.');
+
+					String packageVersion = versions.getProperty(packagePath);
+
+					if (Validator.isNotNull(packageVersion)) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					packageVersion = new String(
+						Files.readAllBytes(packageInfoPath),
+						StandardCharsets.UTF_8);
+
+					packageVersion = packageVersion.trim();
+					packageVersion = packageVersion.substring(8);
+
+					versions.setProperty(packagePath, packageVersion);
+
+					return FileVisitResult.CONTINUE;
 				}
 
 			});
-	}
 
-	private void _configureTaskInstall(Project project) {
-		if (!GradleUtil.isSnapshot(project)) {
-			return;
-		}
-
-		Task installTask = GradleUtil.getTask(
-			project, MavenPlugin.INSTALL_TASK_NAME);
-
-		_configureTaskEnabledIfStaleSnapshot(installTask);
-	}
-
-	private long _getSnapshotLastModifiedTime(Project project)
-		throws IOException {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("jar:");
-		sb.append("http://repository.liferay.com/");
-		sb.append("nexus/service/local/artifact/maven/content?g=");
-		sb.append(
-			URLEncoder.encode(
-				String.valueOf(project.getGroup()),
-				StandardCharsets.UTF_8.name()));
-		sb.append("&a=");
-		sb.append(
-			URLEncoder.encode(
-				GradleUtil.getArchivesBaseName(project),
-				StandardCharsets.UTF_8.name()));
-		sb.append("&v=LATEST&r=liferay-public-snapshots!/");
-
-		URL url = new URL(sb.toString());
-
-		JarURLConnection jarURLConnection =
-			(JarURLConnection)url.openConnection();
-
-		Manifest manifest = jarURLConnection.getManifest();
-
-		Attributes attributes = manifest.getMainAttributes();
-
-		String lastModified = attributes.getValue(Constants.BND_LASTMODIFIED);
-
-		return Long.valueOf(lastModified);
+		return versions;
 	}
 
 	private boolean _isSnapshotStale(Project project) {
@@ -2455,14 +2736,17 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		long lastModifiedTime;
 
 		try {
-			lastModifiedTime = _getSnapshotLastModifiedTime(project);
+			lastModifiedTime = _getArtifactLastModifiedTime(project);
 		}
-		catch (IOException ioe) {
-			logger.error(
-				"Unable to get snapshot last modified time for " + project,
-				ioe);
+		catch (ResolveException re) {
+			if (logger.isInfoEnabled()) {
+				logger.info(
+					"Unable to get artifact last modified time for " + project +
+						", a new snapshot will be published",
+					re);
+			}
 
-			return false;
+			return true;
 		}
 
 		// Remove milliseconds from Unix epoch
@@ -2493,7 +2777,159 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		return false;
 	}
 
+	private void _saveVersions(
+			File projectDir, Properties versions, File versionOverridesFile)
+		throws IOException {
+
+		if (versionOverridesFile != null) {
+			FileUtil.writeProperties(versionOverridesFile, versions);
+		}
+
+		Path projectDirPath = projectDir.toPath();
+
+		String version = versions.getProperty(Constants.BUNDLE_VERSION);
+
+		if (Validator.isNotNull(version)) {
+			FileUtil.replace(
+				projectDirPath.resolve("bnd.bnd"), _BUNDLE_VERSION_REGEX,
+				version);
+		}
+
+		Path packageInfoRootDirPath = projectDirPath.resolve(
+			"src/main/resources");
+
+		for (String key : versions.stringPropertyNames()) {
+			if (key.equals(Constants.BUNDLE_VERSION)) {
+				continue;
+			}
+
+			version = versions.getProperty(key);
+
+			if (Validator.isNull(version)) {
+				continue;
+			}
+
+			String packageInfo = "version " + version;
+
+			Path packageDirPath = packageInfoRootDirPath.resolve(
+				key.replace('.', '/'));
+
+			Path packageInfoPath = packageDirPath.resolve("packageinfo");
+
+			// Avoid unnecessary update if packageinfo has a trailing empty line
+
+			String oldPackageInfo = new String(
+				Files.readAllBytes(packageInfoPath), StandardCharsets.UTF_8);
+
+			if (packageInfo.equals(oldPackageInfo.trim())) {
+				continue;
+			}
+
+			Files.createDirectories(packageDirPath);
+
+			Files.write(
+				packageInfoPath, packageInfo.getBytes(StandardCharsets.UTF_8));
+		}
+	}
+
+	private boolean _syncReleaseVersions(
+		Project project, File portalRootDir, File versionOverridesFile) {
+
+		boolean syncRelease = false;
+
+		if (project.hasProperty(SYNC_RELEASE_PROPERTY_NAME)) {
+			syncRelease = GradleUtil.getProperty(
+				project, SYNC_RELEASE_PROPERTY_NAME, true);
+		}
+
+		if ((portalRootDir == null) || !syncRelease ||
+			!GradleUtil.hasStartParameterTask(project, BASELINE_TASK_NAME)) {
+
+			return false;
+		}
+
+		File releasePortalRootDir = GradleUtil.getProperty(
+			project, _RELEASE_PORTAL_ROOT_DIR_PROPERTY_NAME, (File)null);
+
+		if (releasePortalRootDir == null) {
+			throw new GradleException(
+				"Please set the property \"" +
+					_RELEASE_PORTAL_ROOT_DIR_PROPERTY_NAME + "\".");
+		}
+
+		Logger logger = project.getLogger();
+
+		String relativePath = FileUtil.relativize(
+			project.getProjectDir(), portalRootDir);
+
+		File releaseProjectDir = new File(releasePortalRootDir, relativePath);
+
+		if (!releaseProjectDir.exists()) {
+			if (logger.isInfoEnabled()) {
+				logger.info(
+					"Unable to synchronize release versions of {}, {} does " +
+						"not exist",
+					project, releaseProjectDir);
+			}
+
+			return false;
+		}
+
+		if (logger.isLifecycleEnabled()) {
+			logger.lifecycle(
+				"Synchronizing release versions of {} with {}", project,
+				releaseProjectDir);
+		}
+
+		Properties releaseVersions = null;
+		Properties versions = null;
+
+		if ((versionOverridesFile != null) && versionOverridesFile.exists()) {
+			versions = GUtil.loadProperties(versionOverridesFile);
+		}
+
+		try {
+			releaseVersions = _getVersions(releaseProjectDir, null);
+			versions = _getVersions(project.getProjectDir(), versions);
+
+			for (String key : releaseVersions.stringPropertyNames()) {
+				if (!versions.containsKey(key)) {
+					continue;
+				}
+
+				Version releaseVersion = Version.parseVersion(
+					releaseVersions.getProperty(key));
+				Version version = Version.parseVersion(
+					versions.getProperty(key));
+
+				if (releaseVersion.compareTo(version) > 0) {
+					versions.setProperty(key, releaseVersion.toString());
+				}
+			}
+
+			_saveVersions(
+				project.getProjectDir(), versions, versionOverridesFile);
+		}
+		catch (IOException ioe) {
+			throw new UncheckedIOException(ioe);
+		}
+
+		// Reload Bundle-Version in case it is changed, so the project
+		// configuration can proceed with the new version
+
+		String bundleVersion = versions.getProperty(Constants.BUNDLE_VERSION);
+
+		if (Validator.isNotNull(bundleVersion)) {
+			project.setVersion(bundleVersion);
+		}
+
+		return true;
+	}
+
 	private static final String _APP_BND_FILE_NAME = "app.bnd";
+
+	private static final String _BUNDLE_VERSION_REGEX =
+		Constants.BUNDLE_VERSION + ": (.+)(?:\\s|$)";
 
 	private static final String _CACHE_COMMIT_MESSAGE = "FAKE GRADLE CACHE";
 
@@ -2508,6 +2944,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		"maven.local.ignore");
 
 	private static final String _PMD_PORTAL_TOOL_NAME = "com.liferay.pmd";
+
+	private static final String _RELEASE_PORTAL_ROOT_DIR_PROPERTY_NAME =
+		"release.versions.test.other.dir";
 
 	private static final String _REPOSITORY_PRIVATE_PASSWORD =
 		System.getProperty("repository.private.password");
