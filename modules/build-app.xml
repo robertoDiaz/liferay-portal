@@ -10,20 +10,8 @@
 
 	<property file="../build.properties" />
 
-	<property name="liferay.home" value="${modules.dir}/../bundles" />
-
-	<condition property="liferay.releng.ee">
-		<or>
-			<istrue value="${ee.override}" />
-			<matches pattern="ee-.+" string="${liferay.releng.branch}" />
-		</or>
-	</condition>
-
-	<condition else="Liferay" property="liferay.releng.app.title.prefix" value="Liferay CE">
-		<not>
-			<istrue value="${liferay.releng.ee}" />
-		</not>
-	</condition>
+	<property location="${modules.dir}/../bundles" name="liferay.home" />
+	<property location="${modules.dir}/.." name="project.dir" />
 
 	<property name="portal.lib.dir" value="${app.server.tomcat.lib.portal.dir}" />
 
@@ -80,6 +68,13 @@
 		<condition property="current.branch.private">
 			<contains string="${liferay.releng.branch}" substring="ee-" />
 		</condition>
+
+		<condition else="Liferay CE" property="liferay.releng.app.title.prefix" value="Liferay">
+			<or>
+				<istrue value="${ee.override}" />
+				<istrue value="${current.branch.private}" />
+			</or>
+		</condition>
 	</target>
 
 	<target depends="get-app-version,init-build-app" name="check-stale-artifacts" unless="check.stale.artifacts.skip">
@@ -115,7 +110,7 @@
 
 		<echo message="Checking out public releng info from commit ID: ${git.commit.portal.public}" />
 
-		<exec executable="git">
+		<exec dir="${project.dir}" executable="git">
 			<arg value="fetch" />
 			<arg value="upstream" />
 		</exec>
@@ -154,7 +149,7 @@
 		</subant>
 	</target>
 
-	<target depends="init-build-app" name="dist-module-artifacts-lpkg" unless="module.dirs.null">
+	<target depends="get-osgi-static-modules,init-build-app" name="dist-module-artifacts-lpkg" unless="module.dirs.null">
 		<subant genericantfile="${modules.dir}/build-app-module.xml" target="dist-module-artifact-lpkg">
 			<dirset dir="${modules.dir}" excludes="${build.modules.excludes}" includes="${app.module.dirs}" />
 			<property name="osgi.dir" value="${osgi.dir}" />
@@ -206,7 +201,7 @@
 	</target>
 
 	<target depends="get-app-version" name="get-app-git-id">
-		<exec executable="git" outputproperty="git.rev.parse.output">
+		<exec dir="${project.dir}" executable="git" outputproperty="git.rev.parse.output">
 			<arg value="rev-parse" />
 			<arg value="head" />
 		</exec>
@@ -256,6 +251,14 @@
 				<regexpmapper from="^(.+?)-(\d.*?)\.jar$" to="\1#\2##" />
 			</chainedmapper>
 			<fileset dir="${osgi.dir}/marketplace" includes="*.jar" />
+		</pathconvert>
+	</target>
+
+	<target depends="init-build-app" name="get-osgi-static-modules">
+		<pathconvert property="osgi.static.modules">
+			<fileset dir="${osgi.dir}/static" includes="*.jar" />
+
+			<flattenmapper />
 		</pathconvert>
 	</target>
 
@@ -351,12 +354,6 @@
 		</condition>
 
 		<property file="${modules.dir}/../build.properties" />
-
-		<pathconvert property="osgi.static.modules">
-			<fileset dir="${osgi.dir}/static" includes="*.jar" />
-
-			<flattenmapper />
-		</pathconvert>
 
 		<pathconvert property="app.bnd.file">
 			<fileset dir="${modules.dir}" includes="apps/${app.name}/app.bnd,private/apps/${app.name}/app.bnd" />

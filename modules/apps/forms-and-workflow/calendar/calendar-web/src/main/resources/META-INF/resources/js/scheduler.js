@@ -377,9 +377,14 @@ AUI.add(
 
 						var editCalendarBookingURL = decodeURIComponent(recorder.get('editCalendarBookingURL'));
 
+						var startTimeDate = instance.get('date');
+
 						var data = {
 							activeView: activeViewName,
 							calendarId: calendarId,
+							startTimeDay: startTimeDate.getDate(),
+							startTimeMonth: startTimeDate.getMonth(),
+							startTimeYear: startTimeDate.getFullYear(),
 							titleCurrentValue: ''
 						};
 
@@ -561,7 +566,34 @@ AUI.add(
 
 		Liferay.SchedulerMonthView = SchedulerMonthView;
 
-		Liferay.SchedulerAgendaView = A.SchedulerAgendaView;
+		var SchedulerAgendaView = A.Component.create(
+			{
+				EXTENDS: A.SchedulerAgendaView,
+
+				NAME: 'scheduler-view-agenda',
+
+				prototype: {
+					plotEvents: function() {
+						var instance = this;
+
+						var scheduler = instance.get('scheduler');
+
+						SchedulerAgendaView.superclass.plotEvents.apply(instance, arguments);
+
+						var headerContent = instance.get('headerContent');
+
+						if (scheduler.get('showHeader')) {
+							headerContent.show();
+						}
+						else {
+							headerContent.hide();
+						}
+					}
+				}
+			}
+		);
+
+		Liferay.SchedulerAgendaView = SchedulerAgendaView;
 	},
 	'',
 	{
