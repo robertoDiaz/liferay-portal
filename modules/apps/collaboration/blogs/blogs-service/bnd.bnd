@@ -2,6 +2,7 @@ Bundle-Name: Liferay Blogs Service
 Bundle-SymbolicName: com.liferay.blogs.service
 Bundle-Version: 1.1.0
 Export-Package: com.liferay.blogs.service.permission
+Import-Package: com.liferay.asset.categories.validator
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Blogs
 Liferay-Service: true
