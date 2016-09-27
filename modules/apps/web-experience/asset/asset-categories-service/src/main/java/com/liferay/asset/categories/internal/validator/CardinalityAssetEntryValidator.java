@@ -14,6 +14,7 @@
 
 package com.liferay.asset.categories.internal.validator;
 
+import com.liferay.asset.categories.validator.CardinalityAssetEntryValidatorHelper;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
@@ -23,16 +24,22 @@ import com.liferay.asset.kernel.validator.AssetEntryValidator;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -49,6 +56,17 @@ public class CardinalityAssetEntryValidator implements AssetEntryValidator {
 			long groupId, String className, long classTypePK,
 			long[] categoryIds, String[] entryNames)
 		throws PortalException {
+
+		CardinalityAssetEntryValidatorHelper
+			cardinalityAssetEntryValidatorHelper =
+				_getCardinalityAssetEntryValidatorHelper(className);
+
+		if ((cardinalityAssetEntryValidatorHelper != null) &&
+			!cardinalityAssetEntryValidatorHelper.isValidable(
+				groupId, className, classTypePK, categoryIds, entryNames)) {
+
+			return;
+		}
 
 		if (className.equals(DLFileEntryConstants.getClassName())) {
 			DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
@@ -157,9 +175,40 @@ public class CardinalityAssetEntryValidator implements AssetEntryValidator {
 		}
 	}
 
+	private CardinalityAssetEntryValidatorHelper
+		_getCardinalityAssetEntryValidatorHelper(String className) {
+
+		if (Validator.isNotNull(className)) {
+			CardinalityAssetEntryValidatorHelper
+				cardinalityAssetEntryValidatorHelper =
+					_serviceTrackerMap.getService(className);
+
+			if (cardinalityAssetEntryValidatorHelper != null) {
+				return cardinalityAssetEntryValidatorHelper;
+			}
+		}
+
+		return null;
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, CardinalityAssetEntryValidatorHelper.class,
+			"model.class.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
+	}
+
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
 	private ClassNameLocalService _classNameLocalService;
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 	private GroupLocalService _groupLocalService;
+
+	private ServiceTrackerMap<String, CardinalityAssetEntryValidatorHelper>
+	_serviceTrackerMap;
 
 }
