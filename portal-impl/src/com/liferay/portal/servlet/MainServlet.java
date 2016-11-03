@@ -217,7 +217,8 @@ public class MainServlet extends ActionServlet {
 					_log.warn(
 						"Set the property \"verify.patch.levels.disabled\" " +
 							"to override stopping the server due to the " +
-								"inconsistent patch levels");
+								"inconsistent patch levels",
+						pie);
 				}
 
 				System.exit(0);
@@ -1131,7 +1132,7 @@ public class MainServlet extends ActionServlet {
 
 		Group group = layout.getGroup();
 
-		if (group.isActive()) {
+		if (GroupLocalServiceUtil.isLiveGroupActive(group)) {
 			return false;
 		}
 

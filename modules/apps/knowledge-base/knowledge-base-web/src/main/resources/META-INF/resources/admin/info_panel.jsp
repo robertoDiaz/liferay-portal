@@ -42,10 +42,12 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		kbArticles.add(KBArticleServiceUtil.getLatestKBArticle(parentResourcePrimKey, WorkflowConstants.STATUS_ANY));
 	}
 }
+
+boolean showSidebarHeader = ParamUtil.getBoolean(request, "showSidebarHeader", GetterUtil.getBoolean(request.getAttribute(KBWebKeys.SHOW_SIDEBAR_HEADER)));
 %>
 
 <c:choose>
-	<c:when test="<%= (ListUtil.isEmpty(kbArticles) && ListUtil.isNotEmpty(kbFolders) && (kbFolders.size() == 1)) %>">
+	<c:when test="<%= ListUtil.isEmpty(kbArticles) && ListUtil.isNotEmpty(kbFolders) && (kbFolders.size() == 1) %>">
 
 		<%
 		KBFolder kbFolder = kbFolders.get(0);
@@ -106,14 +108,16 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		%>
 
 		<div class="sidebar-header">
-			<ul class="sidebar-header-actions">
-				<li>
-					<liferay-util:include page="/admin/subscribe.jsp" servletContext="<%= application %>" />
-				</li>
-				<li>
-					<liferay-util:include page="/admin/article_action.jsp" servletContext="<%= application %>" />
-				</li>
-			</ul>
+			<c:if test="<%= showSidebarHeader %>">
+				<ul class="sidebar-header-actions">
+					<li>
+						<liferay-util:include page="/admin/subscribe.jsp" servletContext="<%= application %>" />
+					</li>
+					<li>
+						<liferay-util:include page="/admin/article_action.jsp" servletContext="<%= application %>" />
+					</li>
+				</ul>
+			</c:if>
 
 			<h4><%= HtmlUtil.escape(kbArticle.getTitle()) %></h4>
 

@@ -31,6 +31,10 @@ public class ProjectTemplatesArgs {
 		return _className;
 	}
 
+	public String getContributorType() {
+		return _contributorType;
+	}
+
 	public File getDestinationDir() {
 		return _destinationDir;
 	}
@@ -59,12 +63,24 @@ public class ProjectTemplatesArgs {
 		return _template;
 	}
 
+	public boolean isForce() {
+		return _force;
+	}
+
 	public void setClassName(String className) {
 		_className = className;
 	}
 
+	public void setContributorType(String contributorType) {
+		_contributorType = contributorType;
+	}
+
 	public void setDestinationDir(File destinationDir) {
 		_destinationDir = destinationDir;
+	}
+
+	public void setForce(boolean force) {
+		_force = force;
 	}
 
 	public void setHostBundleSymbolicName(String hostBundleSymbolicName) {
@@ -106,10 +122,22 @@ public class ProjectTemplatesArgs {
 	private String _className;
 
 	@Parameter(
+		description = "Used to identify your module as a Theme Contributor. Also, used to add the Liferay-Theme-Contributor-Type and Web-ContextPath bundle headers.",
+		names = "--contributor-type"
+	)
+	private String _contributorType;
+
+	@Parameter(
 		description = "The directory where to create the new project.",
 		names = "--destination"
 	)
 	private File _destinationDir;
+
+	@Parameter(
+		description = "Forces creation of new project even if target directory contains files.",
+		names = "--force"
+	)
+	private boolean _force;
 
 	@Parameter(
 		description = "Print this message.", help = true,

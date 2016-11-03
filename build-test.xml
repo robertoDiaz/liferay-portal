@@ -89,6 +89,8 @@
 
 module.framework.properties.osgi.console=11312</echo>
 
+					<print-file file.name="${tstamp.value}/WEB-INF/classes/portal-ext.properties" />
+
 					<zip
 						basedir="${tstamp.value}"
 						destfile="${test.build.liferay.portal.zip.file.name}"
@@ -106,6 +108,8 @@ module.framework.properties.osgi.console=11312</echo>
 					<echo append="true" file="${app.server.classes.portal.dir}/portal-ext.properties">
 
 module.framework.properties.osgi.console=11312</echo>
+
+					<print-file file.name="${app.server.classes.portal.dir}/portal-ext.properties" />
 				</else>
 			</if>
 		</sequential>
@@ -3855,6 +3859,7 @@ go]]></replacevalue>
 					<property name="testray.component.names" value="${testray.component.names}" />
 					<property name="testray.main.component.name" value="${testray.main.component.name}" />
 					<property name="testray.team.name" value="${testray.team.name}" />
+					<property name="testray.case.type.name" value="Automated Functional Test" />
 					<property name="testray.testcase.description" value="${testray.testcase.description}" />
 					<property name="testray.testcase.name" value="${testray.testcase.name}" />
 					<property name="testray.testcase.priority" value="${testray.testcase.priority}" />
@@ -3891,6 +3896,7 @@ go]]></replacevalue>
 					<property name="java.jdk.version" value="${java.jdk.version}" />
 					<property name="operating.system.type" value="${operating.system.type}" />
 					<property name="operating.system.version" value="${operating.system.version}" />
+					<property name="test.type" value="Automated Functional Test" />
 					<property name="testray.build.name" value="${testray.build.name}" />
 					<property name="testray.build.time" value="${testray.build.time}" />
 					<property name="testray.build.type" value="${testray.build.type}" />
@@ -4051,8 +4057,6 @@ go]]></replacevalue>
 
 							bufferedReader = new BufferedReader(new FileReader(file));
 
-							String line;
-
 							List lines = new ArrayList();
 
 							int lineNumber = 0;
@@ -4061,7 +4065,7 @@ go]]></replacevalue>
 							Boolean testcaseFailed = null;
 							String testrayTestcaseName = null;
 
-							while ((line = bufferedReader.readLine()) != null) {
+							for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
 								lineNumber++;
 
 								lines.add(line);
@@ -4128,8 +4132,6 @@ go]]></replacevalue>
 							for (Integer propertyLocation : propertyLocations) {
 								String testrayTestcaseName = testcasePropertyLocations.get(propertyLocation);
 
-								lines.add(propertyLocation, "<property name=\"testray.case.type.name\" value=\"Automated Functional Test\" />");
-
 								if (testcaseFailures.contains(testrayTestcaseName)) {
 									lines.add(propertyLocation, "<property name=\"testray.testcase.status\" value=\"failed\" />");
 								}
@@ -4140,10 +4142,11 @@ go]]></replacevalue>
 
 
 							FileWriter fileWriter = new FileWriter(file);
+
 							BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-							for (String currentLine : lines) {
-								bufferedWriter.write(currentLine);
+							for (String line : lines) {
+								bufferedWriter.write(line);
 								bufferedWriter.write('\n');
 							}
 
@@ -5157,6 +5160,68 @@ go]]></replacevalue>
 			</then>
 		</if>
 
+		<beanshell>
+			<![CDATA[
+				import java.io.BufferedReader;
+				import java.io.File;
+				import java.io.IOException;
+
+				BufferedReader bufferedReader = null;
+
+				try {
+					File jenkinsResultsXMLSuiteFile = new File(project.getProperty("jenkins.results.xml.suite.file"));
+
+					bufferedReader = new BufferedReader(new FileReader(jenkinsResultsXMLSuiteFile));
+
+					List lines = new ArrayList();
+
+					int failCount = 0;
+					int lineNumber = 0;
+					int summaryLocation = 0;
+					int totalCount = 0;
+
+					for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
+						lineNumber++;
+
+						lines.add(line);
+
+						if (line.contains("<failure")) {
+							failCount++;
+						}
+						else if (line.contains("<testcase")) {
+							totalCount++;
+						}
+						else if (line.contains("<testsuite")) {
+							summaryLocation = lineNumber;
+						}
+					}
+
+					bufferedReader.close();
+
+					int passCount = totalCount - failCount;
+
+					lines.add(summaryLocation, "\t</summary>");
+					lines.add(summaryLocation, "\t\t<property name=\"FAILED\" value=\"" + Integer.toString(failCount) + "\" />");
+					lines.add(summaryLocation, "\t\t<property name=\"PASSED\" value=\"" + Integer.toString(passCount) + "\" />");
+					lines.add(summaryLocation, "\t<summary>");
+
+					FileWriter fileWriter = new FileWriter(jenkinsResultsXMLSuiteFile);
+
+					BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+					for (String line : lines) {
+						bufferedWriter.write(line);
+						bufferedWriter.write('\n');
+					}
+
+					bufferedWriter.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			]]>
+		</beanshell>
+
 		<if>
 			<isset property="jenkins.testray.results.dir" />
 			<then>
@@ -6002,7 +6067,11 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<pathconvert pathsep="," property="test.toggle.file.names">
 			<fileset dir="${project.dir}">
-				<include name="modules/**/poshi.toggle" />
+				<include name="modules/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/*/poshi.toggle" />
+				<include name="modules/*/*/*/*/*/*/poshi.toggle" />
 				<include name="portal-web/poshi.toggle" />
 			</fileset>
 		</pathconvert>
@@ -6950,7 +7019,9 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 	</target>
 
 	<target name="prepare-system-ext-properties">
-		<echo file="${app.server.classes.portal.dir}/system-ext.properties">log.sanitizer.enabled=false</echo>
+		<echo file="${app.server.classes.portal.dir}/system-ext.properties">liferay.mode=test
+log.sanitizer.enabled=false</echo>
+
 	</target>
 
 	<target name="prepare-test-build">
@@ -8523,6 +8594,19 @@ jdbc.default.password=${database.mysql.password}</echo>
 				<equals arg1="${skip.start-app-server}" arg2="true" />
 			</not>
 			<then>
+				<get-testcase-property property.name="themes.delayed.deployment" />
+
+				<if>
+					<equals arg1="${themes.delayed.deployment}" arg2="true" />
+					<then>
+						<mkdir dir="${liferay.home}/tmp" />
+
+						<move todir="${liferay.home}/tmp">
+							<fileset dir="${liferay.home}/deploy" includes="*-theme.war" />
+						</move>
+					</then>
+				</if>
+
 				<start-app-server />
 
 				<get-testcase-property property.name="app.server.bundles.size" />
@@ -8560,6 +8644,19 @@ jdbc.default.password=${database.mysql.password}</echo>
 						</waitfor>
 
 						<antcall target="wait-for-plugins-deployment" />
+					</then>
+				</if>
+
+				<if>
+					<equals arg1="${themes.delayed.deployment}" arg2="true" />
+					<then>
+						<move todir="${liferay.home}/deploy">
+							<fileset dir="${liferay.home}/tmp" includes="*-theme.war" />
+						</move>
+
+						<delete dir="${liferay.home}/tmp" failonerror="false" />
+
+						<sleep seconds="60" />
 					</then>
 				</if>
 			</then>

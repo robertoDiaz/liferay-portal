@@ -2377,9 +2377,34 @@ public class ServiceBuilder {
 	}
 
 	private void _createHbmXml() throws Exception {
+		File xmlFile = new File(_hbmFileName);
+
+		List<Entity> entities = new ArrayList<>();
+
+		boolean hasDeprecated = false;
+
+		for (Entity entity : _ejbList) {
+			if (entity.hasColumns()) {
+				if (entity.isDeprecated()) {
+					hasDeprecated = true;
+				}
+				else {
+					entities.add(entity);
+				}
+			}
+		}
+
+		if (entities.isEmpty()) {
+			if (!hasDeprecated) {
+				xmlFile.delete();
+			}
+
+			return;
+		}
+
 		Map<String, Object> context = _getContext();
 
-		context.put("entities", _ejbList);
+		context.put("entities", entities);
 
 		// Content
 
@@ -2392,8 +2417,6 @@ public class ServiceBuilder {
 		String imports = content.substring(0, lastImportEnd);
 
 		content = content.substring(lastImportEnd + 1);
-
-		File xmlFile = new File(_hbmFileName);
 
 		if (!xmlFile.exists()) {
 			StringBundler sb = new StringBundler(5);
@@ -3504,6 +3527,10 @@ public class ServiceBuilder {
 				continue;
 			}
 
+			if (entity.isDeprecated()) {
+				continue;
+			}
+
 			List<EntityFinder> finderList = entity.getFinderList();
 
 			for (int j = 0; j < finderList.size(); j++) {
@@ -3747,6 +3774,10 @@ public class ServiceBuilder {
 			}
 
 			if (!entity.isDefaultDataSource()) {
+				continue;
+			}
+
+			if (entity.isDeprecated()) {
 				continue;
 			}
 
@@ -5433,7 +5464,11 @@ public class ServiceBuilder {
 	private Map<String, Object> _putDeprecatedKeys(
 		Map<String, Object> context, JavaClass javaClass) {
 
-		context.put("classDeprecated", false);
+		Entity entity = (Entity)context.get("entity");
+
+		context.put("classDeprecated", entity.isDeprecated());
+
+		context.put("classDeprecatedComment", "");
 
 		if (javaClass != null) {
 			DocletTag tag = javaClass.getTagByName("deprecated");
