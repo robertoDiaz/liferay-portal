@@ -553,6 +553,13 @@ public class PortletImportController implements ImportController {
 			serviceElement.attributeValue("owner-type"));
 		String serviceName = serviceElement.attributeValue("service-name");
 
+		if (ownerType == PortletKeys.PREFS_OWNER_TYPE_GROUP) {
+			ownerId = portletDataContext.getGroupId();
+		}
+		else if (ownerType == PortletKeys.PREFS_OWNER_TYPE_COMPANY) {
+			ownerId = portletDataContext.getCompanyId();
+		}
+
 		PortletPreferences portletPreferences = getPortletPreferences(
 			portletDataContext.getCompanyId(), ownerId, ownerType,
 			LayoutConstants.DEFAULT_PLID, serviceName);
@@ -989,6 +996,13 @@ public class PortletImportController implements ImportController {
 			}
 		}
 		catch (NoSuchPortletPreferencesException nsppe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsppe, nsppe);
+			}
+
 			portletPreferences =
 				_portletPreferencesLocalService.addPortletPreferences(
 					companyId, ownerId, ownerType, plid, serviceName, null,
@@ -1087,6 +1101,13 @@ public class PortletImportController implements ImportController {
 					portletDataContext.getCompanyId(), className);
 			}
 			catch (NoSuchTableException nste) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nste, nste);
+				}
+
 				expandoTable = _expandoTableLocalService.addDefaultTable(
 					portletDataContext.getCompanyId(), className);
 			}
@@ -1247,18 +1268,6 @@ public class PortletImportController implements ImportController {
 			_portletDataHandlerProvider.provide(
 				portletDataContext.getCompanyId(), portletId);
 
-		if (importData || !MergeLayoutPrototypesThreadLocal.isInProgress()) {
-			_portletPreferencesLocalService.updatePreferences(
-				ownerId, ownerType, plid, portletId, xml);
-
-			return;
-		}
-
-		// Portlet preferences to be updated only when importing data
-
-		String[] dataPortletPreferences =
-			portletDataHandler.getDataPortletPreferences();
-
 		// Current portlet preferences
 
 		javax.portlet.PortletPreferences portletPreferences =
@@ -1272,6 +1281,32 @@ public class PortletImportController implements ImportController {
 			PortletPreferencesFactoryUtil.fromXML(
 				portletDataContext.getCompanyId(), ownerId, ownerType, plid,
 				portletId, xml);
+
+		if (importData || !MergeLayoutPrototypesThreadLocal.isInProgress()) {
+			String currentLastPublishDate = portletPreferences.getValue(
+				"last-publish-date", null);
+			String newLastPublishDate = jxPortletPreferences.getValue(
+				"last-publish-date", null);
+
+			if (Validator.isNotNull(currentLastPublishDate)) {
+				jxPortletPreferences.setValue(
+					"last-publish-date", currentLastPublishDate);
+			}
+			else if (Validator.isNotNull(newLastPublishDate)) {
+				jxPortletPreferences.reset("last-publish-date");
+			}
+
+			_portletPreferencesLocalService.updatePreferences(
+				ownerId, ownerType, plid, portletId,
+				PortletPreferencesFactoryUtil.toXML(jxPortletPreferences));
+
+			return;
+		}
+
+		// Portlet preferences will be updated only when importing data
+
+		String[] dataPortletPreferences =
+			portletDataHandler.getDataPortletPreferences();
 
 		Enumeration<String> enu = jxPortletPreferences.getNames();
 
