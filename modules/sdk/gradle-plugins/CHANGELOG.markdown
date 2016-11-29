@@ -614,11 +614,43 @@ version 1.0.135.
 - [LPS-69223]: Update the [Liferay Gradle Plugins CSS Builder] dependency to
 version 2.0.0.
 
-## 3.0.38 - 2016-11-18
+## 3.0.38 - 2016-11-21
 
 ### Changed
 - [LPS-69248]: Update the [Liferay Gradle Plugins JS Transpiler] dependency to
 version 2.3.0.
+- [LPS-69271]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.49.
+- [LPS-69271]: Update the [Liferay Source Formatter] dependency to version
+1.0.315.
+
+## 3.0.39 - 2016-11-22
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.50.
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.316.
+
+## 3.0.40 - 2016-11-23
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.51.
+- [LPS-66853]: Update the [Liferay Source Formatter] dependency to version
+1.0.317.
+
+## 3.0.41 - 2016-11-24
+
+### Changed
+- [LPS-69271]: Update the [Liferay Gradle Plugins Javadoc Formatter] dependency
+to version 1.0.12.
+- [LPS-69271]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.52.
+- [LPS-69271]: Update the [Liferay Javadoc Formatter] dependency to version
+1.0.17.
+- [LPS-69271]: Update the [Liferay Source Formatter] dependency to version
+1.0.318.
 
 [Gradle Bundle Plugin]: https://github.com/TomDmitriev/gradle-bundle-plugin
 [Liferay Ant BND]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/ant-bnd
@@ -627,6 +659,7 @@ version 2.3.0.
 [Liferay Gradle Plugins Gulp]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-gulp
 [Liferay Gradle Plugins JS Module Config Generator]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-js-module-config-generator
 [Liferay Gradle Plugins JS Transpiler]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-js-transpiler
+[Liferay Gradle Plugins Javadoc Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-javadoc-formatter
 [Liferay Gradle Plugins Service Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-service-builder
 [Liferay Gradle Plugins Source Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-source-formatter
 [Liferay Gradle Plugins Theme Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-theme-builder
@@ -682,5 +715,7 @@ version 2.3.0.
 [LPS-68995]: https://issues.liferay.com/browse/LPS-68995
 [LPS-69013]: https://issues.liferay.com/browse/LPS-69013
 [LPS-69026]: https://issues.liferay.com/browse/LPS-69026
+[LPS-69223]: https://issues.liferay.com/browse/LPS-69223
 [LPS-69248]: https://issues.liferay.com/browse/LPS-69248
+[LPS-69271]: https://issues.liferay.com/browse/LPS-69271
 [LRDOCS-3023]: https://issues.liferay.com/browse/LRDOCS-3023

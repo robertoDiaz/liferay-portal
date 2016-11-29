@@ -322,9 +322,11 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 				expectedTabCount = previousLineLeadingTabCount + 1;
 			}
-
-			if (previousLine.matches(".*\t(if|for) .*[(:]")) {
+			else if (previousLine.matches(".*\t(for|if|try) .*[(:]")) {
 				expectedTabCount = previousLineLeadingTabCount + 2;
+			}
+			else if (previousLine.matches(".*\t(else if|while) .*[(:]")) {
+				expectedTabCount = previousLineLeadingTabCount + 3;
 			}
 
 			if ((expectedTabCount != -1) &&
@@ -1251,6 +1253,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		newContent = formatAssertEquals(fileName, newContent);
 
 		newContent = formatValidatorEquals(newContent);
+
+		newContent = fixUnparameterizedClassType(newContent);
 
 		newContent = fixMissingEmptyLineAfterSettingVariable(newContent);
 
@@ -2794,10 +2798,12 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		// LPS-57358
 
-		if (content.contains("ProxyFactory.newServiceTrackedInstance(")) {
+		if (content.contains(
+			"ServiceProxyFactory.newServiceTrackedInstance(")) {
+
 			processMessage(
 				fileName,
-				"Do not use ProxyFactory.newServiceTrackedInstance in " +
+				"Do not use ServiceProxyFactory.newServiceTrackedInstance in " +
 					"modules, see LPS-57358");
 		}
 
@@ -3292,9 +3298,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				}
 			}
 
-			if (trimmedPreviousLine.equals("return") &&
-				!line.endsWith(StringPool.PERIOD)) {
-
+			if (trimmedPreviousLine.equals("return")) {
 				for (int i = 0;; i++) {
 					String nextLine = getLine(content, lineCount + i + 1);
 

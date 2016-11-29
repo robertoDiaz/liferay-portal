@@ -498,7 +498,18 @@ if (portletTitleBasedNavigation) {
 								<aui:a href="<%= rowURL.toString() %>"><%= childPage.getTitle() %></aui:a>
 							</h3>
 
-							<p class="text-default"><%= StringUtil.shorten(HtmlUtil.extractText(childPage.getContent()), 200) %></p>
+							<%
+							String childPageFormattedContent = null;
+
+							try {
+								childPageFormattedContent = wikiEngineRenderer.getFormattedContent(renderRequest, renderResponse, childPage, viewPageURL, editPageURL, childPage.getTitle(), false);
+							}
+							catch (Exception e) {
+								childPageFormattedContent = childPage.getContent();
+							}
+							%>
+
+							<p class="text-default"><%= StringUtil.shorten(HtmlUtil.extractText(childPageFormattedContent), 200) %></p>
 						</li>
 
 					<%
