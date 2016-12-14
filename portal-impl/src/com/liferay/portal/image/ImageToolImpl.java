@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.ImageResolutionException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageMagick;
 import com.liferay.portal.kernel.image.ImageTool;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,6 +42,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -372,6 +375,21 @@ public class ImageToolImpl implements ImageTool {
 	}
 
 	@Override
+	public RenderedImage flip(RenderedImage renderedImage) {
+		BufferedImage bufferedImage = getBufferedImage(renderedImage);
+
+		AffineTransform affineTransform = AffineTransform.getScaleInstance(
+			1.0, -1.0);
+
+		affineTransform.translate(0, -bufferedImage.getHeight());
+
+		AffineTransformOp affineTransformOp = new AffineTransformOp(
+			affineTransform, null);
+
+		return affineTransformOp.filter(bufferedImage, null);
+	}
+
+	@Override
 	public BufferedImage getBufferedImage(RenderedImage renderedImage) {
 		if (renderedImage instanceof BufferedImage) {
 			return (BufferedImage)renderedImage;
@@ -621,6 +639,31 @@ public class ImageToolImpl implements ImageTool {
 		throws ImageResolutionException, IOException {
 
 		return read(_fileUtil.getBytes(inputStream));
+	}
+
+	@Override
+	public RenderedImage rotate(RenderedImage renderedImage, int degrees) {
+		BufferedImage bufferedImage = getBufferedImage(renderedImage);
+
+		int width = bufferedImage.getWidth();
+		int height = bufferedImage.getHeight();
+
+		BufferedImage rotatedImage = new BufferedImage(
+			height, width, BufferedImage.TYPE_INT_RGB);
+
+		AffineTransform affineTransform = new AffineTransform();
+
+		affineTransform.translate(height / 2, width / 2);
+		affineTransform.rotate(Math.toRadians(degrees));
+		affineTransform.translate(width / (-2), height / (-2));
+
+		Graphics2D g = rotatedImage.createGraphics();
+
+		g.drawImage(bufferedImage, affineTransform, null);
+
+		g.dispose();
+
+		return rotatedImage;
 	}
 
 	@Override
