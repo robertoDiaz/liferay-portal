@@ -689,7 +689,7 @@ version if the `com.liferay.app.defaults.plugin` is applied.
 ## 2.0.6 - 2016-11-29
 
 ### Added
-- [LPS-68813]: Add task `findSecurityBugs` to check for security problems.
+- [LPS-68813]: Add the `findSecurityBugs` task to check for security problems.
 
 ### Changed
 - [LPS-69445]: Update the [Liferay Gradle Plugins] dependency to version 3.0.43.
@@ -706,8 +706,8 @@ version 1.1.0.
 - [LPS-69488]: Update the [Liferay Gradle Plugins] dependency to version 3.0.44.
 
 ### Removed
-- [LPS-69488]: Remove the default Node.js version configuration, as it has been
-moved to [Liferay Gradle Plugins].
+- [LPS-69488]: Remove the default Node.js version configuration since it has
+been moved to [Liferay Gradle Plugins].
 
 ## 2.0.9 - 2016-12-01
 
@@ -743,11 +743,52 @@ moved to [Liferay Gradle Plugins].
 ### Changed
 - [LPS-69501]: Update the [Liferay Gradle Plugins] dependency to version 3.0.49.
 
+## 2.2.2 - 2016-12-12
+
+### Added
+- [LPS-69606]: Publish the WSDD fragment JAR of an OSGi project with the
+`install` and `uploadArchives` tasks.
+
+### Changed
+- [LPS-69501]: Use the [Liferay Source Formatter] JAR files deployed locally in
+the `tools/sdk/dependencies/com.liferay.source.formatter/lib` directory, if
+found.
+
+## 2.2.3 - 2016-12-14
+
+### Changed
+- [LPS-69677]: Update the [Liferay Gradle Plugins] dependency to version 3.0.50.
+
+## 2.2.4 - 2016-12-14
+
+### Changed
+- [LPS-67694]: Disable the `install` and `uploadArchives` tasks for `*-test`
+OSGi projects, Ant plugins and themes if the `-PsnapshotIfStale` argument is
+provided.
+
+## 2.2.5 - 2016-12-14
+
+### Changed
+- [LPS-66853]: Update the [Liferay Gradle Plugins] dependency to version 3.0.51.
+
+## 2.3.0 - 2016-12-15
+
+### Fixed
+- [LPS-69606]: Fix artifact publish commands for the "WSDD" commit in older
+versions of Git.
+- [LPS-69606]: Fix artifact URL generation in the `artifact.properties` files.
+
+## 2.3.1 - 2016-12-16
+
+### Changed
+- [LPS-67688]: Update the [Liferay Gradle Plugins] dependency to version 3.0.52.
+
 [Liferay CDN]: https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
 [Liferay Gradle Plugins App Javadoc Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-app-javadoc-builder
 [Liferay Gradle Plugins Baseline]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-baseline
 [Liferay Gradle Plugins Node]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-node
+[Liferay Source Formatter]: https://github.com/liferay/liferay-portal/tree/master/modules/util/source-formatter
 [LPS-52675]: https://issues.liferay.com/browse/LPS-52675
 [LPS-58672]: https://issues.liferay.com/browse/LPS-58672
 [LPS-61099]: https://issues.liferay.com/browse/LPS-61099
@@ -761,6 +802,7 @@ moved to [Liferay Gradle Plugins].
 [LPS-67434]: https://issues.liferay.com/browse/LPS-67434
 [LPS-67573]: https://issues.liferay.com/browse/LPS-67573
 [LPS-67658]: https://issues.liferay.com/browse/LPS-67658
+[LPS-67688]: https://issues.liferay.com/browse/LPS-67688
 [LPS-67694]: https://issues.liferay.com/browse/LPS-67694
 [LPS-67766]: https://issues.liferay.com/browse/LPS-67766
 [LPS-67804]: https://issues.liferay.com/browse/LPS-67804
@@ -811,7 +853,9 @@ moved to [Liferay Gradle Plugins].
 [LPS-69492]: https://issues.liferay.com/browse/LPS-69492
 [LPS-69501]: https://issues.liferay.com/browse/LPS-69501
 [LPS-69518]: https://issues.liferay.com/browse/LPS-69518
+[LPS-69606]: https://issues.liferay.com/browse/LPS-69606
 [LPS-69618]: https://issues.liferay.com/browse/LPS-69618
+[LPS-69677]: https://issues.liferay.com/browse/LPS-69677
 [LRDOCS-2594]: https://issues.liferay.com/browse/LRDOCS-2594
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981
