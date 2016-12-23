@@ -151,6 +151,17 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public JSONObject getBuildJSONObject() {
+		try {
+			return JenkinsResultsParserUtil.toJSONObject(
+				getBuildURL() + "api/json", false);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException("Unable to get build JSON object", ioe);
+		}
+	}
+
+	@Override
 	public int getBuildNumber() {
 		return _buildNumber;
 	}
@@ -475,6 +486,42 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public JSONObject getTestReportJSONObject() {
+		try {
+			return JenkinsResultsParserUtil.toJSONObject(
+				getBuildURL() + "testReport/api/json", false);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to get test report JSON object", ioe);
+		}
+	}
+
+	@Override
+	public List<TestResult> getTestResults(String testStatus) {
+		List<TestResult> testResults = new ArrayList<>();
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			testResults.addAll(downstreamBuild.getTestResults(testStatus));
+		}
+
+		return testResults;
+	}
+
+	@Override
+	public TopLevelBuild getTopLevelBuild() {
+		Build topLevelBuild = this;
+
+		while ((topLevelBuild != null) &&
+		 !(topLevelBuild instanceof TopLevelBuild)) {
+
+			topLevelBuild = topLevelBuild.getParentBuild();
+		}
+
+		return (TopLevelBuild)topLevelBuild;
+	}
+
+	@Override
 	public boolean hasBuildURL(String buildURL) {
 		try {
 			buildURL = JenkinsResultsParserUtil.decode(buildURL);
@@ -647,9 +694,17 @@ public abstract class BaseBuild implements Build {
 		_parentBuild = parentBuild;
 
 		try {
-			JenkinsResultsParserUtil.toString(
+			String archiveMarkerContent = JenkinsResultsParserUtil.toString(
 				url + "/archive-marker", false, 0, 0, 0);
-			fromArchive = true;
+
+			if ((archiveMarkerContent != null) &&
+				!archiveMarkerContent.isEmpty()) {
+
+				fromArchive = true;
+			}
+			else {
+				fromArchive = false;
+			}
 		}
 		catch (IOException ioe) {
 			fromArchive = false;
@@ -1125,18 +1180,6 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return tempMap;
-	}
-
-	protected TopLevelBuild getTopLevelBuild() {
-		Build topLevelBuild = this;
-
-		while ((topLevelBuild != null) &&
-		 !(topLevelBuild instanceof TopLevelBuild)) {
-
-			topLevelBuild = topLevelBuild.getParentBuild();
-		}
-
-		return (TopLevelBuild)topLevelBuild;
 	}
 
 	protected boolean isParentBuildRoot() {
