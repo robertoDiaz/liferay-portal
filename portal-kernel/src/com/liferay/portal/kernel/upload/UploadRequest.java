@@ -48,6 +48,8 @@ public interface UploadRequest extends HttpServletRequest {
 
 	public File[] getFiles(String name);
 
+	public File[] getFiles(String name, boolean forceCreate);
+
 	public InputStream[] getFilesAsStream(String name) throws IOException;
 
 	public InputStream[] getFilesAsStream(String name, boolean deleteOnClose)

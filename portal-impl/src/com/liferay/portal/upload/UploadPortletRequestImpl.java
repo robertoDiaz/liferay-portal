@@ -144,10 +144,16 @@ public class UploadPortletRequestImpl
 
 	@Override
 	public File[] getFiles(String name) {
-		File[] files = _uploadServletRequest.getFiles(_namespace.concat(name));
+		return getFiles(name, false);
+	}
+
+	@Override
+	public File[] getFiles(String name, boolean forceCreate) {
+		File[] files = _uploadServletRequest.getFiles(
+			_namespace.concat(name), forceCreate);
 
 		if (files == null) {
-			files = _uploadServletRequest.getFiles(name);
+			files = _uploadServletRequest.getFiles(name, forceCreate);
 		}
 
 		return files;

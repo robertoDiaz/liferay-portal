@@ -377,6 +377,11 @@ public class UploadServletRequestImpl
 
 	@Override
 	public File[] getFiles(String name) {
+		return getFiles(name, false);
+	}
+
+	@Override
+	public File[] getFiles(String name, boolean forceCreate) {
 		String[] fileNames = getFileNames(name);
 
 		if (fileNames == null) {
@@ -385,14 +390,39 @@ public class UploadServletRequestImpl
 
 		FileItem[] liferayFileItems = _fileParameters.get(name);
 
+		long size;
+
 		if (ArrayUtil.isNotEmpty(liferayFileItems)) {
 			File[] files = new File[liferayFileItems.length];
 
 			for (int i = 0; i < liferayFileItems.length; i++) {
 				FileItem liferayFileItem = liferayFileItems[i];
 
+				size = liferayFileItem.getSize();
+
+				if ((size > 0) &&
+					(size <= liferayFileItem.getSizeThreshold())) {
+
+					forceCreate = true;
+				}
+
 				if (Validator.isNotNull(liferayFileItem.getFileName())) {
 					files[i] = liferayFileItem.getStoreLocation();
+
+					if (liferayFileItem.isInMemory() && forceCreate) {
+						try {
+							FileUtil.write(
+								files[i], liferayFileItem.getInputStream());
+						}
+						catch (IOException ioe) {
+							if (_log.isWarnEnabled()) {
+								_log.warn(
+									"Unable to write temporary file " +
+										files[i].getAbsolutePath(),
+									ioe);
+							}
+						}
+					}
 				}
 			}
 
