@@ -35,6 +35,7 @@ import java.util.Map;
 
 import javax.portlet.PortletURL;
 
+import com.liferay.wiki.constants.WikiPortletKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -43,12 +44,16 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = {
-		"editor.name=alloyeditor", "editor.name=alloyeditor_bbcode",
-		"editor.name=alloyeditor_creole", "service.ranking:Integer=1000"
+		"editor.config.key=contentEditor", "editor.name=alloyeditor",
+		"editor.name=alloyeditor_creole",
+		"javax.portlet.name=" + WikiPortletKeys.WIKI,
+		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
+		"javax.portlet.name=" + WikiPortletKeys.WIKI_DISPLAY,
+		"service.ranking:Integer=1000"
 	},
 	service = EditorConfigContributor.class
 )
-public class AlloyEditorLinkBrowseConfigContributor
+public class WikiContentAlloyEditorLinkBrowseConfigContributor
 	extends BaseEditorConfigContributor {
 
 	@Override
