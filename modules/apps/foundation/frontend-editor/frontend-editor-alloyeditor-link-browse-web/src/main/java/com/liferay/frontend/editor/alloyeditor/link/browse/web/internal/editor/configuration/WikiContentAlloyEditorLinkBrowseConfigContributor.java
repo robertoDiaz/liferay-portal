@@ -36,11 +36,12 @@ import java.util.Map;
 import javax.portlet.PortletURL;
 
 import com.liferay.wiki.constants.WikiPortletKeys;
+import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Ambrín Chaudhary
+ * @author Roberto Díaz
  */
 @Component(
 	property = {
@@ -109,12 +110,13 @@ public class WikiContentAlloyEditorLinkBrowseConfigContributor
 			inputEditorTaglibAttributes.get("liferay-ui:input-editor:name"));
 
 		populateFileBrowserURL(
-			jsonObject, requestBackedPortletURLFactory,
+			jsonObject, inputEditorTaglibAttributes,
+			requestBackedPortletURLFactory,
 			namespace + name + "selectDocument");
 	}
 
 	protected void populateFileBrowserURL(
-		JSONObject jsonObject,
+		JSONObject jsonObject, Map<String, Object> inputEditorTaglibAttributes,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
 		String eventName) {
 
@@ -135,9 +137,37 @@ public class WikiContentAlloyEditorLinkBrowseConfigContributor
 		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			desiredItemSelectorReturnTypes);
 
-		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-			requestBackedPortletURLFactory, eventName,
-			fileItemSelectorCriterion, layoutItemSelectorCriterion);
+		Map<String, String> fileBrowserParamsMap =
+			(Map<String, String>)inputEditorTaglibAttributes.get(
+				"liferay-ui:input-editor:fileBrowserParams");
+
+		long wikiPageResourcePrimKey = 0;
+
+		if (fileBrowserParamsMap != null) {
+			wikiPageResourcePrimKey = GetterUtil.getLong(
+				fileBrowserParamsMap.get("wikiPageResourcePrimKey"));
+		}
+
+		PortletURL itemSelectorURL = null;
+
+		if (wikiPageResourcePrimKey != 0) {
+			ItemSelectorCriterion wikiAttachmentItemSelectorCriterion =
+				new WikiAttachmentItemSelectorCriterion(wikiPageResourcePrimKey);
+
+			wikiAttachmentItemSelectorCriterion.
+				setDesiredItemSelectorReturnTypes(
+					desiredItemSelectorReturnTypes);
+
+			itemSelectorURL = _itemSelector.getItemSelectorURL(
+				requestBackedPortletURLFactory, eventName,
+				fileItemSelectorCriterion, layoutItemSelectorCriterion,
+				wikiAttachmentItemSelectorCriterion);
+		}
+		else {
+			itemSelectorURL = _itemSelector.getItemSelectorURL(
+				requestBackedPortletURLFactory, eventName,
+				fileItemSelectorCriterion, layoutItemSelectorCriterion);
+		}
 
 		jsonObject.put("documentBrowseLinkUrl", itemSelectorURL.toString());
 	}
