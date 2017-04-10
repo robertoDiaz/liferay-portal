@@ -14,6 +14,12 @@
 
 package com.liferay.wiki.editor.configuration.internal;
 
+import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
+import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
+import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
+import com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -21,11 +27,18 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.wiki.constants.WikiPortletKeys;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import javax.portlet.PortletURL;
 
 /**
  * @author Chema Balsas
@@ -78,6 +91,18 @@ public class WikiLinksEditorConfigContributor
 			selectionJSONObject.put(
 				"buttons", updateButtonsJSONArray(buttonsJSONArray));
 		}
+
+		String namespace = GetterUtil.getString(
+			inputEditorTaglibAttributes.get(
+				"liferay-ui:input-editor:namespace"));
+
+		String name = GetterUtil.getString(
+			inputEditorTaglibAttributes.get("liferay-ui:input-editor:name"));
+
+		populateFileBrowserURL(
+			jsonObject, inputEditorTaglibAttributes,
+			requestBackedPortletURLFactory,
+			namespace + name + "selectDocument");
 	}
 
 	protected JSONObject getWikiLinkButtonJSONObject(String buttonName) {
@@ -138,5 +163,66 @@ public class WikiLinksEditorConfigContributor
 
 		return newButtonsJSONArray;
 	}
+
+	protected void populateFileBrowserURL(
+		JSONObject jsonObject, Map<String, Object> inputEditorTaglibAttributes,
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
+		String eventName) {
+
+		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			new ArrayList<>();
+
+		desiredItemSelectorReturnTypes.add(new URLItemSelectorReturnType());
+
+		ItemSelectorCriterion fileItemSelectorCriterion =
+			new FileItemSelectorCriterion();
+
+		fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+
+		LayoutItemSelectorCriterion layoutItemSelectorCriterion =
+			new LayoutItemSelectorCriterion();
+
+		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+
+		Map<String, String> fileBrowserParamsMap =
+			(Map<String, String>)inputEditorTaglibAttributes.get(
+				"liferay-ui:input-editor:fileBrowserParams");
+
+		long wikiPageResourcePrimKey = 0;
+
+		if (fileBrowserParamsMap != null) {
+			wikiPageResourcePrimKey = GetterUtil.getLong(
+				fileBrowserParamsMap.get("wikiPageResourcePrimKey"));
+		}
+
+		PortletURL itemSelectorURL = null;
+
+		if (wikiPageResourcePrimKey != 0) {
+			ItemSelectorCriterion wikiAttachmentItemSelectorCriterion =
+				new WikiAttachmentItemSelectorCriterion(
+					wikiPageResourcePrimKey);
+
+			wikiAttachmentItemSelectorCriterion.
+				setDesiredItemSelectorReturnTypes(
+					desiredItemSelectorReturnTypes);
+
+			itemSelectorURL = _itemSelector.getItemSelectorURL(
+				requestBackedPortletURLFactory, eventName,
+				fileItemSelectorCriterion, layoutItemSelectorCriterion,
+				wikiAttachmentItemSelectorCriterion);
+		}
+		else {
+			itemSelectorURL = _itemSelector.getItemSelectorURL(
+				requestBackedPortletURLFactory, eventName,
+				fileItemSelectorCriterion, layoutItemSelectorCriterion);
+		}
+
+		jsonObject.put("documentBrowseLinkUrl", itemSelectorURL.toString());
+	}
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 }

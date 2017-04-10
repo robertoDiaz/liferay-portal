@@ -18,6 +18,7 @@ import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolverHandler;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
+import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -44,11 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Iván Zaera
  */
-@Component(
-	property = {
-		"item.selector.view.key=com.liferay.wiki.web.internal.item.selector.view.WikiAttachmentItemSelectorView"
-	}
-)
+@Component
 public class WikiAttachmentItemSelectorView
 	implements ItemSelectorView<WikiAttachmentItemSelectorCriterion> {
 
@@ -135,7 +132,8 @@ public class WikiAttachmentItemSelectorView
 		_supportedItemSelectorReturnTypes = Collections.unmodifiableList(
 			ListUtil.fromArray(
 				new ItemSelectorReturnType[] {
-					new FileEntryItemSelectorReturnType()
+					new FileEntryItemSelectorReturnType(),
+					new URLItemSelectorReturnType()
 				}));
 
 	private ItemSelectorReturnTypeResolverHandler
