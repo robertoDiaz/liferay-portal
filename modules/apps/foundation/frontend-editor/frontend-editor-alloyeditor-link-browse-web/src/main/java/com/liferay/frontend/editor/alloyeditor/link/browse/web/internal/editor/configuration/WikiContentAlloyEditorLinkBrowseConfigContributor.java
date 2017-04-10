@@ -20,14 +20,12 @@ import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion;
-import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.wiki.constants.WikiPortletKeys;
+import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +33,6 @@ import java.util.Map;
 
 import javax.portlet.PortletURL;
 
-import com.liferay.wiki.constants.WikiPortletKeys;
-import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -55,66 +51,9 @@ import org.osgi.service.component.annotations.Reference;
 	service = EditorConfigContributor.class
 )
 public class WikiContentAlloyEditorLinkBrowseConfigContributor
-	extends BaseEditorConfigContributor {
+	extends BaseAlloyEditorLinkBrowseConfigContributor {
 
 	@Override
-	public void populateConfigJSONObject(
-		JSONObject jsonObject, Map<String, Object> inputEditorTaglibAttributes,
-		ThemeDisplay themeDisplay,
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
-
-		JSONObject toolbarsJSONObject = jsonObject.getJSONObject("toolbars");
-
-		if (toolbarsJSONObject == null) {
-			toolbarsJSONObject = JSONFactoryUtil.createJSONObject();
-		}
-
-		JSONObject stylesJSONObject = toolbarsJSONObject.getJSONObject(
-			"styles");
-
-		if (stylesJSONObject == null) {
-			stylesJSONObject = JSONFactoryUtil.createJSONObject();
-		}
-
-		JSONArray selectionsJSONArray = stylesJSONObject.getJSONArray(
-			"selections");
-
-		if (selectionsJSONArray != null) {
-			for (int i = 0; i < selectionsJSONArray.length(); i++) {
-				JSONObject selectionJSONObject =
-					selectionsJSONArray.getJSONObject(i);
-
-				String name = selectionJSONObject.getString("name");
-
-				if (name.equals("text") || name.equals("link")) {
-					JSONArray buttonsJSONArray =
-						selectionJSONObject.getJSONArray("buttons");
-
-					selectionJSONObject.put(
-						"buttons", updateButtonsJSONArray(buttonsJSONArray));
-				}
-			}
-
-			stylesJSONObject.put("selections", selectionsJSONArray);
-		}
-
-		toolbarsJSONObject.put("styles", stylesJSONObject);
-
-		jsonObject.put("toolbars", toolbarsJSONObject);
-
-		String namespace = GetterUtil.getString(
-			inputEditorTaglibAttributes.get(
-				"liferay-ui:input-editor:namespace"));
-
-		String name = GetterUtil.getString(
-			inputEditorTaglibAttributes.get("liferay-ui:input-editor:name"));
-
-		populateFileBrowserURL(
-			jsonObject, inputEditorTaglibAttributes,
-			requestBackedPortletURLFactory,
-			namespace + name + "selectDocument");
-	}
-
 	protected void populateFileBrowserURL(
 		JSONObject jsonObject, Map<String, Object> inputEditorTaglibAttributes,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
@@ -152,7 +91,8 @@ public class WikiContentAlloyEditorLinkBrowseConfigContributor
 
 		if (wikiPageResourcePrimKey != 0) {
 			ItemSelectorCriterion wikiAttachmentItemSelectorCriterion =
-				new WikiAttachmentItemSelectorCriterion(wikiPageResourcePrimKey);
+				new WikiAttachmentItemSelectorCriterion(
+					wikiPageResourcePrimKey);
 
 			wikiAttachmentItemSelectorCriterion.
 				setDesiredItemSelectorReturnTypes(
@@ -172,39 +112,7 @@ public class WikiContentAlloyEditorLinkBrowseConfigContributor
 		jsonObject.put("documentBrowseLinkUrl", itemSelectorURL.toString());
 	}
 
-	@Reference(unbind = "-")
-	protected void setItemSelector(ItemSelector itemSelector) {
-		_itemSelector = itemSelector;
-	}
-
-	protected JSONArray updateButtonsJSONArray(JSONArray oldButtonsJSONArray) {
-		JSONArray newButtonsJSONArray = JSONFactoryUtil.createJSONArray();
-
-		for (int i = 0; i < oldButtonsJSONArray.length(); i++) {
-			JSONObject oldButtonJSONObject = oldButtonsJSONArray.getJSONObject(
-				i);
-
-			if (oldButtonJSONObject == null) {
-				String buttonName = oldButtonsJSONArray.getString(i);
-
-				if (buttonName.equals("link")) {
-					newButtonsJSONArray.put("linkBrowse");
-				}
-				else if (buttonName.equals("linkEdit")) {
-					newButtonsJSONArray.put("linkEditBrowse");
-				}
-				else {
-					newButtonsJSONArray.put(buttonName);
-				}
-			}
-			else {
-				newButtonsJSONArray.put(oldButtonJSONObject);
-			}
-		}
-
-		return newButtonsJSONArray;
-	}
-
+	@Reference
 	private ItemSelector _itemSelector;
 
 }
