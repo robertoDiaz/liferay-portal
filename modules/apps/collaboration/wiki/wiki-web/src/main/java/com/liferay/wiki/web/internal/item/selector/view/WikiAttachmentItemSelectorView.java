@@ -44,7 +44,11 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Iván Zaera
  */
-@Component
+@Component(
+	property = {
+		"item.selector.view.key=com.liferay.wiki.web.internal.item.selector.view.WikiAttachmentItemSelectorView"
+	}
+)
 public class WikiAttachmentItemSelectorView
 	implements ItemSelectorView<WikiAttachmentItemSelectorCriterion> {
 
