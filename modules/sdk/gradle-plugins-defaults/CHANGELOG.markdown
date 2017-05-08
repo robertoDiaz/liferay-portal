@@ -1426,6 +1426,35 @@ not contain a class or JAR file.
 task if the URL is protected.
 - [LPS-72152]: Update the [Liferay Gradle Plugins] dependency to version 3.3.5.
 
+## 3.6.8 - 2017-04-27
+
+### Added
+- [LPS-68813]: Execute `findSecurityBugs` with the `check` task.
+- [LPS-68813]: Make the `findSecurityBugs` task visible in `gradle task`.
+
+### Changed
+- [LPS-67039]: Embed and use [Liferay's PMD rule set file](https://github.com/liferay/liferay-plugins/blob/master/dependencies/net.sourceforge.pmd/rulesets/java/standard-rules.xml).
+- [LPS-71728]: Update the [Liferay Gradle Plugins] dependency to version 3.3.6.
+- [LPS-71728]: Update the [Liferay Gradle Plugins Baseline] dependency to
+version 1.1.5.
+
+## 3.6.9 - 2017-04-28
+
+### Changed
+- [LPS-71728]: Update the [Liferay Gradle Plugins] dependency to version 3.3.7.
+- [LPS-71728]: Update the [Liferay Gradle Plugins Baseline] dependency to
+version 1.1.6.
+
+## 3.6.10 - 2017-05-03
+
+### Changed
+- [LPS-72340]: Update the [Liferay Gradle Plugins] dependency to version 3.3.8.
+
+## 3.6.11 - 2017-05-03
+
+### Changed
+- [LPS-72252]: Update the [Liferay Gradle Plugins] dependency to version 3.3.9.
+
 [Find Security Bugs]: https://github.com/liferay/liferay-portal/tree/master/modules/third-party/com-h3xstream-findsecbugs
 [Liferay CDN]: https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
@@ -1565,6 +1594,7 @@ task if the URL is protected.
 [LPS-71603]: https://issues.liferay.com/browse/LPS-71603
 [LPS-71686]: https://issues.liferay.com/browse/LPS-71686
 [LPS-71722]: https://issues.liferay.com/browse/LPS-71722
+[LPS-71728]: https://issues.liferay.com/browse/LPS-71728
 [LPS-71795]: https://issues.liferay.com/browse/LPS-71795
 [LPS-71826]: https://issues.liferay.com/browse/LPS-71826
 [LPS-71901]: https://issues.liferay.com/browse/LPS-71901
@@ -1574,6 +1604,8 @@ task if the URL is protected.
 [LPS-72067]: https://issues.liferay.com/browse/LPS-72067
 [LPS-72102]: https://issues.liferay.com/browse/LPS-72102
 [LPS-72152]: https://issues.liferay.com/browse/LPS-72152
+[LPS-72252]: https://issues.liferay.com/browse/LPS-72252
+[LPS-72340]: https://issues.liferay.com/browse/LPS-72340
 [LRDOCS-2594]: https://issues.liferay.com/browse/LRDOCS-2594
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981

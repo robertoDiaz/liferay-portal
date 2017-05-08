@@ -41,6 +41,8 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
@@ -49,6 +51,7 @@ import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
@@ -65,6 +68,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowDefinitionManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
@@ -79,6 +83,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.log4j.Level;
 
@@ -110,22 +115,44 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 	}
 
 	protected void activateSingleApproverWorkflow(
+			long groupId, String className, long classPK, long typePK)
+		throws PortalException {
+
+		activateWorkflow(
+			groupId, className, classPK, typePK, "Single Approver", 1);
+	}
+
+	protected void activateSingleApproverWorkflow(
 			String className, long classPK, long typePK)
 		throws PortalException {
 
+		activateWorkflow(
+			group.getGroupId(), className, classPK, typePK, "Single Approver",
+			1);
+	}
+
+	protected void activateWorkflow(
+			long groupId, String className, long classPK, long typePK,
+			String workflowDefinitionName, int workflowDefinitionVersion)
+		throws PortalException {
+
 		WorkflowDefinitionLinkLocalServiceUtil.updateWorkflowDefinitionLink(
-			adminUser.getUserId(), TestPropsValues.getCompanyId(),
-			group.getGroupId(), className, classPK, typePK,
-			"Single Approver@1");
+			adminUser.getUserId(), TestPropsValues.getCompanyId(), groupId,
+			className, classPK, typePK, workflowDefinitionName,
+			workflowDefinitionVersion);
 	}
 
 	protected BlogsEntry addBlogsEntry() throws PortalException {
+		return addBlogsEntry(adminUser);
+	}
+
+	protected BlogsEntry addBlogsEntry(User user) throws PortalException {
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_MAIL_ENGINE_CLASS_NAME, Level.OFF)) {
 
 			return BlogsEntryLocalServiceUtil.addEntry(
-				adminUser.getUserId(), StringUtil.randomString(),
+				user.getUserId(), StringUtil.randomString(),
 				StringUtil.randomString(), new Date(), serviceContext);
 		}
 	}
@@ -241,11 +268,18 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 	protected void assignWorkflowTaskToUser(User user, User assigneeUser)
 		throws Exception {
 
+		assignWorkflowTaskToUser(user, assigneeUser, null);
+	}
+
+	protected void assignWorkflowTaskToUser(
+			User user, User assigneeUser, String taskName)
+		throws Exception {
+
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_MAIL_ENGINE_CLASS_NAME, Level.OFF)) {
 
-			WorkflowTask workflowTask = getWorkflowTask();
+			WorkflowTask workflowTask = getWorkflowTask(user, taskName, false);
 
 			PermissionChecker userPermissionChecker =
 				PermissionCheckerFactoryUtil.create(user);
@@ -296,11 +330,18 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 	protected void completeWorkflowTask(User user, String transition)
 		throws Exception {
 
+		completeWorkflowTask(user, transition, null);
+	}
+
+	protected void completeWorkflowTask(
+			User user, String transition, String taskName)
+		throws Exception {
+
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_MAIL_ENGINE_CLASS_NAME, Level.OFF)) {
 
-			WorkflowTask workflowTask = getWorkflowTask();
+			WorkflowTask workflowTask = getWorkflowTask(user, taskName, false);
 
 			PermissionChecker userPermissionChecker =
 				PermissionCheckerFactoryUtil.create(user);
@@ -327,7 +368,32 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 		return ddmFormValues;
 	}
 
+	protected void createJoinXorWorkflow() throws Exception {
+		String content = read("join-xor-definition.xml");
+
+		WorkflowDefinitionManagerUtil.deployWorkflowDefinition(
+			adminUser.getCompanyId(), adminUser.getUserId(), "Join Xor",
+			content.getBytes());
+	}
+
+	protected Organization createOrganization() throws PortalException {
+		return createOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
+	}
+
+	protected Organization createOrganization(long parentOrganizationId)
+		throws PortalException {
+
+		return OrganizationLocalServiceUtil.addOrganization(
+			adminUser.getUserId(), parentOrganizationId,
+			StringUtil.randomString(), true);
+	}
+
 	protected User createUser(String roleName) throws Exception {
+		return createUser(roleName, group);
+	}
+
+	protected User createUser(String roleName, Group group) throws Exception {
 		User user = UserTestUtil.addUser(group.getGroupId());
 
 		Role role = RoleLocalServiceUtil.getRole(
@@ -344,23 +410,61 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 	}
 
 	protected void deactivateWorkflow(
-			String className, long classPK, long typePK)
+			long groupId, String className, long classPK, long typePK)
 		throws PortalException {
 
 		WorkflowDefinitionLinkLocalServiceUtil.updateWorkflowDefinitionLink(
-			adminUser.getUserId(), TestPropsValues.getCompanyId(),
-			group.getGroupId(), className, classPK, typePK, null);
+			adminUser.getUserId(), TestPropsValues.getCompanyId(), groupId,
+			className, classPK, typePK, null);
+	}
+
+	protected void deactivateWorkflow(
+			String className, long classPK, long typePK)
+		throws PortalException {
+
+		deactivateWorkflow(group.getGroupId(), className, classPK, typePK);
+	}
+
+	protected String getBasePath() {
+		return "com/liferay/portal/workflow/kaleo/dependencies/";
 	}
 
 	protected WorkflowTask getWorkflowTask() throws WorkflowException {
-		List<WorkflowTask> workflowTasks =
-			WorkflowTaskManagerUtil.getWorkflowTasksBySubmittingUser(
-				adminUser.getCompanyId(), adminUser.getUserId(), false,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return getWorkflowTask(adminUser, null, false);
+	}
+
+	protected WorkflowTask getWorkflowTask(
+			User user, String taskName, boolean completed)
+		throws WorkflowException {
+
+		List<WorkflowTask> workflowTasks = new ArrayList<>();
+
+		workflowTasks.addAll(
+			WorkflowTaskManagerUtil.getWorkflowTasksByUserRoles(
+				user.getCompanyId(), user.getUserId(), completed,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+		workflowTasks.addAll(
+			WorkflowTaskManagerUtil.getWorkflowTasksByUser(
+				user.getCompanyId(), user.getUserId(), completed,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+		for (WorkflowTask workflowTask : workflowTasks) {
+			if (Objects.equals(taskName, workflowTask.getName())) {
+				return workflowTask;
+			}
+		}
 
 		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
 
 		return workflowTasks.get(0);
+	}
+
+	protected String read(String fileName) throws Exception {
+		Class<?> clazz = getClass();
+
+		return StringUtil.read(
+			clazz.getClassLoader(), getBasePath() + fileName);
 	}
 
 	protected void setUpUsers() throws Exception {

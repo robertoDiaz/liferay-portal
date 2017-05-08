@@ -108,12 +108,6 @@ public class SourceFormatter {
 					GitUtil.getLocalChangesFileNames(baseDirName));
 			}
 
-			String copyrightFileName = ArgumentsUtil.getString(
-				arguments, "source.copyright.file",
-				SourceFormatterArgs.COPYRIGHT_FILE_NAME);
-
-			sourceFormatterArgs.setCopyrightFileName(copyrightFileName);
-
 			String fileNamesString = ArgumentsUtil.getString(
 				arguments, "source.files", StringPool.BLANK);
 
@@ -254,12 +248,12 @@ public class SourceFormatter {
 			try {
 				future.get();
 			}
-			catch (ExecutionException ee2) {
+			catch (ExecutionException ee) {
 				if (ee1 == null) {
-					ee1 = ee2;
+					ee1 = ee;
 				}
 				else {
-					ee1.addSuppressed(ee2);
+					ee1.addSuppressed(ee);
 				}
 			}
 		}

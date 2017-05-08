@@ -26,7 +26,17 @@
 
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
 
-		<execute macro="Alert#viewSuccessMessage" />
+		<if>
+			<isset var="duplicate" />
+			<then>
+				<execute macro="Alert#viewErrorMessage">
+					<var name="errorMessage" value="A configuration with this ID already exists. Please enter a unique ID." />
+				</execute>
+			</then>
+			<else>
+				<execute macro="Alert#viewSuccessMessage" />
+			</else>
+		</if>
 	</command>
 
 	<command name="addNonNumericImageResolution">
@@ -201,6 +211,12 @@
 		<var name="key_imageName" value="${imageName}" />
 
 		<execute function="AssertElementPresent" locator1="AdaptiveMedia#IMAGE_VARIANT_SOURCE_URL" />
+	</command>
+
+	<command name="viewNoImageResolution">
+		<var name="key_imageName" value="${imageName}" />
+
+		<execute function="AssertElementNotPresent" locator1="AdaptiveMediaTable#NAME" />
 	</command>
 
 	<command name="viewNumberOfOptimizedImages">
