@@ -29,6 +29,10 @@ public interface AssetEntryValidator {
 		validate(groupId, className, classTypePK, categoryIds, entryNames);
 	}
 
+	/**
+	 * @deprecated As of 1.1.0
+	 */
+	@Deprecated
 	public void validate(
 			long groupId, String className, long classTypePK,
 			long[] categoryIds, String[] entryNames)
