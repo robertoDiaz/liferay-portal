@@ -20,6 +20,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portlet.asset.validator.AssetEntryValidatorRegistry;
 import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.model.WikiPageConstants;
@@ -53,19 +54,11 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 	public void activate(ComponentContext componentContext) {
 		BundleContext bundleContext = componentContext.getBundleContext();
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, AssetEntryValidator.class, "model.class.name");
-
 		Dictionary<String, Object> properties =
 			componentContext.getProperties();
 
 		_wikiGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
 			WikiGroupServiceConfiguration.class, properties);
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_serviceTrackerMap.close();
 	}
 
 	@Override
@@ -92,13 +85,11 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 			return;
 		}
 
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
+		for (AssetEntryValidator assetEntryValidator :
+			_assetEntryValidatorRegistry.getAssetEntryValidators(
+				className)) {
 
-		for (AssetEntryValidator generalAssetEntryValidator :
-				generalAssetEntryValidators) {
-
-			generalAssetEntryValidator.validate(
+			assetEntryValidator.validate(
 				groupId, className, classPK, classTypePK, categoryIds,
 				entryNames);
 		}
@@ -117,8 +108,9 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 		validate(groupId, className, 0L, classTypePK, categoryIds, entryNames);
 	}
 
-	private ServiceTrackerMap<String, List<AssetEntryValidator>>
-		_serviceTrackerMap;
+	@Reference(unbind = "-")
+	private AssetEntryValidatorRegistry _assetEntryValidatorRegistry;
+
 	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
 
 	@Reference(unbind = "-")

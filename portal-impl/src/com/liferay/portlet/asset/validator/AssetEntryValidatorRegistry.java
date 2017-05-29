@@ -15,6 +15,7 @@
 package com.liferay.portlet.asset.validator;
 
 import com.liferay.asset.kernel.validator.AssetEntryValidator;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.registry.collections.ServiceTrackerCollections;
@@ -26,6 +27,7 @@ import java.util.List;
 /**
  * @author Julio Camarero
  */
+@OSGiBeanProperties(service = AssetEntryValidatorRegistry.class)
 public class AssetEntryValidatorRegistry {
 
 	public void afterPropertiesSet() {
@@ -40,20 +42,20 @@ public class AssetEntryValidatorRegistry {
 	public List<AssetEntryValidator> getAssetEntryValidators(String className) {
 		List<AssetEntryValidator> assetEntryValidators = new ArrayList<>();
 
-		if (Validator.isNotNull(className)) {
-			List<AssetEntryValidator> classNameAssetEntryValidators =
-				_serviceTrackerMap.getService(className);
-
-			if (!ListUtil.isEmpty(classNameAssetEntryValidators)) {
-				return classNameAssetEntryValidators;
-			}
-		}
-
 		List<AssetEntryValidator> generalAssetEntryValidators =
 			_serviceTrackerMap.getService("*");
 
 		if (!ListUtil.isEmpty(generalAssetEntryValidators)) {
 			assetEntryValidators.addAll(generalAssetEntryValidators);
+		}
+
+		if (Validator.isNotNull(className)) {
+			List<AssetEntryValidator> classNameAssetEntryValidators =
+				_serviceTrackerMap.getService(className);
+
+			if (!ListUtil.isEmpty(classNameAssetEntryValidators)) {
+				assetEntryValidators.addAll(classNameAssetEntryValidators);
+			}
 		}
 
 		return assetEntryValidators;

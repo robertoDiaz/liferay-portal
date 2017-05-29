@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
+import com.liferay.portlet.asset.validator.AssetEntryValidatorRegistry;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -70,13 +71,11 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 			return;
 		}
 
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
+		for (AssetEntryValidator assetEntryValidator :
+			_assetEntryValidatorRegistry.getAssetEntryValidators(
+				className)) {
 
-		for (AssetEntryValidator generalAssetEntryValidator :
-				generalAssetEntryValidators) {
-
-			generalAssetEntryValidator.validate(
+			assetEntryValidator.validate(
 				groupId, className, classPK, classTypePK, categoryIds,
 				entryNames);
 		}
@@ -94,6 +93,9 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 
 		validate(groupId, className, 0L, classTypePK, categoryIds, entryNames);
 	}
+
+	@Reference(unbind = "-")
+	private AssetEntryValidatorRegistry _assetEntryValidatorRegistry;
 
 	@Reference(unbind = "-")
 	private DLFileEntryLocalService _dlFileEntryLocalService;
