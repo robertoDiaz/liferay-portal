@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
+import com.liferay.portlet.asset.validator.AssetEntryValidatorRegistry;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -43,18 +44,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DLAssetEntryValidator implements AssetEntryValidator {
 
-	@Activate
-	@Modified
-	public void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, AssetEntryValidator.class, "model.class.name");
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
 	@Override
 	public void validate(
 			long groupId, String className, long classPK, long classTypePK,
@@ -70,13 +59,11 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 			return;
 		}
 
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
+		List<AssetEntryValidator> assetEntryValidators =
+			assetEntryValidatorRegistry.getAssetEntryValidators("*");
 
-		for (AssetEntryValidator generalAssetEntryValidator :
-				generalAssetEntryValidators) {
-
-			generalAssetEntryValidator.validate(
+		for (AssetEntryValidator assetEntryValidator : assetEntryValidators) {
+			assetEntryValidator.validate(
 				groupId, className, classPK, classTypePK, categoryIds,
 				entryNames);
 		}
@@ -98,7 +85,8 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 	@Reference(unbind = "-")
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
-	private ServiceTrackerMap<String, List<AssetEntryValidator>>
-		_serviceTrackerMap;
+	@Reference(unbind = "-")
+	protected AssetEntryValidatorRegistry assetEntryValidatorRegistry;
+
 
 }
