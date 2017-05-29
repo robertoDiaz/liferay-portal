@@ -53,19 +53,11 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 	public void activate(ComponentContext componentContext) {
 		BundleContext bundleContext = componentContext.getBundleContext();
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, AssetEntryValidator.class, "model.class.name");
-
 		Dictionary<String, Object> properties =
 			componentContext.getProperties();
 
 		_wikiGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
 			WikiGroupServiceConfiguration.class, properties);
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_serviceTrackerMap.close();
 	}
 
 	@Override
@@ -91,17 +83,6 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 
 			return;
 		}
-
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
-
-		for (AssetEntryValidator generalAssetEntryValidator :
-				generalAssetEntryValidators) {
-
-			generalAssetEntryValidator.validate(
-				groupId, className, classPK, classTypePK, categoryIds,
-				entryNames);
-		}
 	}
 
 	/**
@@ -117,8 +98,6 @@ public class WikiPageAssetEntryValidator implements AssetEntryValidator {
 		validate(groupId, className, 0L, classTypePK, categoryIds, entryNames);
 	}
 
-	private ServiceTrackerMap<String, List<AssetEntryValidator>>
-		_serviceTrackerMap;
 	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
 
 	@Reference(unbind = "-")

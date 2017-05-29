@@ -17,17 +17,9 @@ package com.liferay.document.library.internal.asset.validator;
 import com.liferay.asset.kernel.validator.AssetEntryValidator;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 
-import java.util.List;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -43,18 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DLAssetEntryValidator implements AssetEntryValidator {
 
-	@Activate
-	@Modified
-	public void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, AssetEntryValidator.class, "model.class.name");
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
 	@Override
 	public void validate(
 			long groupId, String className, long classPK, long classTypePK,
@@ -68,17 +48,6 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 			(dlFileEntry.getRepositoryId() != groupId)) {
 
 			return;
-		}
-
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
-
-		for (AssetEntryValidator generalAssetEntryValidator :
-				generalAssetEntryValidators) {
-
-			generalAssetEntryValidator.validate(
-				groupId, className, classPK, classTypePK, categoryIds,
-				entryNames);
 		}
 	}
 
@@ -98,7 +67,5 @@ public class DLAssetEntryValidator implements AssetEntryValidator {
 	@Reference(unbind = "-")
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
-	private ServiceTrackerMap<String, List<AssetEntryValidator>>
-		_serviceTrackerMap;
 
 }
