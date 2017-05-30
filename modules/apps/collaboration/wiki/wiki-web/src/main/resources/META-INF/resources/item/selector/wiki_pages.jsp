@@ -133,11 +133,11 @@ else {
 			Util.getOpener().Liferay.fire(
 				'<%= wikiPageItemSelectorViewDisplayContext.getItemSelectedEventName() %>',
 				{
-					value: event.currentTarget.attr('data-value')
+					data: {
+						value: event.currentTarget.attr('data-value')
+					}
 				}
 			);
-
-			Util.getWindow().destroy();
 		},
 		'.wiki-page'
 	);
