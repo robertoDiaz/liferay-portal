@@ -99,7 +99,7 @@ else {
 				%>
 
 				<h4>
-					<a class="wiki-page" data-value="<%= itemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
+					<a class="wiki-page" data-title="<%= itemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" data-value="<%= itemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
 						<%= curPage.getTitle() %>
 					</a>
 				</h4>
@@ -128,6 +128,7 @@ else {
 				'<%= wikiPageItemSelectorViewDisplayContext.getItemSelectedEventName() %>',
 				{
 					data: {
+						title: event.currentTarget.attr('data-TITLE'),
 						value: event.currentTarget.attr('data-value')
 					}
 				}
