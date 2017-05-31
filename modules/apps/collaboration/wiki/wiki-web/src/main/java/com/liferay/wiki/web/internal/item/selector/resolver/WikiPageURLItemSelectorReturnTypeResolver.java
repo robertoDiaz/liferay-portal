@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.escape.WikiEscapeUtil;
 import com.liferay.wiki.item.selector.criterion.WikiPageURLItemSelectorReturnType;
+import com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver;
 import com.liferay.wiki.model.WikiPage;
 
 import javax.portlet.PortletRequest;
@@ -39,9 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, property = {"service.ranking:Integer=100"},
 	service = ItemSelectorReturnTypeResolver.class
 )
-public class WikiPageURLReturnTypeResolver implements
-	ItemSelectorReturnTypeResolver
-		<WikiPageURLItemSelectorReturnType, WikiPage> {
+public class WikiPageURLItemSelectorReturnTypeResolver implements
+	WikiPageItemSelectorReturnTypeResolver<WikiPageURLItemSelectorReturnType, WikiPage> {
 
 	@Override
 	public Class<WikiPageURLItemSelectorReturnType>
@@ -53,6 +53,13 @@ public class WikiPageURLReturnTypeResolver implements
 	@Override
 	public Class<WikiPage> getModelClass() {
 		return WikiPage.class;
+	}
+
+	@Override
+	public String getTitle(WikiPage page, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return StringPool.BLANK;
 	}
 
 	@Override

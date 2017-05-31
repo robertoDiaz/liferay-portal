@@ -26,7 +26,6 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 <%@ taglib prefix="aui" uri="http://liferay.com/tld/aui" %>
 
 <%@ page import="com.liferay.document.library.kernel.model.DLFolderConstants" %><%@
-page import="com.liferay.item.selector.ItemSelectorReturnTypeResolver" %><%@
 page import="com.liferay.document.library.kernel.util.DLUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchPaginationUtil" %><%@
@@ -51,6 +50,7 @@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver" %><%@
 page import="com.liferay.wiki.model.WikiNode" %><%@
 page import="com.liferay.wiki.model.WikiPage" %><%@
 page import="com.liferay.wiki.service.WikiPageLocalServiceUtil" %><%@

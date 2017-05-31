@@ -23,7 +23,7 @@ WikiNode node = wikiPageItemSelectorViewDisplayContext.getNode();
 
 String keywords = ParamUtil.getString(request, "keywords");
 
-SearchContainer wikiPagesSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, null, wikiPageItemSelectorViewDisplayContext.isSearch() ? LanguageUtil.format(locale, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) : "there-are-no-pages");
+SearchContainer wikiPagesSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, wikiPageItemSelectorViewDisplayContext.getPortletURL(request, liferayPortletResponse), null, wikiPageItemSelectorViewDisplayContext.isSearch() ? LanguageUtil.format(locale, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) : "there-are-no-pages");
 
 if (wikiPageItemSelectorViewDisplayContext.isSearch()) {
 	Indexer<WikiPage> indexer = IndexerRegistryUtil.getIndexer(WikiPage.class);
@@ -95,11 +95,11 @@ else {
 				</h5>
 
 				<%
-				ItemSelectorReturnTypeResolver itemSelectorReturnTypeResolver = wikiPageItemSelectorViewDisplayContext.getItemSelectorReturnTypeResolver();
+				WikiPageItemSelectorReturnTypeResolver wikiPageItemSelectorReturnTypeResolver = wikiPageItemSelectorViewDisplayContext.getWikiPageItemSelectorReturnTypeResolver();
 				%>
 
 				<h4>
-					<a class="wiki-page" data-title="<%= itemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" data-value="<%= itemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
+					<a class="wiki-page" data-title="<%= wikiPageItemSelectorReturnTypeResolver.get %>" data-value="<%= wikiPageItemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
 						<%= curPage.getTitle() %>
 					</a>
 				</h4>
@@ -128,7 +128,7 @@ else {
 				'<%= wikiPageItemSelectorViewDisplayContext.getItemSelectedEventName() %>',
 				{
 					data: {
-						title: event.currentTarget.attr('data-TITLE'),
+						title: event.currentTarget.attr('data-title'),
 						value: event.currentTarget.attr('data-value')
 					}
 				}

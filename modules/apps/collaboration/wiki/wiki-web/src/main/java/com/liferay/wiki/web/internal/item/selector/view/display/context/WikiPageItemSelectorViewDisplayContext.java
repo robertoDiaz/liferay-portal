@@ -14,12 +14,12 @@
 
 package com.liferay.wiki.web.internal.item.selector.view.display.context;
 
-import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolverHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.wiki.item.selector.criterion.WikiPageItemSelectorCriterion;
+import com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiNodeLocalService;
@@ -59,13 +59,6 @@ public class WikiPageItemSelectorViewDisplayContext {
 		return _itemSelectedEventName;
 	}
 
-	public ItemSelectorReturnTypeResolver getItemSelectorReturnTypeResolver() {
-		return _itemSelectorReturnTypeResolverHandler.
-			getItemSelectorReturnTypeResolver(
-				_wikiPageItemSelectorCriterion, _wikiPageItemSelectorView,
-				WikiPage.class);
-	}
-
 	public WikiNode getNode() throws PortalException {
 		return _wikiNodeLocalService.getNode(
 			_wikiPageItemSelectorCriterion.getNodeId());
@@ -95,6 +88,16 @@ public class WikiPageItemSelectorViewDisplayContext {
 
 	public WikiPageItemSelectorCriterion getWikiPageItemSelectorCriterion() {
 		return _wikiPageItemSelectorCriterion;
+	}
+
+	public WikiPageItemSelectorReturnTypeResolver
+		getWikiPageItemSelectorReturnTypeResolver() {
+
+		return (WikiPageItemSelectorReturnTypeResolver)
+			_itemSelectorReturnTypeResolverHandler.
+				getItemSelectorReturnTypeResolver(
+					_wikiPageItemSelectorCriterion, _wikiPageItemSelectorView,
+					WikiPage.class);
 	}
 
 	public boolean isSearch() {

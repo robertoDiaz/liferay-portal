@@ -17,6 +17,7 @@ package com.liferay.wiki.web.internal.item.selector.resolver;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.wiki.item.selector.criterion.WikiPageTitleItemSelectorReturnType;
+import com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver;
 import com.liferay.wiki.model.WikiPage;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,9 +29,8 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true, property = {"service.ranking:Integer=100"},
 	service = ItemSelectorReturnTypeResolver.class
 )
-public class WikiPageTitleReturnTypeResolver implements
-	ItemSelectorReturnTypeResolver
-		<WikiPageTitleItemSelectorReturnType, WikiPage> {
+public class WikiPageTitleItemSelectorReturnTypeResolver implements
+	WikiPageItemSelectorReturnTypeResolver<WikiPageTitleItemSelectorReturnType, WikiPage> {
 
 	@Override
 	public Class<WikiPageTitleItemSelectorReturnType>
@@ -42,6 +42,13 @@ public class WikiPageTitleReturnTypeResolver implements
 	@Override
 	public Class<WikiPage> getModelClass() {
 		return WikiPage.class;
+	}
+
+	@Override
+	public String getTitle(WikiPage page, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getValue(page, themeDisplay);
 	}
 
 	@Override
