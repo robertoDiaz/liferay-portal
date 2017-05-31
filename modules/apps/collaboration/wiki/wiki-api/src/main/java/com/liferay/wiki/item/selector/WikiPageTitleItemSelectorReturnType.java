@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.wiki.item.selector.criterion;
+package com.liferay.wiki.item.selector;
 
 import com.liferay.item.selector.ItemSelectorReturnType;
 
 /**
  * @author Roberto Díaz
  */
-public class WikiPageURLItemSelectorReturnType
+public class WikiPageTitleItemSelectorReturnType
 	implements ItemSelectorReturnType {
 }

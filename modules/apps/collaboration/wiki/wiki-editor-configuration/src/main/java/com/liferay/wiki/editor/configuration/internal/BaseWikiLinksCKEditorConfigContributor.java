@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.wiki.item.selector.constants.WikiItemSelectorViewConstants;
 import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 import com.liferay.wiki.item.selector.criterion.WikiPageItemSelectorCriterion;
-import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,19 +57,6 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 			return;
 		}
 
-		long wikiPageResourcePrimKey = GetterUtil.getLong(
-			fileBrowserParamsMap.get("wikiPageResourcePrimKey"));
-
-		if (wikiPageResourcePrimKey == 0) {
-			return;
-		}
-
-		WikiPage page = wikiPageLocalService.fetchPage(wikiPageResourcePrimKey);
-
-		if (page == null) {
-			return;
-		}
-
 		String filebrowserBrowseUrl = jsonObject.getString(
 			"filebrowserBrowseUrl");
 
@@ -81,10 +66,21 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 		List<ItemSelectorCriterion> itemSelectorCriteria =
 			itemSelector.getItemSelectorCriteria(filebrowserBrowseUrl);
 
-		itemSelectorCriteria.add(
-			0, getWikiPageItemSelectorCriterion(page.getNodeId()));
-		itemSelectorCriteria.add(
-			1, getWikiAttachmentItemSelectorCriterion(wikiPageResourcePrimKey));
+		long wikiPageResourcePrimKey = GetterUtil.getLong(
+			fileBrowserParamsMap.get("wikiPageResourcePrimKey"));
+
+		if (wikiPageResourcePrimKey != 0) {
+			itemSelectorCriteria.add(
+				0, getWikiAttachmentItemSelectorCriterion(
+					wikiPageResourcePrimKey));
+		}
+
+		long nodeId = GetterUtil.getLong(fileBrowserParamsMap.get("nodeId"));
+
+		if (nodeId != 0) {
+			itemSelectorCriteria.add(
+				0, getWikiPageItemSelectorCriterion(nodeId));
+		}
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, itemSelectedEventName,
@@ -139,8 +135,5 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 	)
 	protected ItemSelectorViewReturnTypeProvider
 		itemSelectorViewReturnTypeProvider;
-
-	@Reference
-	protected WikiPageLocalService wikiPageLocalService;
 
 }

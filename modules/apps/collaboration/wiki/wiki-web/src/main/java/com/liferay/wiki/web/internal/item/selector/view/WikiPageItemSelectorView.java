@@ -23,10 +23,10 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.language.LanguageResources;
+import com.liferay.wiki.item.selector.WikiPageTitleItemSelectorReturnType;
+import com.liferay.wiki.item.selector.WikiPageURLItemSelectorReturnType;
 import com.liferay.wiki.item.selector.constants.WikiItemSelectorViewConstants;
 import com.liferay.wiki.item.selector.criterion.WikiPageItemSelectorCriterion;
-import com.liferay.wiki.item.selector.criterion.WikiPageTitleItemSelectorReturnType;
-import com.liferay.wiki.item.selector.criterion.WikiPageURLItemSelectorReturnType;
 import com.liferay.wiki.service.WikiNodeLocalService;
 import com.liferay.wiki.web.internal.item.selector.view.display.context.WikiPageItemSelectorViewDisplayContext;
 

@@ -23,8 +23,8 @@ import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.escape.WikiEscapeUtil;
-import com.liferay.wiki.item.selector.criterion.WikiPageURLItemSelectorReturnType;
-import com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver;
+import com.liferay.wiki.item.selector.WikiPageURLItemSelectorReturnType;
+import com.liferay.wiki.item.selector.resolver.WikiPageItemSelectorReturnTypeResolver;
 import com.liferay.wiki.model.WikiPage;
 
 import javax.portlet.PortletRequest;

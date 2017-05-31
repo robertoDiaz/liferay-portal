@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.wiki.item.selector.criterion.WikiAttachmentItemSelectorCriterion;
 import com.liferay.wiki.item.selector.criterion.WikiPageItemSelectorCriterion;
-import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,25 +55,36 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 			return;
 		}
 
+		long nodeId = GetterUtil.getLong(fileBrowserParamsMap.get("nodeId"));
 		long wikiPageResourcePrimKey = GetterUtil.getLong(
 			fileBrowserParamsMap.get("wikiPageResourcePrimKey"));
-
-		if (wikiPageResourcePrimKey == 0) {
-			return;
-		}
-
-		WikiPage page = wikiPageLocalService.fetchPage(wikiPageResourcePrimKey);
-
-		if (page == null) {
-			return;
-		}
 
 		String documentBrowseLinkUrl = jsonObject.getString(
 			"documentBrowseLinkUrl");
 
 		PortletURL itemSelectorURL = null;
 
+		List<ItemSelectorCriterion> itemSelectorCriteria =
+			new ArrayList<>();
+
+		String itemSelectedEventName = null;
+
 		if (documentBrowseLinkUrl == null) {
+			if (nodeId != 0) {
+				itemSelectorCriteria.add(
+					getWikiPageItemSelectorCriterion(nodeId));
+			}
+
+			if (wikiPageResourcePrimKey == 0) {
+				itemSelectorCriteria.add(
+					getWikiAttachmentItemSelectorCriterion(
+						wikiPageResourcePrimKey));
+			}
+
+			if (itemSelectorCriteria.isEmpty()) {
+				return;
+			}
+
 			String name = GetterUtil.getString(
 				inputEditorTaglibAttributes.get(
 					"liferay-ui:input-editor:name"));
@@ -92,31 +101,31 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 				name = namespace + name;
 			}
 
-			itemSelectorURL = itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, name + "selectItem",
-				getWikiPageItemSelectorCriterion(page.getNodeId()),
-				getWikiAttachmentItemSelectorCriterion(
-					wikiPageResourcePrimKey));
+			itemSelectedEventName = name + "selectItem";
 		}
 		else {
-			List<ItemSelectorCriterion> itemSelectorCriteria =
-				itemSelector.getItemSelectorCriteria(documentBrowseLinkUrl);
+			itemSelectorCriteria = itemSelector.getItemSelectorCriteria(
+				documentBrowseLinkUrl);
 
-			String itemSelectedEventName =
+			itemSelectedEventName =
 				itemSelector.getItemSelectedEventName(documentBrowseLinkUrl);
 
-			itemSelectorCriteria.add(
-				0, getWikiPageItemSelectorCriterion(page.getNodeId()));
-			itemSelectorCriteria.add(
-				1,
-				getWikiAttachmentItemSelectorCriterion(
-					wikiPageResourcePrimKey));
+			if (wikiPageResourcePrimKey != 0) {
+				itemSelectorCriteria.add(
+					0, getWikiAttachmentItemSelectorCriterion(
+						wikiPageResourcePrimKey));
+			}
 
-			itemSelectorURL = itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, itemSelectedEventName,
-				itemSelectorCriteria.toArray(
-					new ItemSelectorCriterion[itemSelectorCriteria.size()]));
+			if (nodeId != 0) {
+				itemSelectorCriteria.add(
+					0, getWikiPageItemSelectorCriterion(nodeId));
+			}
 		}
+
+		itemSelectorURL = itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, itemSelectedEventName,
+			itemSelectorCriteria.toArray(
+				new ItemSelectorCriterion[itemSelectorCriteria.size()]));
 
 		jsonObject.put("documentBrowseLinkUrl", itemSelectorURL.toString());
 	}
@@ -160,8 +169,5 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 
 	@Reference
 	protected ItemSelector itemSelector;
-
-	@Reference
-	protected WikiPageLocalService wikiPageLocalService;
 
 }

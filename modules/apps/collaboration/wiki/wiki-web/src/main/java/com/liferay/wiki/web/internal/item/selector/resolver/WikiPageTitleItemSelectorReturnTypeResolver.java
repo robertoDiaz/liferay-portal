@@ -16,8 +16,8 @@ package com.liferay.wiki.web.internal.item.selector.resolver;
 
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.wiki.item.selector.criterion.WikiPageTitleItemSelectorReturnType;
-import com.liferay.wiki.item.selector.criterion.resolver.WikiPageItemSelectorReturnTypeResolver;
+import com.liferay.wiki.item.selector.WikiPageTitleItemSelectorReturnType;
+import com.liferay.wiki.item.selector.resolver.WikiPageItemSelectorReturnTypeResolver;
 import com.liferay.wiki.model.WikiPage;
 
 import org.osgi.service.component.annotations.Component;

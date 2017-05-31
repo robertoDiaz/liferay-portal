@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.wiki.item.selector.criterion.resolver;
+package com.liferay.wiki.item.selector.resolver;
 
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;

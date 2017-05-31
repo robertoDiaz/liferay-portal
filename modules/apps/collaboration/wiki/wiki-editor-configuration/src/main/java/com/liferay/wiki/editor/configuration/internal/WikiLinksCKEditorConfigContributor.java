@@ -17,7 +17,7 @@ package com.liferay.wiki.editor.configuration.internal;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.wiki.constants.WikiPortletKeys;
-import com.liferay.wiki.item.selector.criterion.WikiPageURLItemSelectorReturnType;
+import com.liferay.wiki.item.selector.WikiPageURLItemSelectorReturnType;
 
 import org.osgi.service.component.annotations.Component;
 

@@ -99,7 +99,7 @@ else {
 				%>
 
 				<h4>
-					<a class="wiki-page" data-title="<%= wikiPageItemSelectorReturnTypeResolver.get %>" data-value="<%= wikiPageItemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
+					<a class="wiki-page" data-title="<%= wikiPageItemSelectorReturnTypeResolver.getTitle(curPage, themeDisplay) %>" data-value="<%= wikiPageItemSelectorReturnTypeResolver.getValue(curPage, themeDisplay) %>" href="javascript:;">
 						<%= curPage.getTitle() %>
 					</a>
 				</h4>
