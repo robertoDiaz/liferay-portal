@@ -40,20 +40,20 @@ public class AssetEntryValidatorRegistry {
 	public List<AssetEntryValidator> getAssetEntryValidators(String className) {
 		List<AssetEntryValidator> assetEntryValidators = new ArrayList<>();
 
-		List<AssetEntryValidator> generalAssetEntryValidators =
-			_serviceTrackerMap.getService("*");
-
-		if (!ListUtil.isEmpty(generalAssetEntryValidators)) {
-			assetEntryValidators.addAll(generalAssetEntryValidators);
-		}
-
 		if (Validator.isNotNull(className)) {
 			List<AssetEntryValidator> classNameAssetEntryValidators =
 				_serviceTrackerMap.getService(className);
 
 			if (!ListUtil.isEmpty(classNameAssetEntryValidators)) {
-				assetEntryValidators.addAll(classNameAssetEntryValidators);
+				return classNameAssetEntryValidators;
 			}
+		}
+
+		List<AssetEntryValidator> generalAssetEntryValidators =
+			_serviceTrackerMap.getService("*");
+
+		if (!ListUtil.isEmpty(generalAssetEntryValidators)) {
+			assetEntryValidators.addAll(generalAssetEntryValidators);
 		}
 
 		return assetEntryValidators;

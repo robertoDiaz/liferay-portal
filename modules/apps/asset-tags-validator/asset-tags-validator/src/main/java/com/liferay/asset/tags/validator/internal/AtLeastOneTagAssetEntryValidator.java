@@ -35,7 +35,7 @@ public class AtLeastOneTagAssetEntryValidator implements AssetEntryValidator {
 
 	@Override
 	public void validate(
-			long groupId, String className, long classTypePK,
+			long groupId, String className, long classPK, long classTypePK,
 			long[] categoryIds, String[] tagNames)
 		throws PortalException {
 
@@ -46,6 +46,19 @@ public class AtLeastOneTagAssetEntryValidator implements AssetEntryValidator {
 
 			throw new AssetTagException(AssetTagException.AT_LEAST_ONE_TAG);
 		}
+	}
+
+	/**
+	 * @deprecated As of 1.0.0
+	 */
+	@Deprecated
+	@Override
+	public void validate(
+			long groupId, String className, long classTypePK,
+			long[] categoryIds, String[] tagNames)
+		throws PortalException {
+
+		validate(groupId, className, 0L, classTypePK, categoryIds, tagNames);
 	}
 
 }
