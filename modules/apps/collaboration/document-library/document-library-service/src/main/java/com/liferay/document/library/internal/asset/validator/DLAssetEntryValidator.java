@@ -12,17 +12,18 @@
  * details.
  */
 
-package com.liferay.document.library.internal.asset.categories.validator;
+package com.liferay.document.library.internal.asset.validator;
 
-import com.liferay.asset.kernel.validator.AssetEntryValidatorExclusionRule;
+import com.liferay.asset.kernel.validator.AssetEntryValidator;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Adolfo Pérez
+ * @author Roberto Díaz
  */
 @Component(
 	immediate = true,
@@ -30,15 +31,15 @@ import org.osgi.service.component.annotations.Reference;
 		"model.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 		"model.class.name=com.liferay.portal.kernel.repository.model.FileEntry"
 	},
-	service = AssetEntryValidatorExclusionRule.class
+	service = AssetEntryValidator.class
 )
-public class ExternalRepositoryAssetEntryValidatorExclusionRule
-	implements AssetEntryValidatorExclusionRule {
+public class DLAssetEntryValidator implements AssetEntryValidator {
 
 	@Override
-	public boolean isValidationExcluded(
-		long groupId, String className, long classPK, long classTypePK,
-		long[] categoryIds, String[] tagNames) {
+	public void validate(
+			long groupId, String className, long classPK, long classTypePK,
+			long[] categoryIds, String[] entryNames)
+		throws PortalException {
 
 		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
 			classPK);
@@ -46,13 +47,25 @@ public class ExternalRepositoryAssetEntryValidatorExclusionRule
 		if ((dlFileEntry == null) ||
 			(dlFileEntry.getRepositoryId() != groupId)) {
 
-			return true;
+			return;
 		}
+	}
 
-		return false;
+	/**
+	 * @deprecated As of 1.1.0
+	 */
+	@Deprecated
+	@Override
+	public void validate(
+			long groupId, String className, long classTypePK,
+			long[] categoryIds, String[] entryNames)
+		throws PortalException {
+
+		validate(groupId, className, 0L, classTypePK, categoryIds, entryNames);
 	}
 
 	@Reference(unbind = "-")
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
 
 }
