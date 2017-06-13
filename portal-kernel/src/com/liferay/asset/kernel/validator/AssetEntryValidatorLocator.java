@@ -15,14 +15,10 @@
 package com.liferay.asset.kernel.validator;
 
 /**
- * @author Adolfo Pérez
- * @deprecated As of 7.0.0, with no direct replacement
+ * @author Roberto Díaz
  */
-@Deprecated
-public interface AssetEntryValidatorExclusionRule {
+public interface AssetEntryValidatorLocator {
 
-	public boolean isValidationExcluded(
-		long groupId, String className, long classPK, long classTypePK,
-		long[] categoryIds, String[] tagNames);
+	public AssetEntryValidator getAssetEntryValidator();
 
 }
