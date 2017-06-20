@@ -312,6 +312,10 @@ public class BlogsEntryStagedModelDataHandler
 		if (coverImageSelector != null) {
 			_blogsEntryLocalService.addCoverImage(
 				importedEntry.getEntryId(), coverImageSelector);
+
+			_blogsEntryLocalService.addOriginalImageFileEntry(
+				userId, importedEntry.getGroupId(), importedEntry.getEntryId(),
+				coverImageSelector);
 		}
 
 		// Small image
@@ -589,7 +593,7 @@ public class BlogsEntryStagedModelDataHandler
 	private void _importFriendlyURLEntries(
 			PortletDataContext portletDataContext, BlogsEntry blogsEntry,
 			BlogsEntry importedBlogsEntry)
-		throws PortletDataException {
+		throws PortalException {
 
 		List<Element> friendlyURLEntryElements =
 			portletDataContext.getReferenceDataElements(
@@ -603,11 +607,20 @@ public class BlogsEntryStagedModelDataHandler
 
 			friendlyURLEntry.setClassNameId(
 				_portal.getClassNameId(BlogsEntry.class));
-			friendlyURLEntry.setClassPK(importedBlogsEntry.getPrimaryKey());
 
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, friendlyURLEntry);
 		}
+
+		FriendlyURLEntry mainFriendlyURLEntry =
+			_friendlyURLEntryLocalService.getMainFriendlyURLEntry(
+				importedBlogsEntry.getGroupId(),
+				importedBlogsEntry.getCompanyId(), BlogsEntry.class,
+				importedBlogsEntry.getEntryId());
+
+		importedBlogsEntry.setUrlTitle(mainFriendlyURLEntry.getUrlTitle());
+
+		_blogsEntryLocalService.updateBlogsEntry(importedBlogsEntry);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
