@@ -149,6 +149,7 @@
 				DLFileEntry
 			LEFT JOIN
 				AssetEntry ON
+					(AssetEntry.classNameId = ?) &&
 					(AssetEntry.classPK = DLFileEntry.fileEntryId)
 			WHERE
 				(AssetEntry.classPK IS NULL)
