@@ -277,21 +277,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		List<Group> groupChildren = group.getChildren(true);
 
 		for (Group groupChild : groupChildren) {
-			if (groupChild.hasStagingGroup()) {
-				Group groupChildStagingGroup = groupChild.getStagingGroup();
-
-				groupLocalService.updateGroup(
-					groupChildStagingGroup.getGroupId(),
-					groupChild.getParentGroupId(),
-					groupChildStagingGroup.getNameMap(),
-					groupChildStagingGroup.getDescriptionMap(),
-					groupChildStagingGroup.getType(),
-					groupChildStagingGroup.getManualMembership(),
-					groupChildStagingGroup.getMembershipRestriction(),
-					groupChildStagingGroup.getFriendlyURL(),
-					groupChildStagingGroup.getInheritContent(),
-					groupChildStagingGroup.isActive(), null);
-			}
+			updateChildGroupParentGroup(
+				groupChild.getParentGroupId(), groupChild);
 		}
 	}
 
@@ -316,22 +303,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			List<Group> liveGroupChildren = liveGroup.getChildren(true);
 
 			for (Group liveGroupChild : liveGroupChildren) {
-				if (liveGroupChild.hasStagingGroup()) {
-					Group liveGroupChildStagingGroup =
-						liveGroupChild.getStagingGroup();
-
-					groupLocalService.updateGroup(
-						liveGroupChildStagingGroup.getGroupId(),
-						stagingGroup.getGroupId(),
-						liveGroupChildStagingGroup.getNameMap(),
-						liveGroupChildStagingGroup.getDescriptionMap(),
-						liveGroupChildStagingGroup.getType(),
-						liveGroupChildStagingGroup.getManualMembership(),
-						liveGroupChildStagingGroup.getMembershipRestriction(),
-						liveGroupChildStagingGroup.getFriendlyURL(),
-						liveGroupChildStagingGroup.getInheritContent(),
-						liveGroupChildStagingGroup.isActive(), null);
-				}
+				updateChildGroupParentGroup(
+					stagingGroup.getGroupId(), liveGroupChild);
 			}
 		}
 
@@ -1032,6 +1005,20 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		typeSettingsProperties.putAll(
 			PropertiesParamUtil.getProperties(
 				serviceContext, StagingConstants.STAGED_PREFIX));
+	}
+
+	protected void updateChildGroupParentGroup(
+		long newParentGroupId, Group group)
+		throws PortalException {
+
+		if (group.hasStagingGroup()) {
+			Group stagingGroup = group.getStagingGroup();
+
+			stagingGroup.setParentGroupId(newParentGroupId);
+			stagingGroup.setTreePath(stagingGroup.buildTreePath());
+
+			groupLocalService.updateGroup(stagingGroup);
+		}
 	}
 
 	protected Layout updateLayoutWithLayoutRevision(
