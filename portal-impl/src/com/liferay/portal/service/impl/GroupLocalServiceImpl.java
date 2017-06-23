@@ -3217,6 +3217,32 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		groupPersistence.update(group);
 
+		if (group.hasStagingGroup()) {
+			Group stagingGroup = group.getStagingGroup();
+
+			if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
+				stagingGroup.setParentGroupId(parentGroupId);
+			}
+			else {
+				Group parentGroup = getGroup(parentGroupId);
+
+				if (parentGroup.hasStagingGroup()) {
+					Group parentGroupStagingGroup =
+						parentGroup.getStagingGroup();
+
+					stagingGroup.setParentGroupId(
+						parentGroupStagingGroup.getGroupId());
+				}
+				else {
+					stagingGroup.setParentGroupId(parentGroupId);
+				}
+			}
+
+			stagingGroup.setTreePath(stagingGroup.buildTreePath());
+
+			groupPersistence.update(stagingGroup);
+		}
+
 		// Asset
 
 		if ((serviceContext == null) || !group.isSite()) {
@@ -4431,15 +4457,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			}
 		}
 
-		Group parentGroup = groupPersistence.findByPrimaryKey(parentGroupId);
+		if (group.isStagingGroup() &&
+			(group.getLiveGroupId() == parentGroupId)) {
 
-		if (group.isStagingGroup()) {
-			long stagingGroupId = parentGroup.getStagingGroup().getGroupId();
-
-			if (groupId == stagingGroupId) {
-				throw new GroupParentException.MustNotHaveStagingParent(
-					groupId, stagingGroupId);
-			}
+			throw new GroupParentException.MustNotHaveStagingParent(
+				groupId, parentGroupId);
 		}
 	}
 

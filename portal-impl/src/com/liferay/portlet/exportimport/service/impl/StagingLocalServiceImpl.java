@@ -271,8 +271,28 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			liveGroup.clearStagingGroup();
 		}
 
-		groupLocalService.updateGroup(
+		Group group = groupLocalService.updateGroup(
 			liveGroup.getGroupId(), typeSettingsProperties.toString());
+
+		List<Group> groupChildren = group.getChildren(true);
+
+		for (Group groupChild : groupChildren) {
+			if (groupChild.hasStagingGroup()) {
+				Group groupChildStagingGroup = groupChild.getStagingGroup();
+
+				groupLocalService.updateGroup(
+					groupChildStagingGroup.getGroupId(),
+					groupChild.getParentGroupId(),
+					groupChildStagingGroup.getNameMap(),
+					groupChildStagingGroup.getDescriptionMap(),
+					groupChildStagingGroup.getType(),
+					groupChildStagingGroup.getManualMembership(),
+					groupChildStagingGroup.getMembershipRestriction(),
+					groupChildStagingGroup.getFriendlyURL(),
+					groupChildStagingGroup.getInheritContent(),
+					groupChildStagingGroup.isActive(), null);
+			}
+		}
 	}
 
 	@Override
@@ -290,7 +310,29 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		if (!hasStagingGroup) {
 			serviceContext.setAttribute("staging", String.valueOf(true));
 
-			addStagingGroup(userId, liveGroup, serviceContext);
+			Group stagingGroup = addStagingGroup(
+				userId, liveGroup, serviceContext);
+
+			List<Group> liveGroupChildren = liveGroup.getChildren(true);
+
+			for (Group liveGroupChild : liveGroupChildren) {
+				if (liveGroupChild.hasStagingGroup()) {
+					Group liveGroupChildStagingGroup =
+						liveGroupChild.getStagingGroup();
+
+					groupLocalService.updateGroup(
+						liveGroupChildStagingGroup.getGroupId(),
+						stagingGroup.getGroupId(),
+						liveGroupChildStagingGroup.getNameMap(),
+						liveGroupChildStagingGroup.getDescriptionMap(),
+						liveGroupChildStagingGroup.getType(),
+						liveGroupChildStagingGroup.getManualMembership(),
+						liveGroupChildStagingGroup.getMembershipRestriction(),
+						liveGroupChildStagingGroup.getFriendlyURL(),
+						liveGroupChildStagingGroup.getInheritContent(),
+						liveGroupChildStagingGroup.isActive(), null);
+				}
+			}
 		}
 
 		checkDefaultLayoutSetBranches(
