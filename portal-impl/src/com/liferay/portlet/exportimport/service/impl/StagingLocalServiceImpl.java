@@ -271,8 +271,15 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			liveGroup.clearStagingGroup();
 		}
 
-		groupLocalService.updateGroup(
+		Group group = groupLocalService.updateGroup(
 			liveGroup.getGroupId(), typeSettingsProperties.toString());
+
+		List<Group> groupChildren = group.getChildren(true);
+
+		for (Group groupChild : groupChildren) {
+			updateChildGroupParentGroup(
+				groupChild.getParentGroupId(), groupChild);
+		}
 	}
 
 	@Override
@@ -290,7 +297,15 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		if (!hasStagingGroup) {
 			serviceContext.setAttribute("staging", String.valueOf(true));
 
-			addStagingGroup(userId, liveGroup, serviceContext);
+			Group stagingGroup = addStagingGroup(
+				userId, liveGroup, serviceContext);
+
+			List<Group> liveGroupChildren = liveGroup.getChildren(true);
+
+			for (Group liveGroupChild : liveGroupChildren) {
+				updateChildGroupParentGroup(
+					stagingGroup.getGroupId(), liveGroupChild);
+			}
 		}
 
 		checkDefaultLayoutSetBranches(
@@ -990,6 +1005,20 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		typeSettingsProperties.putAll(
 			PropertiesParamUtil.getProperties(
 				serviceContext, StagingConstants.STAGED_PREFIX));
+	}
+
+	protected void updateChildGroupParentGroup(
+			long newParentGroupId, Group group)
+		throws PortalException {
+
+		if (group.hasStagingGroup()) {
+			Group stagingGroup = group.getStagingGroup();
+
+			stagingGroup.setParentGroupId(newParentGroupId);
+			stagingGroup.setTreePath(stagingGroup.buildTreePath());
+
+			groupLocalService.updateGroup(stagingGroup);
+		}
 	}
 
 	protected Layout updateLayoutWithLayoutRevision(
