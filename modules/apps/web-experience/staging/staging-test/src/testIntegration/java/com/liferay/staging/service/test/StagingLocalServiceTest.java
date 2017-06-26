@@ -66,8 +66,7 @@ public class StagingLocalServiceTest {
 
 			StagingLocalServiceUtil.disableStaging(group, new ServiceContext());
 
-			group = GroupLocalServiceUtil.getGroup(
-				group.getGroupId());
+			group = GroupLocalServiceUtil.getGroup(group.getGroupId());
 
 			Assert.assertFalse(group.hasStagingGroup());
 		}
@@ -163,16 +162,15 @@ public class StagingLocalServiceTest {
 			StagingLocalServiceUtil.enableLocalStaging(
 				_user.getUserId(), group, false, false, new ServiceContext());
 
-			group = GroupLocalServiceUtil.getGroup(
-				group.getGroupId());
+			group = GroupLocalServiceUtil.getGroup(group.getGroupId());
 
 			Group groupStagingGroup = group.getStagingGroup();
 
 			Assert.assertEquals(
 				parentGroup.getGroupId(), group.getParentGroupId());
+
 			Assert.assertEquals(
-				parentGroup.getGroupId(),
-				groupStagingGroup.getParentGroupId());
+				parentGroup.getGroupId(), groupStagingGroup.getParentGroupId());
 		}
 		finally {
 			GroupLocalServiceUtil.deleteGroup(group.getGroupId());
