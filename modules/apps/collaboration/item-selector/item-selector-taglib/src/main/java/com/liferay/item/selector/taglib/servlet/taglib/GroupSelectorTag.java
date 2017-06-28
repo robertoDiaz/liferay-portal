@@ -16,7 +16,6 @@ package com.liferay.item.selector.taglib.servlet.taglib;
 
 import com.liferay.item.selector.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.item.selector.taglib.internal.servlet.item.selector.ItemSelectorUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -25,16 +24,14 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -91,26 +88,23 @@ public class GroupSelectorTag extends IncludeTag {
 		int[] startAndEnd = SearchPaginationUtil.calculateStartAndEnd(
 			cur, delta);
 
-		if (Validator.isNotNull(keywords)) {
-			LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
-			groupParams.put("site", Boolean.TRUE);
-			groupParams.put("usersGroups", Long.valueOf(user.getUserId()));
+		groupParams.put("site", Boolean.TRUE);
 
+		if (_checkPermission(themeDisplay.getPermissionChecker())) {
 			return GroupLocalServiceUtil.search(
 				themeDisplay.getCompanyId(), _CLASSNAME_IDS, keywords,
 				groupParams, startAndEnd[0], startAndEnd[1], null);
 		}
-
-		try {
-			List<Group> groups = user.getMySiteGroups(null, startAndEnd[1]);
-
-			return ListUtil.subList(groups, startAndEnd[0], startAndEnd[1]);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			return new ArrayList<>();
+		else {
+			return GroupLocalServiceUtil.search(
+				themeDisplay.getCompanyId(),
+				new long[] {
+					ClassNameLocalServiceUtil.getClassNameId(Group.class),
+					ClassNameLocalServiceUtil.getClassNameId(Organization.class)
+				},
+				keywords, groupParams, startAndEnd[0], startAndEnd[1], null);
 		}
 	}
 
@@ -126,26 +120,23 @@ public class GroupSelectorTag extends IncludeTag {
 
 		String keywords = ParamUtil.getString(request, "keywords");
 
-		if (Validator.isNotNull(keywords)) {
-			LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
 
-			groupParams.put("site", Boolean.TRUE);
-			groupParams.put("usersGroups", Long.valueOf(user.getUserId()));
+		groupParams.put("site", Boolean.TRUE);
 
+		if (_checkPermission(themeDisplay.getPermissionChecker())) {
 			return GroupLocalServiceUtil.searchCount(
 				themeDisplay.getCompanyId(), _CLASSNAME_IDS, keywords,
 				groupParams);
 		}
-
-		try {
-			List<Group> groups = user.getMySiteGroups(null, QueryUtil.ALL_POS);
-
-			return groups.size();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			return 0;
+		else {
+			return GroupLocalServiceUtil.searchCount(
+				themeDisplay.getCompanyId(),
+				new long[] {
+					ClassNameLocalServiceUtil.getClassNameId(Group.class),
+					ClassNameLocalServiceUtil.getClassNameId(Organization.class)
+				},
+				keywords, groupParams);
 		}
 	}
 
@@ -164,6 +155,14 @@ public class GroupSelectorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-item-selector:group-selector:itemSelector",
 			ItemSelectorUtil.getItemSelector());
+	}
+
+	private boolean _checkPermission(PermissionChecker permissionChecker) {
+		if (permissionChecker.isCompanyAdmin()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final long[] _CLASSNAME_IDS = {
