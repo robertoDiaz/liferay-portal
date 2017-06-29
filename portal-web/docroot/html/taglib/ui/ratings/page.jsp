@@ -21,6 +21,7 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_rating
 
 String className = (String)request.getAttribute("liferay-ui:ratings:className");
 long classPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:ratings:classPK"));
+Boolean inTrash = (Boolean)request.getAttribute("liferay-ui:ratings:inTrash");
 int numberOfStars = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:ratings:numberOfStars"));
 RatingsEntry ratingsEntry = (RatingsEntry)request.getAttribute("liferay-ui:ratings:ratingsEntry");
 RatingsStats ratingsStats = (RatingsStats)request.getAttribute("liferay-ui:ratings:ratingsStats");
@@ -30,16 +31,20 @@ boolean setRatingsStats = GetterUtil.getBoolean((String)request.getAttribute("li
 String type = GetterUtil.getString((String)request.getAttribute("liferay-ui:ratings:type"));
 String url = (String)request.getAttribute("liferay-ui:ratings:url");
 
+if (inTrash == null) {
+	inTrash = TrashUtil.isInTrash(className, classPK);
+}
+
 if (numberOfStars < 1) {
 	numberOfStars = 1;
 }
 
-if (!setRatingsEntry) {
-	ratingsEntry = RatingsEntryLocalServiceUtil.fetchEntry(themeDisplay.getUserId(), className, classPK);
-}
-
 if (!setRatingsStats) {
 	ratingsStats = RatingsStatsLocalServiceUtil.fetchStats(className, classPK);
+}
+
+if (!setRatingsEntry && (ratingsStats != null)) {
+	ratingsEntry = RatingsEntryLocalServiceUtil.fetchEntry(themeDisplay.getUserId(), className, classPK);
 }
 
 if (Validator.isNull(url)) {
@@ -69,8 +74,6 @@ double yourScore = -1.0;
 if (ratingsEntry != null) {
 	yourScore = ratingsEntry.getScore();
 }
-
-boolean inTrash = TrashUtil.isInTrash(className, classPK);
 %>
 
 <div class="taglib-ratings <%= type %>" id="<%= randomNamespace %>ratingContainer">

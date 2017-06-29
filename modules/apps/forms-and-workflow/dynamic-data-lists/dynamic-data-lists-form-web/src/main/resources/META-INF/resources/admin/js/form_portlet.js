@@ -63,6 +63,10 @@ AUI.add(
 						valueFn: '_valueRuleBuilder'
 					},
 
+					rules: {
+						value: []
+					},
+
 					translationManager: {
 					}
 				},
@@ -560,9 +564,11 @@ AUI.add(
 
 						var publishMessage = Liferay.Language.get('the-form-was-published-successfully-access-it-with-this-url-x');
 
-						var formUrl = '<span style="font-weight: 500">' + instance._createFormURL() + '</span>';
+						var formUrl = instance._createFormURL();
 
-						publishMessage = publishMessage.replace(/\{0\}/gim, formUrl);
+						var span = '<span style="font-weight: 500"><a href=' + formUrl + ' target="_blank">' + formUrl + '</a></span>';
+
+						publishMessage = publishMessage.replace(/\{0\}/gim, span);
 
 						instance._showAlert(publishMessage, 'success');
 
@@ -862,7 +868,7 @@ AUI.add(
 						return new Liferay.DDL.FormBuilderRuleBuilder(
 							{
 								formBuilder: instance.get('formBuilder'),
-								rules: Settings.rules,
+								rules: instance.get('rules'),
 								visible: false
 							}
 						);
