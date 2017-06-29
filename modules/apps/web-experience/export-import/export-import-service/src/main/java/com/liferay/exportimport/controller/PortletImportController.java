@@ -50,6 +50,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerStatusMessageSenderUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
@@ -74,10 +75,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
-import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.model.PortletItem;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -513,7 +514,7 @@ public class PortletImportController implements ImportController {
 						exportImportPortletPreferencesProcessor =
 							ExportImportPortletPreferencesProcessorRegistryUtil.
 								getExportImportPortletPreferencesProcessor(
-									PortletConstants.getRootPortletId(
+									PortletIdCodec.decodePortletName(
 										curPortletId));
 
 					if (exportImportPortletPreferencesProcessor != null) {
@@ -1137,6 +1138,8 @@ public class PortletImportController implements ImportController {
 
 		portletDataContext.addDeletionSystemEventStagedModelTypes(
 			portletDataHandler.getDeletionSystemEventStagedModelTypes());
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			new StagedModelType(StagedAssetLink.class));
 	}
 
 	protected void readExpandoTables(PortletDataContext portletDataContext)
@@ -1447,7 +1450,7 @@ public class PortletImportController implements ImportController {
 
 		String rootPortletId = headerElement.attributeValue("root-portlet-id");
 
-		String expectedRootPortletId = PortletConstants.getRootPortletId(
+		String expectedRootPortletId = PortletIdCodec.decodePortletName(
 			portletId);
 
 		if (!expectedRootPortletId.equals(rootPortletId)) {
