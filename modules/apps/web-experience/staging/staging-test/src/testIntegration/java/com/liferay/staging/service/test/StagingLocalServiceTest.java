@@ -201,6 +201,7 @@ public class StagingLocalServiceTest {
 
 			Assert.assertEquals(
 				parentGroup.getGroupId(), childGroup.getParentGroupId());
+
 			Assert.assertEquals(
 				parentGroup.getGroupId(),
 				childGroupStagingGroup.getParentGroupId());
@@ -234,6 +235,7 @@ public class StagingLocalServiceTest {
 
 			Assert.assertEquals(
 				parentGroup.getGroupId(), childGroup.getParentGroupId());
+
 			Assert.assertEquals(
 				parentGroup.getGroupId(),
 				childGroupStagingGroup.getParentGroupId());
