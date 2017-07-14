@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,10 +11,28 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/init.jsp" %>
+package com.liferay.portal.upgrade;
 
-<liferay-ui:input-permissions
-	modelName="<%= AssetCategory.class.getName() %>"
-/>
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.upgrade.v7_0_4.UpgradeGroup;
+
+/**
+ * @author Roberto Díaz
+ */
+public class UpgradeProcess_7_0_4 extends UpgradeProcess {
+
+	@Override
+	public int getThreshold() {
+		return ReleaseInfo.RELEASE_7_0_4_BUILD_NUMBER;
+	}
+
+	@Override
+	protected void doUpgrade() throws Exception {
+		upgrade(UpgradeGroup.class);
+
+		clearIndexesCache();
+	}
+
+}
