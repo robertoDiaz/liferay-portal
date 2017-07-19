@@ -12,20 +12,33 @@
  * details.
  */
 
-package com.liferay.portal.search.solr.internal.pagination;
+package com.liferay.poshi.runner.elements;
 
-import com.liferay.portal.search.solr.internal.SolrIndexingFixture;
-import com.liferay.portal.search.test.util.indexing.IndexingFixture;
-import com.liferay.portal.search.test.util.pagination.BasePaginationTestCase;
+import org.dom4j.Element;
 
 /**
- * @author Preston Crary
+ * @author Kenji Heigel
  */
-public class PaginationTest extends BasePaginationTestCase {
+public class DescriptionElement extends PoshiElement {
+
+	public DescriptionElement(Element element) {
+		super("description", element);
+	}
+
+	public DescriptionElement(String readableSyntax) {
+		super("description", readableSyntax);
+	}
 
 	@Override
-	protected IndexingFixture createIndexingFixture() {
-		return new SolrIndexingFixture();
+	public String getBlockName() {
+		return "description";
+	}
+
+	@Override
+	public void parseReadableSyntax(String readableSyntax) {
+		String message = getQuotedContent(readableSyntax);
+
+		addAttribute("message", message);
 	}
 
 }
