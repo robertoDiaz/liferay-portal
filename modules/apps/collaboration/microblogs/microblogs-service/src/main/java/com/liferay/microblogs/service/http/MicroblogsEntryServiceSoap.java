@@ -98,6 +98,20 @@ public class MicroblogsEntryServiceSoap {
 		}
 	}
 
+	public static java.lang.String getJSONRecipients(long userId)
+		throws RemoteException {
+		try {
+			com.liferay.portal.kernel.json.JSONArray returnValue = MicroblogsEntryServiceUtil.getJSONRecipients(userId);
+
+			return returnValue.toString();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.microblogs.model.MicroblogsEntrySoap[] getMicroblogsEntries(
 		int start, int end) throws RemoteException {
 		try {

@@ -123,12 +123,43 @@ public class MicroblogsEntryServiceHttp {
 		}
 	}
 
+	public static com.liferay.portal.kernel.json.JSONArray getJSONRecipients(
+		HttpPrincipal httpPrincipal, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		try {
+			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
+					"getJSONRecipients", _getJSONRecipientsParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, userId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (com.liferay.portal.kernel.json.JSONArray)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static java.util.List<com.liferay.microblogs.model.MicroblogsEntry> getMicroblogsEntries(
 		HttpPrincipal httpPrincipal, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
-					"getMicroblogsEntries", _getMicroblogsEntriesParameterTypes2);
+					"getMicroblogsEntries", _getMicroblogsEntriesParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, start,
 					end);
@@ -160,7 +191,7 @@ public class MicroblogsEntryServiceHttp {
 		int end) throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
-					"getMicroblogsEntries", _getMicroblogsEntriesParameterTypes3);
+					"getMicroblogsEntries", _getMicroblogsEntriesParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					assetTagName, start, end);
@@ -192,7 +223,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getMicroblogsEntriesCount",
-					_getMicroblogsEntriesCountParameterTypes4);
+					_getMicroblogsEntriesCountParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey);
 
@@ -224,7 +255,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getMicroblogsEntriesCount",
-					_getMicroblogsEntriesCountParameterTypes5);
+					_getMicroblogsEntriesCountParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					assetTagName);
@@ -256,7 +287,7 @@ public class MicroblogsEntryServiceHttp {
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
-					"getMicroblogsEntry", _getMicroblogsEntryParameterTypes6);
+					"getMicroblogsEntry", _getMicroblogsEntryParameterTypes7);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryId);
@@ -289,7 +320,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getUserMicroblogsEntries",
-					_getUserMicroblogsEntriesParameterTypes7);
+					_getUserMicroblogsEntriesParameterTypes8);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryUserId, start, end);
@@ -323,7 +354,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getUserMicroblogsEntries",
-					_getUserMicroblogsEntriesParameterTypes8);
+					_getUserMicroblogsEntriesParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryUserId, type, start, end);
@@ -356,7 +387,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getUserMicroblogsEntriesCount",
-					_getUserMicroblogsEntriesCountParameterTypes9);
+					_getUserMicroblogsEntriesCountParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryUserId);
@@ -389,7 +420,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"getUserMicroblogsEntriesCount",
-					_getUserMicroblogsEntriesCountParameterTypes10);
+					_getUserMicroblogsEntriesCountParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryUserId, type);
@@ -424,7 +455,7 @@ public class MicroblogsEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(MicroblogsEntryServiceUtil.class,
 					"updateMicroblogsEntry",
-					_updateMicroblogsEntryParameterTypes11);
+					_updateMicroblogsEntryParameterTypes12);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					microblogsEntryId, content, socialRelationType,
@@ -460,32 +491,35 @@ public class MicroblogsEntryServiceHttp {
 	private static final Class<?>[] _deleteMicroblogsEntryParameterTypes1 = new Class[] {
 			long.class
 		};
-	private static final Class<?>[] _getMicroblogsEntriesParameterTypes2 = new Class[] {
-			int.class, int.class
-		};
-	private static final Class<?>[] _getMicroblogsEntriesParameterTypes3 = new Class[] {
-			java.lang.String.class, int.class, int.class
-		};
-	private static final Class<?>[] _getMicroblogsEntriesCountParameterTypes4 = new Class[] {
-			
-		};
-	private static final Class<?>[] _getMicroblogsEntriesCountParameterTypes5 = new Class[] {
-			java.lang.String.class
-		};
-	private static final Class<?>[] _getMicroblogsEntryParameterTypes6 = new Class[] {
+	private static final Class<?>[] _getJSONRecipientsParameterTypes2 = new Class[] {
 			long.class
 		};
-	private static final Class<?>[] _getUserMicroblogsEntriesParameterTypes7 = new Class[] {
-			long.class, int.class, int.class
+	private static final Class<?>[] _getMicroblogsEntriesParameterTypes3 = new Class[] {
+			int.class, int.class
+		};
+	private static final Class<?>[] _getMicroblogsEntriesParameterTypes4 = new Class[] {
+			java.lang.String.class, int.class, int.class
+		};
+	private static final Class<?>[] _getMicroblogsEntriesCountParameterTypes5 = new Class[] {
+			
+		};
+	private static final Class<?>[] _getMicroblogsEntriesCountParameterTypes6 = new Class[] {
+			java.lang.String.class
+		};
+	private static final Class<?>[] _getMicroblogsEntryParameterTypes7 = new Class[] {
+			long.class
 		};
 	private static final Class<?>[] _getUserMicroblogsEntriesParameterTypes8 = new Class[] {
+			long.class, int.class, int.class
+		};
+	private static final Class<?>[] _getUserMicroblogsEntriesParameterTypes9 = new Class[] {
 			long.class, int.class, int.class, int.class
 		};
-	private static final Class<?>[] _getUserMicroblogsEntriesCountParameterTypes9 =
-		new Class[] { long.class };
 	private static final Class<?>[] _getUserMicroblogsEntriesCountParameterTypes10 =
+		new Class[] { long.class };
+	private static final Class<?>[] _getUserMicroblogsEntriesCountParameterTypes11 =
 		new Class[] { long.class, int.class };
-	private static final Class<?>[] _updateMicroblogsEntryParameterTypes11 = new Class[] {
+	private static final Class<?>[] _updateMicroblogsEntryParameterTypes12 = new Class[] {
 			long.class, java.lang.String.class, int.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};

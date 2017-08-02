@@ -68,6 +68,12 @@ public class MicroblogsEntryServiceWrapper implements MicroblogsEntryService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.json.JSONArray getJSONRecipients(
+		long userId) throws com.liferay.portal.kernel.exception.PortalException {
+		return _microblogsEntryService.getJSONRecipients(userId);
+	}
+
+	@Override
 	public int getMicroblogsEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _microblogsEntryService.getMicroblogsEntriesCount();

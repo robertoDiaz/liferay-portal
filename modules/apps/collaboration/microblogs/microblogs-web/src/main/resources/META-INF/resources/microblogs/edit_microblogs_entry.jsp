@@ -440,27 +440,41 @@ if (comment) {
 		};
 
 		var createAutocomplete = function(contentTextarea) {
-			autocompleteDiv = new A.AutoComplete(
+			Liferay.Service(
+				'/microblogs.microblogsentry/get-json-recipients',
 				{
-					inputNode: contentTextarea,
-					maxResults: 5,
-					on: {
-						clear: function() {
-							var highlighterContent = A.one('#<portlet:namespace />highlighterContent<%= formId %>');
+					userId: <%= user.getUserId() %>
+				},
+				function(result) {
+					var pathImage = themeDisplay.getPathImage();
 
-							highlighterContent.html('');
-						},
-						query: updateHighlightDivContent,
-						select: updateContentTextbox
-					},
-					resultFilters: 'phraseMatch',
-					resultFormatter: resultFormatter,
-					resultTextLocator: 'fullName',
-					source: <%= MicroblogsUtil.getJSONRecipients(user.getUserId(), themeDisplay) %>
+					for (var i = 0; i < result.length; i++) {
+						result[i].portraitURL = pathImage + result[i].portraitURL;
+					}
+
+					autocompleteDiv = new A.AutoComplete(
+						{
+							inputNode: contentTextarea,
+							maxResults: 5,
+							on: {
+								clear: function() {
+									var highlighterContent = A.one('#<portlet:namespace />highlighterContent<%= formId %>');
+
+									highlighterContent.html('');
+								},
+								query: updateHighlightDivContent,
+								select: updateContentTextbox
+							},
+							resultFilters: 'phraseMatch',
+							resultFormatter: resultFormatter,
+							resultTextLocator: 'fullName',
+							source: result
+						}
+					).render();
+
+					return autocompleteDiv;
 				}
-			).render();
-
-			return autocompleteDiv;
+			);
 		};
 
 		<c:choose>

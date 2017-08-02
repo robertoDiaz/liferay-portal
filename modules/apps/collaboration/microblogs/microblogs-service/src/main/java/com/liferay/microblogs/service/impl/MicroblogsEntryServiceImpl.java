@@ -18,10 +18,13 @@ import com.liferay.microblogs.model.MicroblogsEntry;
 import com.liferay.microblogs.service.base.MicroblogsEntryServiceBaseImpl;
 import com.liferay.microblogs.service.permission.MicroblogsEntryPermission;
 import com.liferay.microblogs.service.permission.MicroblogsPermission;
+import com.liferay.microblogs.util.MicroblogsUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 
 import java.util.List;
 
@@ -54,6 +57,13 @@ public class MicroblogsEntryServiceImpl extends MicroblogsEntryServiceBaseImpl {
 
 		return microblogsEntryLocalService.deleteMicroblogsEntry(
 			microblogsEntryId);
+	}
+
+	@Override
+	public JSONArray getJSONRecipients(long userId) throws PortalException {
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		return MicroblogsUtil.getJSONRecipients(userId, themeDisplay);
 	}
 
 	@Override

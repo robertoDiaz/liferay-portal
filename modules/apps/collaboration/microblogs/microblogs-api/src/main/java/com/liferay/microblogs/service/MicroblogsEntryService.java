@@ -20,6 +20,7 @@ import com.liferay.microblogs.model.MicroblogsEntry;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
@@ -70,6 +71,9 @@ public interface MicroblogsEntryService extends BaseService {
 	public MicroblogsEntry updateMicroblogsEntry(long microblogsEntryId,
 		java.lang.String content, int socialRelationType,
 		ServiceContext serviceContext) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public JSONArray getJSONRecipients(long userId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getMicroblogsEntriesCount() throws PortalException;

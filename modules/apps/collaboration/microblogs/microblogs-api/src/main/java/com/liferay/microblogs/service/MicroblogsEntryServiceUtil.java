@@ -73,6 +73,11 @@ public class MicroblogsEntryServiceUtil {
 			socialRelationType, serviceContext);
 	}
 
+	public static com.liferay.portal.kernel.json.JSONArray getJSONRecipients(
+		long userId) throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getJSONRecipients(userId);
+	}
+
 	public static int getMicroblogsEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getMicroblogsEntriesCount();
