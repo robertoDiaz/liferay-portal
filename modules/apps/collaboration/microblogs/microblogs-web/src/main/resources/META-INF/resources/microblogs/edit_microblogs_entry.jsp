@@ -444,6 +444,7 @@ if (comment) {
 				'<liferay-portlet:resourceURL id="/microblogs/get_json_recipients" />',
 				{
 					data: {
+						compress: false,
 						userId: <%= user.getUserId() %>
 					},
 					success: function(responseData) {
