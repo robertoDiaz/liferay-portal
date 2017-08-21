@@ -12,14 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.search.web.internal.search.insights.constants;
+package com.liferay.portal.configuration.upgrade.util;
 
 /**
- * @author André de Oliveira
+ * @author Drew Brokke
  */
-public class SearchInsightsWebKeys {
+public enum PrefsPropsValueType {
 
-	public static final String DISPLAY_CONTEXT =
-		"SEARCH_INSIGHTS_PORTLET_DISPLAY_CONTEXT";
+	BOOLEAN, DOUBLE, INT, LONG, SHORT, STRING, STRING_ARRAY
 
 }

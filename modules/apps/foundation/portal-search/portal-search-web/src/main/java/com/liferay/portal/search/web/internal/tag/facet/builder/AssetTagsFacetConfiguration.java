@@ -12,14 +12,19 @@
  * details.
  */
 
-package com.liferay.portal.search.web.internal.search.results.constants;
+package com.liferay.portal.search.web.internal.tag.facet.builder;
 
 /**
- * @author André de Oliveira
+ * @author Lino Alves
  */
-public class SearchResultsWebKeys {
+public interface AssetTagsFacetConfiguration {
 
-	public static final String DISPLAY_CONTEXT =
-		"SEARCH_RESULTS_PORTLET_DISPLAY_CONTEXT";
+	public int getFrequencyThreshold();
+
+	public int getMaxTerms();
+
+	public void setFrequencyThreshold(int frequencyThreshold);
+
+	public void setMaxTerms(int maxTerms);
 
 }
