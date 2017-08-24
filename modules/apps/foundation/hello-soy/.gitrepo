@@ -4,8 +4,8 @@
 [subrepo]
 	autopull = false
 	cmdver = liferay
-	commit = 62acc78d5c927fc3b3954fb86ea5678aa8cf7b3a
+	commit = 7f87a993815d8fe7007b26347568534429dc2720
 	mergebuttonmergecommits = false
 	mode = push
-	parent = 303279bb93188196e8abe79ff78116499d4b7e6b
+	parent = 65e1092f79726b3275c3e380d93ce70bb640dbea
 	remote = git@github.com:liferay/com-liferay-hello-soy.git
