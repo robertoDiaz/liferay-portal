@@ -40,6 +40,7 @@ public class BNDWebContextPathCheck extends BaseFileCheck {
 		throws Exception {
 
 		if (fileName.endsWith("/bnd.bnd") &&
+			!absolutePath.contains("/modules/private/apps/") &&
 			!absolutePath.contains("/testIntegration/") &&
 			!absolutePath.contains("/third-party/")) {
 
@@ -64,17 +65,18 @@ public class BNDWebContextPathCheck extends BaseFileCheck {
 		String webContextPath = BNDSourceUtil.getDefinitionValue(
 			content, "Web-ContextPath");
 
-		if (webContextPath != null) {
-			if (!webContextPath.equals("/" + moduleName)) {
+		if (_hasPackageJSONNameProperty(absolutePath)) {
+			if (webContextPath == null) {
 				addMessage(
-					fileName,
-					"Incorrect Web-ContextPath '" + webContextPath + "'",
+					fileName, "Missing Web-ContextPath",
 					"bnd_bundle_information.markdown");
 			}
 		}
-		else if (_hasPackageJSONNameProperty(absolutePath)) {
+		else if ((webContextPath != null) &&
+				 !webContextPath.equals("/" + moduleName)) {
+
 			addMessage(
-				fileName, "Missing Web-ContextPath",
+				fileName, "Incorrect Web-ContextPath '" + webContextPath + "'",
 				"bnd_bundle_information.markdown");
 		}
 	}
