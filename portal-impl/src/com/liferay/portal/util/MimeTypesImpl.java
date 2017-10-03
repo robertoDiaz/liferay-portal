@@ -73,8 +73,16 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		URL url = org.apache.tika.mime.MimeTypes.class.getResource(
 			"tika-mimetypes.xml");
 
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		URL customMimeTypesUrl = classLoader.getResource(
+			"tika/custom-mimetypes.xml");
+
 		try {
 			read(url.openStream());
+			read(customMimeTypesUrl.openStream());
 		}
 		catch (Exception e) {
 			_log.error("Unable to populate extensions map", e);
