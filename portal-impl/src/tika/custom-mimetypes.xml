@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info>
+	<mime-type type="application/zip">
+		<_comment>Compressed Archive File</_comment>
+		<tika:link>http://en.wikipedia.org/wiki/ZIP_(file_format)</tika:link>
+		<tika:uti>com.pkware.zip-archive</tika:uti>
+		<alias type="application/x-zip-compressed" />
+		<magic priority="50">
+			<match offset="0" type="string" value="PK\003\004" />
+			<match offset="0" type="string" value="PK\005\006" />
+			<match offset="0" type="string" value="PK\x07\x08" />
+		</magic>
+		<glob pattern="*.lar" />
+		<glob pattern="*.zip" />
+	</mime-type>
+</mime-info>
