@@ -52,8 +52,12 @@
 	<property file="${project.dir}/sql/sql.${env.HOSTNAME}.properties" />
 	<property file="${project.dir}/sql/sql.properties" />
 
+	<path id="ant.bnd.classpath">
+		<fileset dir="${project.dir}/lib/development" includes="biz.aQute.bnd.jar,com.liferay.ant.bnd.jar" />
+	</path>
+
 	<path id="lib.classpath">
-		<fileset dir="${project.dir}/lib/development" includes="*.jar" />
+		<fileset dir="${project.dir}/lib/development" excludes="biz.aQute.bnd.jar,com.liferay.ant.bnd.jar" includes="*.jar" />
 		<fileset dir="${project.dir}/lib/global" includes="*.jar" />
 		<fileset dir="${project.dir}/lib/portal" includes="*.jar" />
 	</path>
@@ -77,12 +81,11 @@
 		<path refid="web-lib.classpath" />
 	</path>
 
-	<taskdef classpathref="lib.classpath" resource="aQute/bnd/ant/taskdef.properties" />
+	<taskdef classpathref="ant.bnd.classpath" resource="aQute/bnd/ant/taskdef.properties" />
 	<taskdef classpathref="lib.classpath" resource="ise/antelope/tasks/antlib.xml" uri="antlib:ise.antelope.tasks" />
 	<taskdef classpathref="lib.classpath" resource="net/sf/antcontrib/antlib.xml" />
 	<typedef classpathref="lib.classpath" resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" />
 	<taskdef classpathref="lib.classpath" resource="org/jacoco/ant/antlib.xml" uri="antlib:org.jacoco.ant" />
-	<taskdef classpathref="lib.classpath" resource="tasks.properties" />
 
 	<taskdef classname="com.liferay.ant.beanshell.BeanShellTask" classpathref="lib.classpath" name="beanshell" />
 	<taskdef classname="com.liferay.ant.build.logger.LiferayBuildLoggerInstallerTask" classpath="${project.dir}/lib/development/com.liferay.ant.build.logger.jar" name="liferay-build-logger-installer" />
@@ -1121,9 +1124,9 @@ information.
 						src="${sdk.zip.dir}/com.liferay.portal.plugins.sdk-${build.sdk.version}.zip"
 					>
 						<mapper
-							type="glob"
 							from="com.liferay.portal.plugins.sdk-${build.sdk.version}/*"
 							to="sdk/*"
+							type="glob"
 						/>
 					</unzip>
 
@@ -1204,7 +1207,7 @@ information.
 				<fileset dir="${project.dir}/lib/development" excludes="jalopy.jar,jetty*.jar,tomcat*.jar" includes="*.jar" />
 				<fileset dir="${project.dir}/lib/global" includes="*.jar" />
 				<fileset dir="${project.dir}/lib/portal" excludes="ant.jar" includes="*.jar" />
-				<fileset dir="${sdk.dir}/dist" includes="com.liferay.portal.dao.db-*.jar" />
+				<fileset dir="${sdk.dir}/dist" erroronmissingdir="false" includes="com.liferay.portal.dao.db-*.jar" />
 			</path>
 		</sequential>
 	</macrodef>

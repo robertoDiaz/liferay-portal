@@ -32,8 +32,8 @@ import javax.ws.rs.core.HttpHeaders;
  * methods a {@link JSONObjectBuilder} is received.
  *
  * All methods are called in a not predefined order, except
- * {@link #onStart(JSONObjectBuilder, Page, Class, HttpHeaders)},
- * {@link #onFinish(JSONObjectBuilder, Page, Class, HttpHeaders)} (called when
+ * {@link #onStart(JSONObjectBuilder, Page, HttpHeaders)},
+ * {@link #onFinish(JSONObjectBuilder, Page, HttpHeaders)} (called when
  * the writer starts and finishes the page) and
  * {@link #onStartItem(JSONObjectBuilder, JSONObjectBuilder, Object, Class,
  * HttpHeaders)},
@@ -44,6 +44,7 @@ import javax.ws.rs.core.HttpHeaders;
  * @author Carlos Sierra Andrés
  * @author Jorge Ferrer
  */
+@SuppressWarnings("unused")
 public interface PageMessageMapper<T> {
 
 	/**
@@ -270,11 +271,10 @@ public interface PageMessageMapper<T> {
 	 *
 	 * @param jsonObjectBuilder the json object builder for the page.
 	 * @param page the actual page.
-	 * @param modelClass the model class of the page.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onFinish(
-		JSONObjectBuilder jsonObjectBuilder, Page<T> page, Class<T> modelClass,
+		JSONObjectBuilder jsonObjectBuilder, Page<T> page,
 		HttpHeaders httpHeaders) {
 	}
 
@@ -286,7 +286,7 @@ public interface PageMessageMapper<T> {
 	 * @param itemJSONObjectBuilder the json object builder for the item.
 	 * @param item the actual item.
 	 * @param modelClass the model class of the item.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onFinishItem(
 		JSONObjectBuilder pageJSONObjectBuilder,
@@ -299,11 +299,10 @@ public interface PageMessageMapper<T> {
 	 *
 	 * @param jsonObjectBuilder the json object builder for the page.
 	 * @param page the actual page.
-	 * @param modelClass the model class of the page.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onStart(
-		JSONObjectBuilder jsonObjectBuilder, Page<T> page, Class<T> modelClass,
+		JSONObjectBuilder jsonObjectBuilder, Page<T> page,
 		HttpHeaders httpHeaders) {
 	}
 
@@ -314,7 +313,7 @@ public interface PageMessageMapper<T> {
 	 * @param itemJSONObjectBuilder the json object builder for the item.
 	 * @param item the actual item.
 	 * @param modelClass the model class of the item.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onStartItem(
 		JSONObjectBuilder pageJSONObjectBuilder,
@@ -327,14 +326,11 @@ public interface PageMessageMapper<T> {
 	 * related to the current request.
 	 *
 	 * @param  page the actual page.
-	 * @param  modelClass the model class of the page.
-	 * @param  httpHeaders the http headers of the current request.
+	 * @param  httpHeaders the HTTP headers of the current request.
 	 * @return <code>true</code> if mapper supports mapping this request;
 	 *         <code>false</code> otherwise.
 	 */
-	public default boolean supports(
-		Page<T> page, Class<T> modelClass, HttpHeaders httpHeaders) {
-
+	public default boolean supports(Page<T> page, HttpHeaders httpHeaders) {
 		return true;
 	}
 

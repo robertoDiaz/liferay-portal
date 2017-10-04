@@ -32,7 +32,7 @@ if (Boolean.getBoolean("build.bnd.print.enabled") && System.getenv("JENKINS_HOME
 	}
 
 	dependencies {
-		bnd group: "biz.aQute.bnd", name: "biz.aQute.bnd", version: "3.2.0"
+		bnd group: "biz.aQute.bnd", name: "biz.aQute.bnd", version: "3.5.0"
 	}
 
 	repositories {
@@ -121,6 +121,12 @@ gradle.beforeProject {
 
 			if (ant.properties["app.server.type"] == "tomcat") {
 				task compileJSP(dependsOn: "compile-jsp")
+			}
+		}
+
+		pluginManager.withPlugin("com.liferay.node") {
+			node {
+				npmArgs "--no-package-lock"
 			}
 		}
 

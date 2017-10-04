@@ -35,6 +35,7 @@ import javax.ws.rs.core.HttpHeaders;
  *
  * @author Alejandro Hernández
  */
+@SuppressWarnings("unused")
 public interface ErrorMessageMapper {
 
 	/**
@@ -89,7 +90,7 @@ public interface ErrorMessageMapper {
 	 *
 	 * @param jsonObjectBuilder the json object builder for the apiError.
 	 * @param apiError the actual apiError.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onFinish(
 		JSONObjectBuilder jsonObjectBuilder, APIError apiError,
@@ -101,7 +102,7 @@ public interface ErrorMessageMapper {
 	 *
 	 * @param jsonObjectBuilder the json object builder for the apiError.
 	 * @param apiError the actual apiError.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onStart(
 		JSONObjectBuilder jsonObjectBuilder, APIError apiError,
@@ -113,7 +114,7 @@ public interface ErrorMessageMapper {
 	 * related to the current request.
 	 *
 	 * @param  apiError the actual apiError.
-	 * @param  httpHeaders the http headers of the current request.
+	 * @param  httpHeaders the HTTP headers of the current request.
 	 * @return <code>true</code> if mapper supports mapping this request;
 	 *         <code>false</code> otherwise.
 	 */
