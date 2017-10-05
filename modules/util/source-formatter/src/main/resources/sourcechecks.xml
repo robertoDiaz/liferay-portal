@@ -272,6 +272,8 @@
 		<check name="XMLFriendlyURLRoutesFileCheck" />
 		<check name="XMLFSBExcludeFileCheck" />
 		<check name="XMLHBMFileCheck" />
+		<check name="XMLIndentationCheck" />
+		<check name="XMLIvyFileCheck" />
 		<check name="XMLLog4jFileCheck" />
 		<check name="XMLLookAndFeelFileCheck" />
 		<check name="XMLModelHintsFileCheck" />

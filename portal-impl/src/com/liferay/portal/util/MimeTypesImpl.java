@@ -17,11 +17,14 @@ package com.liferay.portal.util;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
@@ -73,8 +76,16 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		URL url = org.apache.tika.mime.MimeTypes.class.getResource(
 			"tika-mimetypes.xml");
 
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		URL customMimeTypesUrl = classLoader.getResource(
+			"tika/custom-mimetypes.xml");
+
 		try {
 			read(url.openStream());
+			read(customMimeTypesUrl.openStream());
 		}
 		catch (Exception e) {
 			_log.error("Unable to populate extensions map", e);
@@ -118,16 +129,23 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		TikaInputStream tikaInputStream = null;
 
 		try {
-			tikaInputStream = TikaInputStream.get(
-				new CloseShieldInputStream(inputStream));
+			String extension = _getFileNameExtension(fileName);
 
-			Metadata metadata = new Metadata();
+			contentType = getExtensionContentType(extension);
 
-			metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+			if (contentType == ContentTypes.APPLICATION_OCTET_STREAM) {
+				tikaInputStream = TikaInputStream.get(
+					new CloseShieldInputStream(inputStream));
 
-			MediaType mediaType = _detector.detect(tikaInputStream, metadata);
+				Metadata metadata = new Metadata();
 
-			contentType = mediaType.toString();
+				metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+
+				MediaType mediaType = _detector.detect(
+					tikaInputStream, metadata);
+
+				contentType = mediaType.toString();
+			}
 
 			if (contentType.contains("tika")) {
 				if (_log.isDebugEnabled()) {
@@ -163,14 +181,22 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 			return ContentTypes.APPLICATION_OCTET_STREAM;
 		}
 
+		String contentType = null;
+
 		try {
-			Metadata metadata = new Metadata();
+			String extension = _getFileNameExtension(fileName);
 
-			metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+			contentType = getExtensionContentType(extension);
 
-			MediaType mediaType = _detector.detect(null, metadata);
+			if (contentType == ContentTypes.APPLICATION_OCTET_STREAM) {
+				Metadata metadata = new Metadata();
 
-			String contentType = mediaType.toString();
+				metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+
+				MediaType mediaType = _detector.detect(null, metadata);
+
+				contentType = mediaType.toString();
+			}
 
 			if (!contentType.contains("tika")) {
 				return contentType;
@@ -190,6 +216,14 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 	public String getExtensionContentType(String extension) {
 		if (Validator.isNull(extension)) {
 			return ContentTypes.APPLICATION_OCTET_STREAM;
+		}
+
+		for (Map.Entry<String, Set<String>> entry : _extensionsMap.entrySet()) {
+			Set<String> valueSet = entry.getValue();
+
+			if (valueSet.contains(".".concat(extension))) {
+				return entry.getKey();
+			}
 		}
 
 		return getContentType("A.".concat(extension));
@@ -294,6 +328,22 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 
 		for (String mimeType : mimeTypes) {
 			_extensionsMap.put(mimeType, extensions);
+		}
+	}
+
+	private String _getFileNameExtension(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+
+		int pos = fileName.lastIndexOf(CharPool.PERIOD);
+
+		if (pos > 0) {
+			return StringUtil.toLowerCase(
+				fileName.substring(pos + 1, fileName.length()));
+		}
+		else {
+			return StringPool.BLANK;
 		}
 	}
 

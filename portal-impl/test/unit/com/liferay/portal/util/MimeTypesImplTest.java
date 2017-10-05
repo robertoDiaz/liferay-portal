@@ -102,7 +102,7 @@ public class MimeTypesImplTest {
 
 	@Test
 	public void testPdf() throws Exception {
-		String validContentType = "application/pdf";
+		String validContentType = "application/x-pdf";
 
 		String contentTypeStream = getContentType("test.pdf", true);
 		String contentTypeName = getContentType("test.pdf", false);
@@ -119,7 +119,7 @@ public class MimeTypesImplTest {
 
 	@Test
 	public void testPpt() throws Exception {
-		String validContentType = "application/vnd.ms-powerpoint";
+		String validContentType = "application/mspowerpoint";
 
 		String contentTypeStream = getContentType("test.ppt", true);
 		String contentTypeName = getContentType("test.ppt", false);
@@ -188,7 +188,7 @@ public class MimeTypesImplTest {
 
 	@Test
 	public void testXml() throws Exception {
-		String validContentType = "application/xml";
+		String validContentType = "text/xml";
 
 		String contentTypeStream = getContentType("test.xml", true);
 		String contentTypeName = getContentType("test.xml", false);
