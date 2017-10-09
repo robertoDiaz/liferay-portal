@@ -43,6 +43,7 @@ import javax.ws.rs.core.HttpHeaders;
  * @author Jorge Ferrer
  */
 @ConsumerType
+@SuppressWarnings("unused")
 public interface SingleModelMessageMapper<T> {
 
 	/**
@@ -170,7 +171,7 @@ public interface SingleModelMessageMapper<T> {
 	 * @param jsonObjectBuilder the json object builder for the model.
 	 * @param model the actual model.
 	 * @param modelClass the model class of the model.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onFinish(
 		JSONObjectBuilder jsonObjectBuilder, T model, Class<T> modelClass,
@@ -183,7 +184,7 @@ public interface SingleModelMessageMapper<T> {
 	 * @param jsonObjectBuilder the json object builder for the model.
 	 * @param model the actual model.
 	 * @param modelClass the model class of the model.
-	 * @param httpHeaders the http headers of the current request.
+	 * @param httpHeaders the HTTP headers of the current request.
 	 */
 	public default void onStart(
 		JSONObjectBuilder jsonObjectBuilder, T model, Class<T> modelClass,
@@ -196,7 +197,7 @@ public interface SingleModelMessageMapper<T> {
 	 *
 	 * @param  model the actual model.
 	 * @param  modelClass the model class of the model.
-	 * @param  httpHeaders the http headers of the current request.
+	 * @param  httpHeaders the HTTP headers of the current request.
 	 * @return <code>true</code> if mapper supports mapping this request;
 	 *         <code>false</code> otherwise.
 	 */

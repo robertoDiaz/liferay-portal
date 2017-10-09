@@ -117,6 +117,7 @@
 		<check name="JavaStylingCheck" />
 		<check name="JavaSystemExceptionCheck" />
 		<check name="JavaTermDividersCheck" />
+		<check name="JavaTermMetadataLineBreakCheck" />
 		<check name="JavaTermOrderCheck" />
 		<check name="JavaTermStylingCheck" />
 		<check name="JavaWhitespaceCheck" />
@@ -272,6 +273,8 @@
 		<check name="XMLFriendlyURLRoutesFileCheck" />
 		<check name="XMLFSBExcludeFileCheck" />
 		<check name="XMLHBMFileCheck" />
+		<check name="XMLIndentationCheck" />
+		<check name="XMLIvyFileCheck" />
 		<check name="XMLLog4jFileCheck" />
 		<check name="XMLLookAndFeelFileCheck" />
 		<check name="XMLModelHintsFileCheck" />
