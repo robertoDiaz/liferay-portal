@@ -103,10 +103,9 @@ public class ImportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 
 			inputStream = uploadPortletRequest.getFileAsStream("file");
 
-			String contentType = uploadPortletRequest.getContentType("file");
-
 			_layoutService.addTempFileEntry(
-				groupId, folderName, sourceFileName, inputStream, contentType);
+				groupId, folderName, sourceFileName, inputStream,
+				ContentTypes.APPLICATION_ZIP);
 		}
 		catch (Exception e) {
 			UploadException uploadException =
