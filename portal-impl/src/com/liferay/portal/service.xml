@@ -469,6 +469,11 @@
 			<finder-column name="liveGroupId" />
 			<finder-column name="groupKey" />
 		</finder>
+		<finder db-index="false" name="C_T_S" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column comparator="LIKE" name="treePath" />
+			<finder-column name="site" />
+		</finder>
 		<finder db-index="false" name="G_C_C_P" return-type="Collection">
 			<finder-column comparator="&gt;" name="groupId" />
 			<finder-column name="companyId" />
@@ -2743,7 +2748,6 @@
 		<reference entity="AnnouncementsDelivery" package-path="com.liferay.portlet.announcements" />
 		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
 		<reference entity="DLFileEntry" package-path="com.liferay.portlet.documentlibrary" />
-		<reference entity="DLFileRank" package-path="com.liferay.portlet.documentlibrary" />
 		<reference entity="ExpandoRow" package-path="com.liferay.portlet.expando" />
 		<reference entity="MBBan" package-path="com.liferay.portlet.messageboards" />
 		<reference entity="MBMessage" package-path="com.liferay.portlet.messageboards" />

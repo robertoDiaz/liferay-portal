@@ -97,6 +97,8 @@ page import="java.util.List" %>
 <%
 AnnouncementsRequestHelper announcementsRequestHelper = new AnnouncementsRequestHelper(request);
 AnnouncementsDisplayContext announcementsDisplayContext = new DefaultAnnouncementsDisplayContext(announcementsRequestHelper);
+
+Group group = themeDisplay.getScopeGroup();
 %>
 
 <%@ include file="/init-ext.jsp" %>

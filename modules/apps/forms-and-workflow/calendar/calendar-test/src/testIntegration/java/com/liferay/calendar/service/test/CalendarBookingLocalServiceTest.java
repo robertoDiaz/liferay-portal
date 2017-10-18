@@ -27,6 +27,7 @@ import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
 import com.liferay.calendar.test.util.CalendarBookingTestUtil;
 import com.liferay.calendar.test.util.CalendarStagingTestUtil;
 import com.liferay.calendar.test.util.CalendarTestUtil;
+import com.liferay.calendar.test.util.CalendarWorkflowTestUtil;
 import com.liferay.calendar.test.util.CheckBookingsMessageListenerTestUtil;
 import com.liferay.calendar.test.util.RecurrenceTestUtil;
 import com.liferay.calendar.util.JCalendarUtil;
@@ -675,6 +676,41 @@ public class CalendarBookingLocalServiceTest {
 	}
 
 	@Test
+	public void testDeleteStagingCalendarBookingDeletesLiveCalendarBooking()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		CalendarBooking calendarBooking =
+			CalendarBookingTestUtil.addRegularCalendarBooking(stagingCalendar);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+
+		CalendarBookingLocalServiceUtil.deleteCalendarBooking(calendarBooking);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 0);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar, 0);
+
+		assertCalendarBookingsCount(stagingCalendar, 0);
+	}
+
+	@Test
 	public void testGetRecurringCalendarBookings() throws Exception {
 		ServiceContext serviceContext = createServiceContext();
 
@@ -956,7 +992,7 @@ public class CalendarBookingLocalServiceTest {
 	}
 
 	@Test
-	public void testInviteStagingCalendarCreatesPendingLiveCalendarBookingAfterPublish()
+	public void testInviteStagingCalendarShouldNotCreatesPendingLiveCalendarBookingAfterPublish()
 		throws Exception {
 
 		_liveGroup = GroupTestUtil.addGroup();
@@ -984,16 +1020,9 @@ public class CalendarBookingLocalServiceTest {
 
 		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
 
-		assertCalendarBookingsCount(liveCalendar, 1);
+		assertCalendarBookingsCount(liveCalendar, 0);
 
 		assertCalendarBookingsCount(stagingCalendar, 1);
-
-		CalendarBooking liveChildCalendarBooking =
-			CalendarBookingLocalServiceUtil.fetchCalendarBooking(
-				childCalendarBooking.getUuid(), _liveGroup.getGroupId());
-
-		assertStatus(
-			liveChildCalendarBooking, WorkflowConstants.STATUS_PENDING);
 	}
 
 	@Test
@@ -1136,6 +1165,113 @@ public class CalendarBookingLocalServiceTest {
 	}
 
 	@Test
+	public void testInviteUserCalendarWithWorkflowShouldInviteCalendarBookingOnlyAfterApprovedAndPublished()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		CalendarWorkflowTestUtil.activateWorkflow(_liveGroup);
+
+		Calendar invitedCalendar = CalendarTestUtil.addCalendar(_user);
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		CalendarBooking childCalendarBooking =
+			CalendarBookingTestUtil.addChildCalendarBooking(
+				stagingCalendar, invitedCalendar);
+
+		assertStatus(
+			childCalendarBooking,
+			CalendarBookingWorkflowConstants.STATUS_MASTER_PENDING);
+
+		CalendarBooking calendarBooking =
+			childCalendarBooking.getParentCalendarBooking();
+
+		assertStatus(
+			calendarBooking, CalendarBookingWorkflowConstants.STATUS_PENDING);
+
+		CalendarWorkflowTestUtil.completeWorkflow(_liveGroup);
+
+		childCalendarBooking =
+			CalendarBookingLocalServiceUtil.fetchCalendarBooking(
+				childCalendarBooking.getCalendarBookingId());
+
+		assertStatus(
+			childCalendarBooking,
+			CalendarBookingWorkflowConstants.STATUS_MASTER_STAGING);
+
+		calendarBooking = childCalendarBooking.getParentCalendarBooking();
+
+		assertStatus(
+			calendarBooking, CalendarBookingWorkflowConstants.STATUS_APPROVED);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		List<CalendarBooking> childCalendarBookings =
+			CalendarBookingLocalServiceUtil.getCalendarBookings(
+				invitedCalendar.getCalendarId(),
+				new int[] {CalendarBookingWorkflowConstants.STATUS_PENDING});
+
+		Assert.assertEquals(
+			childCalendarBookings.toString(), 1, childCalendarBookings.size());
+	}
+
+	@Test
+	public void testInviteUserCalendarWithWorkflowShouldNotCreatesCalendarBookingAfterPublish()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		CalendarWorkflowTestUtil.activateWorkflow(_liveGroup);
+
+		Calendar invitedCalendar = CalendarTestUtil.addCalendar(_user);
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		Assert.assertNotNull(stagingCalendar);
+
+		CalendarBooking childCalendarBooking =
+			CalendarBookingTestUtil.addChildCalendarBooking(
+				stagingCalendar, invitedCalendar);
+
+		assertCalendar(childCalendarBooking, invitedCalendar);
+
+		assertCalendarBookingsCount(liveCalendar, 0);
+
+		assertCalendarBookingsCount(invitedCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar, 0);
+
+		CalendarBooking calendarBooking =
+			childCalendarBooking.getParentCalendarBooking();
+
+		assertStatus(
+			calendarBooking, CalendarBookingWorkflowConstants.STATUS_PENDING);
+
+		childCalendarBooking =
+			CalendarBookingLocalServiceUtil.fetchCalendarBooking(
+				childCalendarBooking.getCalendarBookingId());
+
+		assertStatus(
+			childCalendarBooking,
+			CalendarBookingWorkflowConstants.STATUS_MASTER_PENDING);
+	}
+
+	@Test
 	public void testInviteUserResourceCalendar() throws Exception {
 		ServiceContext serviceContext = createServiceContext();
 
@@ -1152,6 +1288,172 @@ public class CalendarBookingLocalServiceTest {
 				invitingCalendar, resourceCalendar);
 
 		assertCalendar(childCalendarBooking, resourceCalendar);
+	}
+
+	@Test
+	public void testMoveStagingCalendarBookingToOtherSiteAndBack()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		CalendarBooking calendarBooking =
+			CalendarBookingTestUtil.addRegularCalendarBooking(stagingCalendar);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+
+		_group = GroupTestUtil.addGroup();
+
+		Calendar externalCalendar = CalendarTestUtil.addCalendar(_group);
+
+		CalendarBookingLocalServiceUtil.updateCalendarBooking(
+			calendarBooking.getUserId(), calendarBooking.getCalendarBookingId(),
+			externalCalendar.getCalendarId(), calendarBooking.getTitleMap(),
+			calendarBooking.getDescriptionMap(), calendarBooking.getLocation(),
+			calendarBooking.getStartTime(), calendarBooking.getEndTime(),
+			calendarBooking.isAllDay(), calendarBooking.getRecurrence(),
+			calendarBooking.getFirstReminder(),
+			calendarBooking.getFirstReminderType(),
+			calendarBooking.getSecondReminder(),
+			calendarBooking.getSecondReminderType(), createServiceContext());
+
+		CalendarBookingLocalServiceUtil.updateCalendarBooking(
+			calendarBooking.getUserId(), calendarBooking.getCalendarBookingId(),
+			stagingCalendar.getCalendarId(), calendarBooking.getTitleMap(),
+			calendarBooking.getDescriptionMap(), calendarBooking.getLocation(),
+			calendarBooking.getStartTime(), calendarBooking.getEndTime(),
+			calendarBooking.isAllDay(), calendarBooking.getRecurrence(),
+			calendarBooking.getFirstReminder(),
+			calendarBooking.getFirstReminderType(),
+			calendarBooking.getSecondReminder(),
+			calendarBooking.getSecondReminderType(), createServiceContext());
+
+		assertCalendarBookingsCount(externalCalendar, 0);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(externalCalendar, 0);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+	}
+
+	@Test
+	public void testMoveStagingCalendarBookingToOtherSiteDeletesLiveCalendarBooking()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		CalendarBooking calendarBooking =
+			CalendarBookingTestUtil.addRegularCalendarBooking(stagingCalendar);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 1);
+
+		_group = GroupTestUtil.addGroup();
+
+		Calendar externalCalendar = CalendarTestUtil.addCalendar(_group);
+
+		CalendarBookingLocalServiceUtil.updateCalendarBooking(
+			calendarBooking.getUserId(), calendarBooking.getCalendarBookingId(),
+			externalCalendar.getCalendarId(), calendarBooking.getTitleMap(),
+			calendarBooking.getDescriptionMap(), calendarBooking.getLocation(),
+			calendarBooking.getStartTime(), calendarBooking.getEndTime(),
+			calendarBooking.isAllDay(), calendarBooking.getRecurrence(),
+			calendarBooking.getFirstReminder(),
+			calendarBooking.getFirstReminderType(),
+			calendarBooking.getSecondReminder(),
+			calendarBooking.getSecondReminderType(), createServiceContext());
+
+		assertCalendarBookingsCount(externalCalendar, 1);
+
+		assertCalendarBookingsCount(liveCalendar, 1);
+
+		assertCalendarBookingsCount(stagingCalendar, 0);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(externalCalendar, 1);
+
+		assertCalendarBookingsCount(liveCalendar, 0);
+
+		assertCalendarBookingsCount(stagingCalendar, 0);
+	}
+
+	@Test
+	public void testMoveStagingCalendarBookingToSameSitePreservesLiveCalendarBooking()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		Calendar liveCalendar1 = CalendarTestUtil.getDefaultCalendar(
+			_liveGroup);
+		Calendar liveCalendar2 = CalendarTestUtil.addCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar1 = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar1);
+		Calendar stagingCalendar2 = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar2);
+
+		CalendarBooking calendarBooking =
+			CalendarBookingTestUtil.addRegularCalendarBooking(stagingCalendar1);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar1, 1);
+		assertCalendarBookingsCount(liveCalendar2, 0);
+		assertCalendarBookingsCount(stagingCalendar1, 1);
+		assertCalendarBookingsCount(stagingCalendar2, 0);
+
+		CalendarBookingLocalServiceUtil.updateCalendarBooking(
+			calendarBooking.getUserId(), calendarBooking.getCalendarBookingId(),
+			stagingCalendar2.getCalendarId(), calendarBooking.getTitleMap(),
+			calendarBooking.getDescriptionMap(), calendarBooking.getLocation(),
+			calendarBooking.getStartTime(), calendarBooking.getEndTime(),
+			calendarBooking.isAllDay(), calendarBooking.getRecurrence(),
+			calendarBooking.getFirstReminder(),
+			calendarBooking.getFirstReminderType(),
+			calendarBooking.getSecondReminder(),
+			calendarBooking.getSecondReminderType(), createServiceContext());
+
+		assertCalendarBookingsCount(liveCalendar1, 1);
+		assertCalendarBookingsCount(liveCalendar2, 0);
+		assertCalendarBookingsCount(stagingCalendar1, 0);
+		assertCalendarBookingsCount(stagingCalendar2, 1);
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		assertCalendarBookingsCount(liveCalendar1, 0);
+		assertCalendarBookingsCount(liveCalendar2, 1);
+		assertCalendarBookingsCount(stagingCalendar1, 0);
+		assertCalendarBookingsCount(stagingCalendar2, 1);
 	}
 
 	@Test
@@ -1405,6 +1707,68 @@ public class CalendarBookingLocalServiceTest {
 		assertStatus(calendarBooking, WorkflowConstants.STATUS_DRAFT);
 	}
 
+	@Test
+	public void testStagingCalendarResourceShouldNotBeInviteToLiveCalendarBookingAfterPublish()
+		throws Exception {
+
+		_liveGroup = GroupTestUtil.addGroup();
+
+		Calendar liveCalendar = CalendarTestUtil.getDefaultCalendar(_liveGroup);
+
+		CalendarStagingTestUtil.enableLocalStaging(_liveGroup, true);
+
+		Calendar stagingCalendar = CalendarStagingTestUtil.getStagingCalendar(
+			_liveGroup, liveCalendar);
+
+		Assert.assertNotNull(stagingCalendar);
+
+		CalendarBooking stagingCalendarBooking =
+			CalendarBookingTestUtil.addRegularCalendarBooking(stagingCalendar);
+
+		Group stagingGroup = _liveGroup.getStagingGroup();
+
+		CalendarTestUtil.addCalendarResourceCalendar(stagingGroup);
+
+		CalendarTestUtil.addCalendarResourceCalendar(stagingGroup);
+
+		List<CalendarBooking> liveCalendarBookings =
+			CalendarBookingLocalServiceUtil.getCalendarBookings(
+				liveCalendar.getCalendarId());
+
+		Assert.assertEquals(
+			liveCalendarBookings.toString(), 0, liveCalendarBookings.size());
+
+		List<CalendarBooking> childCalendarBookings =
+			stagingCalendarBooking.getChildCalendarBookings();
+
+		Assert.assertEquals(
+			childCalendarBookings.toString(), 1, childCalendarBookings.size());
+
+		CalendarStagingTestUtil.publishLayouts(_liveGroup, true);
+
+		liveCalendarBookings =
+			CalendarBookingLocalServiceUtil.getCalendarBookings(
+				liveCalendar.getCalendarId());
+
+		Assert.assertEquals(
+			liveCalendarBookings.toString(), 1, liveCalendarBookings.size());
+
+		CalendarBooking liveCalendarBooking = liveCalendarBookings.get(0);
+
+		List<CalendarBooking> liveChildCalendarBookings =
+			liveCalendarBooking.getChildCalendarBookings();
+
+		Assert.assertEquals(
+			liveChildCalendarBookings.toString(), 1,
+			liveChildCalendarBookings.size());
+
+		childCalendarBookings =
+			stagingCalendarBooking.getChildCalendarBookings();
+
+		Assert.assertEquals(
+			childCalendarBookings.toString(), 1, childCalendarBookings.size());
+	}
+
 	@Test(expected = CalendarBookingRecurrenceException.class)
 	public void testStartDateBeforeUntilDateThrowsRecurrenceException()
 		throws Exception {
@@ -1475,16 +1839,8 @@ public class CalendarBookingLocalServiceTest {
 		Assert.assertEquals(
 			laterCalendarBookings.toString(), 2, laterCalendarBookings.size());
 
-		for (CalendarBooking earlierCalendarBooking : earlierCalendarBookings) {
-			Assert.assertEquals(
-				earlierDescriptionMap,
-				earlierCalendarBooking.getDescriptionMap());
-		}
-
-		for (CalendarBooking laterCalendarBooking : laterCalendarBookings) {
-			Assert.assertEquals(
-				laterDescriptionMap, laterCalendarBooking.getDescriptionMap());
-		}
+		assertDescriptions(earlierCalendarBookings, earlierDescriptionMap);
+		assertDescriptions(laterCalendarBookings, laterDescriptionMap);
 	}
 
 	@Test
@@ -1715,6 +2071,37 @@ public class CalendarBookingLocalServiceTest {
 		Assert.assertEquals(
 			expectedJCalendar.get(java.util.Calendar.HOUR_OF_DAY),
 			startTimeJCalendar.get(java.util.Calendar.HOUR_OF_DAY) + 2);
+	}
+
+	@Test
+	public void testUpdateAllFollowingWithInvitations() throws Exception {
+		ServiceContext serviceContext = createServiceContext();
+
+		Calendar invitedCalendar = CalendarTestUtil.addCalendar(_user);
+
+		_invitingUser = UserTestUtil.addUser();
+
+		Calendar invitingCalendar = CalendarTestUtil.addCalendar(_invitingUser);
+
+		CalendarBooking calendarBooking =
+			CalendarBookingTestUtil.addMasterRecurringCalendarBooking(
+				invitedCalendar, invitingCalendar);
+
+		Map<Locale, String> laterDescriptionMap =
+			RandomTestUtil.randomLocaleStringMap();
+
+		CalendarBookingLocalServiceUtil.updateCalendarBookingInstance(
+			_user.getUserId(), calendarBooking.getCalendarBookingId(), 0,
+			calendarBooking.getCalendarId(), calendarBooking.getTitleMap(),
+			laterDescriptionMap, calendarBooking.getLocation(),
+			calendarBooking.getStartTime(), calendarBooking.getEndTime(), false,
+			null, true, 0, null, 0, null, serviceContext);
+
+		assertCalendarBookingsCount(invitedCalendar, 1);
+		assertCalendarBookingsCount(invitingCalendar, 1);
+
+		assertDescriptions(
+			calendarBooking.getChildCalendarBookings(), laterDescriptionMap);
 	}
 
 	@Test
@@ -2420,6 +2807,16 @@ public class CalendarBookingLocalServiceTest {
 
 		Assert.assertEquals(
 			calendarBookings.toString(), count, calendarBookings.size());
+	}
+
+	protected void assertDescriptions(
+		List<CalendarBooking> calendarBookings,
+		Map<Locale, String> descriptionMap) {
+
+		for (CalendarBooking calendarBooking : calendarBookings) {
+			Assert.assertEquals(
+				descriptionMap, calendarBooking.getDescriptionMap());
+		}
 	}
 
 	protected void assertDoesNotRepeat(CalendarBooking calendarBooking) {

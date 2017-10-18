@@ -110,6 +110,10 @@ if (portletTitleBasedNavigation) {
 							classNameId = GetterUtil.getLong(distributionScopeArray[0]);
 							classPK = GetterUtil.getLong(distributionScopeArray[1]);
 						}
+						else if (!group.isUser()) {
+							classNameId = PortalUtil.getClassNameId(Group.class);
+							classPK = themeDisplay.getScopeGroupId();
+						}
 
 						boolean submitOnChange = false;
 						%>

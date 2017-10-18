@@ -241,7 +241,9 @@
 			</then>
 		</if>
 
-		<execute macro="ProductMenu#gotoSitesPublishing">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Publishing" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Export" />
 		</execute>
 	</command>
@@ -256,13 +258,15 @@
 			</then>
 		</if>
 
-		<execute macro="ProductMenu#gotoSitesPublishing">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Publishing" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Import" />
 		</execute>
 	</command>
 
 	<command name="_importSite">
-		<execute function="Pause" locator1="5000" />
+		<execute function="Pause" locator1="12000" />
 
 		<execute function="Click" locator1="Button#CONTINUE" />
 
@@ -376,9 +380,7 @@
 				<if>
 					<equals arg1="${mirrorWithOverwriting}" arg2="true" />
 					<then>
-						<execute function="ScrollWebElementIntoView" locator1="Panel#PANEL_TITLE">
-							<var name="key_componentName" value="Update Data" />
-						</execute>
+						<execute function="ScrollWebElementIntoView" locator1="//div[contains(@class,'panel') and contains(@role,'tablist')]//a[normalize-space(text())='Update Data']" />
 
 						<execute macro="Panel#expandPanel">
 							<var name="panelHeading" value="Update Data" />
@@ -414,7 +416,15 @@
 
 		<execute function="Pause" locator1="13000" />
 
-		<execute function="SikuliUploadTempFile" locator1="OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG" value1="${larFileName}" />
+		<if>
+			<equals arg1="${uploadFrom}" arg2="dependencies" />
+			<then>
+				<execute function="SikuliUploadCommonFile" locator1="OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG" value1="${larFileName}" />
+			</then>
+			<else>
+				<execute function="SikuliUploadTempFile" locator1="OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG" value1="${larFileName}" />
+			</else>
+		</if>
 
 		<execute function="Pause" locator1="190000" />
 
@@ -672,6 +682,7 @@
 			<var name="importCampaignValidationError" value="${importCampaignValidationError}" />
 			<var name="importValidationMissingItem" value="${importValidationMissingItem}" />
 			<var name="larFileName" value="${larFileName}" />
+			<var name="uploadFrom" value="${uploadFrom}" />
 		</execute>
 
 		<if>
@@ -759,7 +770,9 @@
 			</else>
 		</if>
 
-		<execute macro="ProductMenu#gotoSitesConfiguration">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Audience Targeting" />
 		</execute>
 
@@ -790,7 +803,9 @@
 			</else>
 		</if>
 
-		<execute macro="ProductMenu#gotoSitesConfiguration">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Audience Targeting" />
 		</execute>
 
@@ -824,7 +839,9 @@
 			</else>
 		</if>
 
-		<execute macro="ProductMenu#gotoSitesContent">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Web Content" />
 		</execute>
 

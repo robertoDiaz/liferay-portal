@@ -38,10 +38,10 @@ boolean hasDistributionScope = false;
 			<%
 			hasDistributionScope = true;
 
-			for (Group group : groups) {
+			for (Group curGroup : groups) {
 			%>
 
-				<aui:option label="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>" localizeLabel="<%= false %>" selected="<%= classPK == group.getGroupId() %>" value="<%= PortalUtil.getClassNameId(Group.class) + StringPool.COMMA + group.getGroupId() %>" />
+				<aui:option label="<%= HtmlUtil.escape(curGroup.getDescriptiveName(locale)) %>" localizeLabel="<%= false %>" selected="<%= classPK == curGroup.getGroupId() %>" value="<%= PortalUtil.getClassNameId(Group.class) + StringPool.COMMA + curGroup.getGroupId() %>" />
 
 			<%
 			}

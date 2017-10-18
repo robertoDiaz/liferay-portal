@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -32,7 +31,7 @@ import java.util.Set;
 /**
  * @author Hugo Huijser
  */
-public class IndentationCheck extends AbstractCheck {
+public class IndentationCheck extends BaseCheck {
 
 	@Override
 	public int[] getDefaultTokens() {
@@ -79,7 +78,7 @@ public class IndentationCheck extends AbstractCheck {
 	}
 
 	@Override
-	public void visitToken(DetailAST detailAST) {
+	protected void doVisitToken(DetailAST detailAST) {
 
 		// Only check types at the beginning of the line. We can skip if/while
 		// statements since we have logic in BaseSourceProcessor in place to
@@ -398,7 +397,9 @@ public class IndentationCheck extends AbstractCheck {
 
 	private int _adjustTabCountForChains(int tabCount, DetailAST detailAST) {
 		boolean checkChaining = false;
+		DetailAST firstElistParent = null;
 		int methodCallLineCount = -1;
+		boolean outsideMethodCall = false;
 
 		DetailAST parentAST = detailAST;
 
@@ -407,6 +408,31 @@ public class IndentationCheck extends AbstractCheck {
 				(parentAST.getType() == TokenTypes.LABELED_STAT) ||
 				(parentAST.getType() == TokenTypes.OBJBLOCK) ||
 				(parentAST.getType() == TokenTypes.SLIST)) {
+
+				return tabCount;
+			}
+
+			if (firstElistParent == null) {
+				if (parentAST.getType() == TokenTypes.ELIST) {
+					firstElistParent = parentAST;
+				}
+				else if (parentAST.getType() == TokenTypes.RPAREN) {
+					DetailAST previousSibling = parentAST.getPreviousSibling();
+
+					if ((previousSibling != null) &&
+						(previousSibling.getType() == TokenTypes.ELIST)) {
+
+						firstElistParent = previousSibling;
+					}
+				}
+			}
+			else if (parentAST.getType() == TokenTypes.LAMBDA) {
+				firstElistParent = null;
+				outsideMethodCall = false;
+			}
+
+			if (outsideMethodCall &&
+				(parentAST.getType() == TokenTypes.ELIST)) {
 
 				return tabCount;
 			}
@@ -437,6 +463,10 @@ public class IndentationCheck extends AbstractCheck {
 
 					checkChaining = true;
 					methodCallLineCount = parentAST.getLineNo();
+				}
+
+				if (firstElistParent != null) {
+					outsideMethodCall = true;
 				}
 			}
 
