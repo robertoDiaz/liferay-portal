@@ -17,13 +17,14 @@ package com.liferay.portal.kernel.process.local;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncPrintWriter;
-import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.log.ProcessOutputStream;
 import com.liferay.portal.kernel.util.ClassLoaderObjectInputStream;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,8 +33,13 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.net.URLClassLoader;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -100,7 +106,7 @@ public class LocalProcessLauncher {
 			String classPath = (String)bootstrapObjectInputStream.readObject();
 
 			ClassLoader classLoader = new URLClassLoader(
-				ClassPathUtil.getClassPathURLs(classPath));
+				_getClassPathURLs(classPath));
 
 			currentThread.setContextClassLoader(classLoader);
 
@@ -158,7 +164,7 @@ public class LocalProcessLauncher {
 			HeartbeatThread heartbeatThread = new HeartbeatThread(
 				message, interval, shutdownHook);
 
-			boolean value = _heartbeatThreadReference.compareAndSet(
+			boolean value = _heartbeatThreadAtomicReference.compareAndSet(
 				null, heartbeatThread);
 
 			if (value) {
@@ -170,7 +176,7 @@ public class LocalProcessLauncher {
 
 		public static void detach() throws InterruptedException {
 			HeartbeatThread heartbeatThread =
-				_heartbeatThreadReference.getAndSet(null);
+				_heartbeatThreadAtomicReference.getAndSet(null);
 
 			if (heartbeatThread != null) {
 				heartbeatThread.detach();
@@ -187,9 +193,10 @@ public class LocalProcessLauncher {
 		}
 
 		public static boolean isAttached() {
-			HeartbeatThread attachThread = _heartbeatThreadReference.get();
+			HeartbeatThread heartbeatThread =
+				_heartbeatThreadAtomicReference.get();
 
-			if (attachThread != null) {
+			if (heartbeatThread != null) {
 				return true;
 			}
 			else {
@@ -209,7 +216,7 @@ public class LocalProcessLauncher {
 		private static final ConcurrentMap<String, Object> _attributes =
 			new ConcurrentHashMap<>();
 		private static final AtomicReference<HeartbeatThread>
-			_heartbeatThreadReference = new AtomicReference<>();
+			_heartbeatThreadAtomicReference = new AtomicReference<>();
 		private static ProcessOutputStream _processOutputStream;
 
 	}
@@ -224,6 +231,24 @@ public class LocalProcessLauncher {
 
 		public boolean shutdown(int shutdownCode, Throwable shutdownThrowable);
 
+	}
+
+	private static URL[] _getClassPathURLs(String classPath)
+		throws MalformedURLException {
+
+		Set<URL> urls = new LinkedHashSet<>();
+
+		String[] paths = StringUtil.split(classPath, File.pathSeparatorChar);
+
+		for (String path : paths) {
+			File file = new File(path);
+
+			URI uri = file.toURI();
+
+			urls.add(uri.toURL());
+		}
+
+		return urls.toArray(new URL[urls.size()]);
 	}
 
 	private static class HeartbeatThread extends Thread {
@@ -291,6 +316,11 @@ public class LocalProcessLauncher {
 						shutdownCode, shutdownThrowable);
 				}
 			}
+
+			AtomicReference<HeartbeatThread> heartBeatThreadReference =
+				ProcessContext._heartbeatThreadAtomicReference;
+
+			heartBeatThreadReference.compareAndSet(this, null);
 		}
 
 		private volatile boolean _detach;

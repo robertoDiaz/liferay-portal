@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -567,6 +568,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 		boolean hasManageLayoutsPermission = GroupPermissionUtil.contains(
 			themeDisplay.getPermissionChecker(), groupId,
 			ActionKeys.MANAGE_LAYOUTS);
+		boolean mobile = BrowserSnifferUtil.isMobile(request);
 
 		for (LayoutTreeNode layoutTreeNode : layoutTreeNodes) {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
@@ -584,6 +586,8 @@ public class LayoutsTreeImpl implements LayoutsTree {
 				"deleteable",
 				_isDeleteable(layout, themeDisplay, layoutSetBranch));
 			jsonObject.put("friendlyURL", layout.getFriendlyURL());
+			jsonObject.put(
+				"fullURL", _portal.getLayoutURL(layout, themeDisplay));
 
 			if (layout instanceof VirtualLayout) {
 				VirtualLayout virtualLayout = (VirtualLayout)layout;
@@ -609,7 +613,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			jsonObject.put("regularURL", layout.getRegularURL(request));
 			jsonObject.put(
 				"sortable",
-				hasManageLayoutsPermission &&
+				hasManageLayoutsPermission && !mobile &&
 				SitesUtil.isLayoutSortable(layout));
 			jsonObject.put("type", layout.getType());
 			jsonObject.put(
