@@ -52,6 +52,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,11 +67,16 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Future;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 import net.jmge.gif.Gif89Encoder;
 
@@ -310,6 +316,59 @@ public class ImageToolImpl implements ImageTool {
 		return bufferedImage.getSubimage(
 			croppedRectangle.x, croppedRectangle.y, croppedRectangle.width,
 			croppedRectangle.height);
+	}
+
+	@Override
+	public byte[] cropGif(
+		byte[] imageData, int height, int width, int x, int y) {
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+		try {
+			ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+
+			ImageInputStream imageInputStream = ImageIO.createImageInputStream(
+				new ByteArrayInputStream(imageData));
+
+			ImageReader imageReader = (ImageReader)
+				ImageIO.getImageReadersByFormatName(ImageTool.TYPE_GIF).next();
+
+			ImageWriter imageWriter = (ImageWriter)
+				ImageIO.getImageWritersByFormatName(ImageTool.TYPE_GIF).next();
+
+			imageReader.setInput(imageInputStream, false);
+
+			imageWriter.setOutput(ios);
+			imageWriter.prepareWriteSequence(null);
+
+			IIOMetadata imageMetaData = imageReader.getImageMetadata(0);
+			int numberOfFrames = imageReader.getNumImages(true);
+			BufferedImage master = null;
+
+			for (int i = 0; i < numberOfFrames; i++) {
+				BufferedImage image = imageReader.read(i);
+
+				master = new BufferedImage(
+					width, height, BufferedImage.TYPE_INT_ARGB);
+
+				master.getGraphics().drawImage(image, x, y, null);
+
+				IIOImage iioImage = new IIOImage(master, null, imageMetaData);
+
+				imageWriter.writeToSequence(iioImage, null);
+			}
+
+			int delay = _getDelay(imageMetaData);
+
+			imageWriter.endWriteSequence();
+
+			ios.close();
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+
+		return os.toByteArray();
 	}
 
 	@Override
@@ -926,6 +985,37 @@ public class ImageToolImpl implements ImageTool {
 		ImageIO.setUseCache(PropsValues.IMAGE_IO_USE_DISK_CACHE);
 
 		orderImageReaderSpis();
+	}
+
+	private int _getDelay(IIOMetadata imageMetaData) throws IOException {
+		String metaFormatName = imageMetaData.getNativeMetadataFormatName();
+
+		IIOMetadataNode root = (IIOMetadataNode)imageMetaData.getAsTree(
+			metaFormatName);
+
+		IIOMetadataNode graphicsControlExtensionNode = null;
+
+		int numberOfNodes = root.getLength();
+
+		for (int i = 0; i < numberOfNodes; i++) {
+			IIOMetadataNode node = (IIOMetadataNode)root.item(i);
+
+			String nodeName = node.getNodeName();
+
+			if (nodeName.compareToIgnoreCase("GraphicControlExtension") == 0) {
+				graphicsControlExtensionNode = (IIOMetadataNode)root.item(i);
+			}
+		}
+
+		if (graphicsControlExtensionNode == null) {
+			IIOMetadataNode node = new IIOMetadataNode(
+				"GraphicControlExtension");
+
+			root.appendChild(node);
+		}
+
+		return Integer.parseInt(
+			graphicsControlExtensionNode.getAttribute("delayTime"));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(ImageToolImpl.class);

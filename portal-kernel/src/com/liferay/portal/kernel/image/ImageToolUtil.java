@@ -78,6 +78,12 @@ public class ImageToolUtil {
 		return getImageTool().crop(renderedImage, height, width, x, y);
 	}
 
+	public static byte[] cropGif(
+		byte[] imageData, int height, int width, int x, int y) {
+
+		return getImageTool().cropGif(imageData, height, width, x, y);
+	}
+
 	/**
 	 * Encodes the image using the GIF format.
 	 *

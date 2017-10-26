@@ -73,6 +73,9 @@ public interface ImageTool {
 	public RenderedImage crop(
 		RenderedImage renderedImage, int height, int width, int x, int y);
 
+	public byte[] cropGif(
+		byte[] imageData, int height, int width, int x, int y);
+
 	public void encodeGIF(RenderedImage renderedImage, OutputStream os)
 		throws IOException;
 

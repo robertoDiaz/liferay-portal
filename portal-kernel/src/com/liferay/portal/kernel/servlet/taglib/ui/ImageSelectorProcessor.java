@@ -17,9 +17,12 @@ package com.liferay.portal.kernel.servlet.taglib.ui;
 import com.liferay.portal.kernel.exception.ImageResolutionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageTool;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.awt.image.RenderedImage;
 
@@ -49,6 +52,21 @@ public class ImageSelectorProcessor {
 
 			RenderedImage renderedImage = imageBag.getRenderedImage();
 
+			try {
+				if (imageBag.getType().equals(ImageTool.TYPE_GIF)) {
+					return ImageToolUtil.cropGif(_bytes, height, width, x, y);
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException aioobe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to read the uploaded GIF image");
+				}
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(aioobe);
+				}
+			}
+
 			renderedImage = ImageToolUtil.crop(
 				renderedImage, height, width, x, y);
 
@@ -69,6 +87,9 @@ public class ImageSelectorProcessor {
 
 		return ImageToolUtil.getBytes(renderedImage, imageBag.getType());
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ImageSelectorProcessor.class);
 
 	private final byte[] _bytes;
 
