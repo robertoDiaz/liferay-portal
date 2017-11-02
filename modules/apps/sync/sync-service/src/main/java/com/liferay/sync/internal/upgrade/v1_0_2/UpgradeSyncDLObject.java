@@ -15,7 +15,7 @@
 package com.liferay.sync.internal.upgrade.v1_0_2;
 
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
-import com.liferay.document.library.kernel.service.DLSyncEventLocalService;
+import com.liferay.document.library.sync.service.DLSyncEventLocalService;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -244,9 +244,10 @@ public class UpgradeSyncDLObject extends UpgradeProcess {
 			PreparedStatement ps2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,
-					"update SyncDLObject set lockExpirationDate = ?, " +
-						"lockUserId = ?, lockUserName = ? where typePK = ? " +
-							"and repositoryId = " + groupId);
+					StringBundler.concat(
+						"update SyncDLObject set lockExpirationDate = ?, ",
+						"lockUserId = ?, lockUserName = ? where typePK = ? ",
+						"and repositoryId = ", String.valueOf(groupId)));
 			ResultSet rs = ps1.executeQuery()) {
 
 			while (rs.next()) {

@@ -99,9 +99,12 @@ import javax.portlet.PortletURL;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Brian Wing Shun Chan
- * @author Jorge Ferrer
+ * @author     Brian Wing Shun Chan
+ * @author     Jorge Ferrer
+ * @deprecated As of 1.2.0, replaced by {@link
+ *             com.liferay.asset.util.AssetHelper}
  */
+@Deprecated
 public class AssetUtil {
 
 	public static final int ASSET_ENTRY_ABSTRACT_LENGTH = 200;
@@ -750,8 +753,9 @@ public class AssetUtil {
 				if (c == invalidChar) {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
-							"Word " + word + " is not valid because " + c +
-								" is not allowed");
+							StringBundler.concat(
+								"Word ", word, " is not valid because ",
+								String.valueOf(c), " is not allowed"));
 					}
 
 					return false;
