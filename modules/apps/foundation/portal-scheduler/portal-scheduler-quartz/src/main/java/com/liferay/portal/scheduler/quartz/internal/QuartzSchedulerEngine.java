@@ -14,6 +14,7 @@
 
 package com.liferay.portal.scheduler.quartz.internal;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
@@ -31,12 +32,12 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.service.PortletLocalService;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.scheduler.JobStateSerializeUtil;
 import com.liferay.portal.scheduler.quartz.QuartzTrigger;
@@ -57,6 +58,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
+import org.quartz.Calendar;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -66,9 +68,11 @@ import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.jdbcjobstore.UpdateLockRowSemaphore;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.spi.OperableTrigger;
 
 /**
  * @author Michael C. Han
@@ -125,8 +129,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to delete job {jobName=" + jobName + ", groupName=" +
-					groupName + "}",
+				StringBundler.concat(
+					"Unable to delete job {jobName=", jobName, ", groupName=",
+					groupName, "}"),
 				e);
 		}
 	}
@@ -161,8 +166,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to get job {jobName=" + jobName + ", groupName=" +
-					groupName + "}",
+				StringBundler.concat(
+					"Unable to get job {jobName=", jobName, ", groupName=",
+					groupName, "}"),
 				e);
 		}
 	}
@@ -279,8 +285,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to pause job {jobName=" + jobName + ", groupName=" +
-					groupName + "}",
+				StringBundler.concat(
+					"Unable to pause job {jobName=", jobName, ", groupName=",
+					groupName, "}"),
 				e);
 		}
 	}
@@ -330,8 +337,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to resume job {jobName=" + jobName + ", groupName=" +
-					groupName + "}",
+				StringBundler.concat(
+					"Unable to resume job {jobName=", jobName, ", groupName=",
+					groupName, "}"),
 				e);
 		}
 	}
@@ -439,8 +447,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to suppress error for job {jobName=" + jobName +
-					", groupName=" + groupName + "}",
+				StringBundler.concat(
+					"Unable to suppress error for job {jobName=", jobName,
+					", groupName=", groupName, "}"),
 				e);
 		}
 	}
@@ -486,8 +495,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 		catch (Exception e) {
 			throw new SchedulerException(
-				"Unable to unschedule job {jobName=" + jobName +
-					", groupName=" + groupName + "}",
+				StringBundler.concat(
+					"Unable to unschedule job {jobName=", jobName,
+					", groupName=", groupName, "}"),
 				e);
 		}
 	}
@@ -506,6 +516,43 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		catch (Exception e) {
 			throw new SchedulerException("Unable to update trigger", e);
 		}
+	}
+
+	@Override
+	public void validateTrigger(
+			com.liferay.portal.kernel.scheduler.Trigger trigger,
+			StorageType storageType)
+		throws SchedulerException {
+
+		Trigger quartzTrigger = (Trigger)trigger.getWrappedTrigger();
+
+		if (quartzTrigger == null) {
+			return;
+		}
+
+		Scheduler scheduler = getScheduler(storageType);
+
+		Calendar calendar = null;
+
+		try {
+			calendar = scheduler.getCalendar(quartzTrigger.getCalendarName());
+		}
+		catch (org.quartz.SchedulerException se) {
+			throw new SchedulerException(
+				"Unable to validate trigger \"" + quartzTrigger.getKey() + "\"",
+				se);
+		}
+
+		List<Date> dates = TriggerUtils.computeFireTimes(
+			(OperableTrigger)quartzTrigger, calendar, 1);
+
+		if (!dates.isEmpty()) {
+			return;
+		}
+
+		throw new SchedulerException(
+			"Based on configured schedule, the given trigger \"" +
+				quartzTrigger.getKey() + "\" will never fire.");
 	}
 
 	@Activate

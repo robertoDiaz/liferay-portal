@@ -1490,36 +1490,30 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
+	public boolean isIncomplete(Layout layout) {
+		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
+			layout);
+
+		if (layoutRevision != null) {
+			long layoutSetBranchId = layoutRevision.getLayoutSetBranchId();
+
+			if (isLayoutRevisionIncomplete(
+					layout.getPlid(), layoutRevision, layoutSetBranchId)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isIncomplete(Layout layout, long layoutSetBranchId) {
 		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
 			layout);
 
-		if (layoutRevision == null) {
-			List<LayoutRevision> layoutRevisions =
-				_layoutRevisionLocalService.getLayoutRevisions(
-					layoutSetBranchId, layout.getPlid(), true);
-
-			if (!layoutRevisions.isEmpty()) {
-				return false;
-			}
-		}
-
-		List<LayoutRevision> layoutRevisions =
-			_layoutRevisionLocalService.getLayoutRevisions(
-				layoutSetBranchId, layout.getPlid(), false);
-
-		if (!layoutRevisions.isEmpty()) {
-			layoutRevision = layoutRevisions.get(0);
-		}
-
-		if ((layoutRevision == null) ||
-			(layoutRevision.getStatus() ==
-				WorkflowConstants.STATUS_INCOMPLETE)) {
-
-			return true;
-		}
-
-		return false;
+		return isLayoutRevisionIncomplete(
+			layout.getPlid(), layoutRevision, layoutSetBranchId);
 	}
 
 	/**
@@ -2467,6 +2461,12 @@ public class StagingImpl implements Staging {
 			portletId, portletPreferences, null, lastPublishDate);
 	}
 
+	/**
+	 * @deprecated As of 4.0.0, replaced by {@link
+	 *             com.liferay.staging.configuration.web.internal.portlet.StagingConfigurationPortlet#editStagingConfiguration(
+	 *             javax.portlet.ActionRequest, javax.portlet.ActionResponse)}
+	 */
+	@Deprecated
 	@Override
 	public void updateStaging(PortletRequest portletRequest, Group liveGroup)
 		throws PortalException {
@@ -2847,6 +2847,37 @@ public class StagingImpl implements Staging {
 		return false;
 	}
 
+	protected boolean isLayoutRevisionIncomplete(
+		long plid, LayoutRevision layoutRevision, long layoutSetBranchId) {
+
+		if (layoutRevision == null) {
+			List<LayoutRevision> layoutRevisions =
+				_layoutRevisionLocalService.getLayoutRevisions(
+					layoutSetBranchId, plid, true);
+
+			if (!layoutRevisions.isEmpty()) {
+				return false;
+			}
+		}
+
+		List<LayoutRevision> layoutRevisions =
+			_layoutRevisionLocalService.getLayoutRevisions(
+				layoutSetBranchId, plid, false);
+
+		if (!layoutRevisions.isEmpty()) {
+			layoutRevision = layoutRevisions.get(0);
+		}
+
+		if ((layoutRevision == null) ||
+			(layoutRevision.getStatus() ==
+				WorkflowConstants.STATUS_INCOMPLETE)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
@@ -3072,9 +3103,11 @@ public class StagingImpl implements Staging {
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to set recent layout revision ID with layout set " +
-						"branch " + layoutSetBranchId + " and PLID " + plid +
-							" and layout branch " + layoutBranchId,
+					StringBundler.concat(
+						"Unable to set recent layout revision ID with layout ",
+						"set branch ", String.valueOf(layoutSetBranchId),
+						" and PLID ", String.valueOf(plid),
+						" and layout branch ", String.valueOf(layoutBranchId)),
 					pe);
 			}
 		}
@@ -3208,17 +3241,6 @@ public class StagingImpl implements Staging {
 
 			Group remoteGroup = GroupServiceHttp.getGroup(
 				httpPrincipal, remoteGroupId);
-
-			if (group.equals(remoteGroup) &&
-				Objects.equals(group.getUuid(), remoteGroup.getUuid())) {
-
-				RemoteExportException ree = new RemoteExportException(
-					RemoteExportException.SAME_GROUP);
-
-				ree.setGroupId(remoteGroupId);
-
-				throw ree;
-			}
 
 			if (group.isCompany() ^
 				isCompanyGroup(httpPrincipal, remoteGroup)) {
