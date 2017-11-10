@@ -44,7 +44,6 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.scheduler.SchedulerClusterInvokingThreadLocal;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -496,6 +495,13 @@ public class ClusterSchedulerEngine
 		setClusterableThreadLocal(storageType);
 	}
 
+	@Override
+	public void validateTrigger(Trigger trigger, StorageType storageType)
+		throws SchedulerException {
+
+		_schedulerEngine.validateTrigger(trigger, storageType);
+	}
+
 	protected void addMemoryClusteredJob(SchedulerResponse schedulerResponse) {
 		String jobName = schedulerResponse.getJobName();
 		String groupName = schedulerResponse.getGroupName();
@@ -633,9 +639,6 @@ public class ClusterSchedulerEngine
 
 		ClusterableContextThreadLocal.putThreadLocalContext(
 			PLUGIN_READY, pluginReady);
-		ClusterableContextThreadLocal.putThreadLocalContext(
-			SCHEDULER_CLUSTER_INVOKING,
-			SchedulerClusterInvokingThreadLocal.isEnabled());
 	}
 
 	protected void setClusterExecutor(ClusterExecutor clusterExecutor) {
@@ -683,9 +686,6 @@ public class ClusterSchedulerEngine
 	protected static final String PLUGIN_READY = "plugin.ready";
 
 	protected static final String PORTAL_READY = "portal.ready";
-
-	protected static final String SCHEDULER_CLUSTER_INVOKING =
-		"scheduler.cluster.invoking";
 
 	private static void _addMemoryClusteredJob(
 			SchedulerResponse schedulerResponse, String osgiServiceIdentifier)
