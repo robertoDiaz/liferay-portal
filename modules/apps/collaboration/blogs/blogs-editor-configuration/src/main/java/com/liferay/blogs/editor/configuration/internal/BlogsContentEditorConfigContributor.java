@@ -15,6 +15,7 @@
 package com.liferay.blogs.editor.configuration.internal;
 
 import com.liferay.blogs.item.selector.criterion.BlogsItemSelectorCriterion;
+import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.constants.BlogsPortletKeys;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
@@ -24,17 +25,18 @@ import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.security.antisamy.configuration.AntiSamyConfiguration;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
@@ -44,13 +46,18 @@ import java.util.Map;
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Roberto Díaz
  */
 @Component(
+	configurationPid = "com.liferay.portal.security.antisamy.configuration.AntiSamyConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"editor.config.key=contentEditor",
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS,
@@ -67,16 +74,31 @@ public class BlogsContentEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		StringBundler sb = new StringBundler(6);
+		boolean enabled = true;
+		String[] blacklist = null;
+		String[] whitelist = null;
 
-		sb.append("a[*](*); ");
-		sb.append(getAllowedContentText());
-		sb.append(" div(*); img[*] {height, width}; ");
-		sb.append(getAllowedContentLists());
-		sb.append(" p {text-align}; ");
-		sb.append(getAllowedContentTable());
+		if (_antiSamyConfiguration != null) {
+			enabled = _antiSamyConfiguration.enabled();
+			blacklist = _antiSamyConfiguration.blacklist();
+			whitelist = _antiSamyConfiguration.whitelist();
+		}
 
-		jsonObject.put("allowedContent", sb.toString());
+		if ((_antiSamyConfiguration != null) && enabled &&
+			(ArrayUtil.contains(blacklist, BlogsEntry.class.getName()) ||
+			 !ArrayUtil.contains(whitelist, BlogsEntry.class.getName()))) {
+
+			StringBundler sb = new StringBundler(6);
+
+			sb.append("a[*](*); ");
+			sb.append(getAllowedContentText());
+			sb.append(" div(*); img[*] {height, width}; ");
+			sb.append(getAllowedContentLists());
+			sb.append(" p {text-align}; ");
+			sb.append(getAllowedContentTable());
+
+			jsonObject.put("allowedContent", sb.toString());
+		}
 
 		String namespace = GetterUtil.getString(
 			inputEditorTaglibAttributes.get(
@@ -92,6 +114,14 @@ public class BlogsContentEditorConfigContributor
 	@Reference(unbind = "-")
 	public void setItemSelector(ItemSelector itemSelector) {
 		_itemSelector = itemSelector;
+	}
+
+	@Activate
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_antiSamyConfiguration = ConfigurableUtil.createConfigurable(
+			AntiSamyConfiguration.class, properties);
 	}
 
 	protected String getAllowedContentLists() {
@@ -151,14 +181,11 @@ public class BlogsContentEditorConfigContributor
 		uploadURL.setParameter(
 			ActionRequest.ACTION_NAME, "/blogs/upload_image");
 
-		String[] extensions = PropsUtil.getArray(
-			PropsKeys.BLOGS_IMAGE_EXTENSIONS);
-
 		ItemSelectorCriterion uploadItemSelectorCriterion =
 			new UploadItemSelectorCriterion(
 				PortletKeys.BLOGS, uploadURL.toString(),
 				LanguageUtil.get(themeDisplay.getLocale(), "blog-images"),
-				PropsValues.BLOGS_IMAGE_MAX_SIZE, extensions);
+				PropsValues.BLOGS_IMAGE_MAX_SIZE);
 
 		List<ItemSelectorReturnType> uploadDesiredItemSelectorReturnTypes =
 			new ArrayList<>();
@@ -179,6 +206,7 @@ public class BlogsContentEditorConfigContributor
 		jsonObject.put("filebrowserImageBrowseUrl", itemSelectorURL.toString());
 	}
 
+	private AntiSamyConfiguration _antiSamyConfiguration;
 	private ItemSelector _itemSelector;
 
 }

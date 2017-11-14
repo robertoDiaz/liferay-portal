@@ -56,7 +56,7 @@ public class ProjectTemplates {
 	public static Map<String, String> getTemplates() throws Exception {
 		Map<String, String> templates = new TreeMap<>();
 
-		File file = FileUtil.getJarFile();
+		File file = FileUtil.getJarFile(ProjectTemplates.class);
 
 		if (file.isDirectory()) {
 			try (DirectoryStream<Path> directoryStream =
@@ -144,7 +144,7 @@ public class ProjectTemplates {
 		JCommander jCommander = new JCommander(projectTemplatesArgs);
 
 		try {
-			File jarFile = FileUtil.getJarFile();
+			File jarFile = FileUtil.getJarFile(ProjectTemplates.class);
 
 			if (jarFile.isFile()) {
 				jCommander.setProgramName("java -jar " + jarFile.getName());
@@ -330,6 +330,14 @@ public class ProjectTemplates {
 		}
 		else if ((template.equals("freemarker-portlet") ||
 				  template.equals("mvc-portlet") ||
+				  template.equals("npm-angular-portlet") ||
+				  template.equals("npm-billboardjs-portlet") ||
+				  template.equals("npm-isomorphic-portlet") ||
+				  template.equals("npm-jquery-portlet") ||
+				  template.equals("npm-metaljs-portlet") ||
+				  template.equals("npm-portlet") ||
+				  template.equals("npm-react-portlet") ||
+				  template.equals("npm-vuejs-portlet") ||
 				  template.equals("spring-mvc-portlet") ||
 				  template.equals("portlet")) &&
 				 (className.length() > 7) && className.endsWith("Portlet")) {

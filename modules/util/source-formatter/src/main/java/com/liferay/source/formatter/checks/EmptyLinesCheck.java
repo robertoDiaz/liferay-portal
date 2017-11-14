@@ -14,7 +14,7 @@
 
 package com.liferay.source.formatter.checks;
 
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.ToolsUtil;
@@ -85,11 +85,23 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 	}
 
 	protected String fixEmptyLinesInMultiLineTags(String content) {
-		Matcher matcher = _emptyLineInMultiLineTagsPattern.matcher(content);
+		Matcher matcher = _emptyLineInMultiLineTagsPattern1.matcher(content);
 
 		if (matcher.find()) {
 			return StringUtil.replaceFirst(
 				content, "\n\n", "\n", matcher.start());
+		}
+
+		matcher = _emptyLineInMultiLineTagsPattern2.matcher(content);
+
+		while (matcher.find()) {
+			String tabs1 = matcher.group(1);
+			String tabs2 = matcher.group(2);
+
+			if (tabs1.length() == (tabs2.length() + 1)) {
+				return StringUtil.replaceFirst(
+					content, "\n\n", "\n", matcher.start());
+			}
 		}
 
 		return content;
@@ -423,8 +435,16 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 					continue;
 				}
 
+				String nextLine = matcher.group(1);
+
+				if (nextLine.startsWith("package ") ||
+					nextLine.startsWith("/*")) {
+
+					continue;
+				}
+
 				content = StringUtil.replaceFirst(
-					content, "\n", StringPool.BLANK, matcher.end() - 1);
+					content, "\n", StringPool.BLANK, matcher.start() + 1);
 
 				continue outerLoop;
 			}
@@ -480,8 +500,10 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 
 	private final Pattern _emptyLineBetweenTagsPattern = Pattern.compile(
 		"\n(\t*)</([-\\w:]+)>(\n*)(\t*)<([-\\w:]+)[> \n]");
-	private final Pattern _emptyLineInMultiLineTagsPattern = Pattern.compile(
+	private final Pattern _emptyLineInMultiLineTagsPattern1 = Pattern.compile(
 		"\n\t*<[-\\w:#]+\n\n\t*\\w");
+	private final Pattern _emptyLineInMultiLineTagsPattern2 = Pattern.compile(
+		"\n(\t*)\\S*[^>]\n\n(\t*)(/?)>\n");
 	private final Pattern _emptyLineInNestedTagsPattern1 = Pattern.compile(
 		"\n(\t*)(?:<\\w.*[^/])?>\n\n(\t*)(<.*)\n");
 	private final Pattern _emptyLineInNestedTagsPattern2 = Pattern.compile(
@@ -511,11 +533,11 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 		"[\t\n]\\}\n[\t ]*(?!(/\\*|\\}|\\)|//|catch |else |finally |while ))" +
 			"\\S");
 	private final Pattern _missingEmptyLinePattern8 = Pattern.compile(
-		"[^:\\{\n]\n\t*return ");
+		"[^:\\{\\s]\n\t*return ");
 	private final Pattern _redundantEmptyLinePattern1 = Pattern.compile(
 		"\n(.*)\n\npublic ((abstract|static) )*(class|enum|interface) ");
 	private final Pattern _redundantEmptyLinePattern2 = Pattern.compile(
-		" \\* @author .*\n \\*\\/\n\n");
+		"\n\t* \\*/\n\n\t*(.+)\n");
 	private final Pattern _redundantEmptyLinePattern3 = Pattern.compile(
 		"[\n\t](catch |else |finally |for |if |try |while ).*\\{\n\n\t+\\w");
 	private final Pattern _redundantEmptyLinePattern4 = Pattern.compile(
