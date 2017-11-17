@@ -32,6 +32,7 @@ import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifi
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelReadCountComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -58,7 +59,6 @@ import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -514,11 +514,11 @@ public class DLImpl implements DL {
 
 		String previewQueryString = null;
 
-		if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED) {
-			if (ImageProcessorUtil.hasImages(fileVersion)) {
-				previewQueryString = "&imagePreview=1";
-			}
-			else if (PDFProcessorUtil.hasImages(fileVersion)) {
+		if (ImageProcessorUtil.isSupported(fileVersion.getMimeType())) {
+			previewQueryString = "&imagePreview=1";
+		}
+		else if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED) {
+			if (PDFProcessorUtil.hasImages(fileVersion)) {
 				previewQueryString = "&previewFileIndex=1";
 			}
 			else if (VideoProcessorUtil.hasVideo(fileVersion)) {
