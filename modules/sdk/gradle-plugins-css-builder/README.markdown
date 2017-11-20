@@ -12,7 +12,7 @@ To use the plugin, include it in your build script:
 ```gradle
 buildscript {
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.css.builder", version: "2.1.1"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.css.builder", version: "2.1.7"
 	}
 
 	repositories {
@@ -74,6 +74,7 @@ Property Name | Default Value
 [`classpath`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html#org.gradle.api.tasks.JavaExec:classpath) | [`project.configurations.cssBuilder`](#liferay-css-builder-dependency)
 [`defaultCharacterEncoding`](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/JavaExec.html#setDefaultCharacterEncoding(java.lang.String)) | `"UTF-8"`
 [`main`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html#org.gradle.api.tasks.JavaExec:main) | `"com.liferay.css.builder.CSSBuilder"`
+[`systemProperties`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html#org.gradle.api.tasks.JavaExec:systemProperties) | `["sass.compiler.jni.clean.temp.dir", true]`
 
 #### Task Properties
 
@@ -92,6 +93,21 @@ Property Name | Type | Default Value | Description
 `precision` | `int` | `9` | The numeric precision of numbers in Sass. It sets the `sass.precision` argument.
 `rtlExcludedPathRegexps` | `List<String>` | `[]` | The SCSS file patterns to exclude when converting for right-to-left (RTL) support. It sets the `sass.rtl.excluded.path.regexps` argument.
 `sassCompilerClassName` | `String` | `null` | The type of Sass compiler to use. Supported values are `"jni"` and `"ruby"`. If not set, defaults to `"jni"`. It sets the `sass.compiler.class.name` argument.
+
+**Note:** Liferay's CSS Builder is supported for Oracle's JDK and uses a native
+compiler for increased speed. If you're using an IBM JDK, you may experience
+issues when building your Sass files (e.g., when building a theme). It's
+recommended to switch to using the Oracle JDK, but if you prefer using the IBM
+JDK, you must use the fallback Ruby compiler. You can do this two ways:
+
+- If you're working in a [Liferay Workspace](https://dev.liferay.com/develop/tutorials/-/knowledge_base/7-0/liferay-workspace)
+  or using the [Liferay Gradle Plugins](https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins)
+  plugin, set `sass.compiler.class.name=ruby` in your `gradle.properties` file.
+- Otherwise, set `buildCSS.sassCompilerClassName='ruby'` in the project's
+  `build.gradle` file.
+
+Be aware that the Ruby-based compiler doesn't perform as well as the native
+compiler, so expect longer compile times.
 
 The properties of type `File` support any type that can be resolved by [`project.file`](https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:file(java.css.Object)).
 Moreover, it is possible to use Closures and Callables as values for the `int`
@@ -119,7 +135,7 @@ manually adding a dependency to the `cssBuilder` configuration:
 
 ```gradle
 dependencies {
-	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "1.1.1"
+	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "2.0.2"
 }
 ```
 
