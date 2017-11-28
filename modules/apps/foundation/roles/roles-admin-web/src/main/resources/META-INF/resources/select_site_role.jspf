@@ -17,6 +17,7 @@
 <%
 String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 int step = ParamUtil.getInteger(request, "step", 1);
+long siteGroupId = ParamUtil.getLong(request, "groupId", themeDisplay.getSiteGroupId());
 String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectSiteRole");
 String syncEntitiesEventName = ParamUtil.getString(request, "syncEntitiesEventName", liferayPortletResponse.getNamespace() + "syncSiteRoles");
@@ -26,6 +27,7 @@ User selUser = PortalUtil.getSelectedUser(request);
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcPath", "/select_role.jsp");
+portletURL.setParameter("groupId", String.valueOf(siteGroupId));
 portletURL.setParameter("roleType", String.valueOf(RoleConstants.TYPE_SITE));
 
 if (selUser != null) {
@@ -52,10 +54,6 @@ if (step == 1) {
 		uniqueGroupId = groups.get(0).getGroupId();
 	}
 }
-
-long groupId = ParamUtil.getLong(request, "groupId", uniqueGroupId);
-
-portletURL.setParameter("groupId", String.valueOf(groupId));
 
 portletURL.setParameter("step", String.valueOf(step));
 %>
@@ -160,29 +158,32 @@ portletURL.setParameter("step", String.valueOf(step));
 			</aui:script>
 		</c:when>
 		<c:when test="<%= step == 2 %>">
-			<aui:input name="step" type="hidden" value="2" />
-			<aui:input name="groupId" type="hidden" value="<%= String.valueOf(groupId) %>" />
 
 			<%
+			long groupId = ParamUtil.getLong(request, "groupId", uniqueGroupId);
+
 			Group group = GroupServiceUtil.getGroup(groupId);
 
-			portletURL.setParameter("step", "1");
+			portletURL.setParameter("groupId", String.valueOf(groupId));
 			%>
+
+			<aui:input name="step" type="hidden" value="<%= step %>" />
+			<aui:input name="groupId" type="hidden" value="<%= String.valueOf(groupId) %>" />
 
 			<c:if test="<%= selUser != null %>">
 
 				<%
+				portletURL.setParameter("step", "1");
+
 				String breadcrumbs = "<a href=\"" + portletURL.toString() + "\">" + LanguageUtil.get(request, "sites") + "</a> &raquo; " + HtmlUtil.escape(group.getDescriptiveName(locale));
+
+				portletURL.setParameter("step", String.valueOf(step));
 				%>
 
 				<div class="breadcrumbs">
 					<%= breadcrumbs %>
 				</div>
 			</c:if>
-
-			<%
-			portletURL.setParameter("step", "2");
-			%>
 
 			<liferay-ui:search-container
 				headerNames="name"

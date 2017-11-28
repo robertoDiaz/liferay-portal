@@ -74,9 +74,9 @@ if (ddlDisplayContext.isAdminPortlet()) {
 	<liferay-ui:error exception="<%= RecordSetDDMStructureIdException.class %>" message="please-enter-a-valid-definition" />
 	<liferay-ui:error exception="<%= RecordSetNameException.class %>" message="please-enter-a-valid-name" />
 
-	<liferay-ui:asset-categories-error />
+	<liferay-asset:asset-categories-error />
 
-	<liferay-ui:asset-tags-error />
+	<liferay-asset:asset-tags-error />
 
 	<aui:model-context bean="<%= recordSet %>" model="<%= DDLRecordSet.class %>" />
 
@@ -103,7 +103,11 @@ if (ddlDisplayContext.isAdminPortlet()) {
 				/>
 			</div>
 
-			<c:if test="<%= WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(DDLRecord.class.getName()) != null) %>">
+			<%
+			Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
+			%>
+
+			<c:if test="<%= WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(DDLRecord.class.getName()) != null) && !scopeGroup.isLayoutSetPrototype() %>">
 				<aui:select label="workflow" name="workflowDefinition">
 
 					<%
