@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.lists.form.web.internal.portlet;
 
-import com.liferay.dynamic.data.lists.form.web.constants.DDLFormPortletKeys;
+import com.liferay.dynamic.data.lists.form.web.internal.constants.DDLFormPortletKeys;
 import com.liferay.dynamic.data.lists.form.web.internal.display.context.DDLFormDisplayContext;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetSettings;
@@ -22,12 +22,13 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
 import com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
+import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -199,9 +200,19 @@ public class DDLFormPortlet extends MVCPortlet {
 
 		Layout layout = themeDisplay.getLayout();
 
-		String type = layout.getType();
+		String layoutFriendlyURL = layout.getFriendlyURL();
 
-		return type.equals(LayoutConstants.TYPE_SHARED_PORTLET);
+		if (layoutFriendlyURL.equals("/shared")) {
+			Group group = themeDisplay.getSiteGroup();
+
+			String groupFriendlyURL = group.getFriendlyURL();
+
+			if (groupFriendlyURL.equals("/forms")) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	protected void saveParametersInSession(ActionRequest actionRequest) {
@@ -222,7 +233,8 @@ public class DDLFormPortlet extends MVCPortlet {
 		DDLFormDisplayContext ddlFormDisplayContext = new DDLFormDisplayContext(
 			renderRequest, renderResponse, _ddlRecordSetService,
 			_ddlRecordVersionLocalService, _ddmFormRenderer,
-			_ddmFormValuesFactory, _workflowDefinitionLinkLocalService);
+			_ddmFormValuesFactory, _ddmFormValuesMerger,
+			_workflowDefinitionLinkLocalService);
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT, ddlFormDisplayContext);
@@ -241,6 +253,9 @@ public class DDLFormPortlet extends MVCPortlet {
 
 	@Reference
 	private DDMFormValuesFactory _ddmFormValuesFactory;
+
+	@Reference
+	private DDMFormValuesMerger _ddmFormValuesMerger;
 
 	@Reference
 	private Portal _portal;

@@ -20,7 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Provides methods for skipping problems related to the Java generic system.
+ * Provides methods for skipping problems related to the Java generics system.
  *
  * @author Alejandro Hernández
  * @author Carlos Sierra Andrés
@@ -29,43 +29,64 @@ import java.lang.reflect.Type;
 public class GenericUtil {
 
 	/**
-	 * Given a type denoted by {@code T<S>} returns S class or an exception, if
-	 * the class couldn't be get.
+	 * Returns the class of the parameterized class's first type argument.
 	 *
-	 * @param  clazz class of the actual instance.
-	 * @param  interfaceClass class of type T.
-	 * @return class of type S, or an exception, if the class couldn't be get.
+	 * @param  clazz the parameterized class
+	 * @return the class of the parameterized class's first type argument
 	 */
-	public static <T, S> Try<Class<S>> getGenericClassTry(
-		Class<?> clazz, Class<T> interfaceClass) {
+	public static <S> Try<Class<S>> getFirstGenericTypeArgumentTry(
+		Class<?> clazz) {
+
+		return getGenericTypeArgumentTry(clazz, 0);
+	}
+
+	/**
+	 * Returns the class of the first type argument in the {@code Type}.
+	 *
+	 * @param  type the type
+	 * @return the class of the type's first type argument
+	 */
+	public static <S> Try<Class<S>> getFirstGenericTypeArgumentTry(Type type) {
+		return getGenericTypeArgumentTry(type, 0);
+	}
+
+	/**
+	 * Returns the class of the parameterized class's n-th type argument.
+	 *
+	 * @param  clazz the parameterized class
+	 * @param  position the n-th type argument's position in the parameterized
+	 *         class
+	 * @return the class of the parameterized class's n-th type argument
+	 */
+	public static <S> Try<Class<S>> getGenericTypeArgumentTry(
+		Class<?> clazz, int position) {
 
 		Type[] genericInterfaces = clazz.getGenericInterfaces();
 
 		Try<Class<S>> classTry = Try.fail(
 			new IllegalArgumentException(
-				"Class " + clazz + " does not implement any interfaces."));
+				"Class " + clazz + " does not implement any interfaces"));
 
 		for (Type genericInterface : genericInterfaces) {
 			classTry = classTry.recoverWith(
-				throwable -> getGenericClassTry(
-					genericInterface, interfaceClass));
+				throwable -> getGenericTypeArgumentTry(
+					genericInterface, position));
 		}
 
 		return classTry.recoverWith(
-			throwable -> getGenericClassTry(
-				clazz.getSuperclass(), interfaceClass));
+			throwable -> getGenericTypeArgumentTry(
+				clazz.getSuperclass(), position));
 	}
 
 	/**
-	 * Given a type denoted by {@code T<S>} returns S class or an exception, if
-	 * the class couldn't be get.
+	 * Returns the class of the n-th type argument in the {@code Type}.
 	 *
-	 * @param  type type of the actual instance.
-	 * @param  clazz class of type T.
-	 * @return class of type S, or an exception, if the class couldn't be get.
+	 * @param  type the type
+	 * @param  position the type's n-th type argument
+	 * @return the class of the type's n-th type argument
 	 */
-	public static <T, S> Try<Class<S>> getGenericClassTry(
-		Type type, Class<T> clazz) {
+	public static <S> Try<Class<S>> getGenericTypeArgumentTry(
+		Type type, int position) {
 
 		Try<Type> typeTry = Try.success(type);
 
@@ -73,23 +94,25 @@ public class GenericUtil {
 			ParameterizedType.class::isInstance
 		).map(
 			ParameterizedType.class::cast
-		).filter(
-			parameterizedType ->
-				parameterizedType.getRawType().equals(clazz)
 		).map(
 			ParameterizedType::getActualTypeArguments
 		).filter(
-			typeArguments -> typeArguments.length == 1
+			typeArguments -> {
+				if (typeArguments.length >= 1) {
+					return true;
+				}
+
+				return false;
+			}
 		).map(
-			typeArguments -> typeArguments[0]
+			typeArguments -> typeArguments[position]
 		).map(
 			typeArgument -> {
 				if (typeArgument instanceof ParameterizedType) {
 					return ((ParameterizedType)typeArgument).getRawType();
 				}
-				else {
-					return typeArgument;
-				}
+
+				return typeArgument;
 			}
 		).map(
 			typeArgument -> (Class<S>)typeArgument

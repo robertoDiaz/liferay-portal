@@ -70,7 +70,7 @@ String socialBookmarksDisplayPosition = blogsPortletInstanceConfiguration.social
 
 					<c:if test="<%= viewSingleEntry %>">
 						<div class="cover-image-caption">
-							<small><%= HtmlUtil.escape(entry.getCoverImageCaption()) %></small>
+							<small><%= entry.getCoverImageCaption() %></small>
 						</div>
 					</c:if>
 				</c:if>
@@ -83,17 +83,7 @@ String socialBookmarksDisplayPosition = blogsPortletInstanceConfiguration.social
 						<%= dateFormatDate.format(entry.getDisplayDate()) %>
 
 						<c:if test="<%= blogsPortletInstanceConfiguration.enableReadingTime() %>">
-
-							<%
-							int readingTimeInMinutes = com.liferay.blogs.web.internal.util.BlogsUtil.getReadingTimeMinutes(entry.getContent());
-							%>
-
-							<c:if test="<%= readingTimeInMinutes > 0 %>">
-								<span> - </span>
-								<span>
-									<liferay-ui:message arguments="<%= readingTimeInMinutes %>" key="x-minutes-read" translateArguments="<%= false %>" />
-								</span>
-							</c:if>
+							<liferay-reading-time:reading-time model="<%= entry %>" />
 						</c:if>
 					</small>
 
