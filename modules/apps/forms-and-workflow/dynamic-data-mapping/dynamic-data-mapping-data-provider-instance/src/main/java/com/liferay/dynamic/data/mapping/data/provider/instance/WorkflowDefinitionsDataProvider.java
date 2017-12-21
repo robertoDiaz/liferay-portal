@@ -24,10 +24,10 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
-import com.liferay.portal.kernel.workflow.WorkflowEngineManager;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 
 import java.util.ArrayList;
@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Marcellus Tavares
@@ -71,7 +73,7 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 			new KeyValuePair(
 				"no-workflow", LanguageUtil.get(locale, "no-workflow")));
 
-		if (!_workflowEngineManager.isDeployed()) {
+		if (_workflowDefinitionManager == null) {
 			return DDMDataProviderResponse.of(
 				DDMDataProviderResponseOutput.of(
 					"Default-Output", "list", data));
@@ -90,8 +92,8 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 					locale, "version-x", workflowDefinition.getVersion(),
 					false);
 
-				String label =
-					workflowDefinition.getName() + " (" + version + ")";
+				String label = StringBundler.concat(
+					workflowDefinition.getName(), " (", version, ")");
 
 				String value =
 					workflowDefinition.getName() + StringPool.AT +
@@ -124,10 +126,11 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 	@Reference
 	private Portal _portal;
 
-	@Reference
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(proxy.bean=false)"
+	)
 	private WorkflowDefinitionManager _workflowDefinitionManager;
-
-	@Reference
-	private WorkflowEngineManager _workflowEngineManager;
 
 }

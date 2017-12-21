@@ -14,17 +14,20 @@
 
 package com.liferay.source.formatter.checks;
 
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
+import com.liferay.source.formatter.checks.util.SourceUtil;
 
 import java.io.File;
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -37,27 +40,27 @@ import java.util.regex.Pattern;
 public class GradleDependenciesCheck extends BaseFileCheck {
 
 	@Override
-	public void init() throws Exception {
-		_projectPathPrefix = getProjectPathPrefix();
-	}
-
-	@Override
 	protected String doProcess(
 		String fileName, String absolutePath, String content) {
 
-		return _formatDependencies(absolutePath, content);
-	}
-
-	private String _formatDependencies(String absolutePath, String content) {
-		Matcher matcher = _dependenciesPattern.matcher(content);
-
-		if (!matcher.find()) {
-			return content;
+		for (String dependencies : _getDependenciesBlocks(content)) {
+			content = _formatDependencies(absolutePath, content, dependencies);
 		}
 
-		String dependencies = matcher.group(1);
+		return content;
+	}
 
-		matcher = _incorrectWhitespacePattern.matcher(dependencies);
+	private String _formatDependencies(
+		String absolutePath, String content, String dependencies) {
+
+		String indent = SourceUtil.getIndent(dependencies);
+
+		int x = dependencies.indexOf("\n");
+		int y = dependencies.lastIndexOf("\n");
+
+		dependencies = dependencies.substring(x, y + 1);
+
+		Matcher matcher = _incorrectWhitespacePattern.matcher(dependencies);
 
 		while (matcher.find()) {
 			if (!ToolsUtil.isInsideQuotes(dependencies, matcher.start())) {
@@ -114,7 +117,7 @@ public class GradleDependenciesCheck extends BaseFileCheck {
 		for (String dependency : uniqueDependencies) {
 			String configuration = _getConfiguration(dependency);
 
-			if (isModulesApp(absolutePath, _projectPathPrefix, false) &&
+			if (isModulesApp(absolutePath, false) &&
 				_hasBNDFile(absolutePath)) {
 
 				if (configuration.equals("compile")) {
@@ -135,6 +138,7 @@ public class GradleDependenciesCheck extends BaseFileCheck {
 				sb.append("\n");
 			}
 
+			sb.append(indent);
 			sb.append("\t");
 			sb.append(dependency);
 			sb.append("\n");
@@ -147,6 +151,39 @@ public class GradleDependenciesCheck extends BaseFileCheck {
 		int pos = dependency.indexOf(StringPool.SPACE);
 
 		return dependency.substring(0, pos);
+	}
+
+	private List<String> _getDependenciesBlocks(String content) {
+		List<String> dependenciesBlocks = new ArrayList<>();
+
+		Matcher matcher = _dependenciesPattern.matcher(content);
+
+		while (matcher.find()) {
+			int y = matcher.start();
+
+			while (true) {
+				y = content.indexOf("}", y + 1);
+
+				if (y == -1) {
+					return dependenciesBlocks;
+				}
+
+				String dependencies = content.substring(
+					matcher.start(2), y + 1);
+
+				int level = getLevel(dependencies, "{", "}");
+
+				if (level == 0) {
+					if (!dependencies.contains("}\n")) {
+						dependenciesBlocks.add(dependencies);
+					}
+
+					break;
+				}
+			}
+		}
+
+		return dependenciesBlocks;
 	}
 
 	private boolean _hasBNDFile(String absolutePath) {
@@ -162,13 +199,11 @@ public class GradleDependenciesCheck extends BaseFileCheck {
 	}
 
 	private final Pattern _dependenciesPattern = Pattern.compile(
-		"^dependencies \\{(((?![\\{\\}]).)+?\n)\\}",
-		Pattern.DOTALL | Pattern.MULTILINE);
+		"(\n|\\A)(\t*)dependencies \\{\n");
 	private final Pattern _incorrectGroupNameVersionPattern = Pattern.compile(
 		"(^[^\\s]+)\\s+\"([^:]+?):([^:]+?):([^\"]+?)\"(.*?)", Pattern.DOTALL);
 	private final Pattern _incorrectWhitespacePattern = Pattern.compile(
 		":[^ \n]");
-	private String _projectPathPrefix;
 
 	private class GradleDependencyComparator
 		implements Comparator<String>, Serializable {

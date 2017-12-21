@@ -36,10 +36,7 @@ import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 
 import java.net.URI;
@@ -1111,7 +1108,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	public String getFirstNumberIncrement(String locator) {
 		String firstNumber = getFirstNumber(locator);
 
-		return StringUtil.valueOf(GetterUtil.getInteger(firstNumber) + 1);
+		return String.valueOf(GetterUtil.getInteger(firstNumber) + 1);
 	}
 
 	public Node getHtmlNode(String locator) {
@@ -1185,7 +1182,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	public String getLocation() throws Exception {
 		List<Exception> exceptions = new ArrayList<>();
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < PropsValues.GET_LOCATION_MAX_RETRIES; i++) {
 			FutureTask<String> futureTask = new FutureTask<>(
 				new Callable<String>() {
 
@@ -1212,7 +1209,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 			try {
 				String location = futureTask.get(
-					PropsValues.TIMEOUT_EXPLICIT_WAIT, TimeUnit.SECONDS);
+					PropsValues.GET_LOCATION_TIMEOUT, TimeUnit.SECONDS);
 
 				return location;
 			}
@@ -1489,28 +1486,11 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public boolean isHTMLSourceTextPresent(String value) throws Exception {
-		URL url = new URL(getLocation());
+		String pageSource = getPageSource();
 
-		InputStream inputStream = url.openStream();
-
-		BufferedReader bufferedReader = new BufferedReader(
-			new InputStreamReader(inputStream));
-
-		String line = null;
-
-		while ((line = bufferedReader.readLine()) != null) {
-			Pattern pattern = Pattern.compile(value);
-
-			Matcher matcher = pattern.matcher(line);
-
-			if (matcher.find()) {
-				return true;
-			}
+		if (pageSource.contains(value)) {
+			return true;
 		}
-
-		inputStream.close();
-
-		bufferedReader.close();
 
 		return false;
 	}
@@ -2296,8 +2276,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		typeKeys(locator, "");
 
-		Keyboard keyboard = new DesktopKeyboard();
-
 		Matcher matcher = _aceEditorPattern.matcher(value);
 
 		int x = 0;
@@ -2307,12 +2285,12 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 			String line = value.substring(x, y);
 
-			keyboard.type(line.trim());
+			webElement.sendKeys(line.trim());
 
 			String specialCharacter = matcher.group();
 
 			if (specialCharacter.equals("(")) {
-				keyboard.type("(");
+				webElement.sendKeys("(");
 			}
 			else if (specialCharacter.equals("${line.separator}")) {
 				keyPress(locator, "\\SPACE");
@@ -2324,7 +2302,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		String line = value.substring(x);
 
-		keyboard.type(line.trim());
+		webElement.sendKeys(line.trim());
 	}
 
 	@Override
@@ -2699,14 +2677,12 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
-	public void typeAceEditor(String locator, String value) throws Exception {
+	public void typeAceEditor(String locator, String value) {
 		WebElement webElement = getWebElement(locator);
 
 		webElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
 
-		typeKeys(locator, "");
-
-		Keyboard keyboard = new DesktopKeyboard();
+		webElement.sendKeys(Keys.DELETE);
 
 		Matcher matcher = _aceEditorPattern.matcher(value);
 
@@ -2717,12 +2693,12 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 			String line = value.substring(x, y);
 
-			keyboard.type(line.trim());
+			webElement.sendKeys(line.trim());
 
 			String specialCharacter = matcher.group();
 
 			if (specialCharacter.equals("(")) {
-				keyboard.type("(");
+				webElement.sendKeys("(");
 			}
 			else if (specialCharacter.equals("${line.separator}")) {
 				keyPress(locator, "\\SPACE");
@@ -2734,7 +2710,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		String line = value.substring(x);
 
-		keyboard.type(line.trim());
+		webElement.sendKeys(line.trim());
 
 		webElement.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.END));
 
