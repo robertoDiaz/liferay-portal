@@ -40,8 +40,12 @@ import org.osgi.service.component.annotations.Modified;
 	configurationPid = "com.liferay.rss.web.configuration.RSSWebCacheConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
+		"com.liferay.portlet.add-default-resource=true",
+		"com.liferay.portlet.application-type=full-page-application",
+		"com.liferay.portlet.application-type=widget",
 		"com.liferay.portlet.css-class-wrapper=portlet-rss",
 		"com.liferay.portlet.display-category=category.news",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.icon=/icons/rss.png",
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",

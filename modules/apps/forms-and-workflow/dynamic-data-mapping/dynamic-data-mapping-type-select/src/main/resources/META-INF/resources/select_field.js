@@ -138,14 +138,16 @@ AUI.add(
 					getTemplateContext: function() {
 						var instance = this;
 
+						var soyIncDom = window.DDMSelect.render.Soy.toIncDom;
+
 						return A.merge(
 							SelectField.superclass.getTemplateContext.apply(instance, arguments),
 							{
-								badgeCloseIcon: Liferay.Util.getLexiconIconTpl('times', 'icon-monospaced'),
+								badgeCloseIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('times', 'icon-monospaced')),
 								open: instance._open,
 								options: instance.get('options'),
-								selectCaretDoubleIcon: Liferay.Util.getLexiconIconTpl('caret-double-l', 'icon-monospaced'),
-								selectSearchIcon: Liferay.Util.getLexiconIconTpl('search', 'icon-monospaced'),
+								selectCaretDoubleIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('caret-double-l', 'icon-monospaced')),
+								selectSearchIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('search', 'icon-monospaced')),
 								strings: instance.get('strings'),
 								value: instance.getValueSelected()
 							}
@@ -338,7 +340,7 @@ AUI.add(
 							if (currentTarget.getAttribute('data-option-selected')) {
 								value = instance._removeValue(itemValue);
 							}
-							else {
+							else if (value.indexOf(itemValue) == -1) {
 								value.push(itemValue);
 							}
 						}
@@ -395,7 +397,6 @@ AUI.add(
 						if (triggers.length) {
 							for (var i = 0; i < triggers.length; i++) {
 								if (triggers[i].contains(event.target)) {
-
 									return false;
 								}
 							}

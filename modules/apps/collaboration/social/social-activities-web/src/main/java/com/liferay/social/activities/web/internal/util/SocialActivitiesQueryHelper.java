@@ -42,8 +42,8 @@ public class SocialActivitiesQueryHelper {
 					group.getGroupId(), start, end);
 			}
 
-			return _socialActivitySetLocalService.getUserActivitySets(
-				group.getClassPK(), start, end);
+			return _socialActivitySetLocalService.getSocialActivitySets(
+				start, end);
 		}
 		else if (group.isOrganization()) {
 			return _socialActivitySetLocalService.getOrganizationActivitySets(

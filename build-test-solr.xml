@@ -48,7 +48,7 @@ clientType=CLOUD</echo>
 	<macrodef name="configure-liferay-solr-ssl-adapter-properties">
 		<sequential>
 			<replace file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg" value="https://">
-			 	<replacetoken>http://</replacetoken>
+				<replacetoken>http://</replacetoken>
 			</replace>
 
 			<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg">
@@ -168,6 +168,11 @@ trustStorePath=${solr.dir}/server/etc/solr-ssl.keystore.jks</echo>
 					<include name="solrconfig.xml" />
 				</fileset>
 			</copy>
+
+			<replace file="${solr.dir}/server/solr/liferay/conf/solrconfig.xml">
+				<replacetoken><![CDATA[<maxWarmingSearchers>2</maxWarmingSearchers>]]></replacetoken>
+				<replacevalue><![CDATA[<maxWarmingSearchers>5</maxWarmingSearchers>]]></replacevalue>
+			</replace>
 		</sequential>
 	</macrodef>
 
