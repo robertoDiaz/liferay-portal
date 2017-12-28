@@ -1,0 +1,11 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	autopull = true
+	cmdver = liferay
+	commit = fdbab6b1d7d72eaa0457241f7533efe5664a06c6
+	mergebuttonmergecommits = false
+	mode = pull
+	parent = 364393a5f34cf37fc1652650a3e65a22e703b309
+	remote = git@github.com:liferay/com-liferay-apio-architect.git

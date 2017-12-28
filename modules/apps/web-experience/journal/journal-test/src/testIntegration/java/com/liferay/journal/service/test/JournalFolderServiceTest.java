@@ -97,7 +97,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure1 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure1.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure1.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -117,7 +117,7 @@ public class JournalFolderServiceTest {
 				JournalFolderConstants.
 					RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW);
 
-		Assert.assertFalse(ddmStructures.isEmpty());
+		Assert.assertFalse(ddmStructures.toString(), ddmStructures.isEmpty());
 
 		String xml = DDMStructureTestUtil.getSampleStructuredContent(
 			"Test Article");
@@ -163,7 +163,7 @@ public class JournalFolderServiceTest {
 			JournalFolderConstants.
 				RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW);
 
-		Assert.assertTrue(ddmStructures.isEmpty());
+		Assert.assertTrue(ddmStructures.toString(), ddmStructures.isEmpty());
 	}
 
 	@Test
@@ -256,7 +256,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure2.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure2.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -319,7 +319,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure2.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure2.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -390,7 +390,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure2.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure2.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -456,7 +456,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure2.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure2.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -536,7 +536,7 @@ public class JournalFolderServiceTest {
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName());
 
-		long[] ddmStructureIds = new long[] {ddmStructure2.getStructureId()};
+		long[] ddmStructureIds = {ddmStructure2.getStructureId()};
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());

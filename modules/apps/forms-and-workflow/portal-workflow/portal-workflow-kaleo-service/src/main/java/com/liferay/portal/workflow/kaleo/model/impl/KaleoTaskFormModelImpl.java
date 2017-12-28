@@ -19,6 +19,8 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringPool;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -29,7 +31,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskForm;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormModel;
 
@@ -71,7 +72,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
-			{ "kaleoDefinitionId", Types.BIGINT },
+			{ "kaleoDefinitionVersionId", Types.BIGINT },
 			{ "kaleoNodeId", Types.BIGINT },
 			{ "kaleoTaskId", Types.BIGINT },
 			{ "kaleoTaskName", Types.VARCHAR },
@@ -95,7 +96,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
-		TABLE_COLUMNS_MAP.put("kaleoDefinitionId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("kaleoDefinitionVersionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("kaleoNodeId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("kaleoTaskId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("kaleoTaskName", Types.VARCHAR);
@@ -110,7 +111,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		TABLE_COLUMNS_MAP.put("priority", Types.INTEGER);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table KaleoTaskForm (kaleoTaskFormId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,kaleoDefinitionId LONG,kaleoNodeId LONG,kaleoTaskId LONG,kaleoTaskName VARCHAR(200) null,name VARCHAR(200) null,description STRING null,formCompanyId LONG,formDefinition STRING null,formGroupId LONG,formId LONG,formUuid VARCHAR(75) null,metadata STRING null,priority INTEGER)";
+	public static final String TABLE_SQL_CREATE = "create table KaleoTaskForm (kaleoTaskFormId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,kaleoDefinitionVersionId LONG,kaleoNodeId LONG,kaleoTaskId LONG,kaleoTaskName VARCHAR(200) null,name VARCHAR(200) null,description STRING null,formCompanyId LONG,formDefinition STRING null,formGroupId LONG,formId LONG,formUuid VARCHAR(75) null,metadata STRING null,priority INTEGER)";
 	public static final String TABLE_SQL_DROP = "drop table KaleoTaskForm";
 	public static final String ORDER_BY_JPQL = " ORDER BY kaleoTaskForm.priority ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY KaleoTaskForm.priority ASC";
@@ -128,7 +129,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 			true);
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 	public static final long FORMUUID_COLUMN_BITMASK = 2L;
-	public static final long KALEODEFINITIONID_COLUMN_BITMASK = 4L;
+	public static final long KALEODEFINITIONVERSIONID_COLUMN_BITMASK = 4L;
 	public static final long KALEONODEID_COLUMN_BITMASK = 8L;
 	public static final long KALEOTASKID_COLUMN_BITMASK = 16L;
 	public static final long PRIORITY_COLUMN_BITMASK = 32L;
@@ -179,7 +180,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoNodeId", getKaleoNodeId());
 		attributes.put("kaleoTaskId", getKaleoTaskId());
 		attributes.put("kaleoTaskName", getKaleoTaskName());
@@ -243,10 +244,11 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 			setModifiedDate(modifiedDate);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		Long kaleoNodeId = (Long)attributes.get("kaleoNodeId");
@@ -382,7 +384,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -393,7 +395,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -432,25 +434,25 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	}
 
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoDefinitionId;
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoDefinitionVersionId;
 	}
 
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_columnBitmask |= KALEODEFINITIONID_COLUMN_BITMASK;
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_columnBitmask |= KALEODEFINITIONVERSIONID_COLUMN_BITMASK;
 
-		if (!_setOriginalKaleoDefinitionId) {
-			_setOriginalKaleoDefinitionId = true;
+		if (!_setOriginalKaleoDefinitionVersionId) {
+			_setOriginalKaleoDefinitionVersionId = true;
 
-			_originalKaleoDefinitionId = _kaleoDefinitionId;
+			_originalKaleoDefinitionVersionId = _kaleoDefinitionVersionId;
 		}
 
-		_kaleoDefinitionId = kaleoDefinitionId;
+		_kaleoDefinitionVersionId = kaleoDefinitionVersionId;
 	}
 
-	public long getOriginalKaleoDefinitionId() {
-		return _originalKaleoDefinitionId;
+	public long getOriginalKaleoDefinitionVersionId() {
+		return _originalKaleoDefinitionVersionId;
 	}
 
 	@Override
@@ -500,7 +502,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getKaleoTaskName() {
 		if (_kaleoTaskName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _kaleoTaskName;
@@ -515,7 +517,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -530,7 +532,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -555,7 +557,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getFormDefinition() {
 		if (_formDefinition == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _formDefinition;
@@ -590,7 +592,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getFormUuid() {
 		if (_formUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _formUuid;
@@ -615,7 +617,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	@Override
 	public String getMetadata() {
 		if (_metadata == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _metadata;
@@ -677,7 +679,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		kaleoTaskFormImpl.setUserName(getUserName());
 		kaleoTaskFormImpl.setCreateDate(getCreateDate());
 		kaleoTaskFormImpl.setModifiedDate(getModifiedDate());
-		kaleoTaskFormImpl.setKaleoDefinitionId(getKaleoDefinitionId());
+		kaleoTaskFormImpl.setKaleoDefinitionVersionId(getKaleoDefinitionVersionId());
 		kaleoTaskFormImpl.setKaleoNodeId(getKaleoNodeId());
 		kaleoTaskFormImpl.setKaleoTaskId(getKaleoTaskId());
 		kaleoTaskFormImpl.setKaleoTaskName(getKaleoTaskName());
@@ -764,9 +766,9 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 
 		kaleoTaskFormModelImpl._setModifiedDate = false;
 
-		kaleoTaskFormModelImpl._originalKaleoDefinitionId = kaleoTaskFormModelImpl._kaleoDefinitionId;
+		kaleoTaskFormModelImpl._originalKaleoDefinitionVersionId = kaleoTaskFormModelImpl._kaleoDefinitionVersionId;
 
-		kaleoTaskFormModelImpl._setOriginalKaleoDefinitionId = false;
+		kaleoTaskFormModelImpl._setOriginalKaleoDefinitionVersionId = false;
 
 		kaleoTaskFormModelImpl._originalKaleoNodeId = kaleoTaskFormModelImpl._kaleoNodeId;
 
@@ -819,7 +821,7 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 			kaleoTaskFormCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		kaleoTaskFormCacheModel.kaleoDefinitionId = getKaleoDefinitionId();
+		kaleoTaskFormCacheModel.kaleoDefinitionVersionId = getKaleoDefinitionVersionId();
 
 		kaleoTaskFormCacheModel.kaleoNodeId = getKaleoNodeId();
 
@@ -902,8 +904,8 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		sb.append(getCreateDate());
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
-		sb.append(", kaleoDefinitionId=");
-		sb.append(getKaleoDefinitionId());
+		sb.append(", kaleoDefinitionVersionId=");
+		sb.append(getKaleoDefinitionVersionId());
 		sb.append(", kaleoNodeId=");
 		sb.append(getKaleoNodeId());
 		sb.append(", kaleoTaskId=");
@@ -970,8 +972,8 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 		sb.append(getModifiedDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>kaleoDefinitionId</column-name><column-value><![CDATA[");
-		sb.append(getKaleoDefinitionId());
+			"<column><column-name>kaleoDefinitionVersionId</column-name><column-value><![CDATA[");
+		sb.append(getKaleoDefinitionVersionId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>kaleoNodeId</column-name><column-value><![CDATA[");
@@ -1041,9 +1043,9 @@ public class KaleoTaskFormModelImpl extends BaseModelImpl<KaleoTaskForm>
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
-	private long _kaleoDefinitionId;
-	private long _originalKaleoDefinitionId;
-	private boolean _setOriginalKaleoDefinitionId;
+	private long _kaleoDefinitionVersionId;
+	private long _originalKaleoDefinitionVersionId;
+	private boolean _setOriginalKaleoDefinitionVersionId;
 	private long _kaleoNodeId;
 	private long _originalKaleoNodeId;
 	private boolean _setOriginalKaleoNodeId;

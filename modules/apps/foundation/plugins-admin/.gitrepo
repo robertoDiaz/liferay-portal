@@ -4,8 +4,8 @@
 [subrepo]
 	autopull = false
 	cmdver = liferay
-	commit = 8b4e87f8789ce4517618911aba6bf202f76ee064
+	commit = 2464c483fd8c0285729ac08471a4e7b73594cf34
 	mergebuttonmergecommits = false
 	mode = push
-	parent = 1ae671ef4d660b659a291c744b441b8744a50698
+	parent = cc33bc662d8433b18c9fdd717a7b4772eb1e5010
 	remote = git@github.com:liferay/com-liferay-plugins-admin.git

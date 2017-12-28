@@ -16,6 +16,8 @@ package com.liferay.portal.workflow.kaleo.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 
+import com.liferay.petra.string.StringPool;
+
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -29,7 +31,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
@@ -135,7 +136,7 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 
 		newKaleoTaskInstanceToken.setModifiedDate(RandomTestUtil.nextDate());
 
-		newKaleoTaskInstanceToken.setKaleoDefinitionId(RandomTestUtil.nextLong());
+		newKaleoTaskInstanceToken.setKaleoDefinitionVersionId(RandomTestUtil.nextLong());
 
 		newKaleoTaskInstanceToken.setKaleoInstanceId(RandomTestUtil.nextLong());
 
@@ -180,8 +181,8 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingKaleoTaskInstanceToken.getModifiedDate()),
 			Time.getShortTimestamp(newKaleoTaskInstanceToken.getModifiedDate()));
-		Assert.assertEquals(existingKaleoTaskInstanceToken.getKaleoDefinitionId(),
-			newKaleoTaskInstanceToken.getKaleoDefinitionId());
+		Assert.assertEquals(existingKaleoTaskInstanceToken.getKaleoDefinitionVersionId(),
+			newKaleoTaskInstanceToken.getKaleoDefinitionVersionId());
 		Assert.assertEquals(existingKaleoTaskInstanceToken.getKaleoInstanceId(),
 			newKaleoTaskInstanceToken.getKaleoInstanceId());
 		Assert.assertEquals(existingKaleoTaskInstanceToken.getKaleoInstanceTokenId(),
@@ -217,10 +218,10 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 	}
 
 	@Test
-	public void testCountByKaleoDefinitionId() throws Exception {
-		_persistence.countByKaleoDefinitionId(RandomTestUtil.nextLong());
+	public void testCountByKaleoDefinitionVersionId() throws Exception {
+		_persistence.countByKaleoDefinitionVersionId(RandomTestUtil.nextLong());
 
-		_persistence.countByKaleoDefinitionId(0L);
+		_persistence.countByKaleoDefinitionVersionId(0L);
 	}
 
 	@Test
@@ -240,9 +241,9 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 
 	@Test
 	public void testCountByCN_CPK() throws Exception {
-		_persistence.countByCN_CPK(StringPool.BLANK, RandomTestUtil.nextLong());
+		_persistence.countByCN_CPK("", RandomTestUtil.nextLong());
 
-		_persistence.countByCN_CPK(StringPool.NULL, 0L);
+		_persistence.countByCN_CPK("null", 0L);
 
 		_persistence.countByCN_CPK((String)null, 0L);
 	}
@@ -274,11 +275,11 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 		return OrderByComparatorFactoryUtil.create("KaleoTaskInstanceToken",
 			"kaleoTaskInstanceTokenId", true, "groupId", true, "companyId",
 			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "kaleoDefinitionId", true, "kaleoInstanceId",
-			true, "kaleoInstanceTokenId", true, "kaleoTaskId", true,
-			"kaleoTaskName", true, "className", true, "classPK", true,
-			"completionUserId", true, "completed", true, "completionDate",
-			true, "dueDate", true);
+			"modifiedDate", true, "kaleoDefinitionVersionId", true,
+			"kaleoInstanceId", true, "kaleoInstanceTokenId", true,
+			"kaleoTaskId", true, "kaleoTaskName", true, "className", true,
+			"classPK", true, "completionUserId", true, "completed", true,
+			"completionDate", true, "dueDate", true);
 	}
 
 	@Test
@@ -522,7 +523,7 @@ public class KaleoTaskInstanceTokenPersistenceTest {
 
 		kaleoTaskInstanceToken.setModifiedDate(RandomTestUtil.nextDate());
 
-		kaleoTaskInstanceToken.setKaleoDefinitionId(RandomTestUtil.nextLong());
+		kaleoTaskInstanceToken.setKaleoDefinitionVersionId(RandomTestUtil.nextLong());
 
 		kaleoTaskInstanceToken.setKaleoInstanceId(RandomTestUtil.nextLong());
 

@@ -16,10 +16,11 @@ package com.liferay.portal.workflow.kaleo.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringPool;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskForm;
 
 import java.io.Externalizable;
@@ -81,8 +82,8 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
-		sb.append(", kaleoDefinitionId=");
-		sb.append(kaleoDefinitionId);
+		sb.append(", kaleoDefinitionVersionId=");
+		sb.append(kaleoDefinitionVersionId);
 		sb.append(", kaleoNodeId=");
 		sb.append(kaleoNodeId);
 		sb.append(", kaleoTaskId=");
@@ -122,7 +123,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		kaleoTaskFormImpl.setUserId(userId);
 
 		if (userName == null) {
-			kaleoTaskFormImpl.setUserName(StringPool.BLANK);
+			kaleoTaskFormImpl.setUserName("");
 		}
 		else {
 			kaleoTaskFormImpl.setUserName(userName);
@@ -142,26 +143,26 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 			kaleoTaskFormImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoTaskFormImpl.setKaleoDefinitionId(kaleoDefinitionId);
+		kaleoTaskFormImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		kaleoTaskFormImpl.setKaleoNodeId(kaleoNodeId);
 		kaleoTaskFormImpl.setKaleoTaskId(kaleoTaskId);
 
 		if (kaleoTaskName == null) {
-			kaleoTaskFormImpl.setKaleoTaskName(StringPool.BLANK);
+			kaleoTaskFormImpl.setKaleoTaskName("");
 		}
 		else {
 			kaleoTaskFormImpl.setKaleoTaskName(kaleoTaskName);
 		}
 
 		if (name == null) {
-			kaleoTaskFormImpl.setName(StringPool.BLANK);
+			kaleoTaskFormImpl.setName("");
 		}
 		else {
 			kaleoTaskFormImpl.setName(name);
 		}
 
 		if (description == null) {
-			kaleoTaskFormImpl.setDescription(StringPool.BLANK);
+			kaleoTaskFormImpl.setDescription("");
 		}
 		else {
 			kaleoTaskFormImpl.setDescription(description);
@@ -170,7 +171,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		kaleoTaskFormImpl.setFormCompanyId(formCompanyId);
 
 		if (formDefinition == null) {
-			kaleoTaskFormImpl.setFormDefinition(StringPool.BLANK);
+			kaleoTaskFormImpl.setFormDefinition("");
 		}
 		else {
 			kaleoTaskFormImpl.setFormDefinition(formDefinition);
@@ -180,14 +181,14 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		kaleoTaskFormImpl.setFormId(formId);
 
 		if (formUuid == null) {
-			kaleoTaskFormImpl.setFormUuid(StringPool.BLANK);
+			kaleoTaskFormImpl.setFormUuid("");
 		}
 		else {
 			kaleoTaskFormImpl.setFormUuid(formUuid);
 		}
 
 		if (metadata == null) {
-			kaleoTaskFormImpl.setMetadata(StringPool.BLANK);
+			kaleoTaskFormImpl.setMetadata("");
 		}
 		else {
 			kaleoTaskFormImpl.setMetadata(metadata);
@@ -213,7 +214,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 
-		kaleoDefinitionId = objectInput.readLong();
+		kaleoDefinitionVersionId = objectInput.readLong();
 
 		kaleoNodeId = objectInput.readLong();
 
@@ -246,7 +247,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		objectOutput.writeLong(userId);
 
 		if (userName == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(userName);
@@ -255,28 +256,28 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
-		objectOutput.writeLong(kaleoDefinitionId);
+		objectOutput.writeLong(kaleoDefinitionVersionId);
 
 		objectOutput.writeLong(kaleoNodeId);
 
 		objectOutput.writeLong(kaleoTaskId);
 
 		if (kaleoTaskName == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(kaleoTaskName);
 		}
 
 		if (name == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(name);
 		}
 
 		if (description == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(description);
@@ -285,7 +286,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		objectOutput.writeLong(formCompanyId);
 
 		if (formDefinition == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(formDefinition);
@@ -296,14 +297,14 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 		objectOutput.writeLong(formId);
 
 		if (formUuid == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(formUuid);
 		}
 
 		if (metadata == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
+			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(metadata);
@@ -319,7 +320,7 @@ public class KaleoTaskFormCacheModel implements CacheModel<KaleoTaskForm>,
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
-	public long kaleoDefinitionId;
+	public long kaleoDefinitionVersionId;
 	public long kaleoNodeId;
 	public long kaleoTaskId;
 	public String kaleoTaskName;

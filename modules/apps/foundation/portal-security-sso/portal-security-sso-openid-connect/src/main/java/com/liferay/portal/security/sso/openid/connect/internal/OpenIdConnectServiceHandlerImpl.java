@@ -138,9 +138,12 @@ public class OpenIdConnectServiceHandlerImpl
 				openIdConnectSession.getOpenIdConnectFlowState())) {
 
 			throw new OpenIdConnectServiceException.AuthenticationException(
-				"OpenId Connect login flow is not in the " +
-					OpenIdConnectFlowState.AUTH_REQUESTED + " state: " +
-						openIdConnectSession.getOpenIdConnectFlowState());
+				StringBundler.concat(
+					"OpenId Connect login flow is not in the ",
+					String.valueOf(OpenIdConnectFlowState.AUTH_REQUESTED),
+					" state: ",
+					String.valueOf(
+						openIdConnectSession.getOpenIdConnectFlowState())));
 		}
 
 		validateState(
@@ -276,12 +279,12 @@ public class OpenIdConnectServiceHandlerImpl
 
 	protected URI getLoginRedirectURI(HttpServletRequest httpServletRequest) {
 		try {
-			StringBundler loginURL = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			loginURL.append(_portal.getPortalURL(httpServletRequest));
-			loginURL.append(OpenIdConnectConstants.REDIRECT_URL_PATTERN);
+			sb.append(_portal.getPortalURL(httpServletRequest));
+			sb.append(OpenIdConnectConstants.REDIRECT_URL_PATTERN);
 
-			return new URI(loginURL.toString());
+			return new URI(sb.toString());
 		}
 		catch (URISyntaxException urise) {
 			throw new SystemException(
@@ -543,9 +546,10 @@ public class OpenIdConnectServiceHandlerImpl
 
 		if (!state.equals(requestedState)) {
 			throw new OpenIdConnectServiceException.AuthenticationException(
-				"Requested value \"" + requestedState.getValue() +
-					"\" and approved state \"" + state.getValue() +
-						"\" do not match");
+				StringBundler.concat(
+					"Requested value \"", requestedState.getValue(),
+					"\" and approved state \"", state.getValue(),
+					"\" do not match"));
 		}
 	}
 
