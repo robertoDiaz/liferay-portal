@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.mail.kernel.model.Account;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.petra.log4j.Log4JUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.convert.ConvertException;
 import com.liferay.portal.convert.ConvertProcess;
 import com.liferay.portal.instances.service.PortalInstancesLocalService;
@@ -60,7 +61,6 @@ import com.liferay.portal.kernel.servlet.DirectServletRegistry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -526,8 +526,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			String name = enu.nextElement();
 
 			if (name.startsWith("imageMagickLimit")) {
-				String key = StringUtil.toLowerCase(
-					name.substring(16, name.length()));
+				String key = StringUtil.toLowerCase(name.substring(16));
 				String value = ParamUtil.getString(actionRequest, name);
 
 				portletPreferences.setValue(
@@ -545,29 +544,17 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, PortletPreferences portletPreferences)
 		throws Exception {
 
-		long dlFileEntryPreviewableProcessorMaxSize = ParamUtil.getLong(
-			actionRequest, "dlFileEntryPreviewableProcessorMaxSize");
 		long dlFileEntryThumbnailMaxHeight = ParamUtil.getLong(
 			actionRequest, "dlFileEntryThumbnailMaxHeight");
 		long dlFileEntryThumbnailMaxWidth = ParamUtil.getLong(
 			actionRequest, "dlFileEntryThumbnailMaxWidth");
-		String dlFileExtensions = getFileExtensions(
-			actionRequest, "dlFileExtensions");
-		long dlFileMaxSize = ParamUtil.getLong(actionRequest, "dlFileMaxSize");
 
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_ENTRY_PREVIEWABLE_PROCESSOR_MAX_SIZE,
-			String.valueOf(dlFileEntryPreviewableProcessorMaxSize));
 		portletPreferences.setValue(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT,
 			String.valueOf(dlFileEntryThumbnailMaxHeight));
 		portletPreferences.setValue(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH,
 			String.valueOf(dlFileEntryThumbnailMaxWidth));
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_EXTENSIONS, dlFileExtensions);
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_MAX_SIZE, String.valueOf(dlFileMaxSize));
 
 		portletPreferences.store();
 	}
