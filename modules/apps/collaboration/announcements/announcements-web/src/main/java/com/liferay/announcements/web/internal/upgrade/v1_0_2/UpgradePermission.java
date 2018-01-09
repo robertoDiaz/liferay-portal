@@ -121,7 +121,7 @@ public class UpgradePermission extends UpgradeProcess {
 		try {
 			long resourceActionId = increment(ResourceAction.class.getName());
 
-			StringBundler sb = new StringBundler(4);
+			StringBundler sb = new StringBundler(3);
 
 			sb.append("insert into ResourceAction (mvccVersion, ");
 			sb.append("resourceActionId, name, actionId, bitwiseValue) ");
@@ -155,12 +155,13 @@ public class UpgradePermission extends UpgradeProcess {
 	protected void deleteResourceAction(long resourceActionId)
 		throws SQLException {
 
-		PreparedStatement ps = connection.prepareStatement(
-			"delete from ResourceAction where resourceActionId = ?");
+		try (PreparedStatement ps = connection.prepareStatement(
+				"delete from ResourceAction where resourceActionId = ?")) {
 
-		ps.setLong(1, resourceActionId);
+			ps.setLong(1, resourceActionId);
 
-		ps.executeUpdate();
+			ps.executeUpdate();
+		}
 	}
 
 	@Override
@@ -191,14 +192,15 @@ public class UpgradePermission extends UpgradeProcess {
 			long resourcePermissionId, long bitwiseValue)
 		throws Exception {
 
-		PreparedStatement ps = connection.prepareStatement(
-			"update ResourcePermission set actionIds = ? where " +
-				"resourcePermissionId = ?");
+		try (PreparedStatement ps = connection.prepareStatement(
+				"update ResourcePermission set actionIds = ? where " +
+					"resourcePermissionId = ?")) {
 
-		ps.setLong(1, bitwiseValue);
-		ps.setLong(2, resourcePermissionId);
+			ps.setLong(1, bitwiseValue);
+			ps.setLong(2, resourcePermissionId);
 
-		ps.executeUpdate();
+			ps.executeUpdate();
+		}
 	}
 
 	protected void upgradeAlertsResourcePermission() throws Exception {
@@ -222,21 +224,22 @@ public class UpgradePermission extends UpgradeProcess {
 		StringBundler sb2 = new StringBundler(5);
 
 		sb2.append("select resourcePermissionId, companyId, scope, primKey, ");
-		sb2.append("primKeyId, roleId, actionIds from ");
-		sb2.append("ResourcePermission where name = '");
+		sb2.append("primKeyId, roleId, actionIds from ResourcePermission ");
+		sb2.append("where name = '");
 		sb2.append(name);
 		sb2.append("'");
 
 		try (PreparedStatement ps1 = connection.prepareStatement(
 				sb1.toString());
-
 			ResultSet rs1 = ps1.executeQuery()) {
 
 			if (!rs1.next()) {
 				if (!_ignoreMissingAddEntryResourceAction) {
 					_log.error(
-						"Unable to upgrade ADD_ENTRY action, ResourceAction " +
-							"for " + name + " is not initialized");
+						StringBundler.concat(
+							"Unable to upgrade ADD_ENTRY action, ",
+							"ResourceAction for ", name,
+							" is not initialized"));
 				}
 
 				return;
@@ -247,7 +250,6 @@ public class UpgradePermission extends UpgradeProcess {
 
 			try (PreparedStatement ps2 = connection.prepareStatement(
 					sb2.toString());
-
 				ResultSet rs = ps2.executeQuery()) {
 
 				while (rs.next()) {
