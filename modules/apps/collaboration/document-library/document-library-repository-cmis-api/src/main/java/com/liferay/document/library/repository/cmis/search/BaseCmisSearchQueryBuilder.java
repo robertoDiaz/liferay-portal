@@ -142,7 +142,7 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("CMIS query " + sb);
+			_log.debug("CMIS query " + sb.toString());
 		}
 
 		return sb.toString();
@@ -216,7 +216,8 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 				}
 
 				throw new SearchException(
-					"Unable to determine user {" + field + "=" + value + "}",
+					StringBundler.concat(
+						"Unable to determine user {", field, "=", value, "}"),
 					e);
 			}
 		}

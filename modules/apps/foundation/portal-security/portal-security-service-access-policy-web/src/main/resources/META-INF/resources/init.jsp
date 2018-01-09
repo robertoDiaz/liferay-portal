@@ -25,11 +25,11 @@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+<%@ page import="com.liferay.petra.string.CharPool" %><%@
+page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
-page import="com.liferay.portal.kernel.util.CharPool" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
@@ -44,10 +44,10 @@ page import="com.liferay.portal.security.service.access.policy.exception.SAPEntr
 page import="com.liferay.portal.security.service.access.policy.model.SAPEntry" %><%@
 page import="com.liferay.portal.security.service.access.policy.model.SAPEntryConstants" %><%@
 page import="com.liferay.portal.security.service.access.policy.service.SAPEntryServiceUtil" %><%@
-page import="com.liferay.portal.security.service.access.policy.service.permission.SAPEntryPermission" %><%@
-page import="com.liferay.portal.security.service.access.policy.service.permission.SAPPermission" %><%@
 page import="com.liferay.portal.security.service.access.policy.util.comparator.SAPEntryNameComparator" %><%@
 page import="com.liferay.portal.security.service.access.policy.web.internal.constants.SAPWebKeys" %><%@
+page import="com.liferay.portal.security.service.access.policy.web.internal.security.permission.SAPEntryPermission" %><%@
+page import="com.liferay.portal.security.service.access.policy.web.internal.security.permission.SAPPermission" %><%@
 page import="com.liferay.taglib.search.ResultRow" %>
 
 <%@ page import="javax.portlet.ActionRequest" %><%@

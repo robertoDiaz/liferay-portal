@@ -17,12 +17,12 @@ package com.liferay.item.selector.web.internal;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorCriterionHandler;
+import com.liferay.item.selector.ItemSelectorCriterionSerializer;
 import com.liferay.item.selector.ItemSelectorRendering;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.ItemSelectorViewRenderer;
 import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
-import com.liferay.item.selector.web.ItemSelectorCriterionSerializer;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -148,9 +148,8 @@ public class ItemSelectorImpl implements ItemSelector {
 			itemSelectorCriteria.toArray(
 				new ItemSelectorCriterion[itemSelectorCriteria.size()]);
 
-		for (int i = 0; i < itemSelectorCriteria.size(); i++) {
-			ItemSelectorCriterion itemSelectorCriterion =
-				itemSelectorCriteria.get(i);
+		for (ItemSelectorCriterion itemSelectorCriterion :
+				itemSelectorCriteria) {
 
 			Class<? extends ItemSelectorCriterion> itemSelectorCriterionClass =
 				itemSelectorCriterion.getClass();
