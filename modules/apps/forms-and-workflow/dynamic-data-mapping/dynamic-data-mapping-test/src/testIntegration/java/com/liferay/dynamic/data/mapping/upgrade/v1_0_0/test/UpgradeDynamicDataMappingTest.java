@@ -39,6 +39,7 @@ import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.expando.kernel.service.ExpandoRowLocalServiceUtil;
 import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
 import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
@@ -57,7 +58,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -71,6 +71,7 @@ import java.sql.Timestamp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -901,7 +902,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append(".getData()) />");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 
 			// If statement
 
@@ -911,7 +913,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append("_Data)>");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 
 			// Date parse statement
 
@@ -923,7 +926,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append("_Data, locale) />");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 		}
 	}
 
@@ -956,7 +960,8 @@ public class UpgradeDynamicDataMappingTest {
 		sb.append("_DateObj");
 		sb.append(", \"dd MMM yyyy - HH:mm:ss\", locale)");
 
-		Assert.assertTrue(actualDefinition.contains(sb.toString()));
+		Assert.assertTrue(
+			actualDefinition, actualDefinition.contains(sb.toString()));
 	}
 
 	@Test
@@ -1069,7 +1074,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append(".getData()))");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 
 			// If statement
 
@@ -1079,7 +1085,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append("_Data))");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 
 			// Date parse statement
 
@@ -1091,7 +1098,8 @@ public class UpgradeDynamicDataMappingTest {
 			sb.append(dateFieldName);
 			sb.append("_Data, $locale))");
 
-			Assert.assertTrue(actualDefinition.contains(sb.toString()));
+			Assert.assertTrue(
+				actualDefinition, actualDefinition.contains(sb.toString()));
 		}
 	}
 
@@ -1124,7 +1132,8 @@ public class UpgradeDynamicDataMappingTest {
 		sb.append("_DateObj");
 		sb.append(", \"dd MMM yyyy - HH:mm:ss\", $locale)");
 
-		Assert.assertTrue(actualDefinition.contains(sb.toString()));
+		Assert.assertTrue(
+			actualDefinition, actualDefinition.contains(sb.toString()));
 	}
 
 	@Test
@@ -1727,9 +1736,7 @@ public class UpgradeDynamicDataMappingTest {
 					for (UpgradeStep upgradeStep : upgradeSteps) {
 						Class<?> clazz = upgradeStep.getClass();
 
-						String className = clazz.getName();
-
-						if (className.contains("UpgradeDynamicDataMapping")) {
+						if (Objects.equals(clazz.getName(), _CLASS_NAME)) {
 							_upgradeDynamicDataMapping =
 								(UpgradeProcess)upgradeStep;
 						}
@@ -1738,6 +1745,10 @@ public class UpgradeDynamicDataMappingTest {
 
 			});
 	}
+
+	private static final String _CLASS_NAME =
+		"com.liferay.dynamic.data.mapping.internal.upgrade.v1_0_0." +
+			"UpgradeDynamicDataMapping";
 
 	private long _classNameIdDDLRecordSet;
 	private long _classNameIdDDMContent;

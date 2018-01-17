@@ -185,17 +185,15 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"There should be a line break before 'new " +
 					"Comparator<String>() {'",
 				"There should be a line break after '},'",
-				"Line starts with '2' tabs, but '3' tabs are expected",
-				"Line starts with '2' tabs, but '3' tabs are expected",
 				"There should be a line break before 'throws'",
 				"There should be a line break after " +
 					"'themeDisplay.getCompanyId(),'",
-				"Line starts with '2' tabs, but '3' tabs are expected",
-				"There should be a line break before 'throws'"
+				"There should be a line break before 'throws'",
+				"There should be a line break after '}'"
 			},
 			new Integer[] {
 				33, 37, 45, 49, 49, 54, 57, 60, 63, 67, 70, 75, 79, 84, 88, 95,
-				106, 119, 123, 124, 124, 131, 141, 141
+				106, 119, 124, 131, 141, 159
 			});
 		test("IncorrectLineBreaks2.testjava");
 	}
@@ -270,8 +268,28 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testJavaParameterAnnotations() throws Exception {
+		test("JavaParameterAnnotations.testjava");
+	}
+
+	@Test
 	public void testJavaTermDividers() throws Exception {
 		test("JavaTermDividers.testjava");
+	}
+
+	@Test
+	public void testJavaTermMetadataIncorrectLineBreaks() throws Exception {
+		test("JavaTermMetadataIncorrectLineBreaks.testjava");
+	}
+
+	@Test
+	public void testJavaVariableFinalableFields1() throws Exception {
+		test("JavaVariableFinalableFields1.testjava");
+	}
+
+	@Test
+	public void testJavaVariableFinalableFields2() throws Exception {
+		test("JavaVariableFinalableFields2.testjava");
 	}
 
 	@Test
@@ -288,7 +306,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testLPS28266() throws Exception {
-		test("LPS28266.testjava", "Use rs.getInt(1) for count, see LPS-28266");
+		test("LPS28266.testjava", "Use rs.getInt(1) for count");
 	}
 
 	@Test
@@ -314,9 +332,9 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
-	public void testPackagePath() throws Exception {
+	public void testPackageName() throws Exception {
 		test(
-			"PackagePath.testjava",
+			"PackageName.testjava",
 			"The declared package 'com.liferay.source.formatter.hello.world' " +
 				"does not match the expected package");
 	}

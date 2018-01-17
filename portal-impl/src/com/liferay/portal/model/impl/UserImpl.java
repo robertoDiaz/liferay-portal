@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.service.WebsiteLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -539,13 +540,15 @@ public class UserImpl extends UserBaseImpl {
 		Company company = CompanyLocalServiceUtil.getCompanyById(
 			getCompanyId());
 
-		if (company.getAuthType().equals(CompanyConstants.AUTH_TYPE_EA)) {
+		String authType = company.getAuthType();
+
+		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 			login = getEmailAddress();
 		}
-		else if (company.getAuthType().equals(CompanyConstants.AUTH_TYPE_SN)) {
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
 			login = getScreenName();
 		}
-		else if (company.getAuthType().equals(CompanyConstants.AUTH_TYPE_ID)) {
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
 			login = String.valueOf(getUserId());
 		}
 
@@ -975,7 +978,9 @@ public class UserImpl extends UserBaseImpl {
 	@Override
 	public void setTimeZoneId(String timeZoneId) {
 		if (Validator.isNull(timeZoneId)) {
-			timeZoneId = TimeZoneUtil.getDefault().getID();
+			TimeZone defaultTimeZone = TimeZoneUtil.getDefault();
+
+			timeZoneId = defaultTimeZone.getID();
 		}
 
 		_timeZone = TimeZoneUtil.getTimeZone(timeZoneId);
@@ -988,11 +993,15 @@ public class UserImpl extends UserBaseImpl {
 			return null;
 		}
 
+		String normalizedScreenName = FriendlyURLNormalizerUtil.normalize(
+			getScreenName());
+
 		return StringUtil.replace(
 			PropsValues.USERS_PROFILE_FRIENDLY_URL,
 			new String[] {"${liferay:screenName}", "${liferay:userId}"},
 			new String[] {
-				HtmlUtil.escapeURL(getScreenName()), String.valueOf(getUserId())
+				HtmlUtil.escapeURL(normalizedScreenName),
+				String.valueOf(getUserId())
 			});
 	}
 
