@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
@@ -36,8 +37,11 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.util.comparator.UserFirstNameComparator;
@@ -231,6 +235,18 @@ public class InviteMembersPortlet extends MVCPortlet {
 
 		String createAccountURL = _portal.getCreateAccountURL(
 			request, themeDisplay);
+
+		Layout layout = themeDisplay.getLayout();
+
+		if (layout.isPrivateLayout()) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_portal.getPortalURL(themeDisplay));
+			sb.append(StringPool.QUESTION);
+			sb.append(HttpUtil.getQueryString(createAccountURL));
+
+			createAccountURL = sb.toString();
+		}
 
 		serviceContext.setAttribute("createAccountURL", createAccountURL);
 
