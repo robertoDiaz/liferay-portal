@@ -14,6 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
+import com.google.template.soy.data.SanitizedContent;
+
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluationResult;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorContext;
@@ -29,6 +31,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceService;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.Language;
@@ -37,9 +40,7 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.template.soy.utils.SoyHTMLContextValue;
 import com.liferay.portal.util.PortalImpl;
 
 import java.lang.reflect.Field;
@@ -202,10 +203,12 @@ public class DDMFormTemplateContextFactoryTest extends PowerMockito {
 			"<label class=\"required-warning\">All fields marked with '*' " +
 				"are required.</label>";
 
+		SanitizedContent sanitizedContent =
+			(SanitizedContent)templateContext.get(
+				"requiredFieldsWarningMessageHTML");
+
 		Assert.assertEquals(
-			expectedRequiredFieldsWarningHTML,
-			((SoyHTMLContextValue)templateContext.get(
-				"requiredFieldsWarningMessageHTML")).toString());
+			expectedRequiredFieldsWarningHTML, sanitizedContent.getContent());
 	}
 
 	@Test

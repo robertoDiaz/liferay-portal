@@ -46,6 +46,12 @@ AUI.add(
 						value: []
 					},
 
+					predefinedValue: {
+						state: true,
+						validator: Array.isArray,
+						value: []
+					},
+
 					strings: {
 						value: {
 							chooseAnOption: Liferay.Language.get('choose-an-option'),
@@ -65,6 +71,7 @@ AUI.add(
 					},
 
 					value: {
+						state: true,
 						value: []
 					}
 				},
@@ -138,16 +145,19 @@ AUI.add(
 					getTemplateContext: function() {
 						var instance = this;
 
+						var soyIncDom = window.DDMSelect.render.Soy.toIncDom;
+
 						return A.merge(
 							SelectField.superclass.getTemplateContext.apply(instance, arguments),
 							{
-								badgeCloseIcon: Liferay.Util.getLexiconIconTpl('times', 'icon-monospaced'),
+								badgeCloseIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('times', 'icon-monospaced')),
 								open: instance._open,
 								options: instance.get('options'),
-								selectCaretDoubleIcon: Liferay.Util.getLexiconIconTpl('caret-double-l', 'icon-monospaced'),
-								selectSearchIcon: Liferay.Util.getLexiconIconTpl('search', 'icon-monospaced'),
+								predefinedValue: instance.get('readOnly') ? instance.get('predefinedValue') : instance.getValue(),
+								selectCaretDoubleIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('caret-double-l', 'icon-monospaced')),
+								selectSearchIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('search', 'icon-monospaced')),
 								strings: instance.get('strings'),
-								value: instance.getValueSelected()
+								value: instance.getValue()
 							}
 						);
 					},
@@ -156,14 +166,6 @@ AUI.add(
 						var instance = this;
 
 						return instance.get('value') || [];
-					},
-
-					getValueSelected: function() {
-						var instance = this;
-
-						var value = instance.get('value') || [];
-
-						return instance._getOptionsSelected(value);
 					},
 
 					openList: function() {
@@ -263,28 +265,6 @@ AUI.add(
 						return options || [];
 					},
 
-					_getOptionsSelected: function(value) {
-						var instance = this;
-
-						var options = instance.get('options');
-
-						var optionsSelected = [];
-
-						value.forEach(
-							function(value, index) {
-								options.forEach(
-									function(option, index) {
-										if (value && option.value === value) {
-											optionsSelected.push(option);
-										}
-									}
-								);
-							}
-						);
-
-						return optionsSelected;
-					},
-
 					_getSelectTriggerAction: function() {
 						var instance = this;
 
@@ -338,7 +318,7 @@ AUI.add(
 							if (currentTarget.getAttribute('data-option-selected')) {
 								value = instance._removeValue(itemValue);
 							}
-							else {
+							else if (value.indexOf(itemValue) == -1) {
 								value.push(itemValue);
 							}
 						}
@@ -351,6 +331,8 @@ AUI.add(
 						instance.setValue(value);
 
 						instance.focus();
+
+						instance._fireStartedFillingEvent();
 					},
 
 					_handleSelectTriggerClick: function(event) {
@@ -395,7 +377,6 @@ AUI.add(
 						if (triggers.length) {
 							for (var i = 0; i < triggers.length; i++) {
 								if (triggers[i].contains(event.target)) {
-
 									return false;
 								}
 							}
