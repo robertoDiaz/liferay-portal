@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
@@ -29,11 +30,14 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ page import="com.liferay.asset.categories.admin.web.constants.AssetCategoriesConstants" %><%@
 page import="com.liferay.asset.categories.admin.web.internal.display.context.AssetCategoriesDisplayContext" %><%@
 page import="com.liferay.asset.categories.admin.web.internal.util.AssetCategoryUtil" %><%@
+page import="com.liferay.asset.category.property.exception.CategoryPropertyKeyException" %><%@
+page import="com.liferay.asset.category.property.exception.CategoryPropertyValueException" %><%@
+page import="com.liferay.asset.category.property.model.AssetCategoryProperty" %><%@
+page import="com.liferay.asset.category.property.service.AssetCategoryPropertyLocalServiceUtil" %><%@
+page import="com.liferay.asset.category.property.service.AssetCategoryPropertyServiceUtil" %><%@
 page import="com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil" %><%@
 page import="com.liferay.asset.kernel.NoSuchClassTypeException" %><%@
 page import="com.liferay.asset.kernel.exception.AssetCategoryNameException" %><%@
-page import="com.liferay.asset.kernel.exception.CategoryPropertyKeyException" %><%@
-page import="com.liferay.asset.kernel.exception.CategoryPropertyValueException" %><%@
 page import="com.liferay.asset.kernel.exception.DuplicateCategoryException" %><%@
 page import="com.liferay.asset.kernel.exception.DuplicateCategoryPropertyException" %><%@
 page import="com.liferay.asset.kernel.exception.DuplicateVocabularyException" %><%@
@@ -42,13 +46,11 @@ page import="com.liferay.asset.kernel.exception.NoSuchVocabularyException" %><%@
 page import="com.liferay.asset.kernel.exception.VocabularyNameException" %><%@
 page import="com.liferay.asset.kernel.model.AssetCategory" %><%@
 page import="com.liferay.asset.kernel.model.AssetCategoryConstants" %><%@
-page import="com.liferay.asset.kernel.model.AssetCategoryProperty" %><%@
 page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@
 page import="com.liferay.asset.kernel.model.AssetVocabulary" %><%@
 page import="com.liferay.asset.kernel.model.ClassType" %><%@
 page import="com.liferay.asset.kernel.model.ClassTypeReader" %><%@
 page import="com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil" %><%@
-page import="com.liferay.asset.kernel.service.AssetCategoryPropertyServiceUtil" %><%@
 page import="com.liferay.asset.kernel.service.AssetVocabularyServiceUtil" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
@@ -66,7 +68,6 @@ page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
-page import="com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl" %><%@
 page import="com.liferay.portlet.asset.util.AssetVocabularySettingsHelper" %>
 
 <%@ page import="java.util.ArrayList" %><%@
