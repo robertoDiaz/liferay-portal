@@ -84,10 +84,12 @@ public class UpdateDataProviderMVCActionCommand
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DDMDataProviderInstance.class.getName(), actionRequest);
 
+		Locale locale = themeDisplay.getSiteDefaultLocale();
+
 		ddmDataProviderInstanceService.updateDataProviderInstance(
 			dataProviderInstanceId,
-			getLocalizedMap(themeDisplay.getLocale(), name),
-			getLocalizedMap(themeDisplay.getLocale(), description),
+			getLocalizedMap(themeDisplay.getSiteDefaultLocale(), name),
+			getLocalizedMap(themeDisplay.getSiteDefaultLocale(), description),
 			ddmFormValues, serviceContext);
 	}
 
@@ -103,7 +105,7 @@ public class UpdateDataProviderMVCActionCommand
 		Stream<DDMFormFieldValue> storedDDMFormFieldValuesStream =
 			storedDDMFormFieldValues.stream();
 
-		Predicate<DDMFormFieldValue> predicate = (ddmFormFieldValue) ->
+		Predicate<DDMFormFieldValue> predicate = ddmFormFieldValue ->
 			Objects.equals(ddmFormFieldValue.getName(), name) &&
 			Objects.equals(ddmFormFieldValue.getInstanceId(), instanceId);
 

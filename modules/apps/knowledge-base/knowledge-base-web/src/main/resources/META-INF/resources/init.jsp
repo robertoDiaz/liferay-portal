@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/expando" prefix="liferay-expando" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
@@ -50,6 +51,7 @@ page import="com.liferay.knowledge.base.configuration.KBGroupServiceConfiguratio
 page import="com.liferay.knowledge.base.constants.KBActionKeys" %><%@
 page import="com.liferay.knowledge.base.constants.KBArticleConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBCommentConstants" %><%@
+page import="com.liferay.knowledge.base.constants.KBConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBFolderConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBPortletKeys" %><%@
 page import="com.liferay.knowledge.base.exception.DuplicateKBFolderNameException" %><%@
@@ -92,14 +94,15 @@ page import="com.liferay.knowledge.base.service.util.KnowledgeBaseConstants" %><
 page import="com.liferay.knowledge.base.util.KnowledgeBaseUtil" %><%@
 page import="com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator" %><%@
 page import="com.liferay.knowledge.base.util.comparator.KBObjectsTitleComparator" %><%@
-page import="com.liferay.knowledge.base.web.configuration.KBArticlePortletInstanceConfiguration" %><%@
-page import="com.liferay.knowledge.base.web.configuration.KBDisplayPortletInstanceConfiguration" %><%@
-page import="com.liferay.knowledge.base.web.configuration.KBSearchPortletInstanceConfiguration" %><%@
-page import="com.liferay.knowledge.base.web.configuration.KBSectionPortletInstanceConfiguration" %><%@
 page import="com.liferay.knowledge.base.web.internal.KBUtil" %><%@
 page import="com.liferay.knowledge.base.web.internal.application.dao.search.KBCommentResultRowSplitter" %><%@
 page import="com.liferay.knowledge.base.web.internal.application.dao.search.KBResultRowSplitter" %><%@
+page import="com.liferay.knowledge.base.web.internal.configuration.KBArticlePortletInstanceConfiguration" %><%@
+page import="com.liferay.knowledge.base.web.internal.configuration.KBDisplayPortletInstanceConfiguration" %><%@
+page import="com.liferay.knowledge.base.web.internal.configuration.KBSearchPortletInstanceConfiguration" %><%@
+page import="com.liferay.knowledge.base.web.internal.configuration.KBSectionPortletInstanceConfiguration" %><%@
 page import="com.liferay.knowledge.base.web.internal.constants.KBWebKeys" %><%@
+page import="com.liferay.knowledge.base.web.internal.display.context.KBAdminNavigationDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.internal.display.context.KBAdminViewDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.internal.display.context.KBNavigationDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.internal.display.context.KBSelectParentDisplayContext" %><%@
@@ -151,6 +154,7 @@ page import="com.liferay.portal.kernel.service.permission.GroupPermissionUtil" %
 page import="com.liferay.portal.kernel.service.permission.PortletPermissionUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.HttpHeaders" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
+page import="com.liferay.portal.kernel.settings.GroupServiceSettingsLocator" %><%@
 page import="com.liferay.portal.kernel.upload.UploadRequestSizeException" %><%@
 page import="com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
@@ -164,7 +168,6 @@ page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
 page import="com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
-page import="com.liferay.portal.kernel.util.PrefsPropsUtil" %><%@
 page import="com.liferay.portal.kernel.util.PropsKeys" %><%@
 page import="com.liferay.portal.kernel.util.PropsUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringBundler" %><%@
@@ -215,7 +218,7 @@ String rootPortletId = portletDisplay.getRootPortletId();
 
 String templatePath = portletConfig.getInitParameter("template-path");
 
-KBGroupServiceConfiguration kbGroupServiceConfiguration = ConfigurationProviderUtil.getGroupConfiguration(KBGroupServiceConfiguration.class, themeDisplay.getScopeGroupId());
+KBGroupServiceConfiguration kbGroupServiceConfiguration = ConfigurationProviderUtil.getConfiguration(KBGroupServiceConfiguration.class, new GroupServiceSettingsLocator(themeDisplay.getScopeGroupId(), KBConstants.SERVICE_NAME));
 
 KBSectionPortletInstanceConfiguration kbSectionPortletInstanceConfiguration = portletDisplay.getPortletInstanceConfiguration(KBSectionPortletInstanceConfiguration.class);
 

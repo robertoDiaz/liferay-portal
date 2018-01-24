@@ -35,6 +35,8 @@
 		<or>
 			<available file="hotfix" />
 			<available file=".lfrbuild-app-server-lib" />
+			<available file=".lfrbuild-portal-pre" />
+			<contains string="${basedir}" substring="modules-compat-data" />
 			<contains string="${basedir}" substring="required-dependencies" />
 		</or>
 	</condition>
@@ -61,7 +63,7 @@
 
 	<target depends="move-artifact,move-artifact-dependencies" name="dist-module-artifact-lpkg" />
 
-	<target name="download-artifact" unless="artifact.exclude">
+	<target depends="get-artifact-properties" name="download-artifact" unless="artifact.exclude">
 		<fail message="Missing artifact.properties file in ${releng.module.dir}.">
 			<condition>
 				<not>

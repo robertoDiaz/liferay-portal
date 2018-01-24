@@ -173,6 +173,21 @@ entriesSearchContainer.setResults(entriesResults);
 				orderColumns='<%= new String[] {"title", "display-date"} %>'
 				portletURL="<%= sortURL %>"
 			/>
+
+			<%
+			String navigation = ParamUtil.getString(request, "navigation", "entries");
+
+			PortletURL searchURL = renderResponse.createRenderURL();
+
+			searchURL.setParameter("mvcRenderCommandName", "/blogs/view");
+			searchURL.setParameter("navigation", navigation);
+			%>
+
+			<li>
+				<aui:form action="<%= searchURL.toString() %>" name="searchFm">
+					<liferay-ui:input-search markupView="lexicon" placeholder='<%= LanguageUtil.get(request, "search") %>' />
+				</aui:form>
+			</li>
 		</liferay-frontend:management-bar-filters>
 	</c:if>
 
@@ -195,7 +210,7 @@ entriesSearchContainer.setResults(entriesResults);
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteEntryIds" type="hidden" />
 
-		<liferay-ui:categorization-filter
+		<liferay-asset:categorization-filter
 			assetType="entries"
 			portletURL="<%= portletURL %>"
 		/>

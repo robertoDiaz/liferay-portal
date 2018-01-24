@@ -23,7 +23,7 @@
 		<delete failonerror="false" file="${jar.file}-sources.jar" />
 	</target>
 
-	<target depends="init-compile" name="compile" unless="compile.uptodate">
+	<target depends="download-latest-artifact,init-compile" name="compile" unless="${compile.uptodate}">
 		<property name="javac.destdir" value="classes" />
 		<property name="javac.srcdir" value="src" />
 		<property name="javac.classpathref" value="project.classpath" />
@@ -51,7 +51,13 @@
 		<copy file="${jar.file}.jar" preservelastmodified="true" todir="${deploy.dir}" />
 	</target>
 
-	<target name="init-compile">
+	<target name="download-latest-artifact" unless="${build.portal.artifacts.enabled}">
+		<download-latest-artifact destfile="${jar.file}.jar" />
+
+		<property name="compile.uptodate" value="true" />
+	</target>
+
+	<target if="${build.portal.artifacts.enabled}" name="init-compile">
 		<condition property="compile.uptodate">
 			<uptodate targetfile="classes/.touch">
 				<srcfiles dir="${basedir}" includes="bnd.bnd,build.xml,ivy.xml,src/**/*.*" />
@@ -318,15 +324,15 @@
 		</if>
 	</target>
 
-	<target depends="jar,jar-javadoc,jar-sources" name="publish-portal-release">
-		<publish-portal-artifact >
+	<target name="publish-portal-release">
+		<publish-portal-artifact targets="jar,jar-javadoc,jar-sources">
 			<attach classifier="javadoc" file="${artifact.name}-javadoc.jar" />
 			<attach classifier="sources" file="${artifact.name}-sources.jar" />
 		</publish-portal-artifact>
 	</target>
 
-	<target depends="jar,jar-javadoc,jar-sources" name="publish-portal-snapshot">
-		<publish-portal-artifact snapshot="true">
+	<target name="publish-portal-snapshot">
+		<publish-portal-artifact snapshot="true" targets="jar,jar-javadoc,jar-sources">
 			<attach classifier="javadoc" file="${artifact.name}-javadoc.jar" />
 			<attach classifier="sources" file="${artifact.name}-sources.jar" />
 		</publish-portal-artifact>
