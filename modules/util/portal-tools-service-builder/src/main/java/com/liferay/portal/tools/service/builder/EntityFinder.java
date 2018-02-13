@@ -14,8 +14,8 @@
 
 package com.liferay.portal.tools.service.builder;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TextFormatter;
 
 import java.util.List;
@@ -66,7 +66,9 @@ public class EntityFinder {
 
 	public String getHumanConditions(boolean arrayable) {
 		if (_columns.size() == 1) {
-			return _columns.get(0).getHumanCondition(arrayable);
+			EntityColumn column = _columns.get(0);
+
+			return column.getHumanCondition(arrayable);
 		}
 
 		StringBundler sb = new StringBundler(_columns.size() * 2);

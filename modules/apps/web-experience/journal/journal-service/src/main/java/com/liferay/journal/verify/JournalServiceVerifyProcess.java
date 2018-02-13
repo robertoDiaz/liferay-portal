@@ -31,6 +31,7 @@ import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.util.comparator.ArticleVersionComparator;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
@@ -52,14 +53,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.verify.VerifyLayout;
 import com.liferay.portal.verify.VerifyProcess;
 import com.liferay.portal.verify.VerifyResourcePermissions;
@@ -104,7 +103,6 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		verifyOracleNewLine();
 		verifyPermissions();
 		verifyResourcedModels();
-		verifyTree();
 		verifyURLTitle();
 		verifyUUIDModels();
 
@@ -402,8 +400,10 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"Unable to update asset for article " +
-								journalArticle.getId() + ": " + e.getMessage());
+							StringBundler.concat(
+								"Unable to update asset for article ",
+								String.valueOf(journalArticle.getId()), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -527,8 +527,8 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 
 			StringBundler sb = new StringBundler(15);
 
-			sb.append("select JournalArticle.* from JournalArticle left ");
-			sb.append("join JournalArticle tempJournalArticle on ");
+			sb.append("select JournalArticle.* from JournalArticle left join ");
+			sb.append("JournalArticle tempJournalArticle on ");
 			sb.append("(JournalArticle.groupId = tempJournalArticle.groupId) ");
 			sb.append("and (JournalArticle.articleId = ");
 			sb.append("tempJournalArticle.articleId) and ");
@@ -576,8 +576,10 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 				long count = actionableDynamicQuery.performCount();
 
 				_log.debug(
-					"Processing " + count + " articles for invalid " +
-						"structures and dynamic elements");
+					StringBundler.concat(
+						"Processing ", String.valueOf(count),
+						" articles for invalid structures and dynamic ",
+						"elements"));
 			}
 
 			actionableDynamicQuery.setPerformActionMethod(
@@ -653,8 +655,10 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"Unable to update asset for folder " +
-								folder.getFolderId() + ": " + e.getMessage());
+							StringBundler.concat(
+								"Unable to update asset for folder ",
+								String.valueOf(folder.getFolderId()), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -742,16 +746,6 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 			_verifyResourcePermissions.verify(
 				new JournalArticleVerifiableModel());
 			_verifyResourcePermissions.verify(new JournalFeedVerifiableModel());
-		}
-	}
-
-	protected void verifyTree() throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			long[] companyIds = PortalInstances.getCompanyIdsBySQL();
-
-			for (long companyId : companyIds) {
-				_journalFolderLocalService.rebuildTree(companyId);
-			}
 		}
 	}
 

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.servlet.filters.secure;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,7 +34,6 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -274,24 +274,24 @@ public class SecureFilter extends BasePortalFilter {
 				_log.debug("Securing " + completeURL);
 			}
 
-			StringBundler redirectURL = new StringBundler(5);
+			StringBundler sb = new StringBundler(5);
 
-			redirectURL.append(Http.HTTPS_WITH_SLASH);
-			redirectURL.append(request.getServerName());
-			redirectURL.append(request.getServletPath());
+			sb.append(Http.HTTPS_WITH_SLASH);
+			sb.append(request.getServerName());
+			sb.append(request.getServletPath());
 
 			String queryString = request.getQueryString();
 
 			if (Validator.isNotNull(queryString)) {
-				redirectURL.append(StringPool.QUESTION);
-				redirectURL.append(request.getQueryString());
+				sb.append(StringPool.QUESTION);
+				sb.append(request.getQueryString());
 			}
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Redirect to " + redirectURL);
+				_log.debug("Redirect to " + sb.toString());
 			}
 
-			response.sendRedirect(redirectURL.toString());
+			response.sendRedirect(sb.toString());
 		}
 		else {
 			if (_log.isDebugEnabled()) {

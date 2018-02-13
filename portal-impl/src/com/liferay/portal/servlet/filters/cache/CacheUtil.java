@@ -15,10 +15,11 @@
 package com.liferay.portal.servlet.filters.cache;
 
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.util.servlet.filters.CacheResponseData;
@@ -61,7 +62,7 @@ public class CacheUtil {
 		if (data != null) {
 			key = _encodeKey(companyId, key);
 
-			_portalCache.put(key, data);
+			PortalCacheHelperUtil.putWithoutReplicator(_portalCache, key, data);
 		}
 	}
 

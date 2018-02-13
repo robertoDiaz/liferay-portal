@@ -22,6 +22,7 @@ import com.liferay.asset.kernel.model.adapter.StagedAssetLink;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -43,7 +44,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.asset.model.impl.AssetLinkImpl;
 import com.liferay.portlet.asset.service.base.AssetLinkLocalServiceBaseImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
@@ -85,7 +85,7 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 			long userId, long entryId1, long entryId2, int type, int weight)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
 		long linkId = counterLocalService.increment();
@@ -422,6 +422,18 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 		links.addAll(e2Links);
 
 		return links;
+	}
+
+	/**
+	 * Returns all the asset links of an AssetEntry.
+	 *
+	 * @param classNameId AssetEntry's classNameId
+	 * @param classPK AssetEntry's classPK
+	 * @return the asset links of the given entry params
+	 */
+	@Override
+	public List<AssetLink> getLinks(long classNameId, long classPK) {
+		return assetLinkFinder.findByC_C(classNameId, classPK);
 	}
 
 	/**
