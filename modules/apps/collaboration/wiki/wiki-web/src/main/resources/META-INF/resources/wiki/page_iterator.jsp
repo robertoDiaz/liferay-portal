@@ -210,7 +210,13 @@ for (int i = 0; i < pages.size(); i++) {
 	// Date
 
 	if (!curWikiPage.isNew()) {
-		row.addDate(curWikiPage.getCreateDate(), rowURL);
+		Date curDate = new Date();
+		Date modifiedDate = curWikiPage.getStatusDate();
+
+		String dataAsText = LanguageUtil.getTimeDescription(
+			request, curDate.getTime() - modifiedDate.getTime(), true);
+
+		row.addText(dataAsText, rowURL);
 	}
 	else {
 		row.addText(StringPool.BLANK);
@@ -250,11 +256,11 @@ for (int i = 0; i < pages.size(); i++) {
 
 <c:if test='<%= navigation.equals("history") && (pages.size() > 1) %>'>
 	<aui:button-row>
-		<aui:button cssClass="btn-lg" name="compare" primary="<%= true %>" value="compare-versions" />
+		<aui:button name="compare" primary="<%= true %>" value="compare-versions" />
 	</aui:button-row>
 </c:if>
 
-<liferay-ui:categorization-filter
+<liferay-asset:categorization-filter
 	assetType="pages"
 	portletURL="<%= portletURL %>"
 />
