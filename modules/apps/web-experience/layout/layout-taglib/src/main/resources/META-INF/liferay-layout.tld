@@ -11,6 +11,66 @@
 	<short-name>liferay-layout</short-name>
 	<uri>http://liferay.com/tld/layout</uri>
 	<tag>
+		<description>Creates a component that displays a contextual sidebar.</description>
+		<name>contextual-sidebar</name>
+		<tag-class>com.liferay.layout.taglib.servlet.taglib.soy.ContextualSidebarTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description></description>
+			<name>body</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>bodyClasses</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>componentId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>elementClasses</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>header</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>headerClasses</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>namespace</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>visible</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<description>Creates a component that displays a tree of pages.</description>
 		<name>layouts-tree</name>
 		<tag-class>com.liferay.layout.taglib.servlet.taglib.LayoutsTreeTag</tag-class>
@@ -70,14 +130,14 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>The base <![CDATA[<code>PortletURL</code>]]> to use to generate the URL of the nodes.</description>
+			<description>The base portlet URL to use to generate the URL of the nodes.</description>
 			<name>portletURL</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>javax.portlet.PortletURL</type>
 		</attribute>
 		<attribute>
-			<description>A map of base <![CDATA[<code>PortletURL</code>]]>s that can be used to generate several URLs in the nodes. The key of the map is replaced by the value in the <![CDATA[<code>linkTemplate</code>]]> or <![CDATA[<code>rootLinkTemplate</code>]]>.</description>
+			<description>A map of base portlet URLs that can be used to generate several URLs in the nodes. The key of the map is replaced by the value in the <![CDATA[<code>linkTemplate</code>]]> or <![CDATA[<code>rootLinkTemplate</code>]]>.</description>
 			<name>portletURLs</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>

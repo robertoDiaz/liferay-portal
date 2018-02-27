@@ -14,12 +14,12 @@
 
 package com.liferay.wiki.util;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.wiki.engine.WikiEngine;
 import com.liferay.wiki.engine.impl.WikiEngineRenderer;
@@ -49,12 +49,24 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = WikiCacheHelper.class)
 public class WikiCacheHelper {
 
+	public void clearCache() {
+		_portalCache.removeAll();
+	}
+
+	/**
+	 * @deprecated As of 1.7.0, replaced by {@link #clearCache()}
+	 */
+	@Deprecated
 	public void clearCache(long nodeId) {
 		_portalCache.removeAll();
 	}
 
+	/**
+	 * @deprecated As of 1.7.0, replaced by {@link #clearCache()}
+	 */
+	@Deprecated
 	public void clearCache(long nodeId, String title) {
-		clearCache(nodeId);
+		_portalCache.removeAll();
 	}
 
 	public WikiPageDisplay getDisplay(
@@ -89,9 +101,11 @@ public class WikiCacheHelper {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"getDisplay for {" + nodeId + ", " + title + ", " +
-					viewPageURL + ", " + editPageURLSupplier.get() +
-						"} takes " + stopWatch.getTime() + " ms");
+				StringBundler.concat(
+					"getDisplay for {", String.valueOf(nodeId), ", ", title,
+					", ", String.valueOf(viewPageURL), ", ",
+					String.valueOf(editPageURLSupplier.get()), "} takes ",
+					String.valueOf(stopWatch.getTime()), " ms"));
 		}
 
 		return pageDisplay;
@@ -146,11 +160,10 @@ public class WikiCacheHelper {
 	}
 
 	private String _encodeKey(long nodeId, String title, String postfix) {
-		StringBundler sb = new StringBundler(6);
+		StringBundler sb = new StringBundler(5);
 
-		sb.append(_CACHE_NAME);
-		sb.append(StringPool.POUND);
 		sb.append(StringUtil.toHexString(nodeId));
+		sb.append(StringPool.POUND);
 		sb.append(title);
 
 		if (postfix != null) {
@@ -168,8 +181,10 @@ public class WikiCacheHelper {
 		try {
 			if (_log.isInfoEnabled()) {
 				_log.info(
-					"Get page display for {" + nodeId + ", " + title + ", " +
-						viewPageURL + ", " + editPageURL + "}");
+					StringBundler.concat(
+						"Get page display for {", String.valueOf(nodeId), ", ",
+						title, ", ", String.valueOf(viewPageURL), ", ",
+						String.valueOf(editPageURL), "}"));
 			}
 
 			return WikiPageLocalServiceUtil.getPageDisplay(
@@ -178,15 +193,18 @@ public class WikiCacheHelper {
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to get page display for {" + nodeId + ", " + title +
-						", " + viewPageURL + ", " + editPageURL + "}");
+					StringBundler.concat(
+						"Unable to get page display for {",
+						String.valueOf(nodeId), ", ", title, ", ",
+						String.valueOf(viewPageURL), ", ",
+						String.valueOf(editPageURL), "}"));
 			}
 
 			return null;
 		}
 	}
 
-	private static final String _CACHE_NAME = WikiCacheHelper.class.getName();
+	private static final String _CACHE_NAME = WikiPageDisplay.class.getName();
 
 	private static final String _OUTGOING_LINKS = "OUTGOING_LINKS";
 

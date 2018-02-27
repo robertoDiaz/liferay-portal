@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
@@ -37,6 +38,7 @@ page import="com.liferay.dynamic.data.mapping.exception.StructureFieldException"
 page import="com.liferay.dynamic.data.mapping.exception.StructureNameException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.TemplateNameException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.TemplateScriptException" %><%@
+page import="com.liferay.dynamic.data.mapping.exception.TemplateSmallImageContentException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.TemplateSmallImageNameException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.TemplateSmallImageSizeException" %><%@
 page import="com.liferay.dynamic.data.mapping.model.DDMForm" %><%@
@@ -71,10 +73,12 @@ page import="com.liferay.dynamic.data.mapping.validator.DDMFormValidationExcepti
 page import="com.liferay.dynamic.data.mapping.web.configuration.DDMWebConfigurationKeys" %><%@
 page import="com.liferay.dynamic.data.mapping.web.configuration.DDMWebConfigurationUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.web.internal.display.context.DDMDisplayContext" %><%@
-page import="com.liferay.petra.content.ContentUtil" %><%@
+page import="com.liferay.dynamic.data.mapping.web.internal.search.DDMStructureRowChecker" %><%@
+page import="com.liferay.dynamic.data.mapping.web.internal.search.DDMTemplateRowChecker" %><%@
+page import="com.liferay.petra.string.CharPool" %><%@
+page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.configuration.Filter" %><%@
-page import="com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.editor.EditorModeUtil" %><%@
 page import="com.liferay.portal.kernel.exception.LocaleException" %><%@
@@ -101,7 +105,6 @@ page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><
 page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
 page import="com.liferay.portal.kernel.template.comparator.TemplateHandlerComparator" %><%@
-page import="com.liferay.portal.kernel.util.CharPool" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ListUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
@@ -111,7 +114,6 @@ page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.ResourceBundleLoader" %><%@
 page import="com.liferay.portal.kernel.util.ResourceBundleLoaderUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringBundler" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
