@@ -14,11 +14,12 @@
 
 package com.liferay.source.formatter.util;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.ExcludeSyntax;
 import com.liferay.source.formatter.ExcludeSyntaxPattern;
 import com.liferay.source.formatter.SourceFormatterExcludes;
@@ -188,6 +189,43 @@ public class SourceFormatterUtil {
 		}
 
 		return null;
+	}
+
+	public static List<File> getSuppressionsFiles(
+		String basedir, String fileName, List<String> allFileNames,
+		SourceFormatterExcludes sourceFormatterExcludes) {
+
+		List<File> suppressionsFiles = new ArrayList<>();
+
+		// Find suppressions files in any parent directory
+
+		String parentDirName = basedir;
+
+		for (int i = 0; i < ToolsUtil.PORTAL_MAX_DIR_LEVEL; i++) {
+			File suppressionsFile = new File(parentDirName + fileName);
+
+			if (suppressionsFile.exists()) {
+				suppressionsFiles.add(suppressionsFile);
+			}
+
+			parentDirName += "../";
+		}
+
+		// Find suppressions files in any child directory
+
+		List<String> moduleSuppressionsFileNames = filterFileNames(
+			allFileNames, new String[0], new String[] {"**/" + fileName},
+			sourceFormatterExcludes, true);
+
+		for (String moduleSuppressionsFileName : moduleSuppressionsFileNames) {
+			moduleSuppressionsFileName = StringUtil.replace(
+				moduleSuppressionsFileName, CharPool.BACK_SLASH,
+				CharPool.SLASH);
+
+			suppressionsFiles.add(new File(moduleSuppressionsFileName));
+		}
+
+		return suppressionsFiles;
 	}
 
 	public static void printError(String fileName, File file) {
