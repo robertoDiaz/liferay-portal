@@ -21,6 +21,8 @@ AUI.add(
 
 		var CSS_SELECT_OPTION_ITEM = A.getClassName('select', 'option', 'item');
 
+		var CSS_SELECT_DROPDOWN_ITEM = A.getClassName('dropdown', 'item');
+
 		var CSS_SELECT_TRIGGER_ACTION = A.getClassName('select', 'field', 'trigger');
 
 		var Lang = A.Lang;
@@ -34,6 +36,13 @@ AUI.add(
 						value: 'manual'
 					},
 
+					fixedOptions: {
+						getter: '_getFixedOptions',
+						state: true,
+						validator: Array.isArray,
+						value: []
+					},
+
 					multiple: {
 						state: true,
 						value: false
@@ -41,6 +50,12 @@ AUI.add(
 
 					options: {
 						getter: '_getOptions',
+						state: true,
+						validator: Array.isArray,
+						value: []
+					},
+
+					predefinedValue: {
 						state: true,
 						validator: Array.isArray,
 						value: []
@@ -65,6 +80,7 @@ AUI.add(
 					},
 
 					value: {
+						state: true,
 						value: []
 					}
 				},
@@ -138,16 +154,20 @@ AUI.add(
 					getTemplateContext: function() {
 						var instance = this;
 
+						var soyIncDom = window.DDMSelect.render.Soy.toIncDom;
+
 						return A.merge(
 							SelectField.superclass.getTemplateContext.apply(instance, arguments),
 							{
-								badgeCloseIcon: Liferay.Util.getLexiconIconTpl('times', 'icon-monospaced'),
+								badgeCloseIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('times')),
+								fixedOptions: instance.get('fixedOptions'),
 								open: instance._open,
 								options: instance.get('options'),
-								selectCaretDoubleIcon: Liferay.Util.getLexiconIconTpl('caret-double-l', 'icon-monospaced'),
-								selectSearchIcon: Liferay.Util.getLexiconIconTpl('search', 'icon-monospaced'),
+								predefinedValue: instance.get('readOnly') ? instance.get('predefinedValue') : instance.getValue(),
+								selectCaretDoubleIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('caret-double')),
+								selectSearchIcon: soyIncDom(Liferay.Util.getLexiconIconTpl('search')),
 								strings: instance.get('strings'),
-								value: instance.getValueSelected()
+								value: instance.getValue()
 							}
 						);
 					},
@@ -156,14 +176,6 @@ AUI.add(
 						var instance = this;
 
 						return instance.get('value') || [];
-					},
-
-					getValueSelected: function() {
-						var instance = this;
-
-						var value = instance.get('value') || [];
-
-						return instance._getOptionsSelected(value);
 					},
 
 					openList: function() {
@@ -259,30 +271,12 @@ AUI.add(
 						);
 					},
 
-					_getOptions: function(options) {
-						return options || [];
+					_getFixedOptions: function(fixedOptions) {
+						return fixedOptions || [];
 					},
 
-					_getOptionsSelected: function(value) {
-						var instance = this;
-
-						var options = instance.get('options');
-
-						var optionsSelected = [];
-
-						value.forEach(
-							function(value, index) {
-								options.forEach(
-									function(option, index) {
-										if (value && option.value === value) {
-											optionsSelected.push(option);
-										}
-									}
-								);
-							}
-						);
-
-						return optionsSelected;
+					_getOptions: function(options) {
+						return options || [];
 					},
 
 					_getSelectTriggerAction: function() {
@@ -306,9 +300,20 @@ AUI.add(
 
 						var target = event.target;
 
+						var addRepeatebleButton = target.hasClass('lfr-ddm-form-field-repeatable-add-button');
+
 						var closeIconNode = target.ancestor('.' + CSS_SELECT_BADGE_ITEM_CLOSE, true);
 
+						var deleteRepeatebleButton = target.hasClass('lfr-ddm-form-field-repeatable-delete-button');
+
 						var optionNode = target.ancestor('.' + CSS_SELECT_OPTION_ITEM, true);
+
+						if (instance.get('multiple')) {
+							var optionNode = target.ancestor('.' + CSS_SELECT_DROPDOWN_ITEM, true);
+						} else {
+							var optionNode = target.ancestor('.' + CSS_SELECT_OPTION_ITEM, true);
+
+						}
 
 						if (closeIconNode) {
 							instance._handleBadgeItemCloseClick(closeIconNode);
@@ -316,7 +321,7 @@ AUI.add(
 						else if (optionNode) {
 							instance._handleItemClick(optionNode);
 						}
-						else {
+						else if (!addRepeatebleButton && !deleteRepeatebleButton) {
 							instance._handleSelectTriggerClick(event);
 						}
 
@@ -338,7 +343,7 @@ AUI.add(
 							if (currentTarget.getAttribute('data-option-selected')) {
 								value = instance._removeValue(itemValue);
 							}
-							else {
+							else if (value.indexOf(itemValue) == -1) {
 								value.push(itemValue);
 							}
 						}
@@ -351,6 +356,8 @@ AUI.add(
 						instance.setValue(value);
 
 						instance.focus();
+
+						instance._fireStartedFillingEvent();
 					},
 
 					_handleSelectTriggerClick: function(event) {
@@ -395,7 +402,6 @@ AUI.add(
 						if (triggers.length) {
 							for (var i = 0; i < triggers.length; i++) {
 								if (triggers[i].contains(event.target)) {
-
 									return false;
 								}
 							}

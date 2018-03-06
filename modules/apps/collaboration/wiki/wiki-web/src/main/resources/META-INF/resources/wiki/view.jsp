@@ -100,7 +100,7 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(WikiPage.class
 AssetEntryServiceUtil.incrementViewCounter(layoutAssetEntry);
 
 if (Validator.isNotNull(ParamUtil.getString(request, "title"))) {
-	AssetUtil.addLayoutTags(request, AssetTagLocalServiceUtil.getTags(WikiPage.class.getName(), wikiPage.getResourcePrimKey()));
+	assetHelper.addLayoutTags(request, AssetTagLocalServiceUtil.getTags(WikiPage.class.getName(), wikiPage.getResourcePrimKey()));
 }
 
 request.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, layoutAssetEntry);
@@ -184,7 +184,7 @@ if (portletTitleBasedNavigation) {
 				WikiEngineRenderer wikiEngineRenderer = (WikiEngineRenderer)request.getAttribute(WikiWebKeys.WIKI_ENGINE_RENDERER);
 
 				try {
-					formattedContent = wikiEngineRenderer.getFormattedContent(renderRequest, renderResponse, wikiPage, viewPageURL, editPageURL, title, preview);
+					formattedContent = WikiUtil.getFormattedContent(wikiEngineRenderer, renderRequest, renderResponse, wikiPage, viewPageURL, editPageURL, title, preview);
 				}
 				catch (Exception e) {
 					formattedContent = wikiPage.getContent();
@@ -224,7 +224,7 @@ if (portletTitleBasedNavigation) {
 						<c:if test="<%= !print && !portletTitleBasedNavigation %>">
 							<div class="page-actions top-actions">
 								<c:if test="<%= followRedirect || (redirectPage == null) %>">
-									<c:if test="<%= Validator.isNotNull(formattedContent) && WikiNodePermissionChecker.contains(permissionChecker, node, ActionKeys.ADD_PAGE) %>">
+									<c:if test="<%= Validator.isNotNull(formattedContent) && WikiNodePermission.contains(permissionChecker, node, ActionKeys.ADD_PAGE) %>">
 										<liferay-ui:icon
 											iconCssClass="icon-plus"
 											label="<%= true %>"
@@ -234,7 +234,7 @@ if (portletTitleBasedNavigation) {
 										/>
 									</c:if>
 
-									<c:if test="<%= WikiPagePermissionChecker.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) %>">
+									<c:if test="<%= WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) %>">
 										<liferay-ui:icon
 											iconCssClass="icon-edit"
 											label="<%= true %>"
@@ -442,7 +442,7 @@ if (portletTitleBasedNavigation) {
 						description = StringUtil.shorten(description, 200);
 
 						PortalUtil.setPageDescription(description, request);
-						PortalUtil.setPageKeywords(AssetUtil.getAssetKeywords(WikiPage.class.getName(), wikiPage.getResourcePrimKey()), request);
+						PortalUtil.setPageKeywords(assetHelper.getAssetKeywords(WikiPage.class.getName(), wikiPage.getResourcePrimKey()), request);
 					}
 
 					List<WikiPage> parentPages = wikiPage.getViewableParentPages();
@@ -491,7 +491,7 @@ if (portletTitleBasedNavigation) {
 							String childPageFormattedContent = null;
 
 							try {
-								childPageFormattedContent = wikiEngineRenderer.getFormattedContent(renderRequest, renderResponse, childPage, viewPageURL, editPageURL, childPage.getTitle(), false);
+								childPageFormattedContent = WikiUtil.getFormattedContent(wikiEngineRenderer, renderRequest, renderResponse, childPage, viewPageURL, editPageURL, childPage.getTitle(), false);
 							}
 							catch (Exception e) {
 								childPageFormattedContent = childPage.getContent();

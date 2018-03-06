@@ -70,14 +70,14 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>The base <![CDATA[<code>PortletURL</code>]]> to use to generate the URL of the nodes.</description>
+			<description>The base portlet URL to use to generate the URL of the nodes.</description>
 			<name>portletURL</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>javax.portlet.PortletURL</type>
 		</attribute>
 		<attribute>
-			<description>A map of base <![CDATA[<code>PortletURL</code>]]>s that can be used to generate several URLs in the nodes. The key of the map is replaced by the value in the <![CDATA[<code>linkTemplate</code>]]> or <![CDATA[<code>rootLinkTemplate</code>]]>.</description>
+			<description>A map of base portlet URLs that can be used to generate several URLs in the nodes. The key of the map is replaced by the value in the <![CDATA[<code>linkTemplate</code>]]> or <![CDATA[<code>rootLinkTemplate</code>]]>.</description>
 			<name>portletURLs</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -108,6 +108,12 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>The position of the script rendered by this tag. See the documentation for the <![CDATA[<code>&lt;aui:script&gt;</code>]]> tag's <![CDATA[<code>&lt;position&gt;</code>]]> attribute for more details.</description>
+			<name>scriptPosition</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<description>Whether to provide each node a checkbox so the pages can be selected.</description>
