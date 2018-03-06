@@ -443,6 +443,8 @@ name = HtmlUtil.escapeJS(name);
 			</c:if>
 
 			window['<%= name %>'].instanceReady = true;
+
+			Liferay.component('<%= name %>', window['<%= name %>']);
 		}
 
 		currentToolbarSet = getToolbarSet(initialToolbarSet);
@@ -578,6 +580,8 @@ name = HtmlUtil.escapeJS(name);
 											window['<%= name %>'].dispose();
 
 											window['<%= name %>'].create();
+
+											window['<%= name %>'].setHTML(ckEditorContent);
 
 											initialEditor = CKEDITOR.instances['<%= name %>'].id;
 										}
