@@ -15,7 +15,6 @@
 package com.liferay.source.formatter.dependencies;
 
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
@@ -126,9 +125,9 @@ public class IncorrectLineBreaks1 {
 		return;
 	}
 
-	public void method7(ThemeDisplay themeDisplay) {
+	public void method7(long companyId) {
 		PortletLocalServiceUtil.visitPortlets(
-			themeDisplay.getCompanyId(), portlet -> {
+			companyId, portlet -> {
 				if (portlet.isSinglePageApplication() && portlet.isActive() &&
 					portlet.isReady()) {
 
@@ -145,6 +144,18 @@ public class IncorrectLineBreaks1 {
 
 			continue;
 		}
+	}
+
+	protected String[][] getTwoDimensionalArray() {
+		return new String[][] {
+			new String[] {
+				"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+				"Nine", "Ten"
+			},
+			new String[] {
+				"Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+				"Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"
+			}};
 	}
 
 	private static final String[] _NUMBERS = {

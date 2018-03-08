@@ -423,6 +423,11 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	@Override
+	public java.lang.String[] getChildrenTypes(java.lang.String type) {
+		return _organizationLocalService.getChildrenTypes(type);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.exportimport.kernel.lar.PortletDataContext portletDataContext) {
 		return _organizationLocalService.getExportActionableDynamicQuery(portletDataContext);
@@ -611,6 +616,12 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 			parentOrganizationId, start, end);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Organization> getOrganizations(
+		long companyId, java.lang.String treePath) {
+		return _organizationLocalService.getOrganizations(companyId, treePath);
+	}
+
 	/**
 	* Returns the organizations with the primary keys.
 	*
@@ -776,6 +787,11 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 		java.util.List<com.liferay.portal.kernel.model.Organization> availableOrganizations) {
 		return _organizationLocalService.getSubsetOrganizations(allOrganizations,
 			availableOrganizations);
+	}
+
+	@Override
+	public java.lang.String[] getTypes() {
+		return _organizationLocalService.getTypes();
 	}
 
 	/**
@@ -959,6 +975,21 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	@Override
 	public boolean hasUserOrganizations(long userId) {
 		return _organizationLocalService.hasUserOrganizations(userId);
+	}
+
+	@Override
+	public boolean isCountryEnabled(java.lang.String type) {
+		return _organizationLocalService.isCountryEnabled(type);
+	}
+
+	@Override
+	public boolean isCountryRequired(java.lang.String type) {
+		return _organizationLocalService.isCountryRequired(type);
+	}
+
+	@Override
+	public boolean isRootable(java.lang.String type) {
+		return _organizationLocalService.isRootable(type);
 	}
 
 	/**

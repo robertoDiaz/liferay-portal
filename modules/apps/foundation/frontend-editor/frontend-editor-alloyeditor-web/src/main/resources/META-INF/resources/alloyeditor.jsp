@@ -57,19 +57,21 @@ if (editorOptions != null) {
 
 <c:if test="<%= !skipEditorLoading %>">
 	<liferay-util:html-top outputKey="js_editor_alloyeditor_skip_editor_loading">
-		<link href="<%= PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR) + "/alloyeditor/assets/alloy-editor-atlas.css") %>" rel="stylesheet" type="text/css" />
+		<link data-senna-track="temporary" href="<%= PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR) + "/alloyeditor/assets/alloy-editor-atlas.css") %>" rel="stylesheet" type="text/css" />
 
 		<%
 		long javaScriptLastModified = PortalWebResourcesUtil.getLastModified(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR);
 		%>
 
-		<script type="text/javascript">
+		<script data-senna-track="temporary" type="text/javascript">
 			window.ALLOYEDITOR_BASEPATH = '<%= PortalUtil.getPathProxy() + application.getContextPath() %>/alloyeditor/';
 		</script>
 
 		<script data-senna-track="temporary" id="<%= namespace %>ckEditorScript" src="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_CKEDITOR) + "/ckeditor/ckeditor.js", javaScriptLastModified)) %>" type="text/javascript"></script>
 
-		<script data-senna-track="temporary" id="<%= namespace %>alloyEditorScript" src="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR) + "/alloyeditor/liferay-alloy-editor-no-ckeditor-min.js", javaScriptLastModified)) %>" type="text/javascript"></script>
+		<script data-senna-track="temporary" id="<%= namespace %>alloyEditorScript" src="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR) + "/alloyeditor/alloy-editor-no-ckeditor-min.js", javaScriptLastModified)) %>" type="text/javascript"></script>
+
+		<script data-senna-track="temporary" id="<%= namespace %>alloyEditorScript" src="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_EDITOR_ALLOYEDITOR) + "/alloyeditor/alloy-editor-extras.js", javaScriptLastModified)) %>" type="text/javascript"></script>
 
 		<liferay-util:dynamic-include key='<%= "com.liferay.frontend.editor.alloyeditor.web#" + editorName + "#additionalResources" %>' />
 
