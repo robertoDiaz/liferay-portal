@@ -22,7 +22,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Lino Alves
  */
 @ExtendedObjectClassDefinition(
-	category = "forms-and-workflow",
+	category = "dynamic-data-mapping",
 	scope = ExtendedObjectClassDefinition.Scope.GROUP
 )
 @Meta.OCD(
@@ -33,13 +33,14 @@ public interface DDMGroupServiceConfiguration {
 
 	@Meta.AD(
 		deflt = ".gif|.jpeg|.jpg|.png",
-		description = "small-image-extensions-description", required = false
+		description = "small-image-extensions-description",
+		name = "small-image-extensions", required = false
 	)
 	public String[] smallImageExtensions();
 
 	@Meta.AD(
 		deflt = "51200", description = "small-image-max-size-description",
-		required = false
+		name = "small-image-max-size", required = false
 	)
 	public int smallImageMaxSize();
 

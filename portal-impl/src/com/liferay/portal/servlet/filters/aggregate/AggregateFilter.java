@@ -14,6 +14,9 @@
 
 package com.liferay.portal.servlet.filters.aggregate;
 
+import com.liferay.petra.io.unsync.UnsyncBufferedReader;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,15 +29,14 @@ import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.ResourceUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -48,7 +50,9 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -133,12 +137,10 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 				String importContent = null;
 
 				if (Validator.isUrl(importFileName)) {
-					URL url = new URL(importFileName);
+					ServletPaths downServletPaths = servletPaths.down(
+						importFileName);
 
-					URLConnection urlConnection = url.openConnection();
-
-					importContent = StringUtil.read(
-						urlConnection.getInputStream());
+					importContent = downServletPaths.getContent();
 				}
 				else {
 					int queryPos = importFileName.indexOf(CharPool.QUESTION);
@@ -292,7 +294,23 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			long lastModified = PortalWebResourcesUtil.getLastModified(
 				PortalWebResourceConstants.RESOURCE_TYPE_JS);
 
-			if (lastModified <= cacheFile.lastModified()) {
+			long fileLastModifiedTime = -1;
+
+			try (Reader reader = new FileReader(cacheFile);
+				UnsyncBufferedReader unsyncBufferedReader =
+					new UnsyncBufferedReader(reader)) {
+
+				String line = unsyncBufferedReader.readLine();
+
+				if ((line != null) &&
+					line.startsWith(StringPool.DOUBLE_SLASH)) {
+
+					fileLastModifiedTime = GetterUtil.getLong(
+						line.substring(2), -1);
+				}
+			}
+
+			if (lastModified == fileLastModifiedTime) {
 				response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 
 				return cacheFile;
@@ -312,6 +330,13 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			content = aggregateJavaScript(
 				new ServletPaths(jsServletContext, bundleDirName), fileNames);
 		}
+
+		content = StringBundler.concat(
+			StringPool.DOUBLE_SLASH,
+			String.valueOf(
+				PortalWebResourcesUtil.getLastModified(
+					PortalWebResourceConstants.RESOURCE_TYPE_JS)),
+			StringPool.NEW_LINE, content);
 
 		response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 
@@ -376,7 +401,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			_tempDir, cacheCommonFileName + "_E_DATA");
 
 		if (cacheDataFile.exists() &&
-			(cacheDataFile.lastModified() >=
+			(cacheDataFile.lastModified() ==
 				URLUtil.getLastModifiedTime(resourceURL)) &&
 			!_isLegacyIe(request)) {
 
@@ -384,6 +409,12 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 				String contentType = FileUtil.read(cacheContentTypeFile);
 
 				response.setContentType(contentType);
+			}
+			else if (resourcePath.endsWith(_CSS_EXTENSION)) {
+				response.setContentType(ContentTypes.TEXT_CSS);
+			}
+			else if (resourcePath.endsWith(_JAVASCRIPT_EXTENSION)) {
+				response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 			}
 
 			return cacheDataFile;
@@ -447,6 +478,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		}
 
 		FileUtil.write(cacheDataFile, content);
+
+		cacheDataFile.setLastModified(URLUtil.getLastModifiedTime(resourceURL));
 
 		return content;
 	}

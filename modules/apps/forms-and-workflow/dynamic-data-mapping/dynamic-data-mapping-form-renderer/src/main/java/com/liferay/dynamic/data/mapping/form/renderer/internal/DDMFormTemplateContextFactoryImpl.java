@@ -19,12 +19,14 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
+import com.liferay.dynamic.data.mapping.form.renderer.internal.util.DDMFormTemplateContextFactoryUtil;
 import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesJSONSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
+import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceService;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -38,19 +40,23 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.template.soy.utils.SoyHTMLContextValue;
+import com.liferay.portal.template.soy.utils.SoyHTMLSanitizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -157,10 +163,12 @@ public class DDMFormTemplateContextFactoryImpl
 
 		templateContext.put(
 			"requiredFieldsWarningMessageHTML",
-			new SoyHTMLContextValue(
-				getRequiredFieldsWarningMessageHTML(resourceBundle)));
+			_soyHTMLSanitizer.sanitize(
+				getRequiredFieldsWarningMessageHTML(
+					resourceBundle,
+					ddmFormRenderingContext.getHttpServletRequest())));
 
-		templateContext.put("rules", ddmForm.getDDMFormRules());
+		templateContext.put("rules", toObjectList(ddmForm.getDDMFormRules()));
 		templateContext.put(
 			"showRequiredFieldsWarning",
 			ddmFormRenderingContext.isShowRequiredFieldsWarning());
@@ -217,12 +225,13 @@ public class DDMFormTemplateContextFactoryImpl
 			_ddmFormEvaluator);
 		ddmFormPagesTemplateContextFactory.setDDMFormFieldTypeServicesTracker(
 			_ddmFormFieldTypeServicesTracker);
+		ddmFormPagesTemplateContextFactory.setJSONFactory(_jsonFactory);
 
 		return ddmFormPagesTemplateContextFactory.create();
 	}
 
 	protected String getRequiredFieldsWarningMessageHTML(
-		ResourceBundle resourceBundle) {
+		ResourceBundle resourceBundle, HttpServletRequest httpServletRequest) {
 
 		StringBundler sb = new StringBundler(3);
 
@@ -230,8 +239,23 @@ public class DDMFormTemplateContextFactoryImpl
 		sb.append(
 			LanguageUtil.format(
 				resourceBundle, "all-fields-marked-with-x-are-required",
-				"<i class=\"icon-asterisk text-warning\"></i>", false));
+				getRequiredMarkTagHTML(httpServletRequest), false));
 		sb.append("</label>");
+
+		return sb.toString();
+	}
+
+	protected String getRequiredMarkTagHTML(
+		HttpServletRequest httpServletRequest) {
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append("<svg aria-hidden=\"true\" class=\"lexicon-icon ");
+		sb.append("lexicon-icon-asterisk reference-mark\"><use xlink:href=\"");
+		sb.append(
+			DDMFormTemplateContextFactoryUtil.getPathThemeImages(
+				httpServletRequest));
+		sb.append("/lexicon/icons.svg#asterisk\" /></svg>");
 
 		return sb.toString();
 	}
@@ -296,6 +320,30 @@ public class DDMFormTemplateContextFactoryImpl
 		}
 	}
 
+	protected Map<String, Object> toMap(DDMFormRule ddmFormRule) {
+		Map<String, Object> map = new HashMap<>();
+
+		map.put("actions", ddmFormRule.getActions());
+		map.put("condition", ddmFormRule.getCondition());
+		map.put("enable", ddmFormRule.isEnabled());
+
+		return map;
+	}
+
+	protected List<Object> toObjectList(List<DDMFormRule> ddmFormRules) {
+		if (ddmFormRules == null) {
+			return Collections.emptyList();
+		}
+
+		Stream<DDMFormRule> stream = ddmFormRules.stream();
+
+		return stream.map(
+			this::toMap
+		).collect(
+			Collectors.toList()
+		);
+	}
+
 	@Reference
 	private DDM _ddm;
 
@@ -327,5 +375,8 @@ public class DDMFormTemplateContextFactoryImpl
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private SoyHTMLSanitizer _soyHTMLSanitizer;
 
 }
