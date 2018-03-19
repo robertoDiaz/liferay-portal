@@ -9,10 +9,12 @@
 		<if>
 			<condition function="IsElementPresent" locator1="Blogs#ADD_BLOGS_ENTRY" />
 			<then>
-				<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
+				<execute function="Click" locator1="Blogs#ADD_BLOGS_ENTRY" />
 			</then>
 			<else>
-				<execute function="Click" locator1="Button#PLUS" />
+				<var name="key_text" value="New Blog Entry" />
+
+				<execute function="AssertClick" locator1="Button#ANY" value1="New Blog Entry" />
 			</else>
 		</if>
 
@@ -77,7 +79,7 @@
 
 	<command name="gotoDraftCP">
 		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
+			<var name="displayStyle" value="descriptive" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -97,7 +99,7 @@
 
 	<command name="gotoEditCP">
 		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
+			<var name="displayStyle" value="descriptive" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -111,7 +113,9 @@
 		</execute>
 
 		<execute function="AssertElementPresent" locator1="Icon#BACK" />
-		<execute function="AssertVisible" locator1="AlloyEditor#TITLE_FIELD" />
+		<execute function="AssertVisible" locator1="AlloyEditor#EDITOR">
+			<var name="key_editor" value="title" />
+		</execute>
 	</command>
 
 	<command name="gotoEditPG">
@@ -134,7 +138,7 @@
 
 	<command name="gotoEntryCP">
 		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
+			<var name="displayStyle" value="descriptive" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -191,7 +195,7 @@
 
 	<command name="moveToRecycleBinCP">
 		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
+			<var name="displayStyle" value="descriptive" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />

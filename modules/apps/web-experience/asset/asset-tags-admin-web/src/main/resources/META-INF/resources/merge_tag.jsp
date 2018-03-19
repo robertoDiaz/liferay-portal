@@ -46,14 +46,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 			</label>
 
 			<div class="button-holder">
-				<liferay-asset:asset-tags-selector
-					addCallback="onAddTag"
-					allowAddEntry="<%= false %>"
-					hiddenInput="mergeTagNames"
-					id="assetTagsSelector"
-					removeCallback="onRemoveTag"
-					tagNames="<%= StringUtil.merge(assetTagsDisplayContext.getMergeTagNames()) %>"
-				/>
+				<liferay-asset:asset-tags-selector addCallback="onAddTag" allowAddEntry="<%= false %>" hiddenInput="mergeTagNames" id="assetTagsSelector" removeCallback="onRemoveTag" tagNames="<%= StringUtil.merge(assetTagsDisplayContext.getMergeTagNames()) %>" />
 			</div>
 
 			<aui:select cssClass="target-tag" label="into-this-tag" name="targetTagName">
@@ -73,9 +66,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 	</aui:fieldset-group>
 
 	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
+		<aui:button type="submit" />
 
-		<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
+		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
 

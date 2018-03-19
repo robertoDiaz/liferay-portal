@@ -14,8 +14,8 @@
  */
 --%>
 
-<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
-page import="com.liferay.portal.kernel.util.StringPool" %><%@
+<%@ page import="com.liferay.petra.string.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetTermDisplayContext" %>
@@ -62,15 +62,7 @@ UserSearchFacetDisplayContext userSearchFacetDisplayContext = (UserSearchFacetDi
 
 								<li class="facet-value">
 									<label class="facet-checkbox-label" for="<portlet:namespace />term_<%= i %>">
-										<input
-											class="facet-term"
-											data-term-id="<%= userSearchFacetTermDisplayContext.getUserName() %>"
-											id="<portlet:namespace />term_<%= i %>"
-											name="<portlet:namespace />term_<%= i %>"
-											onChange='Liferay.Search.FacetUtil.changeSelection(event);'
-											type="checkbox"
-											<%= userSearchFacetTermDisplayContext.isSelected() ? "checked" : StringPool.BLANK %>
-										/>
+										<input class="facet-term" data-term-id="<%= userSearchFacetTermDisplayContext.getUserName() %>" id="<portlet:namespace />term_<%= i %>" name="<portlet:namespace />term_<%= i %>" onChange="Liferay.Search.FacetUtil.changeSelection(event);" type="checkbox" <%= userSearchFacetTermDisplayContext.isSelected() ? "checked" : StringPool.BLANK %> />
 
 										<span class="term-name">
 											<%= HtmlUtil.escape(userSearchFacetTermDisplayContext.getUserName()) %>

@@ -129,9 +129,9 @@ if (portletTitleBasedNavigation) {
 											function(event) {
 												var folderData = {
 													idString: 'folderId',
-													idValue: event.folderid,
+													idValue: event.entityid,
 													nameString: 'folderName',
-													nameValue: event.name
+													nameValue: event.entityname
 												};
 
 												Liferay.Util.selectFolder(folderData, '<portlet:namespace />');
@@ -191,9 +191,9 @@ if (portletTitleBasedNavigation) {
 		</div>
 
 		<aui:button-row>
-			<aui:button cssClass="btn-lg" type="submit" />
+			<aui:button type="submit" />
 
-			<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
+			<aui:button href="<%= redirect %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
 </div>

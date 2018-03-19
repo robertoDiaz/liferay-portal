@@ -50,12 +50,6 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 
 UserGroupDisplayTerms searchTerms = (UserGroupDisplayTerms)userGroupSearch.getSearchTerms();
 
-boolean hasAssignMembersPermission = GroupPermissionUtil.contains(permissionChecker, siteMembershipsDisplayContext.getGroupId(), ActionKeys.ASSIGN_MEMBERS);
-
-if (!searchTerms.isSearch() && hasAssignMembersPermission) {
-	userGroupSearch.setEmptyResultsMessageCssClass("taglib-empty-result-message-header-has-plus-btn");
-}
-
 LinkedHashMap<String, Object> userGroupParams = new LinkedHashMap<String, Object>();
 
 userGroupParams.put(UserGroupFinderConstants.PARAM_KEY_USER_GROUPS_GROUPS, Long.valueOf(siteMembershipsDisplayContext.getGroupId()));
@@ -73,9 +67,10 @@ List<UserGroup> userGroups = UserGroupLocalServiceUtil.search(company.getCompany
 userGroupSearch.setResults(userGroups);
 %>
 
-<liferay-util:include page="/navigation_bar.jsp" servletContext="<%= application %>">
-	<liferay-util:param name="searchEnabled" value="<%= String.valueOf((userGroupsCount > 0) || searchTerms.isSearch()) %>" />
-</liferay-util:include>
+<clay:navigation-bar
+	inverted="<%= true %>"
+	items="<%= siteMembershipsDisplayContext.getViewNavigationItems() %>"
+/>
 
 <liferay-frontend:management-bar
 	disabled='<%= (userGroupsCount <= 0) && Objects.equals(navigation, "all") %>'
@@ -92,6 +87,12 @@ userGroupSearch.setResults(userGroups);
 			portletURL="<%= changeDisplayStyleURL %>"
 			selectedDisplayStyle="<%= displayStyle %>"
 		/>
+
+		<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, siteMembershipsDisplayContext.getGroupId(), ActionKeys.ASSIGN_MEMBERS) %>">
+			<liferay-frontend:add-menu inline="<%= true %>">
+				<liferay-frontend:add-menu-item id="selectUserGroups" title='<%= LanguageUtil.get(request, "assign-user-groups") %>' url="javascript:;" />
+			</liferay-frontend:add-menu>
+		</c:if>
 	</liferay-frontend:management-bar-buttons>
 
 	<liferay-frontend:management-bar-filters>
@@ -126,6 +127,14 @@ userGroupSearch.setResults(userGroups);
 			orderColumns='<%= new String[] {"name", "description"} %>'
 			portletURL="<%= PortletURLUtil.clone(viewUserGroupsURL, renderResponse) %>"
 		/>
+
+		<c:if test="<%= (userGroupsCount > 0) || searchTerms.isSearch() %>">
+			<li>
+				<aui:form action="<%= siteMembershipsDisplayContext.getPortletURL() %>" name="searchFm">
+					<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" markupView="lexicon" />
+				</aui:form>
+			</li>
+		</c:if>
 	</liferay-frontend:management-bar-filters>
 
 	<liferay-frontend:management-bar-action-buttons>
@@ -190,12 +199,6 @@ userGroupSearch.setResults(userGroups);
 	<aui:input name="tabs1" type="hidden" value="user-groups" />
 	<aui:input name="userGroupId" type="hidden" />
 </aui:form>
-
-<c:if test="<%= hasAssignMembersPermission %>">
-	<liferay-frontend:add-menu>
-		<liferay-frontend:add-menu-item id="selectUserGroups" title='<%= LanguageUtil.get(request, "assign-user-groups") %>' url="javascript:;" />
-	</liferay-frontend:add-menu>
-</c:if>
 
 <aui:script use="liferay-item-selector-dialog">
 	var form = $(document.<portlet:namespace />fm);
@@ -307,7 +310,7 @@ userGroupSearch.setResults(userGroups);
 					},
 					eventName: '<portlet:namespace />selectSiteRole',
 					title: '<liferay-ui:message key="select-site-role" />',
-					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_site_role.jsp" /></portlet:renderURL>'
+					uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_site_role.jsp" /><portlet:param name="groupId" value="<%= String.valueOf(siteMembershipsDisplayContext.getGroupId()) %>" /></portlet:renderURL>'
 				},
 				function(event) {
 					var uri = '<%= viewRoleURL %>';

@@ -22,7 +22,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
 <liferay-frontend:management-bar
 	disabled="<%= journalDisplayContext.isDisabledManagementBar() %>"
-	includeCheckBox="<%= !user.isDefaultUser() && journalDisplayContext.isShowEditActions() %>"
+	includeCheckBox='<%= !user.isDefaultUser() && journalDisplayContext.isShowEditActions() && !Objects.equals(journalDisplayContext.getTabs1(), "versions") %>'
 	searchContainerId="<%= searchContainerId %>"
 >
 	<liferay-frontend:management-bar-buttons>
@@ -38,6 +38,10 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 			portletURL="<%= journalDisplayContext.getPortletURL() %>"
 			selectedDisplayStyle="<%= journalDisplayContext.getDisplayStyle() %>"
 		/>
+
+		<c:if test="<%= !journalDisplayContext.isSearch() %>">
+			<liferay-util:include page="/add_button.jsp" servletContext="<%= application %>" />
+		</c:if>
 	</liferay-frontend:management-bar-buttons>
 
 	<%
@@ -84,12 +88,30 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 			value="<%= journalDisplayContext.getManagementBarStatusFilterValue() %>"
 		/>
 
-		<liferay-frontend:management-bar-sort
-			orderByCol="<%= journalDisplayContext.getOrderByCol() %>"
-			orderByType="<%= journalDisplayContext.getOrderByType() %>"
-			orderColumns="<%= journalDisplayContext.getOrderColumns() %>"
-			portletURL="<%= journalDisplayContext.getPortletURL() %>"
-		/>
+		<c:if test="<%= !journalDisplayContext.isNavigationRecent() %>">
+			<liferay-frontend:management-bar-sort
+				orderByCol="<%= journalDisplayContext.getOrderByCol() %>"
+				orderByType="<%= journalDisplayContext.getOrderByType() %>"
+				orderColumns="<%= journalDisplayContext.getOrderColumns() %>"
+				portletURL="<%= journalDisplayContext.getPortletURL() %>"
+			/>
+		</c:if>
+
+		<li>
+			<c:if test="<%= journalDisplayContext.isShowSearch() %>">
+
+				<%
+				PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+				portletURL.setParameter("folderId", String.valueOf(journalDisplayContext.getFolderId()));
+				portletURL.setParameter("showEditActions", String.valueOf(journalDisplayContext.isShowEditActions()));
+				%>
+
+				<aui:form action="<%= portletURL.toString() %>" method="post" name="fm1">
+					<liferay-ui:input-search markupView="lexicon" />
+				</aui:form>
+			</c:if>
+		</li>
 	</liferay-frontend:management-bar-filters>
 
 	<liferay-frontend:management-bar-action-buttons>
