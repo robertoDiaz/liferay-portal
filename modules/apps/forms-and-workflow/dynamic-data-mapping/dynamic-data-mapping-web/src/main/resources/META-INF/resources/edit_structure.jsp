@@ -252,8 +252,21 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 
 				<aui:input autoFocus="<%= windowState.equals(LiferayWindowState.POP_UP) %>" name="name" />
 
-				<liferay-ui:panel-container cssClass="lfr-structure-entry-details-container" extended="<%= false %>" id="structureDetailsPanelContainer" persistState="<%= true %>">
-					<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= false %>" id="structureDetailsSectionPanel" markupView="lexicon" persistState="<%= true %>" title='<%= LanguageUtil.get(request, "details") %>'>
+				<liferay-ui:panel-container
+					cssClass="lfr-structure-entry-details-container"
+					extended="<%= false %>"
+					id="structureDetailsPanelContainer"
+					persistState="<%= true %>"
+				>
+					<liferay-ui:panel
+						collapsible="<%= true %>"
+						defaultState="closed"
+						extended="<%= false %>"
+						id="structureDetailsSectionPanel"
+						markupView="lexicon"
+						persistState="<%= true %>"
+						title='<%= LanguageUtil.get(request, "details") %>'
+					>
 						<aui:row cssClass="lfr-ddm-types-form-column">
 							<c:choose>
 								<c:when test="<%= Validator.isNull(storageTypeValue) %>">
@@ -317,13 +330,13 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 	</aui:form>
 
 	<aui:button-row>
-		<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "saveStructure(false);" %>' primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
+		<aui:button onClick='<%= renderResponse.getNamespace() + "saveStructure(false);" %>' primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
 
 		<c:if test="<%= ddmDisplay.isVersioningEnabled() %>">
-			<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "saveStructure(true);" %>' value='<%= LanguageUtil.get(request, "save-draft") %>' />
+			<aui:button onClick='<%= renderResponse.getNamespace() + "saveStructure(true);" %>' value='<%= LanguageUtil.get(request, "save-draft") %>' />
 		</c:if>
 
-		<aui:button cssClass="btn-lg" href="<%= ddmDisplay.getViewTemplatesBackURL(liferayPortletRequest, liferayPortletResponse, classPK) %>" type="cancel" />
+		<aui:button href="<%= ddmDisplay.getViewTemplatesBackURL(liferayPortletRequest, liferayPortletResponse, classPK) %>" type="cancel" />
 	</aui:button-row>
 </div>
 

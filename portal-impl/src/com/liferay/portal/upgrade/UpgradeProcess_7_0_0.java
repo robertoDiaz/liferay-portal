@@ -35,6 +35,7 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeMembershipRequest;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeMessageBoards;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeMobileDeviceRules;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeModules;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeMySQL;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeOrgLabor;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeOrganization;
 import com.liferay.portal.upgrade.v7_0_0.UpgradePhone;
@@ -69,6 +70,8 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 
 		upgrade(UpgradeKernelPackage.class);
 
+		upgrade(UpgradeSharding.class);
+
 		upgrade(UpgradeAddress.class);
 		upgrade(UpgradeAsset.class);
 		upgrade(UpgradeAssetTagsResourcePermission.class);
@@ -85,8 +88,8 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradeLookAndFeel.class);
 		upgrade(UpgradeMembershipRequest.class);
 		upgrade(UpgradeMessageBoards.class);
-		upgrade(UpgradeMobileDeviceRules.class);
 		upgrade(UpgradeModules.class);
+		upgrade(UpgradeMySQL.class);
 		upgrade(UpgradeOrganization.class);
 		upgrade(UpgradeOrgLabor.class);
 		upgrade(UpgradePhone.class);
@@ -103,7 +106,7 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradeSubscription.class);
 		upgrade(UpgradeWebsite.class);
 
-		upgrade(UpgradeSharding.class);
+		upgrade(UpgradeMobileDeviceRules.class);
 
 		clearIndexesCache();
 	}

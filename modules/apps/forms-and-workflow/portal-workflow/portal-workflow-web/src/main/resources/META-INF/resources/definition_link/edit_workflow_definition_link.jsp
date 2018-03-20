@@ -49,11 +49,7 @@ renderResponse.setTitle(resource);
 				for (WorkflowDefinition workflowDefinition : workflowDefinitionLinkDisplayContext.getWorkflowDefinitions()) {
 				%>
 
-					<aui:option
-						label="<%= workflowDefinitionLinkDisplayContext.getWorkflowDefinitionLabel(workflowDefinition) %>"
-						selected="<%= workflowDefinitionLinkDisplayContext.isWorkflowDefinitionSelected(workflowDefinition, className) %>"
-						value="<%= workflowDefinitionLinkDisplayContext.getWorkflowDefinitionValue(workflowDefinition) %>"
-					/>
+					<aui:option label="<%= workflowDefinitionLinkDisplayContext.getWorkflowDefinitionLabel(workflowDefinition) %>" selected="<%= workflowDefinitionLinkDisplayContext.isWorkflowDefinitionSelected(workflowDefinition, className) %>" value="<%= workflowDefinitionLinkDisplayContext.getWorkflowDefinitionValue(workflowDefinition) %>" />
 
 				<%
 				}
@@ -63,9 +59,9 @@ renderResponse.setTitle(resource);
 		</div>
 
 		<aui:button-row>
-			<aui:button cssClass="btn-lg" type="submit" />
+			<aui:button type="submit" />
 
-			<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
+			<aui:button href="<%= redirect %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
 </div>

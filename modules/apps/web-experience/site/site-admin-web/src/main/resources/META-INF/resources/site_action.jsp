@@ -45,7 +45,13 @@ else {
 boolean hasUpdatePermission = GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.UPDATE);
 %>
 
-<liferay-ui:icon-menu direction="left-side" icon="<%= StringPool.BLANK %>" markupView="lexicon" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+<liferay-ui:icon-menu
+	direction="left-side"
+	icon="<%= StringPool.BLANK %>"
+	markupView="lexicon"
+	message="<%= StringPool.BLANK %>"
+	showWhenSingleIcon="<%= true %>"
+>
 	<c:if test="<%= hasUpdatePermission %>">
 		<portlet:renderURL var="editURL">
 			<portlet:param name="mvcPath" value="/edit_site.jsp" />
@@ -126,7 +132,9 @@ boolean hasUpdatePermission = GroupPermissionUtil.contains(permissionChecker, gr
 				<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
 			</portlet:actionURL>
 
-			<liferay-ui:icon-deactivate url="<%= activateURL %>" />
+			<liferay-ui:icon-deactivate
+				url="<%= activateURL %>"
+			/>
 		</c:when>
 		<c:when test="<%= !group.isActive() && !group.isCompany() && hasUpdatePermission %>">
 			<portlet:actionURL name="activate" var="activateURL">
@@ -147,6 +155,8 @@ boolean hasUpdatePermission = GroupPermissionUtil.contains(permissionChecker, gr
 			<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
 		</portlet:actionURL>
 
-		<liferay-ui:icon-delete url="<%= deleteURL %>" />
+		<liferay-ui:icon-delete
+			url="<%= deleteURL %>"
+		/>
 	</c:if>
 </liferay-ui:icon-menu>

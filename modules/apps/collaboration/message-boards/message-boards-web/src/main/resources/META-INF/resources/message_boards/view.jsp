@@ -98,7 +98,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 			portletURL.setParameter("groupThreadsUserId", String.valueOf(groupThreadsUserId));
 		}
 
-		MBCategoryDisplay categoryDisplay = new MBCategoryDisplayImpl(scopeGroupId, categoryId);
+		MBCategoryDisplay categoryDisplay = new MBCategoryDisplay(scopeGroupId, categoryId);
 		%>
 
 		<div class="main-content-body">
@@ -115,7 +115,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 				/>
 
 				<liferay-ui:search-container-row
-					className="com.liferay.message.boards.kernel.model.MBCategory"
+					className="com.liferay.message.boards.model.MBCategory"
 					escapedModel="<%= true %>"
 					keyProperty="categoryId"
 					modelVar="curCategory"
@@ -128,7 +128,9 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					<%@ include file="/message_boards/subscribed_category_columns.jspf" %>
 				</liferay-ui:search-container-row>
 
-				<liferay-ui:search-iterator type="more" />
+				<liferay-ui:search-iterator
+					type="more"
+				/>
 			</liferay-ui:search-container>
 
 			<%@ include file="/message_boards/view_threads.jspf" %>
@@ -141,7 +143,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 		</div>
 	</c:when>
 	<c:when test="<%= useAssetEntryQuery && !mbListDisplayContext.isShowMyPosts() %>">
-		<liferay-ui:categorization-filter
+		<liferay-asset:categorization-filter
 			assetType="threads"
 			portletURL="<%= portletURL %>"
 		/>
@@ -151,7 +153,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 	<c:when test='<%= mbListDisplayContext.isShowSearch() || mvcRenderCommandName.equals("/message_boards/view") || mvcRenderCommandName.equals("/message_boards/view_category") || mbListDisplayContext.isShowMyPosts() || mbListDisplayContext.isShowRecentPosts() %>'>
 
 		<%
-		SearchContainer entriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-threads-nor-categories");
+		SearchContainer entriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-threads-or-categories");
 
 		entriesSearchContainer.setId("mbEntries");
 		entriesSearchContainer.setOrderByCol(orderByCol);
@@ -174,7 +176,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					<%
 					boolean showAddCategoryButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_CATEGORY);
 					boolean showAddMessageButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_MESSAGE);
-					boolean showPermissionsButton = MBPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+					boolean showPermissionsButton = MBResourcePermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
 
 					if (showAddMessageButton && !themeDisplay.isSignedIn()) {
 						if (!allowAnonymousPosting) {
@@ -202,7 +204,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 									<portlet:param name="mbCategoryId" value="<%= String.valueOf(categoryId) %>" />
 								</portlet:renderURL>
 
-								<aui:button href="<%= editMessageURL %>" value="post-new-thread" />
+								<aui:button href="<%= editMessageURL %>" value="new-thread" />
 							</c:if>
 
 							<c:if test="<%= showPermissionsButton %>">
@@ -237,11 +239,11 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					<c:if test="<%= category != null %>">
 						<div class="category-subscription category-subscription-types">
 							<c:if test="<%= enableRSS %>">
-								<liferay-ui:rss
+								<liferay-rss:rss
 									delta="<%= rssDelta %>"
 									displayStyle="<%= rssDisplayStyle %>"
 									feedType="<%= rssFeedType %>"
-									url="<%= MBUtil.getRSSURL(plid, category.getCategoryId(), 0, 0, themeDisplay) %>"
+									url="<%= MBRSSUtil.getRSSURL(plid, category.getCategoryId(), 0, 0, themeDisplay) %>"
 								/>
 							</c:if>
 
@@ -281,7 +283,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 
 						<%
 						long parentCategoryId = category.getParentCategoryId();
-						String parentCategoryName = LanguageUtil.get(request, "message-boards-home");
+						String parentCategoryName = LanguageUtil.get(request, "home");
 
 						if (!category.isRoot()) {
 							MBCategory parentCategory = MBCategoryLocalServiceUtil.getCategory(parentCategoryId);
@@ -359,12 +361,12 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					%>
 
 					<c:if test="<%= enableRSS && mbListDisplayContext.isShowRecentPosts() %>">
-						<liferay-ui:rss
+						<liferay-rss:rss
 							delta="<%= rssDelta %>"
 							displayStyle="<%= rssDisplayStyle %>"
 							feedType="<%= rssFeedType %>"
 							message="rss"
-							url="<%= MBUtil.getRSSURL(plid, 0, 0, groupThreadsUserId, themeDisplay) %>"
+							url="<%= MBRSSUtil.getRSSURL(plid, 0, 0, groupThreadsUserId, themeDisplay) %>"
 						/>
 					</c:if>
 
