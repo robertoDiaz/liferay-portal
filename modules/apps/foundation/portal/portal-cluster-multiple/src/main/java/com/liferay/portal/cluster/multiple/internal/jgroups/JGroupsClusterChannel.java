@@ -40,7 +40,7 @@ import org.jgroups.stack.ProtocolStack;
 public class JGroupsClusterChannel implements ClusterChannel {
 
 	public JGroupsClusterChannel(
-		String channelProperties, String clusterName,
+		String channelLogicName, String channelProperties, String clusterName,
 		ClusterReceiver clusterReceiver, InetAddress bindInetAddress) {
 
 		if (Validator.isNull(channelProperties)) {
@@ -60,6 +60,10 @@ public class JGroupsClusterChannel implements ClusterChannel {
 
 		try {
 			_jChannel = new JChannel(channelProperties);
+
+			if (Validator.isNotNull(channelLogicName)) {
+				_jChannel.setName(channelLogicName);
+			}
 
 			if (bindInetAddress != null) {
 				ProtocolStack protocolStack = _jChannel.getProtocolStack();
@@ -164,7 +168,7 @@ public class JGroupsClusterChannel implements ClusterChannel {
 
 			if (_log.isDebugEnabled()) {
 				if (address == null) {
-					_log.debug("Send mullticast message " + message);
+					_log.debug("Send multicast message " + message);
 				}
 				else {
 					_log.debug("Send unicast message " + message);
@@ -174,7 +178,7 @@ public class JGroupsClusterChannel implements ClusterChannel {
 		catch (Exception e) {
 			if (address == null) {
 				throw new SystemException(
-					"Unable to send mullticast message", e);
+					"Unable to send multicast message", e);
 			}
 			else {
 				throw new SystemException("Unable to send unicast message", e);
