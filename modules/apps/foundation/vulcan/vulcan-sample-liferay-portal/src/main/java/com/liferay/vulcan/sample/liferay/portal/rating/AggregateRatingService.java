@@ -14,23 +14,26 @@
 
 package com.liferay.vulcan.sample.liferay.portal.rating;
 
-import com.liferay.vulcan.liferay.portal.identifier.ClassNameClassPKIdentifier;
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.vulcan.sample.liferay.portal.resource.identifier.AggregateRatingIdentifier;
 
 /**
- * Instances of this service can be used to get the related {@link
- * AggregateRating} for a certain combination of className/classPK.
+ * Provides the service for getting an {@link AggregateRating}.
  *
  * @author Alejandro Hernández
  */
+@ProviderType
 public interface AggregateRatingService {
 
 	/**
-	 * Returns the {@link AggregateRating} for a className/classPK combination.
+	 * Returns the aggregate rating specified by the aggregate rating
+	 * identifier.
 	 *
-	 * @param  identifier the aggregate rating identifier.
-	 * @return the aggregate rating.
+	 * @param  aggregateRatingIdentifier the aggregate rating's identifier
+	 * @return the aggregate rating
 	 */
 	public AggregateRating getAggregateRating(
-		ClassNameClassPKIdentifier identifier);
+		AggregateRatingIdentifier aggregateRatingIdentifier);
 
 }

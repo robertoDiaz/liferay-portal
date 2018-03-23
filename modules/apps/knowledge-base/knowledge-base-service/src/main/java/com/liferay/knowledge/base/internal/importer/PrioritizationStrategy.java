@@ -16,9 +16,9 @@ package com.liferay.knowledge.base.internal.importer;
 
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -212,15 +212,7 @@ public class PrioritizationStrategy {
 			double sectionFileEntryNamePrefix = getNumericalPrefix(
 				filePath, childArticle);
 
-			if (sectionFileEntryNamePrefix < 0.0) {
-			}
-			else if (sectionFileEntryNamePrefix < 1.0) {
-				kbArticle.setPriority(1.0);
-
-				_importedKBArticleUrlTitlesPrioritiesMap.put(
-					kbArticle.getUrlTitle(), sectionFileEntryNamePrefix);
-			}
-			else {
+			if (sectionFileEntryNamePrefix >= 0.0) {
 				_importedKBArticleUrlTitlesPrioritiesMap.put(
 					kbArticle.getUrlTitle(), sectionFileEntryNamePrefix);
 			}

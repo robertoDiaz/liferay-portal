@@ -74,6 +74,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CHECKBOX_DISABLED</td>
+	<td>//label[contains(.,'${key_checkboxName}')]/input[@type='checkbox' and contains(@class,'disabled')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DISPLAY_ADDITIONAL_ACTIVITY_COUNTERS</td>
 	<td>//label[contains(.,'Display Additional Activity Counters')]/input[@type='checkbox']</td>
 	<td></td>
@@ -200,12 +205,12 @@
 </tr>
 <tr>
 	<td>ENABLED_ON_PRIVATE_PAGES</td>
-	<td>//input[contains(@id,'branchingPrivate')]</td>
+	<td>//label[contains(@*,'branchingPrivate')]//span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENABLED_ON_PUBLIC_PAGES</td>
-	<td>//input[contains(@id,'branchingPublic')]</td>
+	<td>//label[contains(@*,'branchingPublic')]//span</td>
 	<td></td>
 </tr>
 <tr>
