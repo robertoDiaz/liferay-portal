@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -34,17 +35,20 @@ import java.util.Map;
 
 /**
  * @author Tina Tian
+ * @deprecated As of 7.0.0, moved to {@link
+ *             com.liferay.portal.search.internal.permission.DefaultSearchResultPermissionFilter}
  */
+@Deprecated
 @ProviderType
 public class DefaultSearchResultPermissionFilter
 	extends BaseSearchResultPermissionFilter {
 
 	/**
-	 * @deprecated As of 7.0.0, replace with
-	 *             {@link #DefaultSearchResultPermissionFilter(
-	 *                  SearchExecutor, PermissionChecker)}
-	 * @param baseIndexer
-	 * @param permissionChecker
+	 * @param      baseIndexer
+	 * @param      permissionChecker
+	 * @deprecated As of 7.0.0, replace with {@link
+	 *             #DefaultSearchResultPermissionFilter(SearchExecutor,
+	 *             PermissionChecker)}
 	 */
 	@Deprecated
 	public DefaultSearchResultPermissionFilter(
@@ -166,8 +170,20 @@ public class DefaultSearchResultPermissionFilter
 		try {
 			if (indexer.hasPermission(
 					_permissionChecker, entryClassName, entryClassPK,
-					ActionKeys.VIEW) &&
-				indexer.isVisibleRelatedEntry(entryClassPK, status)) {
+					ActionKeys.VIEW)) {
+
+				List<RelatedEntryIndexer> relatedEntryIndexers =
+					RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers(
+						entryClassName);
+
+				if (ListUtil.isNotEmpty(relatedEntryIndexers)) {
+					for (RelatedEntryIndexer relatedEntryIndexer :
+							relatedEntryIndexers) {
+
+						relatedEntryIndexer.isVisibleRelatedEntry(
+							entryClassPK, status);
+					}
+				}
 
 				return true;
 			}
