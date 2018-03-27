@@ -58,10 +58,6 @@ class EditAdaptiveMediaConfig extends PortletBase {
 			this.eventHandler_.add(maxWidthInput.addEventListener('input', (event) => {
 				this.validateDimensions_(true);
 			}));
-
-			this.eventHandler_.add(maxWidthInput.addEventListener('blur', (event) => {
-				this.validateDimensions_(true);
-			}));
 		}
 
 		if (maxHeightInput) {
@@ -72,23 +68,19 @@ class EditAdaptiveMediaConfig extends PortletBase {
 			this.eventHandler_.add(maxHeightInput.addEventListener('input', (event) => {
 				this.validateDimensions_(true);
 			}));
-
-			this.eventHandler_.add(maxHeightInput.addEventListener('blur', (event) => {
-				this.validateDimensions_(true);
-			}));
 		}
 
 		this.maxWidthInput = maxWidthInput;
 
 		this.maxHeightInput = maxHeightInput;
 
-		Liferay.on('form:registered', (event) => {
-			if (event.formName === this.ns('fm')) {
-				this.validateDimensions_(false);
-			}
-		});
-
 		this.newUuidInput = this.one('#newUuid');
+
+		let saveButton = this.one('button[type=submit]');
+
+		this.eventHandler_.add(saveButton.addEventListener('click', (event) => {
+			this.onSubmitForm_(event);
+		}));
 	}
 
 	/**
@@ -160,6 +152,29 @@ class EditAdaptiveMediaConfig extends PortletBase {
 	}
 
 	/**
+	 * Checks if there are form errors before
+	 * submitting the AMI.
+	 *
+	 * @param {Event} event The event that
+	 * triggered the submit action.
+	 * @protected
+	 */
+	onSubmitForm_(event) {
+		this.validateDimensions_(false);
+
+		let form = Liferay.Form.get(this.ns('fm'));
+
+		form.formValidator.validate();
+
+		if (form.formValidator.hasErrors()) {
+			event.preventDefault();
+		}
+		else {
+			submitForm(form.form);
+		}
+	}
+
+	/**
 	 * Checks if max-widht or max-height has a value.
 	 *
 	 * @param  {Boolean} validateFields whether the dimensions values
@@ -173,13 +188,16 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		let nsMaxWidth = this.ns('maxWidth');
 		let nsMaxHeight = this.ns('maxHeight');
 
+		let inputErrorMessage = Liferay.Language.get('at-least-one-value-is-required');
+		let STR_BLANK = ' ';
+
 		if (this.maxWidthInput.value || this.maxHeightInput.value) {
 			form.removeRule(nsMaxWidth, 'required');
 			form.removeRule(nsMaxHeight, 'required');
 		}
 		else {
-			form.addRule(nsMaxWidth, 'required');
-			form.addRule(nsMaxHeight, 'required');
+			form.addRule(nsMaxWidth, 'required', inputErrorMessage);
+			form.addRule(nsMaxHeight, 'required', STR_BLANK);
 
 			if (validateFields) {
 				form.formValidator.validateField(nsMaxWidth);
@@ -188,5 +206,24 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		}
 	}
 }
+
+/**
+ * EditAdaptiveMediaConfig State definition.
+ * @ignore
+ * @static
+ * @type {!Object}
+ */
+EditAdaptiveMediaConfig.STATE = {
+	/**
+	 * Node where errors will be rendered.
+	 * @instance
+	 * @memberof EditAdaptiveMediaConfig
+	 * @type {String}
+	 */
+	errorNode: {
+		validator: core.isString,
+		value: '.error-wrapper'
+	}
+};
 
 export default EditAdaptiveMediaConfig;
