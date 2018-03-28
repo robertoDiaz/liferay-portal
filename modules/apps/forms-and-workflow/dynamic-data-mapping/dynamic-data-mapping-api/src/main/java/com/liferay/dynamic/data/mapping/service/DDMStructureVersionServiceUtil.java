@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.mapping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -47,17 +48,6 @@ public class DDMStructureVersionServiceUtil {
 		return getService().getLatestStructureVersion(structureId);
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMStructureVersion getStructureVersion(
-		long structureVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getStructureVersion(structureVersionId);
-	}
-
-	public static int getStructureVersionsCount(long structureId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getStructureVersionsCount(structureId);
-	}
-
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -65,6 +55,12 @@ public class DDMStructureVersionServiceUtil {
 	*/
 	public static java.lang.String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static com.liferay.dynamic.data.mapping.model.DDMStructureVersion getStructureVersion(
+		long structureVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getStructureVersion(structureVersionId);
 	}
 
 	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMStructureVersion> getStructureVersions(
@@ -76,10 +72,26 @@ public class DDMStructureVersionServiceUtil {
 			orderByComparator);
 	}
 
+	public static int getStructureVersionsCount(long structureId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getStructureVersionsCount(structureId);
+	}
+
 	public static DDMStructureVersionService getService() {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDMStructureVersionService, DDMStructureVersionService> _serviceTracker =
-		ServiceTrackerFactory.open(DDMStructureVersionService.class);
+	private static ServiceTracker<DDMStructureVersionService, DDMStructureVersionService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDMStructureVersionService.class);
+
+		ServiceTracker<DDMStructureVersionService, DDMStructureVersionService> serviceTracker =
+			new ServiceTracker<DDMStructureVersionService, DDMStructureVersionService>(bundle.getBundleContext(),
+				DDMStructureVersionService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }
