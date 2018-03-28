@@ -25,7 +25,10 @@ Permission permission = (Permission)objArray[0];
 Role role = (Role)objArray[1];
 %>
 
-<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
+<liferay-ui:icon-menu
+	icon="<%= StringPool.BLANK %>"
+	message="<%= StringPool.BLANK %>"
+>
 	<portlet:actionURL name="deletePermission" var="deletePermissionURL">
 		<portlet:param name="mvcPath" value="/edit_role_permissions.jsp" />
 		<portlet:param name="tabs1" value="define-permissions" />
@@ -38,7 +41,7 @@ Role role = (Role)objArray[1];
 	</portlet:actionURL>
 
 	<liferay-ui:icon-delete
-		confirmation="are-your-sure-you-want-to-remove-this-permission"
+		confirmation="are-you-sure-you-want-to-remove-this-permission"
 		message="remove"
 		url="<%= deletePermissionURL %>"
 	/>

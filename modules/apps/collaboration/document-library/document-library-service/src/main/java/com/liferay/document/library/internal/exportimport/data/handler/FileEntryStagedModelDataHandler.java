@@ -16,6 +16,7 @@ package com.liferay.document.library.internal.exportimport.data.handler;
 
 import com.liferay.document.library.exportimport.data.handler.DLPluggableContentDataHandler;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileVersion;
@@ -29,13 +30,13 @@ import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.util.DLProcessorThreadLocal;
-import com.liferay.dynamic.data.mapping.exportimport.content.processor.DDMFormValuesExportImportContentProcessor;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONSerializer;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslatorUtil;
+import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
@@ -46,6 +47,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -68,12 +70,11 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.portletrepository.PortletRepository;
-import com.liferay.portal.verify.extender.marker.VerifyProcessCompletionMarker;
+import com.liferay.portal.util.RepositoryUtil;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 import com.liferay.trash.TrashHelper;
 
@@ -252,6 +253,12 @@ public class FileEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
+		FileVersion fileVersion = fileEntry.getFileVersion();
+
+		fileEntryElement.addAttribute("fileVersionUuid", fileVersion.getUuid());
+
+		fileEntryElement.addAttribute("version", fileEntry.getVersion());
+
 		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)fileEntry;
 
 		liferayFileEntry.setCachedFileVersion(fileEntry.getFileVersion());
@@ -337,12 +344,20 @@ public class FileEntryStagedModelDataHandler
 
 		long userId = portletDataContext.getUserId(fileEntry.getUserUuid());
 
-		if (!fileEntry.isDefaultRepository()) {
+		if (RepositoryUtil.isExternalRepository(fileEntry.getRepositoryId())) {
 
 			// References has been automatically imported, nothing to do here
 
 			return;
 		}
+
+		Map<Long, Long> repositoryIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Repository.class);
+
+		long repositoryId = MapUtil.getLong(
+			repositoryIds, fileEntry.getRepositoryId(),
+			portletDataContext.getScopeGroupId());
 
 		Map<Long, Long> folderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -367,6 +382,9 @@ public class FileEntryStagedModelDataHandler
 			fileEntry);
 
 		String binPath = fileEntryElement.attributeValue("bin-path");
+		String fileVersionUuid = fileEntryElement.attributeValue(
+			"fileVersionUuid");
+		String version = fileEntryElement.attributeValue("version");
 
 		InputStream is = null;
 
@@ -412,22 +430,19 @@ public class FileEntryStagedModelDataHandler
 				FileEntry existingFileEntry = fetchStagedModelByUuidAndGroupId(
 					fileEntry.getUuid(), portletDataContext.getScopeGroupId());
 
-				FileVersion fileVersion = fileEntry.getFileVersion();
-
 				if (existingFileEntry == null) {
 					if (portletDataContext.
 							isDataStrategyMirrorWithOverwriting()) {
 
 						FileEntry existingTitleFileEntry =
 							FileEntryUtil.fetchByR_F_T(
-								portletDataContext.getScopeGroupId(), folderId,
-								fileEntry.getTitle());
+								repositoryId, folderId, fileEntry.getTitle());
 
 						if (existingTitleFileEntry == null) {
 							existingTitleFileEntry =
 								FileEntryUtil.fetchByR_F_FN(
-									portletDataContext.getScopeGroupId(),
-									folderId, fileEntry.getFileName());
+									repositoryId, folderId,
+									fileEntry.getFileName());
 						}
 
 						if (existingTitleFileEntry != null) {
@@ -437,7 +452,7 @@ public class FileEntryStagedModelDataHandler
 					}
 
 					serviceContext.setAttribute(
-						"fileVersionUuid", fileVersion.getUuid());
+						"fileVersionUuid", fileVersionUuid);
 					serviceContext.setUuid(fileEntry.getUuid());
 
 					String fileEntryTitle =
@@ -446,9 +461,9 @@ public class FileEntryStagedModelDataHandler
 							fileEntry.getTitle(), fileEntry.getExtension());
 
 					importedFileEntry = _dlAppLocalService.addFileEntry(
-						userId, portletDataContext.getScopeGroupId(), folderId,
-						fileEntry.getFileName(), fileEntry.getMimeType(),
-						fileEntryTitle, fileEntry.getDescription(), null, is,
+						userId, repositoryId, folderId, fileEntry.getFileName(),
+						fileEntry.getMimeType(), fileEntryTitle,
+						fileEntry.getDescription(), null, is,
 						fileEntry.getSize(), serviceContext);
 
 					if (fileEntry.isInTrash()) {
@@ -467,7 +482,7 @@ public class FileEntryStagedModelDataHandler
 					boolean updateFileEntry = false;
 
 					if (!Objects.equals(
-							fileVersion.getUuid(),
+							fileVersionUuid,
 							latestExistingFileVersion.getUuid())) {
 
 						deleteFileEntry = true;
@@ -504,7 +519,7 @@ public class FileEntryStagedModelDataHandler
 							DLFileVersion alreadyExistingFileVersion =
 								_dlFileVersionLocalService.
 									getFileVersionByUuidAndGroupId(
-										fileVersion.getUuid(),
+										fileVersionUuid,
 										existingFileEntry.getGroupId());
 
 							if (alreadyExistingFileVersion != null) {
@@ -514,7 +529,7 @@ public class FileEntryStagedModelDataHandler
 										getFileVersionId());
 							}
 
-							serviceContext.setUuid(fileVersion.getUuid());
+							serviceContext.setUuid(fileVersionUuid);
 
 							String fileEntryTitle =
 								_dlFileEntryLocalService.getUniqueTitle(
@@ -567,7 +582,10 @@ public class FileEntryStagedModelDataHandler
 								latestExistingFileVersion.getVersion();
 
 							if (!latestExistingVersion.equals(
-									importedFileEntry.getVersion())) {
+									importedFileEntry.getVersion()) &&
+								!latestExistingVersion.equals(
+									DLFileEntryConstants.
+										PRIVATE_WORKING_COPY_VERSION)) {
 
 								_dlAppService.deleteFileVersion(
 									latestExistingFileVersion.getFileEntryId(),
@@ -581,8 +599,7 @@ public class FileEntryStagedModelDataHandler
 				}
 
 				if (ExportImportThreadLocal.isStagingInProcess()) {
-					_overrideFileVersion(
-						importedFileEntry, fileVersion.getVersion());
+					_overrideFileVersion(importedFileEntry, version);
 				}
 			}
 			else {
@@ -591,10 +608,10 @@ public class FileEntryStagedModelDataHandler
 					fileEntry.getTitle(), fileEntry.getExtension());
 
 				importedFileEntry = _dlAppLocalService.addFileEntry(
-					userId, portletDataContext.getScopeGroupId(), folderId,
-					fileEntry.getFileName(), fileEntry.getMimeType(),
-					fileEntryTitle, fileEntry.getDescription(), null, is,
-					fileEntry.getSize(), serviceContext);
+					userId, repositoryId, folderId, fileEntry.getFileName(),
+					fileEntry.getMimeType(), fileEntryTitle,
+					fileEntry.getDescription(), null, is, fileEntry.getSize(),
+					serviceContext);
 			}
 
 			for (DLPluggableContentDataHandler dlPluggableContentDataHandler :
@@ -617,7 +634,9 @@ public class FileEntryStagedModelDataHandler
 		}
 		finally {
 			try {
-				is.close();
+				if (is != null) {
+					is.close();
+				}
 			}
 			catch (IOException ioe) {
 				_log.error(ioe, ioe);
@@ -800,10 +819,14 @@ public class FileEntryStagedModelDataHandler
 		return fileEntry.isInTrash();
 	}
 
-	@Reference(unbind = "-")
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.storage.DDMFormValues)",
+		unbind = "-"
+	)
 	protected void setDDMFormValuesExportImportContentProcessor(
-		DDMFormValuesExportImportContentProcessor
-			ddmFormValuesExportImportContentProcessor) {
+		ExportImportContentProcessor
+			<com.liferay.dynamic.data.mapping.storage.DDMFormValues>
+				ddmFormValuesExportImportContentProcessor) {
 
 		_ddmFormValuesExportImportContentProcessor =
 			ddmFormValuesExportImportContentProcessor;
@@ -882,8 +905,7 @@ public class FileEntryStagedModelDataHandler
 		target = "(&(verify.process.name=com.liferay.document.library.service))",
 		unbind = "-"
 	)
-	protected void setVerifyProcessCompletionMarker(
-		VerifyProcessCompletionMarker verifyProcessCompletionMarker) {
+	protected void setVerifyProcessCompletionMarker(Object object) {
 	}
 
 	@Override
@@ -1010,8 +1032,9 @@ public class FileEntryStagedModelDataHandler
 		TransactionConfig.Factory.create(
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
-	private DDMFormValuesExportImportContentProcessor
-		_ddmFormValuesExportImportContentProcessor;
+	private ExportImportContentProcessor
+		<com.liferay.dynamic.data.mapping.storage.DDMFormValues>
+			_ddmFormValuesExportImportContentProcessor;
 	private DDMFormValuesJSONDeserializer _ddmFormValuesJSONDeserializer;
 	private DDMFormValuesJSONSerializer _ddmFormValuesJSONSerializer;
 	private DLAppLocalService _dlAppLocalService;
