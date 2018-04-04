@@ -26,7 +26,13 @@ long layoutSetPrototypeId = layoutSetPrototype.getLayoutSetPrototypeId();
 Group group = layoutSetPrototype.getGroup();
 %>
 
-<liferay-ui:icon-menu direction="left-side" icon="<%= StringPool.BLANK %>" markupView="lexicon" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+<liferay-ui:icon-menu
+	direction="left-side"
+	icon="<%= StringPool.BLANK %>"
+	markupView="lexicon"
+	message="<%= StringPool.BLANK %>"
+	showWhenSingleIcon="<%= true %>"
+>
 	<c:if test="<%= LayoutSetPrototypePermissionUtil.contains(permissionChecker, layoutSetPrototypeId, ActionKeys.UPDATE) %>">
 
 		<%
@@ -38,6 +44,8 @@ Group group = layoutSetPrototype.getGroup();
 
 		if (Validator.isNotNull(portletId)) {
 			siteAdministrationURL = PortalUtil.getControlPanelPortletURL(request, group, portletId, 0, 0, PortletRequest.RENDER_PHASE);
+
+			siteAdministrationURL.setParameter("redirect", currentURL);
 		}
 		%>
 

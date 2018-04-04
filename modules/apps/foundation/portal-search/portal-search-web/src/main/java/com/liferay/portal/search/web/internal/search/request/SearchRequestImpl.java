@@ -20,13 +20,13 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.HitsImpl;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.facet.AssetEntriesFacet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.ScopeFacet;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.search.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.web.search.request.SearchRequest;
+import com.liferay.portal.search.web.search.request.SearchSettings;
 import com.liferay.portal.search.web.search.request.SearchSettingsContributor;
 
 import java.util.HashSet;
@@ -83,17 +83,9 @@ public class SearchRequestImpl implements SearchRequest {
 		searchContainer.setTotal(hits.getLength());
 
 		SearchResponseImpl searchResponseImpl = buildSearchResponse(
-			hits, searchContext, searchContainer);
+			hits, searchContext, searchContainer, searchSettingsImpl);
 
 		return searchResponseImpl;
-	}
-
-	protected void addAssetEntriesFacet(SearchContext searchContext) {
-		Facet assetEntriesFacet = new AssetEntriesFacet(searchContext);
-
-		assetEntriesFacet.setStatic(true);
-
-		searchContext.addFacet(assetEntriesFacet);
 	}
 
 	protected void addScopeFacet(SearchContext searchContext) {
@@ -115,8 +107,6 @@ public class SearchRequestImpl implements SearchRequest {
 
 		searchContext.setAttribute("paginationType", "more");
 
-		addAssetEntriesFacet(searchContext);
-
 		addScopeFacet(searchContext);
 
 		return searchContext;
@@ -124,7 +114,8 @@ public class SearchRequestImpl implements SearchRequest {
 
 	protected SearchResponseImpl buildSearchResponse(
 		Hits hits, SearchContext searchContext,
-		SearchContainer<Document> searchContainer) {
+		SearchContainer<Document> searchContainer,
+		SearchSettings searchSettings) {
 
 		SearchResponseImpl searchResponseImpl = new SearchResponseImpl();
 
@@ -137,6 +128,7 @@ public class SearchRequestImpl implements SearchRequest {
 			(String)searchContext.getAttribute("queryString"));
 		searchResponseImpl.setSearchContainer(searchContainer);
 		searchResponseImpl.setSearchContext(searchContext);
+		searchResponseImpl.setSearchSettings(searchSettings);
 		searchResponseImpl.setTotalHits(hits.getLength());
 
 		return searchResponseImpl;

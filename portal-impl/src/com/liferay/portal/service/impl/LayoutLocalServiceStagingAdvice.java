@@ -169,6 +169,9 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 			if (arguments.length == 6) {
 				showIncomplete = (Boolean)arguments[3];
 			}
+			else if (arguments.length == 7) {
+				showIncomplete = (Boolean)arguments[3];
+			}
 			else if (Arrays.equals(parameterTypes, _GET_LAYOUTS_TYPES)) {
 				showIncomplete = true;
 			}
@@ -300,8 +303,14 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 		layout.setHidden(hidden);
 		layout.setFriendlyURL(friendlyURL);
 
-		PortalUtil.updateImageId(
-			layoutRevision, iconImage, iconBytes, "iconImageId", 0, 0, 0);
+		if (!iconImage) {
+			layout.setIconImageId(0);
+			layoutRevision.setIconImageId(0);
+		}
+		else {
+			PortalUtil.updateImageId(
+				layout, iconImage, iconBytes, "iconImageId", 0, 0, 0);
+		}
 
 		boolean layoutPrototypeLinkEnabled = ParamUtil.getBoolean(
 			serviceContext, "layoutPrototypeLinkEnabled");
