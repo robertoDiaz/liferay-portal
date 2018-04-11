@@ -74,7 +74,7 @@ if ((ddmStructure == null) && Validator.isNotNull(ddmTemplateKey)) {
 String ddmRendererTemplateKey = ParamUtil.getString(request, "ddmRendererTemplateKey");
 
 if (Validator.isNull(ddmRendererTemplateKey) && (feed != null)) {
-	ddmRendererTemplateKey = feed.getDDMTemplateKey();
+	ddmRendererTemplateKey = feed.getDDMRendererTemplateKey();
 }
 
 String contentField = BeanParamUtil.getString(feed, request, "contentField");
@@ -111,7 +111,13 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 	<portlet:param name="mvcPath" value="/edit_feed.jsp" />
 </portlet:actionURL>
 
-<aui:form action="<%= editFeedURL %>" cssClass="container-fluid-1280" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFeed();" %>'>
+<liferay-frontend:edit-form
+	action="<%= editFeedURL %>"
+	enctype="multipart/form-data"
+	method="post"
+	name="fm"
+	onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFeed();" %>'
+>
 	<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" value="" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
@@ -128,8 +134,8 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 	<aui:model-context bean="<%= feed %>" model="<%= JournalFeed.class %>" />
 
-	<aui:fieldset-group markupView="lexicon">
-		<aui:fieldset>
+	<liferay-frontend:fieldset-group>
+		<liferay-frontend:fieldset>
 			<c:choose>
 				<c:when test="<%= feed == null %>">
 					<c:choose>
@@ -162,15 +168,25 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 				<aui:a href="<%= feedURL.toString() %>" label="preview" target="_blank" />
 			</c:if>
-		</aui:fieldset>
+		</liferay-frontend:fieldset>
 
 		<c:if test="<%= feed == null %>">
-			<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-				<liferay-ui:input-permissions modelName="<%= JournalFeed.class.getName() %>" />
-			</aui:fieldset>
+			<liferay-frontend:fieldset
+				collapsed="<%= true %>"
+				collapsible="<%= true %>"
+				label="permissions"
+			>
+				<liferay-ui:input-permissions
+					modelName="<%= JournalFeed.class.getName() %>"
+				/>
+			</liferay-frontend:fieldset>
 		</c:if>
 
-		<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="web-content-contraints">
+		<liferay-frontend:fieldset
+			collapsed="<%= true %>"
+			collapsible="<%= true %>"
+			label="web-content-contraints"
+		>
 			<div class="form-group">
 				<aui:input name="ddmStructureKey" required="<%= true %>" type="hidden" value="<%= ddmStructureKey %>" />
 
@@ -186,36 +202,28 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 					<aui:input name="ddmTemplateKey" type="hidden" value="<%= ddmTemplateKey %>" />
 				</c:when>
 				<c:otherwise>
-					<aui:field-wrapper label="template">
-						<liferay-ui:table-iterator
-							list="<%= ddmTemplates %>"
-							listType="com.liferay.dynamic.data.mapping.model.DDMTemplate"
-							rowLength="3"
-							rowPadding="30"
-						>
+					<aui:select label="template" name="ddmTemplateKey" showEmptyOption="<%= true %>">
 
-							<%
-							boolean templateChecked = false;
+						<%
+						for (DDMTemplate ddTemplate : ddmTemplates) {
+						%>
 
-							if (ddmTemplateKey.equals(tableIteratorObj.getTemplateKey())) {
-								templateChecked = true;
-							}
-							%>
+							<aui:option label="<%= HtmlUtil.escape(ddTemplate.getName(locale)) %>" selected="<%= Objects.equals(ddmTemplateKey, ddTemplate.getTemplateKey()) %>" value="<%= ddTemplate.getTemplateKey() %>" />
 
-							<aui:input checked="<%= templateChecked %>" label="<%= HtmlUtil.escape(tableIteratorObj.getName(locale)) %>" name="ddmTemplateKey" type="radio" value="<%= tableIteratorObj.getTemplateKey() %>" />
+						<%
+						}
+						%>
 
-							<c:if test="<%= tableIteratorObj.isSmallImage() %>">
-								<br />
-
-								<img alt="" hspace="0" src="<%= HtmlUtil.escapeAttribute(tableIteratorObj.getTemplateImageURL(themeDisplay)) %>" vspace="0" />
-							</c:if>
-						</liferay-ui:table-iterator>
-					</aui:field-wrapper>
+					</aui:select>
 				</c:otherwise>
 			</c:choose>
-		</aui:fieldset>
+		</liferay-frontend:fieldset>
 
-		<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="presentation-settings">
+		<liferay-frontend:fieldset
+			collapsed="<%= true %>"
+			collapsible="<%= true %>"
+			label="presentation-settings"
+		>
 			<aui:select label="feed-item-content" name="contentFieldSelector">
 				<aui:option label="<%= JournalFeedConstants.WEB_CONTENT_DESCRIPTION %>" selected="<%= contentField.equals(JournalFeedConstants.WEB_CONTENT_DESCRIPTION) %>" />
 
@@ -301,10 +309,10 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 				<aui:option label="ascending" value="asc" />
 				<aui:option label="descending" value="desc" />
 			</aui:select>
-		</aui:fieldset>
-	</aui:fieldset-group>
+		</liferay-frontend:fieldset>
+	</liferay-frontend:fieldset-group>
 
-	<aui:button-row>
+	<liferay-frontend:button-row>
 
 		<%
 		boolean hasSavePermission = false;
@@ -318,12 +326,12 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 		%>
 
 		<c:if test="<%= hasSavePermission %>">
-			<aui:button cssClass="btn-lg" type="submit" />
+			<aui:button type="submit" />
 		</c:if>
 
-		<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
-	</aui:button-row>
-</aui:form>
+		<aui:button href="<%= redirect %>" type="cancel" />
+	</liferay-frontend:button-row>
+</liferay-frontend:edit-form>
 
 <aui:script>
 	function <portlet:namespace />openStructureSelector() {
@@ -401,8 +409,9 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 			var renderedWebContent = '<%= JournalFeedConstants.RENDERED_WEB_CONTENT %>';
 
 			if (selectedFeedItemOption.data('contentfield') === renderedWebContent) {
-				contentFieldValue = renderedWebContent;
 				ddmRendererTemplateKeyValue = contentFieldValue;
+
+				contentFieldValue = renderedWebContent;
 			}
 
 			form.fm('contentField').val(contentFieldValue);

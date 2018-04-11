@@ -96,12 +96,11 @@
 		<reference entity="ClassName" package-path="com.liferay.portal" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
-		<reference entity="AssetCategoryProperty" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetTag" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetVocabulary" package-path="com.liferay.portlet.asset" />
 	</entity>
-	<entity local-service="true" name="AssetCategoryProperty" remote-service="true">
+	<entity deprecated="true" local-service="true" name="AssetCategoryProperty" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -344,6 +343,9 @@
 		<finder name="GroupId" return-type="Collection">
 			<finder-column arrayable-operator="OR" name="groupId" />
 		</finder>
+		<finder name="Name" return-type="Collection">
+			<finder-column arrayable-operator="OR" name="name" />
+		</finder>
 		<finder name="G_N" return-type="AssetTag" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="name" />
@@ -360,9 +362,8 @@
 		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
 		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
-		<reference entity="AssetTagStats" package-path="com.liferay.portlet.asset" />
 	</entity>
-	<entity local-service="true" name="AssetTagStats" remote-service="false">
+	<entity deprecated="true" local-service="true" name="AssetTagStats" remote-service="false">
 
 		<!-- PK fields -->
 
