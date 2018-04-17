@@ -17,14 +17,13 @@ package com.liferay.source.formatter.checkstyle.checks;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * @author Hugo Huijser
  */
-public class InstanceofOrderCheck extends AbstractCheck {
+public class InstanceofOrderCheck extends BaseCheck {
 
 	@Override
 	public int[] getDefaultTokens() {
@@ -32,7 +31,7 @@ public class InstanceofOrderCheck extends AbstractCheck {
 	}
 
 	@Override
-	public void visitToken(DetailAST detailAST) {
+	protected void doVisitToken(DetailAST detailAST) {
 		DetailAST parentAST = detailAST.getParent();
 
 		if ((parentAST.getType() != TokenTypes.LAND) &&
@@ -59,8 +58,8 @@ public class InstanceofOrderCheck extends AbstractCheck {
 		NaturalOrderStringComparator comparator =
 			new NaturalOrderStringComparator();
 
-		String typeName1 = DetailASTUtil.getTypeName(detailAST);
-		String typeName2 = DetailASTUtil.getTypeName(nextConditionAST);
+		String typeName1 = DetailASTUtil.getTypeName(detailAST, false);
+		String typeName2 = DetailASTUtil.getTypeName(nextConditionAST, false);
 
 		if (comparator.compare(typeName1, typeName2) > 0) {
 			log(
