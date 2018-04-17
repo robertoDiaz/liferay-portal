@@ -15,6 +15,7 @@
 package com.liferay.portlet.social.service.impl;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.util.PropsValues;
@@ -235,6 +235,13 @@ public class SocialActivityCounterLocalServiceImpl
 				activity.getGroupId(), activity.getClassName(),
 				activity.getType());
 
+		if (activity.getType() == SocialActivityConstants.TYPE_REVOKE_VOTE) {
+			activityDefinition =
+				socialActivitySettingLocalService.getActivityDefinition(
+					activity.getGroupId(), activity.getClassName(),
+					SocialActivityConstants.TYPE_ADD_VOTE);
+		}
+
 		if ((activityDefinition == null) ||
 			!activityDefinition.isCountersEnabled()) {
 
@@ -288,6 +295,16 @@ public class SocialActivityCounterLocalServiceImpl
 			SocialActivityCounterDefinition activityCounterDefinition =
 				activityDefinition.getActivityCounterDefinition(
 					activityCounter.getName());
+
+			if ((activity.getType() == SocialActivityConstants.TYPE_REVOKE_VOTE)
+				&& (activityCounter.getName().equals("contribution") ||
+					(activityCounter.getName().equals("popularity")))) {
+
+				decrementActivityCounter(
+					activityCounter, activityCounterDefinition);
+
+				continue;
+			}
 
 			if (checkActivityLimit(user, activity, activityCounterDefinition)) {
 				incrementActivityCounter(
@@ -994,6 +1011,22 @@ public class SocialActivityCounterLocalServiceImpl
 				SocialActivityCounterFinder.class.getName());
 
 		portalCache.removeAll();
+	}
+
+	protected void decrementActivityCounter(
+		SocialActivityCounter activityCounter,
+		SocialActivityCounterDefinition activityCounterDefinition) {
+
+		activityCounter.setCurrentValue(
+			activityCounter.getCurrentValue() -
+			activityCounterDefinition.getIncrement());
+		activityCounter.setTotalValue(
+			activityCounter.getTotalValue() -
+			activityCounterDefinition.getIncrement());
+
+		socialActivityCounterPersistence.update(activityCounter);
+
+		socialActivityCounterPersistence.clearCache(activityCounter);
 	}
 
 	protected long getClassNameId(AssetEntry assetEntry, int ownerType) {

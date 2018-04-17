@@ -33,7 +33,9 @@ if (Validator.isNotNull(categoryPropertiesIndexesParam)) {
 	categoryPropertiesIndexes = StringUtil.split(categoryPropertiesIndexesParam, 0);
 
 	for (int categoryPropertiesIndex : categoryPropertiesIndexes) {
-		categoryProperties.add(new AssetCategoryPropertyImpl());
+		AssetCategoryProperty assetCategoryProperty = AssetCategoryPropertyLocalServiceUtil.createAssetCategoryProperty(0);
+
+		categoryProperties.add(assetCategoryProperty);
 	}
 }
 else {
@@ -50,7 +52,9 @@ else {
 	if (categoryProperties.isEmpty()) {
 		categoryProperties = new ArrayList<AssetCategoryProperty>();
 
-		categoryProperties.add(new AssetCategoryPropertyImpl());
+		AssetCategoryProperty assetCategoryProperty = AssetCategoryPropertyLocalServiceUtil.createAssetCategoryProperty(0);
+
+		categoryProperties.add(assetCategoryProperty);
 
 		categoryPropertiesIndexes = new int[] {0};
 	}
@@ -70,50 +74,59 @@ long vocabularyId = ParamUtil.getLong(request, "vocabularyId");
 	<portlet:param name="vocabularyId" value="<%= String.valueOf(vocabularyId) %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= editPropertiesURL %>" name="fm">
+<liferay-frontend:edit-form
+	action="<%= editPropertiesURL %>"
+	name="fm"
+>
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="categoryId" type="hidden" value="<%= categoryId %>" />
 
-	<liferay-ui:error exception="<%= CategoryPropertyKeyException.class %>" message="please-enter-a-valid-property-key" />
-	<liferay-ui:error exception="<%= CategoryPropertyValueException.class %>" message="please-enter-a-valid-property-value" />
-	<liferay-ui:error exception="<%= DuplicateCategoryPropertyException.class %>" message="please-enter-a-unique-property-key" />
+	<liferay-frontend:edit-form-body>
+		<liferay-ui:error exception="<%= CategoryPropertyKeyException.class %>" message="please-enter-a-valid-property-key" />
+		<liferay-ui:error exception="<%= CategoryPropertyValueException.class %>" message="please-enter-a-valid-property-value" />
+		<liferay-ui:error exception="<%= DuplicateCategoryPropertyException.class %>" message="please-enter-a-unique-property-key" />
 
-	<div id="<portlet:namespace />categoryPropertiesId">
-		<p class="text-muted">
-			<liferay-ui:message key="properties-are-a-way-to-add-more-detailed-information-to-a-specific-category" />
-		</p>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<div id="<portlet:namespace />categoryPropertiesId">
+					<p class="text-muted">
+						<liferay-ui:message key="properties-are-a-way-to-add-more-detailed-information-to-a-specific-category" />
+					</p>
 
-		<%
-		for (int i = 0; i < categoryPropertiesIndexes.length; i++) {
-			int categoryPropertiesIndex = categoryPropertiesIndexes[i];
+					<%
+					for (int i = 0; i < categoryPropertiesIndexes.length; i++) {
+						int categoryPropertiesIndex = categoryPropertiesIndexes[i];
 
-			AssetCategoryProperty categoryProperty = categoryProperties.get(i);
-		%>
+						AssetCategoryProperty categoryProperty = categoryProperties.get(i);
+					%>
 
-			<aui:model-context bean="<%= categoryProperty %>" model="<%= AssetCategoryProperty.class %>" />
+						<aui:model-context bean="<%= categoryProperty %>" model="<%= AssetCategoryProperty.class %>" />
 
-			<div class="lfr-form-row lfr-form-row-inline">
-				<div class="row-fields">
-					<aui:input fieldParam='<%= "key" + categoryPropertiesIndex %>' id='<%= "key" + categoryPropertiesIndex %>' name="key" />
+						<div class="lfr-form-row lfr-form-row-inline">
+							<div class="row-fields">
+								<aui:input fieldParam='<%= "key" + categoryPropertiesIndex %>' id='<%= "key" + categoryPropertiesIndex %>' name="key" />
 
-					<aui:input fieldParam='<%= "value" + categoryPropertiesIndex %>' id='<%= "value" + categoryPropertiesIndex %>' name="value" />
+								<aui:input fieldParam='<%= "value" + categoryPropertiesIndex %>' id='<%= "value" + categoryPropertiesIndex %>' name="value" />
+							</div>
+						</div>
+
+					<%
+					}
+					%>
+
 				</div>
-			</div>
 
-		<%
-		}
-		%>
+				<aui:input name="categoryPropertiesIndexes" type="hidden" value="<%= StringUtil.merge(categoryPropertiesIndexes) %>" />
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
+	</liferay-frontend:edit-form-body>
 
-	</div>
+	<liferay-frontend:edit-form-footer>
+		<aui:button type="submit" />
 
-	<aui:input name="categoryPropertiesIndexes" type="hidden" value="<%= StringUtil.merge(categoryPropertiesIndexes) %>" />
-
-	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
-
-		<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
-	</aui:button-row>
-</aui:form>
+		<aui:button href="<%= redirect %>" type="cancel" />
+	</liferay-frontend:edit-form-footer>
+</liferay-frontend:edit-form>
 
 <aui:script use="liferay-auto-fields">
 	var autoFields = new Liferay.AutoFields(

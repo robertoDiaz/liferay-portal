@@ -95,6 +95,21 @@ public class RatingsEntryLocalServiceImpl
 
 			ratingsStatsPersistence.update(stats);
 		}
+
+		// Social
+
+		AssetEntry assetEntry = assetEntryLocalService.fetchEntry(
+			className, classPK);
+
+		if (assetEntry != null) {
+			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+			extraDataJSONObject.put("title", assetEntry.getTitle());
+
+			SocialActivityManagerUtil.addActivity(
+				userId, assetEntry, SocialActivityConstants.TYPE_REVOKE_VOTE,
+				extraDataJSONObject.toString(), 0);
+		}
 	}
 
 	@Override
@@ -128,8 +143,9 @@ public class RatingsEntryLocalServiceImpl
 
 		Map<Long, RatingsEntry> ratingsEntries = new HashMap<>();
 
-		for (RatingsEntry entry : ratingsEntryPersistence.findByU_C_C(
-				userId, classNameId, classPKs)) {
+		for (RatingsEntry entry :
+				ratingsEntryPersistence.findByU_C_C(
+					userId, classNameId, classPKs)) {
 
 			ratingsEntries.put(entry.getClassPK(), entry);
 		}

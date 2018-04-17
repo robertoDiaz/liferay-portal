@@ -17,8 +17,9 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureImpl;
-import com.liferay.dynamic.data.mapping.service.permission.DDMStructurePermission;
+import com.liferay.dynamic.data.mapping.security.permission.DDMPermissionSupport;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureFinder;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQLUtil;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -30,10 +31,10 @@ import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Iterator;
 import java.util.List;
@@ -454,7 +455,7 @@ public class DDMStructureFinderImpl
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql,
-					DDMStructurePermission.getStructureModelResourceName(
+					_ddmPermissionSupport.getStructureModelResourceName(
 						classNameId),
 					"DDMStructure.structureId", groupIds);
 			}
@@ -592,7 +593,7 @@ public class DDMStructureFinderImpl
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql,
-					DDMStructurePermission.getStructureModelResourceName(
+					_ddmPermissionSupport.getStructureModelResourceName(
 						classNameId),
 					"DDMStructure.structureId", groupIds);
 			}
@@ -679,5 +680,8 @@ public class DDMStructureFinderImpl
 
 		return sb.toString();
 	}
+
+	@ServiceReference(type = DDMPermissionSupport.class)
+	private DDMPermissionSupport _ddmPermissionSupport;
 
 }
