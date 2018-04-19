@@ -80,7 +80,6 @@ public interface AnnouncementsDeliveryLocalService extends BaseLocalService,
 	* @param deliveryId the primary key for the new announcements delivery
 	* @return the new announcements delivery
 	*/
-	@Transactional(enabled = false)
 	public AnnouncementsDelivery createAnnouncementsDelivery(long deliveryId);
 
 	/**
