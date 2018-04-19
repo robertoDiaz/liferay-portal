@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -218,6 +219,11 @@ public class AnnouncementsEntryLocalServiceImpl
 		deleteEntry(entry);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntries(long, long,
+	 *             LinkedHashMap, boolean, int, int, int)}
+	 */
+	@Deprecated
 	@Override
 	public List<AnnouncementsEntry> getEntries(
 		long userId, LinkedHashMap<Long, long[]> scopes, boolean alert,
@@ -228,6 +234,12 @@ public class AnnouncementsEntryLocalServiceImpl
 			start, end);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntries(long, long,
+	 *             LinkedHashMap, int, int, int, int, int, int, int, int, int,
+	 *             int, boolean, int, int, int)}
+	 */
+	@Deprecated
 	@Override
 	public List<AnnouncementsEntry> getEntries(
 		long userId, LinkedHashMap<Long, long[]> scopes, int displayDateMonth,
@@ -244,14 +256,79 @@ public class AnnouncementsEntryLocalServiceImpl
 			expirationDateMinute, alert, flagValue, start, end);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntries(long, long, long,
+	 *             boolean, int, int)}
+	 */
+	@Deprecated
 	@Override
 	public List<AnnouncementsEntry> getEntries(
 		long classNameId, long classPK, boolean alert, int start, int end) {
 
-		return announcementsEntryPersistence.findByC_C_A(
-			classNameId, classPK, alert, start, end);
+		return getEntries(
+			CompanyThreadLocal.getCompanyId(), classNameId, classPK, alert,
+			start, end);
 	}
 
+	@Override
+	public List<AnnouncementsEntry> getEntries(
+		long companyId, long userId, LinkedHashMap<Long, long[]> scopes,
+		boolean alert, int flagValue, int start, int end) {
+
+		return getEntries(
+			companyId, userId, scopes, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, alert,
+			flagValue, start, end);
+	}
+
+	@Override
+	public List<AnnouncementsEntry> getEntries(
+		long companyId, long userId, LinkedHashMap<Long, long[]> scopes,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean alert, int flagValue, int start,
+		int end) {
+
+		return announcementsEntryFinder.findByScopes(
+			companyId, userId, scopes, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue, start,
+			end);
+	}
+
+	@Override
+	public List<AnnouncementsEntry> getEntries(
+		long companyId, long classNameId, long classPK, boolean alert,
+		int start, int end) {
+
+		return announcementsEntryPersistence.findByC_C_C_A(
+			companyId, classNameId, classPK, alert, start, end);
+	}
+
+	@Override
+	public List<AnnouncementsEntry> getEntries(
+		long companyId, long userId, long classNameId, long[] classPKs,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean alert, int flagValue, int start,
+		int end) {
+
+		return announcementsEntryFinder.findByScope(
+			companyId, userId, classNameId, classPKs, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue, start,
+			end);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntries(long, long, long,
+	 *             long[], int, int, int, int, int, int, int, int, int, int,
+	 *             boolean, int, int, int)}
+	 */
+	@Deprecated
 	@Override
 	public List<AnnouncementsEntry> getEntries(
 		long userId, long classNameId, long[] classPKs, int displayDateMonth,
@@ -269,15 +346,27 @@ public class AnnouncementsEntryLocalServiceImpl
 			end);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             LinkedHashMap, boolean, int)}
+	 */
+	@Deprecated
 	@Override
 	public int getEntriesCount(
 		long userId, LinkedHashMap<Long, long[]> scopes, boolean alert,
 		int flagValue) {
 
 		return getEntriesCount(
-			userId, scopes, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, alert, flagValue);
+			CompanyThreadLocal.getCompanyId(), userId, scopes, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, alert, flagValue);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             LinkedHashMap, int, int, int, int, int, int, int, int, int,
+	 *             int, boolean, int)}
+	 */
+	@Deprecated
 	@Override
 	public int getEntriesCount(
 		long userId, LinkedHashMap<Long, long[]> scopes, int displayDateMonth,
@@ -293,22 +382,96 @@ public class AnnouncementsEntryLocalServiceImpl
 			expirationDateMinute, alert, flagValue);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             long, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public int getEntriesCount(long classNameId, long classPK, boolean alert) {
-		return announcementsEntryPersistence.countByC_C_A(
-			classNameId, classPK, alert);
+		return getEntriesCount(
+			CompanyThreadLocal.getCompanyId(), classNameId, classPK, alert);
 	}
 
+	@Override
+	public int getEntriesCount(
+		long companyId, long userId, LinkedHashMap<Long, long[]> scopes,
+		boolean alert, int flagValue) {
+
+		return getEntriesCount(
+			companyId, userId, scopes, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, alert,
+			flagValue);
+	}
+
+	@Override
+	public int getEntriesCount(
+		long companyId, long userId, LinkedHashMap<Long, long[]> scopes,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean alert, int flagValue) {
+
+		return announcementsEntryFinder.countByScopes(
+			companyId, userId, scopes, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue);
+	}
+
+	@Override
+	public int getEntriesCount(
+		long companyId, long classNameId, long classPK, boolean alert) {
+
+		return announcementsEntryPersistence.countByC_C_C_A(
+			companyId, classNameId, classPK, alert);
+	}
+
+	@Override
+	public int getEntriesCount(
+		long companyId, long userId, long classNameId, long[] classPKs,
+		boolean alert, int flagValue) {
+
+		return getEntriesCount(
+			companyId, userId, classNameId, classPKs, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, alert, flagValue);
+	}
+
+	@Override
+	public int getEntriesCount(
+		long companyId, long userId, long classNameId, long[] classPKs,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean alert, int flagValue) {
+
+		return announcementsEntryFinder.countByScope(
+			companyId, userId, classNameId, classPKs, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             long, long[], boolean, int)}
+	 */
+	@Deprecated
 	@Override
 	public int getEntriesCount(
 		long userId, long classNameId, long[] classPKs, boolean alert,
 		int flagValue) {
 
 		return getEntriesCount(
-			userId, classNameId, classPKs, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, alert,
-			flagValue);
+			CompanyThreadLocal.getCompanyId(), userId, classNameId, classPKs, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, alert, flagValue);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             long, long[], int, int, int, int, int, int, int, int, int,
+	 *             int, boolean, int)}
+	 */
+	@Deprecated
 	@Override
 	public int getEntriesCount(
 		long userId, long classNameId, long[] classPKs, int displayDateMonth,
