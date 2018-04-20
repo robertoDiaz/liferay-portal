@@ -14,8 +14,9 @@
 
 package com.liferay.frontend.image.editor.integration.document.library.internal.display.context.logic;
 
+import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.document.library.web.constants.DLPortletKeys;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
@@ -45,10 +46,8 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 
 import java.util.ResourceBundle;
 
@@ -94,31 +93,31 @@ public class ImageEditorDLDisplayContextHelper {
 			ResourceBundle resourceBundle)
 		throws PortalException {
 
-		JavaScriptMenuItem javascriptMenuItem = new JavaScriptMenuItem();
+		JavaScriptMenuItem javaScriptMenuItem = new JavaScriptMenuItem();
 
-		javascriptMenuItem.setKey("#edit-with-image-editor");
-		javascriptMenuItem.setLabel(
+		javaScriptMenuItem.setKey("#edit-with-image-editor");
+		javaScriptMenuItem.setLabel(
 			LanguageUtil.get(resourceBundle, "edit-with-image-editor"));
-		javascriptMenuItem.setOnClick(_getOnclickMethod());
-		javascriptMenuItem.setJavaScript(_getJavaScript());
+		javaScriptMenuItem.setOnClick(_getOnclickMethod());
+		javaScriptMenuItem.setJavaScript(_getJavaScript());
 
-		return javascriptMenuItem;
+		return javaScriptMenuItem;
 	}
 
 	public JavaScriptToolbarItem getJavacriptEditWithImageEditorToolbarItem(
 			ResourceBundle resourceBundle)
 		throws PortalException {
 
-		JavaScriptToolbarItem javascriptToolbarItem =
+		JavaScriptToolbarItem javaScriptToolbarItem =
 			new JavaScriptToolbarItem();
 
-		javascriptToolbarItem.setKey("#edit-with-image-editor");
-		javascriptToolbarItem.setLabel(
+		javaScriptToolbarItem.setKey("#edit-with-image-editor");
+		javaScriptToolbarItem.setLabel(
 			LanguageUtil.get(resourceBundle, "edit-with-image-editor"));
-		javascriptToolbarItem.setOnClick(_getOnclickMethod());
-		javascriptToolbarItem.setJavaScript(_getJavaScript());
+		javaScriptToolbarItem.setOnClick(_getOnclickMethod());
+		javaScriptToolbarItem.setJavaScript(_getJavaScript());
 
-		return javascriptToolbarItem;
+		return javaScriptToolbarItem;
 	}
 
 	public boolean isShowActions() throws PortalException {
@@ -147,9 +146,8 @@ public class ImageEditorDLDisplayContextHelper {
 		if (!isShowActions()) {
 			_showImageEditorAction = false;
 		}
-		else if (!DLFileEntryPermission.contains(
-					_themeDisplay.getPermissionChecker(), _fileEntry,
-					ActionKeys.UPDATE) ||
+		else if (!_fileEntry.containsPermission(
+					_themeDisplay.getPermissionChecker(), ActionKeys.UPDATE) ||
 				 (_fileEntry.isCheckedOut() && !_fileEntry.hasLock())) {
 
 			_showImageEditorAction = false;

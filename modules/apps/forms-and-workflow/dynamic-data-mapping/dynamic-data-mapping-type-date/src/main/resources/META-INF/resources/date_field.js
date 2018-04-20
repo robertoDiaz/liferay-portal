@@ -3,15 +3,6 @@ AUI.add(
 	function(A) {
 		var isArray = Array.isArray;
 
-		var datePicker = new A.DatePicker(
-			{
-				popover: {
-					zIndex: Liferay.zIndex.TOOLTIP
-				},
-				trigger: '.liferay-ddm-form-field-date .trigger'
-			}
-		);
-
 		var DateField = A.Component.create(
 			{
 				ATTRS: {
@@ -21,6 +12,10 @@ AUI.add(
 
 					mask: {
 						value: Liferay.AUI.getDateFormat()
+					},
+
+					predefinedValue: {
+						value: ''
 					},
 
 					type: {
@@ -36,14 +31,15 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						instance._eventHandlers.push(
-							datePicker.after('selectionChange', A.bind('_afterSelectionChange', instance)),
-							datePicker.on('activeInputChange', A.bind('_onActiveInputChange', instance))
-						);
-
 						if (!instance.get('readOnly')) {
 							instance.bindContainerEvent('click', instance._onClickCalendar, '.input-group-addon');
 						}
+					},
+
+					destructor: function() {
+						var instance = this;
+
+						instance.datePicker.destroy();
 					},
 
 					formatDate: function(isoDate) {
@@ -72,12 +68,14 @@ AUI.add(
 					getTemplateContext: function() {
 						var instance = this;
 
+						var predefinedValue = instance.get('predefinedValue');
 						var value = instance.get('value');
 
 						return A.merge(
 							DateField.superclass.getTemplateContext.apply(instance, arguments),
 							{
-								displayValue: instance.formatDate(value),
+								formattedValue: instance.formatDate(value),
+								predefinedValue: instance.formatDate(predefinedValue),
 								value: value
 							}
 						);
@@ -88,16 +86,66 @@ AUI.add(
 
 						var container = instance.get('container');
 
-						var triggerNode;
+						return container.one('.form-control');
+					},
 
-						if (instance.get('readOnly')) {
-							triggerNode = container.one('.trigger-readonly');
-						}
-						else {
-							triggerNode = container.one('.trigger');
+					hasFocus: function() {
+						var instance = this;
+
+						var datePicker = instance.datePicker;
+
+						var hasFocus = DateField.superclass.hasFocus.apply(instance, arguments);
+
+						if (datePicker.calendar) {
+							var calendarNode = datePicker.calendar.get('boundingBox');
+
+							hasFocus = hasFocus || calendarNode.contains(document.activeElement);
 						}
 
-						return triggerNode;
+						return hasFocus;
+					},
+
+					render: function() {
+						var instance = this;
+
+						var pattern = instance.get('mask');
+
+						pattern = pattern.replace(/%d/, 'dd');
+						pattern = pattern.replace(/%m/, 'mm');
+						pattern = pattern.replace(/%y/, 'yy');
+
+						var autoCorrectedDatePipe = DDMDate.createAutoCorrectedDatePipe(pattern + 'HH:MM');
+
+						DateField.superclass.render.apply(instance, arguments);
+
+						var element = instance.getTriggerNode().getDOM();
+
+						DDMDate.vanillaTextMask(
+							{
+								inputElement: element,
+								mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
+								pipe: autoCorrectedDatePipe,
+								placeholderChar: '_',
+								showMask: true
+							}
+						);
+
+						var qualifiedName = instance.getQualifiedName().replace(/\$/ig, '\\$');
+
+						instance.datePicker = new A.DatePicker(
+							{
+								after: {
+									selectionChange: A.bind('_afterSelectionChange', instance)
+								},
+								mask: instance.get('mask'),
+								popover: {
+									zIndex: Liferay.zIndex.TOOLTIP
+								},
+								trigger: '[data-fieldname=' + qualifiedName + '] .form-control'
+							}
+						);
+
+						return instance;
 					},
 
 					setValue: function(isoDate) {
@@ -105,9 +153,9 @@ AUI.add(
 
 						DateField.superclass.setValue.apply(instance, arguments);
 
-						var formattedDate = instance.formatDate(isoDate);
+						var formattedValue = instance.get('formattedValue');
 
-						instance.getTriggerNode().val(formattedDate);
+						instance.getTriggerNode().val(formattedValue);
 
 						instance.set('value', isoDate);
 					},
@@ -119,41 +167,43 @@ AUI.add(
 
 						var container = instance.get('container');
 
-						var inputGroup = container.one('.input-group-container');
+						var formGroup = container.one('.form-group');
 
-						inputGroup.insert(container.one('.help-block'), 'after');
+						formGroup.append(container.one('.form-feedback-item'));
 					},
 
 					_afterSelectionChange: function(event) {
 						var instance = this;
 
-						var triggerNode = instance.getTriggerNode();
+						var date = event.newSelection;
 
-						if (datePicker.get('activeInput') === triggerNode) {
-							var date = event.newSelection;
-
-							if (isArray(date) && date.length) {
-								date = date[0];
-							}
-
-							instance.setValue(instance.getISODate(date));
-
-							instance.validate();
+						if (isArray(date) && date.length) {
+							date = date[0];
 						}
+
+						instance.setValue(instance.getISODate(date));
+
+						instance.validate();
+
+						instance._fireStartedFillingEvent();
 					},
 
-					_onActiveInputChange: function(event) {
+					_onCalendarFocusedChange: function(event) {
 						var instance = this;
 
-						var triggerNode = instance.getTriggerNode();
+						event.preventDefault();
 
-						if (event.newVal === triggerNode) {
-							datePicker.set('mask', instance.get('mask'));
+						if (event.newVal) {
+							var triggerNode = instance.getTriggerNode();
+
+							triggerNode.focus();
 						}
 					},
 
 					_onClickCalendar: function() {
 						var instance = this;
+
+						var datePicker = instance.datePicker;
 
 						instance.getTriggerNode().focus();
 

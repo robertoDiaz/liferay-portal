@@ -42,7 +42,9 @@ public class WSRPWebUpgrade implements UpgradeStepRegistrator {
 
 				@Override
 				protected String[] getPortletIds() {
-					return new String[] {"1_WAR_wsrpportlet"};
+					return new String[] {
+						"1_WAR_wsrpportlet", "2_WAR_wsrpportlet"
+					};
 				}
 
 			};
@@ -54,11 +56,9 @@ public class WSRPWebUpgrade implements UpgradeStepRegistrator {
 			throw new RuntimeException(ue);
 		}
 
-		registry.register(
-			"com.liferay.wsrp.web", "0.0.0", "1.0.0", new DummyUpgradeStep());
+		registry.register("0.0.0", "1.0.0", new DummyUpgradeStep());
 
-		registry.register(
-			"com.liferay.wsrp.web", "0.0.1", "1.0.0", new UpgradePortletId());
+		registry.register("0.0.1", "1.0.0", new UpgradePortletId());
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")

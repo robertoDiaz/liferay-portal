@@ -17,21 +17,27 @@
 <%@ include file="/deletions/init.jsp" %>
 
 <c:if test="<%= cmd.equals(Constants.EXPORT) || cmd.equals(Constants.IMPORT) || cmd.equals(Constants.PUBLISH) %>">
-	<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="deletions" markupView="lexicon">
-		<c:if test="<%= !cmd.equals(Constants.EXPORT) %>">
-			<aui:input disabled="<%= disableInputs %>" label="delete-application-data-before-importing" name="<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>" type="toggle-switch" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETE_PORTLET_DATA, false) %>" />
+	<aui:fieldset cssClass="options-group" markupView="lexicon">
+		<div class="sheet-section">
+			<h3 class="sheet-subtitle"><liferay-ui:message key="deletions" /></h3>
+			<c:if test="<%= !cmd.equals(Constants.EXPORT) %>">
+				<liferay-staging:checkbox
+					checked="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETE_PORTLET_DATA, false) %>"
+					disabled="<%= disableInputs %>"
+					label="delete-application-data-before-importing"
+					name="<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>"
+					suggestion="delete-content-before-importing-suggestion"
+					warning="delete-content-before-importing-warning"
+				/>
+			</c:if>
 
-			<div class="alert alert-warning" id="<portlet:namespace />showDeleteContentWarning">
-				<liferay-ui:message key="delete-content-before-importing-warning" />
-
-				<liferay-ui:message key="delete-content-before-importing-suggestion" />
-			</div>
-
-			<aui:script>
-				Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>', '<portlet:namespace />showDeleteContentWarning');
-			</aui:script>
-		</c:if>
-
-		<aui:input disabled="<%= disableInputs %>" helpMessage='<%= cmd.equals(Constants.EXPORT) ? "deletions-help-export" : "deletions-help" %>' label='<%= cmd.equals(Constants.EXPORT) ? "export-individual-deletions" : "replicate-individual-deletions" %>' name="<%= PortletDataHandlerKeys.DELETIONS %>" type="toggle-switch" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETIONS, false) %>" />
+			<liferay-staging:checkbox
+				checked="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.DELETIONS, false) %>"
+				description="<%= individualDeletionsDescription %>"
+				disabled="<%= disableInputs %>"
+				label="<%= individualDeletionsTitle %>"
+				name="<%= PortletDataHandlerKeys.DELETIONS %>"
+			/>
+		</div>
 	</aui:fieldset>
 </c:if>

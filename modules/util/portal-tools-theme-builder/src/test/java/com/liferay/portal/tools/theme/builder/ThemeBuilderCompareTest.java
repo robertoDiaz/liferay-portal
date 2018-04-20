@@ -120,10 +120,11 @@ public class ThemeBuilderCompareTest {
 
 		_diffsDir = diffsDir;
 		_name = name;
-		_parentDir = _getParentDir(parentName);
 		_parentName = parentName;
 		_templateExtension = templateExtension;
 		_warFile = warFile;
+
+		_parentDir = _getParentDir(parentName);
 	}
 
 	@Test
@@ -283,6 +284,10 @@ public class ThemeBuilderCompareTest {
 			throw new IllegalArgumentException(
 				"Unsupported base theme " + parentName);
 		}
+
+		documentBuilderFactory.setFeature(
+			"http://apache.org/xml/features/nonvalidating/load-external-dtd",
+			false);
 
 		DocumentBuilder documentBuilder =
 			documentBuilderFactory.newDocumentBuilder();

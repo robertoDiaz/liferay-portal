@@ -36,47 +36,65 @@
 		AUI().use(
 			'liferay-ddm-form-renderer',
 			'liferay-ddm-form-renderer-field',
+			'liferay-ddm-soy-template-util',
 			function(A) {lb}
-				setTimeout(function() {lb}
-					Liferay.DDM.Renderer.FieldTypes.register({$fieldTypes});
+				var SoyTemplateUtil = Liferay.DDM.SoyTemplateUtil;
 
-					var form = Liferay.component(
-						'{$containerId}DDMForm',
-						new Liferay.DDM.Renderer.Form(
-							{lb}
-								container: '#{$containerId}',
-								context: {$context},
-								evaluatorURL: '{$evaluatorURL}',
-								portletNamespace: '{$portletNamespace}',
-								readOnly: {if $readOnly}true{else}false{/if}
-							{rb}
-						).render()
-					);
+				SoyTemplateUtil.loadModules(
+					function() {lb}
+						Liferay.DDM.Renderer.FieldTypes.register({$fieldTypes});
 
-					Liferay.fire(
-						'{$containerId}DDMForm:render',
-						{lb}
-							form: form
-						{rb}
-					);
+						{call .render_form data="all" /}
+					{rb}
+				);
 
-					var destroyFormHandle = function(event) {lb}
-						var form = Liferay.component('{$containerId}DDMForm');
+				var destroyFormHandle = function(event) {lb}
+					var form = Liferay.component('{$containerId}DDMForm');
 
-						var portlet = event.portlet;
+					var portlet = event.portlet;
 
-						if (portlet && portlet.contains(form.get('container'))) {lb}
-							form.destroy();
+					if (portlet && portlet.contains(form.get('container'))) {lb}
+						form.destroy();
 
-							Liferay.detach('destroyPortlet', destroyFormHandle);
-						{rb}
-					{rb};
+						Liferay.detach('destroyPortlet', destroyFormHandle);
+					{rb}
+				{rb};
 
-					Liferay.on('destroyPortlet', destroyFormHandle);
-				{rb}, 500);
+				Liferay.on('destroyPortlet', destroyFormHandle);
 			{rb}
 		);
 	</script>
+{/template}
+
+/**
+ * Prints render form script
+ */
+{template .render_form kind="js"}
+	{@param containerId: string}
+	{@param context: ?}
+	{@param evaluatorURL: string}
+	{@param portletNamespace: string}
+	{@param readOnly: bool}
+
+	var form = Liferay.component(
+		'{$containerId}DDMForm',
+		new Liferay.DDM.Renderer.Form(
+			{lb}
+				container: '#{$containerId}',
+				context: {$context},
+				evaluatorURL: '{$evaluatorURL}',
+				portletNamespace: '{$portletNamespace}',
+				readOnly: {if $readOnly}true{else}false{/if}
+			{rb}
+		).render()
+	);
+
+	Liferay.fire(
+	'{$containerId}DDMForm:render',
+		{lb}
+			form: form
+		{rb}
+	);
 {/template}
 
 /**
@@ -124,8 +142,8 @@
  * Prints the form fields required message warning.
  */
 {template .required_warning_message}
-	{@param showRequiredFieldsWarning: bool}
 	{@param requiredFieldsWarningMessageHTML: html}
+	{@param showRequiredFieldsWarning: bool}
 
 	{if $showRequiredFieldsWarning}
 		{$requiredFieldsWarningMessageHTML}
@@ -144,27 +162,29 @@
 		rows: list<[columns: list<[size: int, fields: list<?>]>]>
 	]>}
 	{@param requiredFieldsWarningMessageHTML: html}
-	{@param submitLabel: string}
 	{@param showSubmitButton: bool}
 	{@param strings: [previous: string, next: string]}
+	{@param submitLabel: string}
 
 	<div class="lfr-ddm-form-container" id="{$containerId}">
-		<div class="lfr-ddm-form-content">
+		<div class="ddm-user-view-content lfr-ddm-form-content">
 			{if length($pages) > 1}
-				<div class="lfr-ddm-form-wizard">
-					<ul class="multi-step-progress-bar multi-step-progress-bar-collapse">
-						{foreach $page in $pages}
-							<li {if isFirst($page)}class="active"{/if}>
-								<div class="progress-bar-title">{$page.title}</div>
+					<div class="lfr-ddm-form-wizard">
+						<ul class="multi-step-indicator-label-top multi-step-nav multi-step-nav-collapse-sm">
+							{foreach $page in $pages}
+								<li {if isFirst($page)}class="active"{/if}>
+									<div class="multi-step-divider"></div>
 
-								<div class="divider"></div>
+									<div class="multi-step-indicator">
+										<div class="multi-step-indicator-label">{$page.title}</div>
+									</div>
 
-								<div class="progress-bar-step">{index($page) + 1}</div>
-							</li>
-						{/foreach}
-					</ul>
-				</div>
-			{/if}
+									<a class="multi-step-icon" data-multi-step-icon="{index($page) + 1}" href="#1"></a>
+								</li>
+							{/foreach}
+						</ul>
+					</div>
+				{/if}
 
 			<div class="lfr-ddm-form-pages">
 				{foreach $page in $pages}
@@ -191,16 +211,16 @@
 		</div>
 
 		<div class="lfr-ddm-form-pagination-controls">
-			<button class="btn btn-lg btn-primary hide lfr-ddm-form-pagination-prev" type="button">
+			<button class="btn btn-primary hide lfr-ddm-form-pagination-prev" type="button">
 				<i class="icon-angle-left"></i> {$strings.previous}
 			</button>
 
-			<button class="btn btn-lg btn-primary{if length($pages) == 1} hide{/if} lfr-ddm-form-pagination-next pull-right" type="button">
+			<button class="btn btn-primary{if length($pages) == 1} hide{/if} lfr-ddm-form-pagination-next pull-right" type="button">
 				{$strings.next} <i class="icon-angle-right"></i>
 			</button>
 
 			{if $showSubmitButton}
-				<button class="btn btn-lg btn-primary{if length($pages) > 1} hide{/if} lfr-ddm-form-submit pull-right" disabled type="submit">{$submitLabel}</button>
+				<button class="btn btn-primary{if length($pages) > 1} hide{/if} lfr-ddm-form-submit pull-right" disabled type="submit">{$submitLabel}</button>
 			{/if}
 		</div>
 	</div>
@@ -261,16 +281,16 @@
 		</div>
 
 		<div class="lfr-ddm-form-pagination-controls">
-			<button class="btn btn-lg btn-primary hide lfr-ddm-form-pagination-prev" type="button">
+			<button class="btn btn-primary hide lfr-ddm-form-pagination-prev" type="button">
 				<i class="icon-angle-left"></i> {$strings.previous}
 			</button>
 
-			<button class="btn btn-lg btn-primary{if length($pages) == 1} hide{/if} lfr-ddm-form-pagination-next pull-right" type="button">
+			<button class="btn btn-primary{if length($pages) == 1} hide{/if} lfr-ddm-form-pagination-next pull-right" type="button">
 				{$strings.next} <i class="icon-angle-right"></i>
 			</button>
 
 			{if $showSubmitButton}
-				<button class="btn btn-lg btn-primary{if length($pages) > 1} hide{/if} lfr-ddm-form-submit pull-right" disabled type="submit">{$submitLabel}</button>
+				<button class="btn btn-primary{if length($pages) > 1} hide{/if} lfr-ddm-form-submit pull-right" disabled type="submit">{$submitLabel}</button>
 			{/if}
 		</div>
 	</div>
@@ -328,7 +348,7 @@
 				{/foreach}
 			</ul>
 
-			<div class="tab-content">
+			<div class="lfr-ddm-form-tabs-content tab-content">
 				{foreach $page in $pages}
 					<div class="lfr-ddm-form-page tab-pane {if isFirst($page)}active{/if}">
 						{call .required_warning_message data="all"}
