@@ -233,6 +233,44 @@ public class AnnouncementsEntryLocalServiceTest {
 		Assert.assertEquals(entry.getEntryId(), finalEntry.getEntryId());
 	}
 
+	@Test
+	public void testGetEntriesInDifferentCompanyWhenGeneralScope1()
+		throws Exception {
+
+		addEntry(0, 0);
+
+		Company company = CompanyTestUtil.addCompany();
+
+		List<AnnouncementsEntry> entries =
+			AnnouncementsEntryLocalServiceUtil.getEntries(
+				company.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		Assert.assertEquals(0, entries.size());
+
+		Assert.fail();
+	}
+
+	@Test
+	public void testGetEntriesInSameCompanyWhenGeneralScope1() throws Exception {
+		Group group = GroupTestUtil.addGroup();
+
+		AnnouncementsEntry entry = addEntry(0, 0);
+
+		List<AnnouncementsEntry> entries =
+			AnnouncementsEntryLocalServiceUtil.getEntries(
+				group.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		Assert.assertEquals(1, entries.size());
+
+		AnnouncementsEntry finalEntry = entries.get(0);
+
+		Assert.assertEquals(entry.getEntryId(), finalEntry.getEntryId());
+
+		Assert.fail();
+	}
+
 	protected AnnouncementsEntry addEntry(long classNameId, long classPK)
 		throws Exception {
 
