@@ -66,6 +66,42 @@ public class AnnouncementsEntryLocalServiceTest {
 		new LiferayIntegrationTestRule();
 
 	@Test
+	public void testDeleteEntriesInDifferentCompany() throws Exception {
+		addEntry(0, 0);
+		addEntry(0, 0);
+		addEntry(0, 0);
+
+		Company company = CompanyTestUtil.addCompany();
+
+		AnnouncementsEntryLocalServiceUtil.deleteEntries(
+			company.getCompanyId(), 0, 0);
+
+		List<AnnouncementsEntry> entries =
+			AnnouncementsEntryLocalServiceUtil.getEntries(
+				TestPropsValues.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		Assert.assertEquals(entries.toString(), 3, entries.size());
+	}
+
+	@Test
+	public void testDeleteEntriesInSameCompany() throws Exception {
+		addEntry(0, 0);
+		addEntry(0, 0);
+		addEntry(0, 0);
+
+		AnnouncementsEntryLocalServiceUtil.deleteEntries(
+			TestPropsValues.getCompanyId(), 0, 0);
+
+		List<AnnouncementsEntry> entries =
+			AnnouncementsEntryLocalServiceUtil.getEntries(
+				TestPropsValues.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		Assert.assertEquals(entries.toString(), 0, entries.size());
+	}
+
+	@Test
 	public void testDeleteGroupAnnouncements() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
