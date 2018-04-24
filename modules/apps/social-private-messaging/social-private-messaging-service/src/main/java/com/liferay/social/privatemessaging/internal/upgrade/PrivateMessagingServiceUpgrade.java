@@ -14,7 +14,7 @@
 
 package com.liferay.social.privatemessaging.internal.upgrade;
 
-import com.liferay.message.boards.kernel.service.MBThreadLocalService;
+import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
@@ -37,11 +37,11 @@ public class PrivateMessagingServiceUpgrade implements UpgradeStepRegistrator {
 	@Override
 	public void register(Registry registry) {
 		registry.register(
-			"com.liferay.social.privatemessaging.service", "0.0.1", "1.0.0",
+			"0.0.1", "1.0.0",
 			new UpgradePrivateMessaging(_mBThreadLocalService));
 
 		registry.register(
-			"com.liferay.social.privatemessaging.service", "1.0.0", "1.0.1",
+			"1.0.0", "1.0.1",
 			new UpgradeResourcePermission(
 				_companyLocalService, _groupLocalService,
 				_repositoryLocalService, _resourceLocalService,

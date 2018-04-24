@@ -75,6 +75,7 @@ public interface ServiceComponentLocalService extends BaseLocalService,
 	* @param serviceComponentId the primary key for the new service component
 	* @return the new service component
 	*/
+	@Transactional(enabled = false)
 	public ServiceComponent createServiceComponent(long serviceComponentId);
 
 	/**
@@ -231,9 +232,9 @@ public interface ServiceComponentLocalService extends BaseLocalService,
 		long buildNumber, long buildDate) throws PortalException;
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #initServiceComponent(
-	ServiceComponentConfiguration, ClassLoader, String, long,
-	long)}
+	* @deprecated As of 7.0.0, replaced by {@link
+	#initServiceComponent(ServiceComponentConfiguration,
+	ClassLoader, String, long, long)}
 	*/
 	@java.lang.Deprecated
 	public ServiceComponent initServiceComponent(

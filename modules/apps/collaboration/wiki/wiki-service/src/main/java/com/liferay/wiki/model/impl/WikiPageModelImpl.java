@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -275,11 +274,11 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		attributes.put("nodeId", getNodeId());
 		attributes.put("title", getTitle());
 		attributes.put("version", getVersion());
-		attributes.put("minorEdit", getMinorEdit());
+		attributes.put("minorEdit", isMinorEdit());
 		attributes.put("content", getContent());
 		attributes.put("summary", getSummary());
 		attributes.put("format", getFormat());
-		attributes.put("head", getHead());
+		attributes.put("head", isHead());
 		attributes.put("parentTitle", getParentTitle());
 		attributes.put("redirectTitle", getRedirectTitle());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -445,7 +444,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -577,7 +576,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -593,7 +592,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -660,7 +659,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getTitle() {
 		if (_title == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _title;
@@ -726,7 +725,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getContent() {
 		if (_content == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _content;
@@ -742,7 +741,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getSummary() {
 		if (_summary == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _summary;
@@ -758,7 +757,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getFormat() {
 		if (_format == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _format;
@@ -813,7 +812,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getParentTitle() {
 		if (_parentTitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _parentTitle;
@@ -839,7 +838,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getRedirectTitle() {
 		if (_redirectTitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _redirectTitle;
@@ -914,7 +913,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -926,7 +925,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusByUserName;
@@ -995,7 +994,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 
 		com.liferay.portal.kernel.trash.TrashHandler trashHandler = getTrashHandler();
 
-		if (!Validator.isNull(trashHandler.getContainerModelClassName(
+		if (Validator.isNotNull(trashHandler.getContainerModelClassName(
 						getPrimaryKey()))) {
 			ContainerModel containerModel = null;
 
@@ -1233,11 +1232,11 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		wikiPageImpl.setNodeId(getNodeId());
 		wikiPageImpl.setTitle(getTitle());
 		wikiPageImpl.setVersion(getVersion());
-		wikiPageImpl.setMinorEdit(getMinorEdit());
+		wikiPageImpl.setMinorEdit(isMinorEdit());
 		wikiPageImpl.setContent(getContent());
 		wikiPageImpl.setSummary(getSummary());
 		wikiPageImpl.setFormat(getFormat());
-		wikiPageImpl.setHead(getHead());
+		wikiPageImpl.setHead(isHead());
 		wikiPageImpl.setParentTitle(getParentTitle());
 		wikiPageImpl.setRedirectTitle(getRedirectTitle());
 		wikiPageImpl.setLastPublishDate(getLastPublishDate());
@@ -1442,7 +1441,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 
 		wikiPageCacheModel.version = getVersion();
 
-		wikiPageCacheModel.minorEdit = getMinorEdit();
+		wikiPageCacheModel.minorEdit = isMinorEdit();
 
 		wikiPageCacheModel.content = getContent();
 
@@ -1468,7 +1467,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 			wikiPageCacheModel.format = null;
 		}
 
-		wikiPageCacheModel.head = getHead();
+		wikiPageCacheModel.head = isHead();
 
 		wikiPageCacheModel.parentTitle = getParentTitle();
 
@@ -1548,7 +1547,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		sb.append(", version=");
 		sb.append(getVersion());
 		sb.append(", minorEdit=");
-		sb.append(getMinorEdit());
+		sb.append(isMinorEdit());
 		sb.append(", content=");
 		sb.append(getContent());
 		sb.append(", summary=");
@@ -1556,7 +1555,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		sb.append(", format=");
 		sb.append(getFormat());
 		sb.append(", head=");
-		sb.append(getHead());
+		sb.append(isHead());
 		sb.append(", parentTitle=");
 		sb.append(getParentTitle());
 		sb.append(", redirectTitle=");
@@ -1634,7 +1633,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>minorEdit</column-name><column-value><![CDATA[");
-		sb.append(getMinorEdit());
+		sb.append(isMinorEdit());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>content</column-name><column-value><![CDATA[");
@@ -1650,7 +1649,7 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>head</column-name><column-value><![CDATA[");
-		sb.append(getHead());
+		sb.append(isHead());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>parentTitle</column-name><column-value><![CDATA[");

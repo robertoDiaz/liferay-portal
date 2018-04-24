@@ -15,14 +15,17 @@
 package com.liferay.staging.configuration.web.internal.portlet.configuration.icon;
 
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
+import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -36,6 +39,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -64,7 +68,7 @@ public class StagingPortletConfigurationIcon
 	public String getOnClick(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(12);
 
 		sb.append("Liferay.Portlet.openWindow({bodyCssClass: ");
 		sb.append("'dialog-with-footer', namespace: '");
@@ -113,7 +117,7 @@ public class StagingPortletConfigurationIcon
 
 		Group group = themeDisplay.getSiteGroup();
 
-		if (group.isStagedRemotely() || group.hasLocalOrRemoteStagingGroup()) {
+		if (group.hasLocalOrRemoteStagingGroup()) {
 			return false;
 		}
 
@@ -133,6 +137,16 @@ public class StagingPortletConfigurationIcon
 		}
 
 		if (!portletDisplay.isShowStagingIcon()) {
+			return false;
+		}
+
+		Portlet portlet = _portletLocalService.getPortletById(
+			portletDisplay.getId());
+
+		PortletDataHandler portletDataHandler =
+			portlet.getPortletDataHandlerInstance();
+
+		if (portletDataHandler == null) {
 			return false;
 		}
 
@@ -160,5 +174,8 @@ public class StagingPortletConfigurationIcon
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingPortletConfigurationIcon.class);
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }

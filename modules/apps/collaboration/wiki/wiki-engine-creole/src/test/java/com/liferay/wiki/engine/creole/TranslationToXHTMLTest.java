@@ -14,9 +14,9 @@
 
 package com.liferay.wiki.engine.creole;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.wiki.engine.creole.internal.parser.ast.WikiPageNode;
@@ -61,7 +61,7 @@ public class TranslationToXHTMLTest {
 	@Test
 	public void testEscapedEscapedCharacter() throws Exception {
 		Assert.assertEquals(
-			"<p>~&#034;~ is escaped&#034; </p>", translate("escape-2.creole"));
+			"<p>~&#34;~ is escaped&#34; </p>", translate("escape-2.creole"));
 	}
 
 	@Test
@@ -767,11 +767,11 @@ public class TranslationToXHTMLTest {
 	}
 
 	protected WikiPageNode getWikiPageNode(String fileName) throws Exception {
-		_creole10parser = getCreole10Parser(fileName);
+		_creole10Parser = getCreole10Parser(fileName);
 
-		_creole10parser.wikipage();
+		_creole10Parser.wikipage();
 
-		return _creole10parser.getWikiPageNode();
+		return _creole10Parser.getWikiPageNode();
 	}
 
 	protected String toUnix(String text) {
@@ -785,7 +785,7 @@ public class TranslationToXHTMLTest {
 
 	private static final String _NEW_LINE = StringPool.NEW_LINE;
 
-	private Creole10Parser _creole10parser;
+	private Creole10Parser _creole10Parser;
 	private WikiEngineCreoleComponentProvider
 		_wikiEngineCreoleComponentProvider;
 	private final XhtmlTranslationVisitor _xhtmlTranslationVisitor =

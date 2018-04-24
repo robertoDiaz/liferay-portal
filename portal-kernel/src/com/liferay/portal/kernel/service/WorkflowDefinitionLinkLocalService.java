@@ -80,6 +80,7 @@ public interface WorkflowDefinitionLinkLocalService extends BaseLocalService,
 	* @param workflowDefinitionLinkId the primary key for the new workflow definition link
 	* @return the new workflow definition link
 	*/
+	@Transactional(enabled = false)
 	public WorkflowDefinitionLink createWorkflowDefinitionLink(
 		long workflowDefinitionLinkId);
 
@@ -248,6 +249,11 @@ public interface WorkflowDefinitionLinkLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<WorkflowDefinitionLink> getWorkflowDefinitionLinks(int start,
 		int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<WorkflowDefinitionLink> getWorkflowDefinitionLinks(
+		long companyId, java.lang.String workflowDefinitionName,
+		int workflowDefinitionVersion) throws PortalException;
 
 	/**
 	* Returns the number of workflow definition links.

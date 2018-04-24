@@ -153,6 +153,7 @@ public interface WikiPageLocalService extends BaseLocalService,
 	* @param pageId the primary key for the new wiki page
 	* @return the new wiki page
 	*/
+	@Transactional(enabled = false)
 	public WikiPage createWikiPage(long pageId);
 
 	public void deletePage(long nodeId, java.lang.String title)
@@ -333,6 +334,11 @@ public interface WikiPageLocalService extends BaseLocalService,
 		java.lang.String title, int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public WikiPageDisplay getDisplay(long nodeId, java.lang.String title,
+		PortletURL viewPageURL, Supplier<PortletURL> editPageURLSupplier,
+		java.lang.String attachmentURLPrefix) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public WikiPage getDraftPage(long nodeId, java.lang.String title)
 		throws PortalException;
 
@@ -361,6 +367,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<WikiPage> getNoAssetPages();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<WikiPage> getOrphans(List<WikiPage> pages)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<WikiPage> getOrphans(long nodeId) throws PortalException;

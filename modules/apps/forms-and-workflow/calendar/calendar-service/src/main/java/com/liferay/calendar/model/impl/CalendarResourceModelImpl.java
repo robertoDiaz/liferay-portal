@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -250,7 +249,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 		attributes.put("code", getCode());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("active", getActive());
+		attributes.put("active", isActive());
 		attributes.put("lastPublishDate", getLastPublishDate());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -362,7 +361,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -458,7 +457,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -470,7 +469,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -513,7 +512,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getClassName() {
 		if (getClassNameId() <= 0) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		return PortalUtil.getClassName(getClassNameId());
@@ -580,7 +579,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getClassUuid() {
 		if (_classUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _classUuid;
@@ -596,7 +595,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getCode() {
 		if (_code == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _code;
@@ -622,7 +621,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -721,7 +720,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -917,7 +916,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 		String xml = getName();
 
 		if (xml == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
@@ -993,7 +992,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 		calendarResourceImpl.setCode(getCode());
 		calendarResourceImpl.setName(getName());
 		calendarResourceImpl.setDescription(getDescription());
-		calendarResourceImpl.setActive(getActive());
+		calendarResourceImpl.setActive(isActive());
 		calendarResourceImpl.setLastPublishDate(getLastPublishDate());
 
 		calendarResourceImpl.resetOriginalValues();
@@ -1166,7 +1165,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 			calendarResourceCacheModel.description = null;
 		}
 
-		calendarResourceCacheModel.active = getActive();
+		calendarResourceCacheModel.active = isActive();
 
 		Date lastPublishDate = getLastPublishDate();
 
@@ -1213,7 +1212,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 		sb.append(", description=");
 		sb.append(getDescription());
 		sb.append(", active=");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append(", lastPublishDate=");
 		sb.append(getLastPublishDate());
 		sb.append("}");
@@ -1287,7 +1286,7 @@ public class CalendarResourceModelImpl extends BaseModelImpl<CalendarResource>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>active</column-name><column-value><![CDATA[");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lastPublishDate</column-name><column-value><![CDATA[");

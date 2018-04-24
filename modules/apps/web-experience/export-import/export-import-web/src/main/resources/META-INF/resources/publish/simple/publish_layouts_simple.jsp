@@ -56,12 +56,7 @@ Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("par
 			<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 		</portlet:renderURL>
 
-		<aui:nav-item
-			href="<%= advancedPublishURL %>"
-			iconCssClass="icon-cog"
-			label="switch-to-advanced-publication"
-			selected="<%= false %>"
-		/>
+		<aui:nav-item href="<%= advancedPublishURL %>" iconCssClass="icon-cog" label="switch-to-advanced-publication" selected="<%= false %>" />
 	</aui:nav>
 </aui:nav-bar>
 
@@ -102,7 +97,7 @@ Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("par
 			<ul class="lfr-tree list-unstyled">
 				<aui:fieldset-group markupView="lexicon">
 					<aui:fieldset>
-						<aui:input name="name" placeholder="process-name-placeholder" />
+						<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
 					</aui:fieldset>
 
 					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="changes-since-last-publication" markupView="lexicon">
@@ -110,16 +105,27 @@ Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("par
 							<ul class="portlet-list">
 
 								<%
-								LayoutSet selLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(groupDisplayContextHelper.getGroupId(), privateLayout);
+								int layoutsCount = 0;
+
+								long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
+
+								if (layoutSetBranchId > 0) {
+									List<LayoutRevision> approvedLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, WorkflowConstants.STATUS_APPROVED);
+									List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, WorkflowConstants.STATUS_PENDING);
+
+									layoutsCount = approvedLayoutRevisions.size() + pendingLayoutRevisions.size();
+								}
+								else {
+									LayoutSet selLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(groupDisplayContextHelper.getGroupId(), privateLayout);
+
+									layoutsCount = selLayoutSet.getPageCount();
+								}
 								%>
 
-								<liferay-util:buffer var="badgeHTML">
+								<liferay-util:buffer
+									var="badgeHTML"
+								>
 									<span class="badge badge-info">
-
-										<%
-										int layoutsCount = selLayoutSet.getPageCount();
-										%>
-
 										<c:choose>
 											<c:when test="<%= layoutsCount == 0 %>">
 												<liferay-ui:message key="none" />
@@ -172,7 +178,9 @@ Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("par
 										if (((exportModelCount > 0) || (modelDeletionCount > 0)) && GetterUtil.getBoolean(liveGroupTypeSettings.getProperty(StagingUtil.getStagedPortletId(portlet.getRootPortletId())), portletDataHandler.isPublishToLiveByDefault())) {
 								%>
 
-											<liferay-util:buffer var="badgeHTML">
+											<liferay-util:buffer
+												var="badgeHTML"
+											>
 												<span class="badge badge-info"><%= (exportModelCount > 0) ? exportModelCount : StringPool.BLANK %></span>
 
 												<span class="badge badge-warning deletions"><%= (modelDeletionCount > 0) ? (modelDeletionCount + StringPool.SPACE + LanguageUtil.get(request, "deletions")) : StringPool.BLANK %></span>
@@ -201,6 +209,6 @@ Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("par
 	</div>
 
 	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" value="<%= LanguageUtil.get(request, publishMessageKey) %>" />
+		<aui:button type="submit" value="<%= LanguageUtil.get(request, publishMessageKey) %>" />
 	</aui:button-row>
 </aui:form>

@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -290,7 +289,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("privateLayout", isPrivateLayout());
 		attributes.put("layoutId", getLayoutId());
 		attributes.put("parentLayoutId", getParentLayoutId());
 		attributes.put("name", getName());
@@ -300,7 +299,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		attributes.put("robots", getRobots());
 		attributes.put("type", getType());
 		attributes.put("typeSettings", getTypeSettings());
-		attributes.put("hidden", getHidden());
+		attributes.put("hidden", isHidden());
 		attributes.put("friendlyURL", getFriendlyURL());
 		attributes.put("iconImageId", getIconImageId());
 		attributes.put("themeId", getThemeId());
@@ -309,7 +308,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		attributes.put("priority", getPriority());
 		attributes.put("layoutPrototypeUuid", getLayoutPrototypeUuid());
 		attributes.put("layoutPrototypeLinkEnabled",
-			getLayoutPrototypeLinkEnabled());
+			isLayoutPrototypeLinkEnabled());
 		attributes.put("sourcePrototypeLayoutUuid",
 			getSourcePrototypeLayoutUuid());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -521,7 +520,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -617,7 +616,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -629,7 +628,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -748,7 +747,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -847,7 +846,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getTitle() {
 		if (_title == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _title;
@@ -946,7 +945,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -1049,7 +1048,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getKeywords() {
 		if (_keywords == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _keywords;
@@ -1150,7 +1149,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getRobots() {
 		if (_robots == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _robots;
@@ -1249,7 +1248,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getType() {
 		if (_type == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _type;
@@ -1275,7 +1274,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getTypeSettings() {
 		if (_typeSettings == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _typeSettings;
@@ -1308,7 +1307,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getFriendlyURL() {
 		if (_friendlyURL == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _friendlyURL;
@@ -1357,7 +1356,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getThemeId() {
 		if (_themeId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _themeId;
@@ -1373,7 +1372,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getColorSchemeId() {
 		if (_colorSchemeId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _colorSchemeId;
@@ -1389,7 +1388,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getCss() {
 		if (_css == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _css;
@@ -1428,7 +1427,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getLayoutPrototypeUuid() {
 		if (_layoutPrototypeUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _layoutPrototypeUuid;
@@ -1472,7 +1471,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public String getSourcePrototypeLayoutUuid() {
 		if (_sourcePrototypeLayoutUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _sourcePrototypeLayoutUuid;
@@ -1595,7 +1594,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String xml = getName();
 
 		if (xml == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
@@ -1693,7 +1692,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutImpl.setUserName(getUserName());
 		layoutImpl.setCreateDate(getCreateDate());
 		layoutImpl.setModifiedDate(getModifiedDate());
-		layoutImpl.setPrivateLayout(getPrivateLayout());
+		layoutImpl.setPrivateLayout(isPrivateLayout());
 		layoutImpl.setLayoutId(getLayoutId());
 		layoutImpl.setParentLayoutId(getParentLayoutId());
 		layoutImpl.setName(getName());
@@ -1703,7 +1702,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutImpl.setRobots(getRobots());
 		layoutImpl.setType(getType());
 		layoutImpl.setTypeSettings(getTypeSettings());
-		layoutImpl.setHidden(getHidden());
+		layoutImpl.setHidden(isHidden());
 		layoutImpl.setFriendlyURL(getFriendlyURL());
 		layoutImpl.setIconImageId(getIconImageId());
 		layoutImpl.setThemeId(getThemeId());
@@ -1711,7 +1710,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutImpl.setCss(getCss());
 		layoutImpl.setPriority(getPriority());
 		layoutImpl.setLayoutPrototypeUuid(getLayoutPrototypeUuid());
-		layoutImpl.setLayoutPrototypeLinkEnabled(getLayoutPrototypeLinkEnabled());
+		layoutImpl.setLayoutPrototypeLinkEnabled(isLayoutPrototypeLinkEnabled());
 		layoutImpl.setSourcePrototypeLayoutUuid(getSourcePrototypeLayoutUuid());
 		layoutImpl.setLastPublishDate(getLastPublishDate());
 
@@ -1887,7 +1886,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			layoutCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		layoutCacheModel.privateLayout = getPrivateLayout();
+		layoutCacheModel.privateLayout = isPrivateLayout();
 
 		layoutCacheModel.layoutId = getLayoutId();
 
@@ -1949,7 +1948,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			layoutCacheModel.typeSettings = null;
 		}
 
-		layoutCacheModel.hidden = getHidden();
+		layoutCacheModel.hidden = isHidden();
 
 		layoutCacheModel.friendlyURL = getFriendlyURL();
 
@@ -1996,7 +1995,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			layoutCacheModel.layoutPrototypeUuid = null;
 		}
 
-		layoutCacheModel.layoutPrototypeLinkEnabled = getLayoutPrototypeLinkEnabled();
+		layoutCacheModel.layoutPrototypeLinkEnabled = isLayoutPrototypeLinkEnabled();
 
 		layoutCacheModel.sourcePrototypeLayoutUuid = getSourcePrototypeLayoutUuid();
 
@@ -2042,7 +2041,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
 		sb.append(", privateLayout=");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append(", layoutId=");
 		sb.append(getLayoutId());
 		sb.append(", parentLayoutId=");
@@ -2062,7 +2061,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append(", typeSettings=");
 		sb.append(getTypeSettings());
 		sb.append(", hidden=");
-		sb.append(getHidden());
+		sb.append(isHidden());
 		sb.append(", friendlyURL=");
 		sb.append(getFriendlyURL());
 		sb.append(", iconImageId=");
@@ -2078,7 +2077,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append(", layoutPrototypeUuid=");
 		sb.append(getLayoutPrototypeUuid());
 		sb.append(", layoutPrototypeLinkEnabled=");
-		sb.append(getLayoutPrototypeLinkEnabled());
+		sb.append(isLayoutPrototypeLinkEnabled());
 		sb.append(", sourcePrototypeLayoutUuid=");
 		sb.append(getSourcePrototypeLayoutUuid());
 		sb.append(", lastPublishDate=");
@@ -2134,7 +2133,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>privateLayout</column-name><column-value><![CDATA[");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>layoutId</column-name><column-value><![CDATA[");
@@ -2174,7 +2173,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>hidden</column-name><column-value><![CDATA[");
-		sb.append(getHidden());
+		sb.append(isHidden());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>friendlyURL</column-name><column-value><![CDATA[");
@@ -2206,7 +2205,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>layoutPrototypeLinkEnabled</column-name><column-value><![CDATA[");
-		sb.append(getLayoutPrototypeLinkEnabled());
+		sb.append(isLayoutPrototypeLinkEnabled());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>sourcePrototypeLayoutUuid</column-name><column-value><![CDATA[");

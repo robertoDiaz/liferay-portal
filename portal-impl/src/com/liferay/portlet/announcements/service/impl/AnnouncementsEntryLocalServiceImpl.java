@@ -27,6 +27,7 @@ import com.liferay.mail.kernel.template.MailTemplate;
 import com.liferay.mail.kernel.template.MailTemplateContext;
 import com.liferay.mail.kernel.template.MailTemplateContextBuilder;
 import com.liferay.mail.kernel.template.MailTemplateFactoryUtil;
+import com.liferay.petra.content.ContentUtil;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -42,6 +44,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -54,10 +57,10 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.announcements.service.base.AnnouncementsEntryLocalServiceBaseImpl;
-import com.liferay.util.ContentUtil;
 
 import java.io.IOException;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -179,16 +182,23 @@ public class AnnouncementsEntryLocalServiceImpl
 		_previousCheckDate = now;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #deleteEntries(long, long,
+	 *             long)}
+	 */
 	@Override
 	public void deleteEntries(long classNameId, long classPK)
 		throws PortalException {
 
-		List<AnnouncementsEntry> entries =
-			announcementsEntryPersistence.findByC_C(classNameId, classPK);
+		deleteEntries(CompanyThreadLocal.getCompanyId(), classNameId, classPK);
+	}
 
-		for (AnnouncementsEntry entry : entries) {
-			deleteEntry(entry);
-		}
+	@Override
+	public void deleteEntries(long companyId, long classNameId, long classPK)
+		throws PortalException {
+
+		announcementsEntryPersistence.removeByC_C_C(
+			companyId, classNameId, classPK);
 	}
 
 	@Override
@@ -236,19 +246,41 @@ public class AnnouncementsEntryLocalServiceImpl
 		int expirationDateMinute, boolean alert, int flagValue, int start,
 		int end) {
 
+		User user = userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return Collections.emptyList();
+		}
+
 		return announcementsEntryFinder.findByScopes(
-			userId, scopes, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, alert, flagValue, start, end);
+			user.getCompanyId(), userId, scopes, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue, start,
+			end);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntries(long, long, long,
+	 *             boolean, int, int)}
+	 */
+	@Deprecated
 	@Override
 	public List<AnnouncementsEntry> getEntries(
 		long classNameId, long classPK, boolean alert, int start, int end) {
 
-		return announcementsEntryPersistence.findByC_C_A(
-			classNameId, classPK, alert, start, end);
+		return getEntries(
+			CompanyThreadLocal.getCompanyId(), classNameId, classPK, alert,
+			start, end);
+	}
+
+	@Override
+	public List<AnnouncementsEntry> getEntries(
+		long companyId, long classNameId, long classPK, boolean alert,
+		int start, int end) {
+
+		return announcementsEntryPersistence.findByC_C_C_A(
+			companyId, classNameId, classPK, alert, start, end);
 	}
 
 	@Override
@@ -260,12 +292,18 @@ public class AnnouncementsEntryLocalServiceImpl
 		int expirationDateMinute, boolean alert, int flagValue, int start,
 		int end) {
 
+		User user = userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return Collections.emptyList();
+		}
+
 		return announcementsEntryFinder.findByScope(
-			userId, classNameId, classPKs, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, alert, flagValue, start,
-			end);
+			user.getCompanyId(), userId, classNameId, classPKs,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute, alert,
+			flagValue, start, end);
 	}
 
 	@Override
@@ -285,17 +323,36 @@ public class AnnouncementsEntryLocalServiceImpl
 		int expirationDateYear, int expirationDateHour,
 		int expirationDateMinute, boolean alert, int flagValue) {
 
+		User user = userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return 0;
+		}
+
 		return announcementsEntryFinder.countByScopes(
-			userId, scopes, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, alert, flagValue);
+			user.getCompanyId(), userId, scopes, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, alert, flagValue);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getEntriesCount(long, long,
+	 *             long, boolean)}
+	 */
+	@Deprecated
+	@Override
+	public int getEntriesCount(long classNameId, long classPK, boolean alert) {
+		return getEntriesCount(
+			CompanyThreadLocal.getCompanyId(), classNameId, classPK, alert);
 	}
 
 	@Override
-	public int getEntriesCount(long classNameId, long classPK, boolean alert) {
-		return announcementsEntryPersistence.countByC_C_A(
-			classNameId, classPK, alert);
+	public int getEntriesCount(
+		long companyId, long classNameId, long classPK, boolean alert) {
+
+		return announcementsEntryPersistence.countByC_C_C_A(
+			companyId, classNameId, classPK, alert);
 	}
 
 	@Override
@@ -316,11 +373,18 @@ public class AnnouncementsEntryLocalServiceImpl
 		int expirationDateYear, int expirationDateHour,
 		int expirationDateMinute, boolean alert, int flagValue) {
 
+		User user = userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return 0;
+		}
+
 		return announcementsEntryFinder.countByScope(
-			userId, classNameId, classPKs, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, alert, flagValue);
+			user.getCompanyId(), userId, classNameId, classPKs,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute, alert,
+			flagValue);
 	}
 
 	@Override
@@ -562,9 +626,10 @@ public class AnnouncementsEntryLocalServiceImpl
 			}
 
 			if (announcementsDelivery.isSms()) {
-				String smsSn = user.getContact().getSmsSn();
+				Contact contact = user.getContact();
 
-				notifyUsersFullNames.put(smsSn, user.getFullName());
+				notifyUsersFullNames.put(
+					contact.getSmsSn(), user.getFullName());
 			}
 		}
 
@@ -572,7 +637,11 @@ public class AnnouncementsEntryLocalServiceImpl
 			return;
 		}
 
-		String body = ContentUtil.get(PropsValues.ANNOUNCEMENTS_EMAIL_BODY);
+		Class<?> clazz = getClass();
+
+		String body = ContentUtil.get(
+			clazz.getClassLoader(), PropsValues.ANNOUNCEMENTS_EMAIL_BODY);
+
 		String fromAddress = PrefsPropsUtil.getStringFromNames(
 			entry.getCompanyId(), PropsKeys.ANNOUNCEMENTS_EMAIL_FROM_ADDRESS,
 			PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
@@ -580,7 +649,7 @@ public class AnnouncementsEntryLocalServiceImpl
 			entry.getCompanyId(), PropsKeys.ANNOUNCEMENTS_EMAIL_FROM_NAME,
 			PropsKeys.ADMIN_EMAIL_FROM_NAME);
 		String subject = ContentUtil.get(
-			PropsValues.ANNOUNCEMENTS_EMAIL_SUBJECT);
+			clazz.getClassLoader(), PropsValues.ANNOUNCEMENTS_EMAIL_SUBJECT);
 
 		Company company = companyLocalService.getCompany(entry.getCompanyId());
 

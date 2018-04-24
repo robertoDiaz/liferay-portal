@@ -85,9 +85,9 @@ MDRRuleGroupInstance ruleGroupInstance = (MDRRuleGroupInstance)renderRequest.get
 	</div>
 
 	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
+		<aui:button type="submit" />
 
-		<aui:button cssClass="btn-lg" href="<%= redirect %>" value="cancel" />
+		<aui:button href="<%= redirect %>" value="cancel" />
 	</aui:button-row>
 </aui:form>
 
@@ -97,7 +97,7 @@ MDRRuleGroupInstance ruleGroupInstance = (MDRRuleGroupInstance)renderRequest.get
 
 		var form = $(document.<portlet:namespace />fm);
 
-		<portlet:resourceURL id="/mobile_device_rules/site_url_layouts" var="siteURLLayoutsURL" />
+		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/mobile_device_rules/site_url_layouts" var="siteURLLayoutsURL" />
 
 		$.ajax(
 			'<%= siteURLLayoutsURL.toString() %>',

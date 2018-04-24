@@ -41,7 +41,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -288,13 +287,13 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		attributes.put("description", getDescription());
 		attributes.put("content", getContent());
 		attributes.put("displayDate", getDisplayDate());
-		attributes.put("allowPingbacks", getAllowPingbacks());
-		attributes.put("allowTrackbacks", getAllowTrackbacks());
+		attributes.put("allowPingbacks", isAllowPingbacks());
+		attributes.put("allowTrackbacks", isAllowTrackbacks());
 		attributes.put("trackbacks", getTrackbacks());
 		attributes.put("coverImageCaption", getCoverImageCaption());
 		attributes.put("coverImageFileEntryId", getCoverImageFileEntryId());
 		attributes.put("coverImageURL", getCoverImageURL());
-		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImage", isSmallImage());
 		attributes.put("smallImageFileEntryId", getSmallImageFileEntryId());
 		attributes.put("smallImageId", getSmallImageId());
 		attributes.put("smallImageURL", getSmallImageURL());
@@ -493,7 +492,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -597,7 +596,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -613,7 +612,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -659,7 +658,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getTitle() {
 		if (_title == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _title;
@@ -675,7 +674,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getSubtitle() {
 		if (_subtitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _subtitle;
@@ -691,7 +690,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getUrlTitle() {
 		if (_urlTitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _urlTitle;
@@ -717,7 +716,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -733,7 +732,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getContent() {
 		if (_content == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _content;
@@ -804,7 +803,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getTrackbacks() {
 		if (_trackbacks == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _trackbacks;
@@ -820,7 +819,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getCoverImageCaption() {
 		if (_coverImageCaption == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _coverImageCaption;
@@ -847,7 +846,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getCoverImageURL() {
 		if (_coverImageURL == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _coverImageURL;
@@ -902,7 +901,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getSmallImageURL() {
 		if (_smallImageURL == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _smallImageURL;
@@ -967,7 +966,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -979,7 +978,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusByUserName;
@@ -1024,7 +1023,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 		com.liferay.portal.kernel.trash.TrashHandler trashHandler = getTrashHandler();
 
-		if (!Validator.isNull(trashHandler.getContainerModelClassName(
+		if (Validator.isNotNull(trashHandler.getContainerModelClassName(
 						getPrimaryKey()))) {
 			ContainerModel containerModel = null;
 
@@ -1264,13 +1263,13 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		blogsEntryImpl.setDescription(getDescription());
 		blogsEntryImpl.setContent(getContent());
 		blogsEntryImpl.setDisplayDate(getDisplayDate());
-		blogsEntryImpl.setAllowPingbacks(getAllowPingbacks());
-		blogsEntryImpl.setAllowTrackbacks(getAllowTrackbacks());
+		blogsEntryImpl.setAllowPingbacks(isAllowPingbacks());
+		blogsEntryImpl.setAllowTrackbacks(isAllowTrackbacks());
 		blogsEntryImpl.setTrackbacks(getTrackbacks());
 		blogsEntryImpl.setCoverImageCaption(getCoverImageCaption());
 		blogsEntryImpl.setCoverImageFileEntryId(getCoverImageFileEntryId());
 		blogsEntryImpl.setCoverImageURL(getCoverImageURL());
-		blogsEntryImpl.setSmallImage(getSmallImage());
+		blogsEntryImpl.setSmallImage(isSmallImage());
 		blogsEntryImpl.setSmallImageFileEntryId(getSmallImageFileEntryId());
 		blogsEntryImpl.setSmallImageId(getSmallImageId());
 		blogsEntryImpl.setSmallImageURL(getSmallImageURL());
@@ -1471,9 +1470,9 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			blogsEntryCacheModel.displayDate = Long.MIN_VALUE;
 		}
 
-		blogsEntryCacheModel.allowPingbacks = getAllowPingbacks();
+		blogsEntryCacheModel.allowPingbacks = isAllowPingbacks();
 
-		blogsEntryCacheModel.allowTrackbacks = getAllowTrackbacks();
+		blogsEntryCacheModel.allowTrackbacks = isAllowTrackbacks();
 
 		blogsEntryCacheModel.trackbacks = getTrackbacks();
 
@@ -1501,7 +1500,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			blogsEntryCacheModel.coverImageURL = null;
 		}
 
-		blogsEntryCacheModel.smallImage = getSmallImage();
+		blogsEntryCacheModel.smallImage = isSmallImage();
 
 		blogsEntryCacheModel.smallImageFileEntryId = getSmallImageFileEntryId();
 
@@ -1581,9 +1580,9 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append(", displayDate=");
 		sb.append(getDisplayDate());
 		sb.append(", allowPingbacks=");
-		sb.append(getAllowPingbacks());
+		sb.append(isAllowPingbacks());
 		sb.append(", allowTrackbacks=");
-		sb.append(getAllowTrackbacks());
+		sb.append(isAllowTrackbacks());
 		sb.append(", trackbacks=");
 		sb.append(getTrackbacks());
 		sb.append(", coverImageCaption=");
@@ -1593,7 +1592,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append(", coverImageURL=");
 		sb.append(getCoverImageURL());
 		sb.append(", smallImage=");
-		sb.append(getSmallImage());
+		sb.append(isSmallImage());
 		sb.append(", smallImageFileEntryId=");
 		sb.append(getSmallImageFileEntryId());
 		sb.append(", smallImageId=");
@@ -1681,11 +1680,11 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>allowPingbacks</column-name><column-value><![CDATA[");
-		sb.append(getAllowPingbacks());
+		sb.append(isAllowPingbacks());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>allowTrackbacks</column-name><column-value><![CDATA[");
-		sb.append(getAllowTrackbacks());
+		sb.append(isAllowTrackbacks());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>trackbacks</column-name><column-value><![CDATA[");
@@ -1705,7 +1704,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>smallImage</column-name><column-value><![CDATA[");
-		sb.append(getSmallImage());
+		sb.append(isSmallImage());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>smallImageFileEntryId</column-name><column-value><![CDATA[");

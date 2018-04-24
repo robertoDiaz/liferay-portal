@@ -24,10 +24,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	immediate = true,
-	property = {
-		"store.type=com.liferay.portal.store.file.system.AdvancedFileSystemStore"
-	},
+	enabled = false, immediate = true,
+	property = "store.type=com.liferay.portal.store.file.system.AdvancedFileSystemStore",
 	service = StoreWrapper.class
 )
 public class IgnoreDuplicatesAdvancedFileSystemStoreWrapper

@@ -75,36 +75,36 @@ portletDisplay.setURLBack(backURL.toString());
 renderResponse.setTitle(LanguageUtil.get(request, "membership-requests"));
 %>
 
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("pending"));
+						navigationItem.setHref(portletURL, "tabs1", "pending");
+						navigationItem.setLabel(LanguageUtil.get(request, "pending"));
+					});
+
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("approved"));
+						navigationItem.setHref(portletURL, "tabs1", "approved");
+						navigationItem.setLabel(LanguageUtil.get(request, "approved"));
+					});
+
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("denied"));
+						navigationItem.setHref(portletURL, "tabs1", "denied");
+						navigationItem.setLabel(LanguageUtil.get(request, "denied"));
+					});
+			}
+		}
+	%>"
+/>
+
 <liferay-ui:success key="membershipReplySent" message="your-reply-will-be-sent-to-the-user-by-email" />
-
-<aui:nav-bar markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-
-		<%
-		PortletURL pendingURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-		pendingURL.setParameter("tabs1", "pending");
-		%>
-
-		<aui:nav-item href="<%= pendingURL.toString() %>" label="pending" selected='<%= tabs1.equals("pending") %>' />
-
-		<%
-		PortletURL approvedURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-		approvedURL.setParameter("tabs1", "approved");
-		%>
-
-		<aui:nav-item href="<%= approvedURL.toString() %>" label="approved" selected='<%= tabs1.equals("approved") %>' />
-
-		<%
-		PortletURL deniedURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-		deniedURL.setParameter("tabs1", "denied");
-		%>
-
-		<aui:nav-item href="<%= deniedURL.toString() %>" label="denied" selected='<%= tabs1.equals("denied") %>' />
-	</aui:nav>
-</aui:nav-bar>
 
 <liferay-frontend:management-bar
 	disabled="<%= membershipRequestCount <= 0 %>"
@@ -154,6 +154,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "membership-requests"));
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </div>

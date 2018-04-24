@@ -23,8 +23,10 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 
 import com.liferay.friendly.url.model.FriendlyURLEntry;
+import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.friendly.url.service.persistence.FriendlyURLEntryLocalizationPersistence;
+import com.liferay.friendly.url.service.persistence.FriendlyURLEntryMappingPersistence;
 import com.liferay.friendly.url.service.persistence.FriendlyURLEntryPersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -51,13 +53,17 @@ import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -105,6 +111,7 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	 * @return the new friendly url entry
 	 */
 	@Override
+	@Transactional(enabled = false)
 	public FriendlyURLEntry createFriendlyURLEntry(long friendlyURLEntryId) {
 		return friendlyURLEntryPersistence.create(friendlyURLEntryId);
 	}
@@ -453,6 +460,118 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 		return friendlyURLEntryPersistence.update(friendlyURLEntry);
 	}
 
+	@Override
+	public FriendlyURLEntryLocalization fetchFriendlyURLEntryLocalization(
+		long friendlyURLEntryId, String languageId) {
+		return friendlyURLEntryLocalizationPersistence.fetchByFriendlyURLEntryId_LanguageId(friendlyURLEntryId,
+			languageId);
+	}
+
+	@Override
+	public FriendlyURLEntryLocalization getFriendlyURLEntryLocalization(
+		long friendlyURLEntryId, String languageId) throws PortalException {
+		return friendlyURLEntryLocalizationPersistence.findByFriendlyURLEntryId_LanguageId(friendlyURLEntryId,
+			languageId);
+	}
+
+	@Override
+	public List<FriendlyURLEntryLocalization> getFriendlyURLEntryLocalizations(
+		long friendlyURLEntryId) {
+		return friendlyURLEntryLocalizationPersistence.findByFriendlyURLEntryId(friendlyURLEntryId);
+	}
+
+	protected FriendlyURLEntryLocalization updateFriendlyURLEntryLocalization(
+		FriendlyURLEntry friendlyURLEntry, String languageId, String urlTitle)
+		throws PortalException {
+		FriendlyURLEntryLocalization friendlyURLEntryLocalization = friendlyURLEntryLocalizationPersistence.fetchByFriendlyURLEntryId_LanguageId(friendlyURLEntry.getFriendlyURLEntryId(),
+				languageId);
+
+		if (friendlyURLEntryLocalization == null) {
+			long friendlyURLEntryLocalizationId = counterLocalService.increment(FriendlyURLEntryLocalization.class.getName());
+
+			friendlyURLEntryLocalization = friendlyURLEntryLocalizationPersistence.create(friendlyURLEntryLocalizationId);
+
+			friendlyURLEntryLocalization.setFriendlyURLEntryId(friendlyURLEntry.getFriendlyURLEntryId());
+			friendlyURLEntryLocalization.setLanguageId(languageId);
+		}
+
+		friendlyURLEntryLocalization.setGroupId(friendlyURLEntry.getGroupId());
+		friendlyURLEntryLocalization.setCompanyId(friendlyURLEntry.getCompanyId());
+		friendlyURLEntryLocalization.setClassNameId(friendlyURLEntry.getClassNameId());
+		friendlyURLEntryLocalization.setClassPK(friendlyURLEntry.getClassPK());
+
+		friendlyURLEntryLocalization.setUrlTitle(urlTitle);
+
+		return friendlyURLEntryLocalizationPersistence.update(friendlyURLEntryLocalization);
+	}
+
+	protected List<FriendlyURLEntryLocalization> updateFriendlyURLEntryLocalizations(
+		FriendlyURLEntry friendlyURLEntry, Map<String, String> urlTitleMap)
+		throws PortalException {
+		Map<String, String[]> localizedValuesMap = new HashMap<String, String[]>();
+
+		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
+			String languageId = entry.getKey();
+
+			String[] localizedValues = localizedValuesMap.get(languageId);
+
+			if (localizedValues == null) {
+				localizedValues = new String[1];
+
+				localizedValuesMap.put(languageId, localizedValues);
+			}
+
+			localizedValues[0] = entry.getValue();
+		}
+
+		List<FriendlyURLEntryLocalization> friendlyURLEntryLocalizations = new ArrayList<FriendlyURLEntryLocalization>(localizedValuesMap.size());
+
+		for (FriendlyURLEntryLocalization friendlyURLEntryLocalization : friendlyURLEntryLocalizationPersistence.findByFriendlyURLEntryId(
+				friendlyURLEntry.getFriendlyURLEntryId())) {
+			String[] localizedValues = localizedValuesMap.remove(friendlyURLEntryLocalization.getLanguageId());
+
+			if (localizedValues == null) {
+				friendlyURLEntryLocalizationPersistence.remove(friendlyURLEntryLocalization);
+			}
+			else {
+				friendlyURLEntryLocalization.setGroupId(friendlyURLEntry.getGroupId());
+				friendlyURLEntryLocalization.setCompanyId(friendlyURLEntry.getCompanyId());
+				friendlyURLEntryLocalization.setClassNameId(friendlyURLEntry.getClassNameId());
+				friendlyURLEntryLocalization.setClassPK(friendlyURLEntry.getClassPK());
+
+				friendlyURLEntryLocalization.setUrlTitle(localizedValues[0]);
+
+				friendlyURLEntryLocalizations.add(friendlyURLEntryLocalizationPersistence.update(
+						friendlyURLEntryLocalization));
+			}
+		}
+
+		long batchCounter = counterLocalService.increment(FriendlyURLEntryLocalization.class.getName(),
+				localizedValuesMap.size()) - localizedValuesMap.size();
+
+		for (Map.Entry<String, String[]> entry : localizedValuesMap.entrySet()) {
+			String languageId = entry.getKey();
+			String[] localizedValues = entry.getValue();
+
+			FriendlyURLEntryLocalization friendlyURLEntryLocalization = friendlyURLEntryLocalizationPersistence.create(++batchCounter);
+
+			friendlyURLEntryLocalization.setFriendlyURLEntryId(friendlyURLEntry.getFriendlyURLEntryId());
+			friendlyURLEntryLocalization.setGroupId(friendlyURLEntry.getGroupId());
+			friendlyURLEntryLocalization.setCompanyId(friendlyURLEntry.getCompanyId());
+			friendlyURLEntryLocalization.setClassNameId(friendlyURLEntry.getClassNameId());
+			friendlyURLEntryLocalization.setClassPK(friendlyURLEntry.getClassPK());
+
+			friendlyURLEntryLocalization.setLanguageId(languageId);
+
+			friendlyURLEntryLocalization.setUrlTitle(localizedValues[0]);
+
+			friendlyURLEntryLocalizations.add(friendlyURLEntryLocalizationPersistence.update(
+					friendlyURLEntryLocalization));
+		}
+
+		return friendlyURLEntryLocalizations;
+	}
+
 	/**
 	 * Returns the friendly url entry local service.
 	 *
@@ -492,25 +611,6 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the friendly url entry localization local service.
-	 *
-	 * @return the friendly url entry localization local service
-	 */
-	public com.liferay.friendly.url.service.FriendlyURLEntryLocalizationLocalService getFriendlyURLEntryLocalizationLocalService() {
-		return friendlyURLEntryLocalizationLocalService;
-	}
-
-	/**
-	 * Sets the friendly url entry localization local service.
-	 *
-	 * @param friendlyURLEntryLocalizationLocalService the friendly url entry localization local service
-	 */
-	public void setFriendlyURLEntryLocalizationLocalService(
-		com.liferay.friendly.url.service.FriendlyURLEntryLocalizationLocalService friendlyURLEntryLocalizationLocalService) {
-		this.friendlyURLEntryLocalizationLocalService = friendlyURLEntryLocalizationLocalService;
-	}
-
-	/**
 	 * Returns the friendly url entry localization persistence.
 	 *
 	 * @return the friendly url entry localization persistence
@@ -527,6 +627,25 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	public void setFriendlyURLEntryLocalizationPersistence(
 		FriendlyURLEntryLocalizationPersistence friendlyURLEntryLocalizationPersistence) {
 		this.friendlyURLEntryLocalizationPersistence = friendlyURLEntryLocalizationPersistence;
+	}
+
+	/**
+	 * Returns the friendly url entry mapping persistence.
+	 *
+	 * @return the friendly url entry mapping persistence
+	 */
+	public FriendlyURLEntryMappingPersistence getFriendlyURLEntryMappingPersistence() {
+		return friendlyURLEntryMappingPersistence;
+	}
+
+	/**
+	 * Sets the friendly url entry mapping persistence.
+	 *
+	 * @param friendlyURLEntryMappingPersistence the friendly url entry mapping persistence
+	 */
+	public void setFriendlyURLEntryMappingPersistence(
+		FriendlyURLEntryMappingPersistence friendlyURLEntryMappingPersistence) {
+		this.friendlyURLEntryMappingPersistence = friendlyURLEntryMappingPersistence;
 	}
 
 	/**
@@ -698,10 +817,10 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	protected FriendlyURLEntryLocalService friendlyURLEntryLocalService;
 	@BeanReference(type = FriendlyURLEntryPersistence.class)
 	protected FriendlyURLEntryPersistence friendlyURLEntryPersistence;
-	@BeanReference(type = com.liferay.friendly.url.service.FriendlyURLEntryLocalizationLocalService.class)
-	protected com.liferay.friendly.url.service.FriendlyURLEntryLocalizationLocalService friendlyURLEntryLocalizationLocalService;
 	@BeanReference(type = FriendlyURLEntryLocalizationPersistence.class)
 	protected FriendlyURLEntryLocalizationPersistence friendlyURLEntryLocalizationPersistence;
+	@BeanReference(type = FriendlyURLEntryMappingPersistence.class)
+	protected FriendlyURLEntryMappingPersistence friendlyURLEntryMappingPersistence;
 	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)

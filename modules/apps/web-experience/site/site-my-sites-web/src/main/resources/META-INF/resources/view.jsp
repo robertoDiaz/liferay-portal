@@ -17,10 +17,15 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String tabs1 = ParamUtil.getString(request, "tabs1", "my-sites");
+final String tabs1;
 
-if (!tabs1.equals("my-sites") && !tabs1.equals("available-sites")) {
+String tempTabs1 = ParamUtil.getString(request, "tabs1", "my-sites");
+
+if (!tempTabs1.equals("my-sites") && !tempTabs1.equals("available-sites")) {
 	tabs1 = "my-sites";
+}
+else {
+	tabs1 = tempTabs1;
 }
 
 String displayStyle = ParamUtil.getString(request, "displayStyle", "descriptive");
@@ -28,6 +33,7 @@ String displayStyle = ParamUtil.getString(request, "displayStyle", "descriptive"
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("tabs1", tabs1);
+portletURL.setParameter("displayStyle", displayStyle);
 
 request.setAttribute("view.jsp-tabs1", tabs1);
 
@@ -70,34 +76,27 @@ Map<Long, Integer> groupUsersCounts = UserLocalServiceUtil.searchCounts(company.
 
 <liferay-ui:error key="membershipAlreadyRequested" message="membership-was-already-requested" />
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("my-sites"));
+						navigationItem.setHref(portletURL, "tabs1", "my-sites");
+						navigationItem.setLabel(LanguageUtil.get(request, "my-sites"));
+					});
 
-		<%
-		PortletURL mySitesURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-		mySitesURL.setParameter("tabs1", "my-sites");
-		%>
-
-		<aui:nav-item href="<%= mySitesURL.toString() %>" id="mySites" label="my-sites" selected='<%= tabs1.equals("my-sites") %>' />
-
-		<%
-		PortletURL availableSitesURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-		availableSitesURL.setParameter("tabs1", "available-sites");
-		%>
-
-		<aui:nav-item href="<%= availableSitesURL.toString() %>" id="availableSites" label="available-sites" selected='<%= tabs1.equals("available-sites") %>' />
-	</aui:nav>
-
-	<aui:nav-bar-search>
-		<aui:form action="<%= portletURL %>" name="searchFm">
-			<liferay-portlet:renderURLParams varImpl="portletURL" />
-
-			<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" markupView="lexicon" />
-		</aui:form>
-	</aui:nav-bar-search>
-</aui:nav-bar>
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("available-sites"));
+						navigationItem.setHref(portletURL, "tabs1", "available-sites");
+						navigationItem.setLabel(LanguageUtil.get(request, "available-sites"));
+					});
+			}
+		}
+	%>"
+/>
 
 <liferay-frontend:management-bar>
 	<liferay-frontend:management-bar-buttons>
@@ -120,6 +119,17 @@ Map<Long, Integer> groupUsersCounts = UserLocalServiceUtil.searchCounts(company.
 			orderColumns='<%= new String[] {"name"} %>'
 			portletURL="<%= PortletURLUtil.clone(portletURL, renderResponse) %>"
 		/>
+
+		<li>
+			<aui:form action="<%= portletURL %>" name="searchFm">
+				<liferay-portlet:renderURLParams varImpl="portletURL" />
+
+				<liferay-ui:input-search
+					autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>"
+					markupView="lexicon"
+				/>
+			</aui:form>
+		</li>
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
@@ -192,7 +202,7 @@ Map<Long, Integer> groupUsersCounts = UserLocalServiceUtil.searchCounts(company.
 						</h6>
 
 						<h6 class="text-default">
-							<strong><liferay-ui:message key="members" /></strong>: <%= String.valueOf(groupUsersCounts.get(group.getGroupId())) %>
+							<strong><liferay-ui:message key="members" /></strong>: <%= GetterUtil.getInteger(groupUsersCounts.get(group.getGroupId())) %>
 						</h6>
 
 						<c:if test='<%= tabs1.equals("my-sites") && PropsValues.LIVE_USERS_ENABLED %>'>
@@ -299,6 +309,9 @@ Map<Long, Integer> groupUsersCounts = UserLocalServiceUtil.searchCounts(company.
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>

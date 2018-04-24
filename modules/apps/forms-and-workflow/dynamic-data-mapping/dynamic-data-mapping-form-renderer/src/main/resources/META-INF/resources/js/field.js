@@ -56,6 +56,10 @@ AUI.add(
 						setter: '_setParent'
 					},
 
+					pathThemeImages: {
+						value: themeDisplay.getPathThemeImages()
+					},
+
 					portletNamespace: {
 						value: ''
 					},
@@ -76,6 +80,10 @@ AUI.add(
 					showLabel: {
 						state: true,
 						value: true
+					},
+
+					startedFilling: {
+						value: false
 					},
 
 					type: {
@@ -229,6 +237,7 @@ AUI.add(
 							instance.get('context'),
 							{
 								name: instance.getQualifiedName(),
+								pathThemeImages: instance.get('pathThemeImages'),
 								value: instance.get('value')
 							}
 						);
@@ -258,12 +267,21 @@ AUI.add(
 						return Lang.String.unescapeHTML(inputNode.val());
 					},
 
-					hasFocus: function() {
+					hasFocus: function(node) {
 						var instance = this;
 
 						var container = instance.get('container');
 
-						return container.contains(document.activeElement);
+						var hasFocus = false;
+
+						if (node) {
+							hasFocus = container.contains(node);
+						}
+						else {
+							hasFocus = container.contains(document.activeElement);
+						}
+
+						return hasFocus;
 					},
 
 					render: function(target) {
@@ -277,7 +295,7 @@ AUI.add(
 							container.appendTo(target);
 						}
 
-						container.html(instance.getTemplate());
+						container.setContent(instance.getTemplate());
 
 						instance.eachField(
 							function(field) {

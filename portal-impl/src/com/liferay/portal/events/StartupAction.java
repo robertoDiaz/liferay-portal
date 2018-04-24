@@ -14,14 +14,16 @@
 
 package com.liferay.portal.events;
 
+import com.liferay.petra.executor.PortalExecutorManager;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.server.FabricServerUtil;
 import com.liferay.portal.jericho.CachedLoggerProvider;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
-import com.liferay.portal.kernel.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBus;
@@ -46,14 +48,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.plugin.PluginPackageIndexer;
 import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.messageboards.util.MBMessageIndexer;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -154,7 +155,6 @@ public class StartupAction extends SimpleAction {
 
 				@Override
 				public void dependenciesFulfilled() {
-					IndexerRegistryUtil.register(new MBMessageIndexer());
 					IndexerRegistryUtil.register(new PluginPackageIndexer());
 				}
 
@@ -188,6 +188,19 @@ public class StartupAction extends SimpleAction {
 		}
 
 		DBUpgrader.checkRequiredBuildNumber(ReleaseInfo.getParentBuildNumber());
+
+		if (!PortalUpgradeProcess.isInRequiredSchemaVersion(
+				DataAccess.getConnection())) {
+
+			String msg =
+				"You must first upgrade the portal core to the required " +
+					"schema version " +
+						PortalUpgradeProcess.getRequiredSchemaVersion();
+
+			System.out.println(msg);
+
+			throw new RuntimeException(msg);
+		}
 
 		Registry registry = RegistryUtil.getRegistry();
 
