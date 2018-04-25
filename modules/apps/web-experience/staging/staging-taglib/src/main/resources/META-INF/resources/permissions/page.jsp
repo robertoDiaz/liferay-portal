@@ -16,31 +16,16 @@
 
 <%@ include file="/permissions/init.jsp" %>
 
-<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="permissions" markupView="lexicon">
-	<span class="<%= labelCSSClass %>">
-		<c:choose>
-			<c:when test='<%= action.equals("publish") %>'>
-				<liferay-ui:message key="publish-permissions" />
-			</c:when>
-			<c:when test='<%= action.equals("export") %>'>
-				<liferay-ui:message key="export-permissions" />
-			</c:when>
-			<c:when test='<%= action.equals("import") %>'>
-				<liferay-ui:message key="import-permissions" />
-			</c:when>
-		</c:choose>
-	</span>
+<aui:fieldset cssClass="options-group" markupView="lexicon">
+	<div class="sheet-section">
+		<h3 class="sheet-subtitle"><liferay-ui:message key="permissions" /></h3>
 
-	<aui:input disabled="<%= disableInputs %>" label="<%= StringPool.BLANK %>" name="<%= PortletDataHandlerKeys.PERMISSIONS %>" type="toggle-switch" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PERMISSIONS, false) %>" />
-
-	<span class="<%= descriptionCSSClass %>">
-		<c:choose>
-			<c:when test="<%= global %>">
-				<liferay-ui:message key="publish-global-permissions-help" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="export-import-permissions-help" />
-			</c:otherwise>
-		</c:choose>
-	</span>
+		<liferay-staging:checkbox
+			checked="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PERMISSIONS, false) %>"
+			description="<%= inputDescription %>"
+			disabled="<%= disableInputs %>"
+			label="<%= inputTitle %>"
+			name="<%= PortletDataHandlerKeys.PERMISSIONS %>"
+		/>
+	</div>
 </aui:fieldset>

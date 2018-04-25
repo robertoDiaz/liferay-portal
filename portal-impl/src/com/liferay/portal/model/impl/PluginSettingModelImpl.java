@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -196,7 +195,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 		attributes.put("pluginId", getPluginId());
 		attributes.put("pluginType", getPluginType());
 		attributes.put("roles", getRoles());
-		attributes.put("active", getActive());
+		attributes.put("active", isActive());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -298,7 +297,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 	@Override
 	public String getPluginId() {
 		if (_pluginId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _pluginId;
@@ -324,7 +323,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 	@Override
 	public String getPluginType() {
 		if (_pluginType == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _pluginType;
@@ -350,7 +349,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 	@Override
 	public String getRoles() {
 		if (_roles == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _roles;
@@ -416,7 +415,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 		pluginSettingImpl.setPluginId(getPluginId());
 		pluginSettingImpl.setPluginType(getPluginType());
 		pluginSettingImpl.setRoles(getRoles());
-		pluginSettingImpl.setActive(getActive());
+		pluginSettingImpl.setActive(isActive());
 
 		pluginSettingImpl.resetOriginalValues();
 
@@ -524,7 +523,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 			pluginSettingCacheModel.roles = null;
 		}
 
-		pluginSettingCacheModel.active = getActive();
+		pluginSettingCacheModel.active = isActive();
 
 		return pluginSettingCacheModel;
 	}
@@ -546,7 +545,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 		sb.append(", roles=");
 		sb.append(getRoles());
 		sb.append(", active=");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append("}");
 
 		return sb.toString();
@@ -586,7 +585,7 @@ public class PluginSettingModelImpl extends BaseModelImpl<PluginSetting>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>active</column-name><column-value><![CDATA[");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

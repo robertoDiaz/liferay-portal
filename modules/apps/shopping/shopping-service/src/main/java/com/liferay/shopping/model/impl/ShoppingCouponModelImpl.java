@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import com.liferay.shopping.model.ShoppingCoupon;
 import com.liferay.shopping.model.ShoppingCouponModel;
@@ -240,7 +239,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		attributes.put("description", getDescription());
 		attributes.put("startDate", getStartDate());
 		attributes.put("endDate", getEndDate());
-		attributes.put("active", getActive());
+		attributes.put("active", isActive());
 		attributes.put("limitCategories", getLimitCategories());
 		attributes.put("limitSkus", getLimitSkus());
 		attributes.put("minOrder", getMinOrder());
@@ -428,7 +427,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -440,7 +439,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -486,7 +485,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getCode() {
 		if (_code == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _code;
@@ -512,7 +511,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -528,7 +527,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -583,7 +582,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getLimitCategories() {
 		if (_limitCategories == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _limitCategories;
@@ -599,7 +598,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getLimitSkus() {
 		if (_limitSkus == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _limitSkus;
@@ -637,7 +636,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	@Override
 	public String getDiscountType() {
 		if (_discountType == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _discountType;
@@ -692,7 +691,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		shoppingCouponImpl.setDescription(getDescription());
 		shoppingCouponImpl.setStartDate(getStartDate());
 		shoppingCouponImpl.setEndDate(getEndDate());
-		shoppingCouponImpl.setActive(getActive());
+		shoppingCouponImpl.setActive(isActive());
 		shoppingCouponImpl.setLimitCategories(getLimitCategories());
 		shoppingCouponImpl.setLimitSkus(getLimitSkus());
 		shoppingCouponImpl.setMinOrder(getMinOrder());
@@ -850,7 +849,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 			shoppingCouponCacheModel.endDate = Long.MIN_VALUE;
 		}
 
-		shoppingCouponCacheModel.active = getActive();
+		shoppingCouponCacheModel.active = isActive();
 
 		shoppingCouponCacheModel.limitCategories = getLimitCategories();
 
@@ -912,7 +911,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		sb.append(", endDate=");
 		sb.append(getEndDate());
 		sb.append(", active=");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append(", limitCategories=");
 		sb.append(getLimitCategories());
 		sb.append(", limitSkus=");
@@ -986,7 +985,7 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>active</column-name><column-value><![CDATA[");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>limitCategories</column-name><column-value><![CDATA[");

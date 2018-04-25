@@ -27,64 +27,55 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "configu
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, tabs1), currentURL);
 %>
 
-<aui:nav-bar cssClass="navbar-collapse-absolute" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<c:if test="<%= selPortlet.getConfigurationActionInstance() != null %>">
-			<portlet:renderURL var="configurationURL">
-				<portlet:param name="mvcPath" value="/edit_configuration.jsp" />
-				<portlet:param name="redirect" value="<%= redirect %>" />
-				<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
-				<portlet:param name="portletConfiguration" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="portletResource" value="<%= portletResource %>" />
-			</portlet:renderURL>
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				if (selPortlet.getConfigurationActionInstance() != null) {
+				add(
+						navigationItem -> {
+							navigationItem.setActive(tabs1.equals("setup"));
+							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_configuration.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
+							navigationItem.setLabel(LanguageUtil.get(request, "setup"));
+						});
+				}
 
-			<aui:nav-item href="<%= configurationURL %>" label="setup" selected='<%= tabs1.equals("setup") %>' />
-		</c:if>
+				if (selPortlet.hasMultipleMimeTypes()) {
+					add(
+						navigationItem -> {
+							navigationItem.setActive(tabs1.equals("supported-clients"));
+							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_supported_clients.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
+							navigationItem.setLabel(LanguageUtil.get(request, "supported-clients"));
+						});
+				}
 
-		<c:if test="<%= selPortlet.hasMultipleMimeTypes() %>">
-			<portlet:renderURL var="supportedClientsURL">
-				<portlet:param name="mvcPath" value="/edit_supported_clients.jsp" />
-				<portlet:param name="redirect" value="<%= redirect %>" />
-				<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
-				<portlet:param name="portletConfiguration" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="portletResource" value="<%= portletResource %>" />
-			</portlet:renderURL>
+				Set<PublicRenderParameter> publicRenderParameters = selPortlet.getPublicRenderParameters();
 
-			<aui:nav-item href="<%= supportedClientsURL %>" label="supported-clients" selected='<%= tabs1.equals("supported-clients") %>' />
-		</c:if>
+				if (!publicRenderParameters.isEmpty()) {
+					add(
+						navigationItem -> {
+							navigationItem.setActive(tabs1.equals("communication"));
+							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_public_render_parameters.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
+							navigationItem.setLabel(LanguageUtil.get(request, "communication"));
+						});
+				}
 
-		<c:if test="<%= !selPortlet.getPublicRenderParameters().isEmpty() %>">
-			<portlet:renderURL var="publicRenderParametersURL">
-				<portlet:param name="mvcPath" value="/edit_public_render_parameters.jsp" />
-				<portlet:param name="redirect" value="<%= redirect %>" />
-				<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
-				<portlet:param name="portletConfiguration" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="portletResource" value="<%= portletResource %>" />
-			</portlet:renderURL>
+				add(
+					navigationItem -> {
+						navigationItem.setActive(tabs1.equals("sharing"));
+						navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_sharing.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
+						navigationItem.setLabel(LanguageUtil.get(request, "sharing"));
+					});
 
-			<aui:nav-item href="<%= publicRenderParametersURL.toString() %>" label="communication" selected='<%= tabs1.equals("communication") %>' />
-		</c:if>
-
-		<portlet:renderURL var="sharingURL">
-			<portlet:param name="mvcPath" value="/edit_sharing.jsp" />
-			<portlet:param name="redirect" value="<%= redirect %>" />
-			<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
-			<portlet:param name="portletConfiguration" value="<%= Boolean.TRUE.toString() %>" />
-			<portlet:param name="portletResource" value="<%= portletResource %>" />
-		</portlet:renderURL>
-
-		<aui:nav-item href="<%= sharingURL %>" label="sharing" selected='<%= tabs1.equals("sharing") %>' />
-
-		<c:if test="<%= selPortlet.isScopeable() %>">
-			<portlet:renderURL var="scopeURL">
-				<portlet:param name="mvcPath" value="/edit_scope.jsp" />
-				<portlet:param name="redirect" value="<%= redirect %>" />
-				<portlet:param name="returnToFullPageURL" value="<%= returnToFullPageURL %>" />
-				<portlet:param name="portletConfiguration" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="portletResource" value="<%= portletResource %>" />
-			</portlet:renderURL>
-
-			<aui:nav-item href="<%= scopeURL %>" label="scope" selected='<%= tabs1.equals("scope") %>' />
-		</c:if>
-	</aui:nav>
-</aui:nav-bar>
+				if (selPortlet.isScopeable()) {
+					add(
+						navigationItem -> {
+							navigationItem.setActive(tabs1.equals("scope"));
+							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_scope.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
+							navigationItem.setLabel(LanguageUtil.get(request, "scope"));
+						});
+				}
+			}
+		}
+	%>"
+/>

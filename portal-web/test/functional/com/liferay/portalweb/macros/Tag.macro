@@ -16,16 +16,14 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Categorization" />
+			<var name="panel" value="Categorization" />
 		</execute>
-
-		<var name="key_tagName" value="${tagName}" />
 
 		<execute function="Type" locator1="AssetCategorization#TAGS_FIELD" value1="tag " />
 
-		<execute function="AssertTextEquals" locator1="AssetCategorization#TAG_AUTOCOMPLETE" value1="${tagName}" />
-
-		<execute function="AssertClick" locator1="AssetCategorization#TAG_AUTOCOMPLETE" value1="${tagName}" />
+		<execute function="AssertClick" locator1="AssetCategorization#TAG_AUTOCOMPLETE_SPECIFIC" value1="${tagName}">
+			<var name="key_tagName" value="${tagName}" />
+		</execute>
 
 		<execute macro="PortletEntry#publish" />
 	</command>
@@ -50,7 +48,7 @@
 
 	<command name="addViaSiteCP">
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Categorization" />
+			<var name="panel" value="Categorization" />
 		</execute>
 
 		<execute macro="AssetCategorization#addTag">
@@ -120,16 +118,26 @@
 	</command>
 
 	<command name="tearDownCP">
-		<execute macro="Navigator#openURL" />
+		<if>
+			<equals arg1="${stagingSite}" arg2="true" />
+			<then>
+				<execute macro="ProductMenu#gotoStagingSite" />
+			</then>
+			<else>
+				<execute macro="Navigator#openURL" />
+			</else>
+		</if>
 
-		<execute macro="ProductMenu#gotoSitesContent">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Tags" />
 		</execute>
 
 		<while>
 			<condition function="IsElementNotPresent" locator1="Message#EMPTY_INFO" />
 			<then>
-				<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
+				<execute macro="PortletEntry#selectAll" />
 
 				<execute function="ClickNoError" locator1="Icon#DELETE" />
 

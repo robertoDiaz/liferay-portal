@@ -16,51 +16,24 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="tags" selected="<%= true %>" />
-	</aui:nav>
+<clay:navigation-bar
+	items="<%= assetTagsSelectorDisplayContext.getNavigationItems() %>"
+/>
 
-	<c:if test="<%= assetTagsSelectorDisplayContext.isShowTagsSearch() %>">
-		<aui:nav-bar-search>
-			<aui:form action="<%= assetTagsSelectorDisplayContext.getPortletURL() %>" name="searchFm">
-				<liferay-ui:input-search markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
-
-<liferay-frontend:management-bar
+<clay:management-toolbar
+	clearResultsURL="<%= assetTagsSelectorDisplayContext.getClearResultsURL() %>"
+	componentId="assetTagsSelectorManagementToolbar"
 	disabled="<%= assetTagsSelectorDisplayContext.isDisabledTagsManagementBar() %>"
-	includeCheckBox="<%= true %>"
+	filterItems="<%= assetTagsSelectorDisplayContext.getFilterItemsDropdownItems() %>"
+	searchActionURL="<%= assetTagsSelectorDisplayContext.getSearchActionURL() %>"
 	searchContainerId="tags"
->
-	<liferay-frontend:management-bar-filters>
-		<liferay-frontend:management-bar-navigation
-			navigationKeys='<%= new String[] {"all"} %>'
-			portletURL="<%= assetTagsSelectorDisplayContext.getPortletURL() %>"
-		/>
-
-		<liferay-frontend:management-bar-sort
-			orderByCol="<%= assetTagsSelectorDisplayContext.getOrderByCol() %>"
-			orderByType="<%= assetTagsSelectorDisplayContext.getOrderByType() %>"
-			orderColumns='<%= new String[] {"name"} %>'
-			portletURL="<%= assetTagsSelectorDisplayContext.getPortletURL() %>"
-		/>
-	</liferay-frontend:management-bar-filters>
-
-	<liferay-frontend:management-bar-buttons>
-		<liferay-portlet:actionURL name="changeDisplayStyle" varImpl="changeDisplayStyleURL">
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</liferay-portlet:actionURL>
-
-		<liferay-frontend:management-bar-display-buttons
-			displayViews='<%= new String[] {"list"} %>'
-			portletURL="<%= assetTagsSelectorDisplayContext.getPortletURL() %>"
-			selectedDisplayStyle="<%= assetTagsSelectorDisplayContext.getDisplayStyle() %>"
-		/>
-	</liferay-frontend:management-bar-buttons>
-</liferay-frontend:management-bar>
+	searchFormName="searchFm"
+	showSearch="<%= assetTagsSelectorDisplayContext.isShowTagsSearch() %>"
+	sortingOrder="<%= assetTagsSelectorDisplayContext.getOrderByType() %>"
+	sortingURL="<%= assetTagsSelectorDisplayContext.getSortingURL() %>"
+	totalItems="<%= assetTagsSelectorDisplayContext.getTotalItems() %>"
+	viewTypes="<%= assetTagsSelectorDisplayContext.getViewTypeItems() %>"
+/>
 
 <div class="container-fluid-1280">
 	<liferay-ui:search-container
@@ -80,12 +53,25 @@
 			/>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= assetTagsSelectorDisplayContext.getDisplayStyle() %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= assetTagsSelectorDisplayContext.getDisplayStyle() %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </div>
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />tags');
+
+	var searchContainerData = searchContainer.getData(true);
+
+	var selectedTagNames = <%= JSONFactoryUtil.serialize(assetTagsSelectorDisplayContext.getSelectedTagNames()) %>;
+
+	selectedTagNames = selectedTagNames.filter(
+		function(tag) {
+			return searchContainerData.indexOf(tag) === -1;
+		}
+	);
 
 	searchContainer.on(
 		'rowToggled',
@@ -95,7 +81,7 @@
 			var selectedItems = event.elements.allSelectedElements;
 
 			if (selectedItems.size() > 0) {
-				items = selectedItems.attr('value').join(',');
+				items = selectedTagNames.concat(selectedItems.attr('value')).join(',');
 			}
 
 			Liferay.Util.getOpener().Liferay.fire(

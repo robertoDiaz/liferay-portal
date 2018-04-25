@@ -14,7 +14,7 @@
 
 package com.liferay.login.web.internal.portlet.action;
 
-import com.liferay.login.web.constants.LoginPortletKeys;
+import com.liferay.login.web.internal.constants.LoginPortletKeys;
 import com.liferay.portal.kernel.exception.CompanyMaxUsersException;
 import com.liferay.portal.kernel.exception.CookieNotSupportedException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
@@ -208,6 +208,25 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		if (Validator.isNotNull(redirect)) {
+			if (!themeDisplay.isSignedIn()) {
+				LiferayPortletResponse liferayPortletResponse =
+					_portal.getLiferayPortletResponse(actionResponse);
+
+				String portletId = _portal.getPortletId(actionRequest);
+
+				PortletURL actionURL = liferayPortletResponse.createActionURL(
+					portletId);
+
+				actionURL.setParameter(
+					ActionRequest.ACTION_NAME, "/login/login");
+				actionURL.setParameter("redirect", redirect);
+
+				actionRequest.setAttribute(
+					WebKeys.REDIRECT, actionURL.toString());
+
+				return;
+			}
+
 			redirect = _portal.escapeRedirect(redirect);
 
 			if (Validator.isNotNull(redirect) &&

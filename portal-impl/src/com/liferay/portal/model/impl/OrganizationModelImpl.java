@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -262,7 +261,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		attributes.put("treePath", getTreePath());
 		attributes.put("name", getName());
 		attributes.put("type", getType());
-		attributes.put("recursable", getRecursable());
+		attributes.put("recursable", isRecursable());
 		attributes.put("regionId", getRegionId());
 		attributes.put("countryId", getCountryId());
 		attributes.put("statusId", getStatusId());
@@ -401,7 +400,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -486,7 +485,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -498,7 +497,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -565,7 +564,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getTreePath() {
 		if (_treePath == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _treePath;
@@ -591,7 +590,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -617,7 +616,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getType() {
 		if (_type == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _type;
@@ -683,7 +682,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	@Override
 	public String getComments() {
 		if (_comments == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _comments;
@@ -755,7 +754,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		organizationImpl.setTreePath(getTreePath());
 		organizationImpl.setName(getName());
 		organizationImpl.setType(getType());
-		organizationImpl.setRecursable(getRecursable());
+		organizationImpl.setRecursable(isRecursable());
 		organizationImpl.setRegionId(getRegionId());
 		organizationImpl.setCountryId(getCountryId());
 		organizationImpl.setStatusId(getStatusId());
@@ -916,7 +915,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 			organizationCacheModel.type = null;
 		}
 
-		organizationCacheModel.recursable = getRecursable();
+		organizationCacheModel.recursable = isRecursable();
 
 		organizationCacheModel.regionId = getRegionId();
 
@@ -966,7 +965,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		sb.append(", type=");
 		sb.append(getType());
 		sb.append(", recursable=");
-		sb.append(getRecursable());
+		sb.append(isRecursable());
 		sb.append(", regionId=");
 		sb.append(getRegionId());
 		sb.append(", countryId=");
@@ -1040,7 +1039,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>recursable</column-name><column-value><![CDATA[");
-		sb.append(getRecursable());
+		sb.append(isRecursable());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>regionId</column-name><column-value><![CDATA[");
