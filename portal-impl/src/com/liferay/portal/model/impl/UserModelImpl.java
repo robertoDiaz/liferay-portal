@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -361,11 +360,11 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		attributes.put("companyId", getCompanyId());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("defaultUser", getDefaultUser());
+		attributes.put("defaultUser", isDefaultUser());
 		attributes.put("contactId", getContactId());
 		attributes.put("password", getPassword());
-		attributes.put("passwordEncrypted", getPasswordEncrypted());
-		attributes.put("passwordReset", getPasswordReset());
+		attributes.put("passwordEncrypted", isPasswordEncrypted());
+		attributes.put("passwordReset", isPasswordReset());
 		attributes.put("passwordModifiedDate", getPasswordModifiedDate());
 		attributes.put("digest", getDigest());
 		attributes.put("reminderQueryQuestion", getReminderQueryQuestion());
@@ -392,10 +391,10 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		attributes.put("lastLoginIP", getLastLoginIP());
 		attributes.put("lastFailedLoginDate", getLastFailedLoginDate());
 		attributes.put("failedLoginAttempts", getFailedLoginAttempts());
-		attributes.put("lockout", getLockout());
+		attributes.put("lockout", isLockout());
 		attributes.put("lockoutDate", getLockoutDate());
-		attributes.put("agreedToTermsOfUse", getAgreedToTermsOfUse());
-		attributes.put("emailAddressVerified", getEmailAddressVerified());
+		attributes.put("agreedToTermsOfUse", isAgreedToTermsOfUse());
+		attributes.put("emailAddressVerified", isEmailAddressVerified());
 		attributes.put("status", getStatus());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -679,7 +678,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -726,7 +725,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -865,7 +864,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getPassword() {
 		if (_password == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _password;
@@ -924,7 +923,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getDigest() {
 		if (_digest == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _digest;
@@ -940,7 +939,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getReminderQueryQuestion() {
 		if (_reminderQueryQuestion == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _reminderQueryQuestion;
@@ -956,7 +955,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getReminderQueryAnswer() {
 		if (_reminderQueryAnswer == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _reminderQueryAnswer;
@@ -983,7 +982,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getScreenName() {
 		if (_screenName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _screenName;
@@ -1009,7 +1008,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getEmailAddress() {
 		if (_emailAddress == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _emailAddress;
@@ -1058,7 +1057,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getGoogleUserId() {
 		if (_googleUserId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _googleUserId;
@@ -1095,7 +1094,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getOpenId() {
 		if (_openId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _openId;
@@ -1144,7 +1143,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getLanguageId() {
 		if (_languageId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _languageId;
@@ -1160,7 +1159,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getTimeZoneId() {
 		if (_timeZoneId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _timeZoneId;
@@ -1176,7 +1175,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getGreeting() {
 		if (_greeting == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _greeting;
@@ -1192,7 +1191,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getComments() {
 		if (_comments == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _comments;
@@ -1208,7 +1207,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getFirstName() {
 		if (_firstName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _firstName;
@@ -1224,7 +1223,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getMiddleName() {
 		if (_middleName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _middleName;
@@ -1240,7 +1239,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getLastName() {
 		if (_lastName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _lastName;
@@ -1256,7 +1255,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getJobTitle() {
 		if (_jobTitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _jobTitle;
@@ -1283,7 +1282,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getLoginIP() {
 		if (_loginIP == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _loginIP;
@@ -1310,7 +1309,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	@Override
 	public String getLastLoginIP() {
 		if (_lastLoginIP == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _lastLoginIP;
@@ -1472,11 +1471,11 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		userImpl.setCompanyId(getCompanyId());
 		userImpl.setCreateDate(getCreateDate());
 		userImpl.setModifiedDate(getModifiedDate());
-		userImpl.setDefaultUser(getDefaultUser());
+		userImpl.setDefaultUser(isDefaultUser());
 		userImpl.setContactId(getContactId());
 		userImpl.setPassword(getPassword());
-		userImpl.setPasswordEncrypted(getPasswordEncrypted());
-		userImpl.setPasswordReset(getPasswordReset());
+		userImpl.setPasswordEncrypted(isPasswordEncrypted());
+		userImpl.setPasswordReset(isPasswordReset());
 		userImpl.setPasswordModifiedDate(getPasswordModifiedDate());
 		userImpl.setDigest(getDigest());
 		userImpl.setReminderQueryQuestion(getReminderQueryQuestion());
@@ -1503,10 +1502,10 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		userImpl.setLastLoginIP(getLastLoginIP());
 		userImpl.setLastFailedLoginDate(getLastFailedLoginDate());
 		userImpl.setFailedLoginAttempts(getFailedLoginAttempts());
-		userImpl.setLockout(getLockout());
+		userImpl.setLockout(isLockout());
 		userImpl.setLockoutDate(getLockoutDate());
-		userImpl.setAgreedToTermsOfUse(getAgreedToTermsOfUse());
-		userImpl.setEmailAddressVerified(getEmailAddressVerified());
+		userImpl.setAgreedToTermsOfUse(isAgreedToTermsOfUse());
+		userImpl.setEmailAddressVerified(isEmailAddressVerified());
 		userImpl.setStatus(getStatus());
 
 		userImpl.resetOriginalValues();
@@ -1653,7 +1652,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 			userCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		userCacheModel.defaultUser = getDefaultUser();
+		userCacheModel.defaultUser = isDefaultUser();
 
 		userCacheModel.contactId = getContactId();
 
@@ -1665,9 +1664,9 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 			userCacheModel.password = null;
 		}
 
-		userCacheModel.passwordEncrypted = getPasswordEncrypted();
+		userCacheModel.passwordEncrypted = isPasswordEncrypted();
 
-		userCacheModel.passwordReset = getPasswordReset();
+		userCacheModel.passwordReset = isPasswordReset();
 
 		Date passwordModifiedDate = getPasswordModifiedDate();
 
@@ -1853,7 +1852,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 
 		userCacheModel.failedLoginAttempts = getFailedLoginAttempts();
 
-		userCacheModel.lockout = getLockout();
+		userCacheModel.lockout = isLockout();
 
 		Date lockoutDate = getLockoutDate();
 
@@ -1864,9 +1863,9 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 			userCacheModel.lockoutDate = Long.MIN_VALUE;
 		}
 
-		userCacheModel.agreedToTermsOfUse = getAgreedToTermsOfUse();
+		userCacheModel.agreedToTermsOfUse = isAgreedToTermsOfUse();
 
-		userCacheModel.emailAddressVerified = getEmailAddressVerified();
+		userCacheModel.emailAddressVerified = isEmailAddressVerified();
 
 		userCacheModel.status = getStatus();
 
@@ -1890,15 +1889,15 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
 		sb.append(", defaultUser=");
-		sb.append(getDefaultUser());
+		sb.append(isDefaultUser());
 		sb.append(", contactId=");
 		sb.append(getContactId());
 		sb.append(", password=");
 		sb.append(getPassword());
 		sb.append(", passwordEncrypted=");
-		sb.append(getPasswordEncrypted());
+		sb.append(isPasswordEncrypted());
 		sb.append(", passwordReset=");
-		sb.append(getPasswordReset());
+		sb.append(isPasswordReset());
 		sb.append(", passwordModifiedDate=");
 		sb.append(getPasswordModifiedDate());
 		sb.append(", digest=");
@@ -1952,13 +1951,13 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append(", failedLoginAttempts=");
 		sb.append(getFailedLoginAttempts());
 		sb.append(", lockout=");
-		sb.append(getLockout());
+		sb.append(isLockout());
 		sb.append(", lockoutDate=");
 		sb.append(getLockoutDate());
 		sb.append(", agreedToTermsOfUse=");
-		sb.append(getAgreedToTermsOfUse());
+		sb.append(isAgreedToTermsOfUse());
 		sb.append(", emailAddressVerified=");
-		sb.append(getEmailAddressVerified());
+		sb.append(isEmailAddressVerified());
 		sb.append(", status=");
 		sb.append(getStatus());
 		sb.append("}");
@@ -2000,7 +1999,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>defaultUser</column-name><column-value><![CDATA[");
-		sb.append(getDefaultUser());
+		sb.append(isDefaultUser());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>contactId</column-name><column-value><![CDATA[");
@@ -2012,11 +2011,11 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>passwordEncrypted</column-name><column-value><![CDATA[");
-		sb.append(getPasswordEncrypted());
+		sb.append(isPasswordEncrypted());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>passwordReset</column-name><column-value><![CDATA[");
-		sb.append(getPasswordReset());
+		sb.append(isPasswordReset());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>passwordModifiedDate</column-name><column-value><![CDATA[");
@@ -2124,7 +2123,7 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lockout</column-name><column-value><![CDATA[");
-		sb.append(getLockout());
+		sb.append(isLockout());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lockoutDate</column-name><column-value><![CDATA[");
@@ -2132,11 +2131,11 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>agreedToTermsOfUse</column-name><column-value><![CDATA[");
-		sb.append(getAgreedToTermsOfUse());
+		sb.append(isAgreedToTermsOfUse());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>emailAddressVerified</column-name><column-value><![CDATA[");
-		sb.append(getEmailAddressVerified());
+		sb.append(isEmailAddressVerified());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>status</column-name><column-value><![CDATA[");

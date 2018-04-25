@@ -16,47 +16,24 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item href="<%= assetBrowserDisplayContext.getPortletURL() %>" label="entries" selected="<%= true %>" />
-	</aui:nav>
+<clay:navigation-bar
+	items="<%= assetBrowserDisplayContext.getNavigationItems() %>"
+/>
 
-	<aui:nav-bar-search>
-		<aui:form action="<%= assetBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="searchFm">
-			<liferay-ui:input-search markupView="lexicon" />
-		</aui:form>
-	</aui:nav-bar-search>
-</aui:nav-bar>
-
-<liferay-frontend:management-bar
+<clay:management-toolbar
+	clearResultsURL="<%= assetBrowserDisplayContext.getClearResultsURL() %>"
+	componentId="assetBrowserManagementToolbar"
+	creationMenu="<%= Validator.isNotNull(assetBrowserDisplayContext.getAddButtonURL()) ? assetBrowserDisplayContext.getCreationMenu() : null %>"
 	disabled="<%= assetBrowserDisplayContext.isDisabledManagementBar() %>"
->
-	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-filters>
-			<liferay-frontend:management-bar-filter
-				managementBarFilterItems="<%= assetBrowserDisplayContext.getManagementBarFilterItem() %>"
-				value="<%= assetBrowserDisplayContext.getManagementBarFilterLabel() %>"
-			/>
-
-			<liferay-frontend:management-bar-sort
-				orderByCol="<%= assetBrowserDisplayContext.getOrderByCol() %>"
-				orderByType="<%= assetBrowserDisplayContext.getOrderByType() %>"
-				orderColumns="<%= assetBrowserDisplayContext.getOrderColumns() %>"
-				portletURL="<%= assetBrowserDisplayContext.getPortletURL() %>"
-			/>
-		</liferay-frontend:management-bar-filters>
-
-		<liferay-portlet:actionURL name="changeDisplayStyle" varImpl="changeDisplayStyleURL">
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</liferay-portlet:actionURL>
-
-		<liferay-frontend:management-bar-display-buttons
-			displayViews='<%= new String[] {"icon", "descriptive", "list"} %>'
-			portletURL="<%= changeDisplayStyleURL %>"
-			selectedDisplayStyle="<%= assetBrowserDisplayContext.getDisplayStyle() %>"
-		/>
-	</liferay-frontend:management-bar-buttons>
-</liferay-frontend:management-bar>
+	filterItems="<%= assetBrowserDisplayContext.getFilterItemsDropdownItems() %>"
+	searchActionURL="<%= assetBrowserDisplayContext.getSearchActionURL() %>"
+	searchFormName="searchFm"
+	selectable="<%= false %>"
+	sortingOrder="<%= assetBrowserDisplayContext.getOrderByType() %>"
+	sortingURL="<%= assetBrowserDisplayContext.getSortingURL() %>"
+	totalItems="<%= assetBrowserDisplayContext.getTotalItems() %>"
+	viewTypes="<%= assetBrowserDisplayContext.getViewTypeItems() %>"
+/>
 
 <aui:form action="<%= assetBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="selectAssetFm">
 	<aui:input name="typeSelection" type="hidden" value="<%= assetBrowserDisplayContext.getTypeSelection() %>" />
@@ -97,7 +74,6 @@
 				<c:when test='<%= Objects.equals(assetBrowserDisplayContext.getDisplayStyle(), "descriptive") %>'>
 					<liferay-ui:search-container-column-text>
 						<liferay-ui:user-portrait
-							cssClass="user-icon-lg"
 							userId="<%= assetEntry.getUserId() %>"
 						/>
 					</liferay-ui:search-container-column-text>
@@ -204,15 +180,12 @@
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= assetBrowserDisplayContext.getDisplayStyle() %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= assetBrowserDisplayContext.getDisplayStyle() %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<c:if test="<%= Validator.isNotNull(assetBrowserDisplayContext.getAddButtonURL()) %>">
-	<liferay-frontend:add-menu>
-		<liferay-frontend:add-menu-item title='<%= LanguageUtil.format(request, "add-x", assetBrowserDisplayContext.getAddButtonLabel(), false) %>' url="<%= assetBrowserDisplayContext.getAddButtonURL() %>" />
-	</liferay-frontend:add-menu>
-</c:if>
 
 <aui:script>
 	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectAssetFm', '<%= HtmlUtil.escapeJS(assetBrowserDisplayContext.getEventName()) %>');

@@ -15,7 +15,11 @@
 package com.liferay.dynamic.data.mapping.form.evaluator.internal.functions;
 
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
+import com.liferay.petra.string.CharPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -35,7 +39,13 @@ public class IsEmailAddressFunction implements DDMExpressionFunction {
 			throw new IllegalArgumentException("One parameter is expected");
 		}
 
-		return Validator.isEmailAddress(parameters[0].toString());
+		return Stream.of(
+			StringUtil.split(parameters[0].toString(), CharPool.COMMA)
+		).map(
+			String::trim
+		).allMatch(
+			Validator::isEmailAddress
+		);
 	}
 
 }

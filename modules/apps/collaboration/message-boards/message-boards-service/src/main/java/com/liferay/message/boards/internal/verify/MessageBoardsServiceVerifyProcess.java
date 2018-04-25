@@ -15,16 +15,24 @@
 package com.liferay.message.boards.internal.verify;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.message.boards.kernel.model.MBMessage;
-import com.liferay.message.boards.kernel.model.MBThread;
-import com.liferay.message.boards.kernel.service.MBMessageLocalService;
-import com.liferay.message.boards.kernel.service.MBThreadLocalService;
+import com.liferay.message.boards.internal.verify.model.MBBanVerifiableModel;
+import com.liferay.message.boards.internal.verify.model.MBDiscussionVerifiableModel;
+import com.liferay.message.boards.internal.verify.model.MBThreadFlagVerifiableModel;
+import com.liferay.message.boards.internal.verify.model.MBThreadVerifiableModel;
+import com.liferay.message.boards.model.MBMessage;
+import com.liferay.message.boards.model.MBThread;
+import com.liferay.message.boards.service.MBMessageLocalService;
+import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.verify.VerifyAuditedModel;
+import com.liferay.portal.verify.VerifyGroupedModel;
 import com.liferay.portal.verify.VerifyProcess;
+import com.liferay.portal.verify.VerifyUUID;
 
 import java.util.List;
 
@@ -37,17 +45,27 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = {"verify.process.name=com.liferay.message.boards.service"},
-	service = {VerifyProcess.class}
+	property = "verify.process.name=com.liferay.message.boards.service",
+	service = VerifyProcess.class
 )
 public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 
 	@Override
 	protected void doVerify() throws Exception {
+		verifyAuditedModels();
+		verifyGroupedModels();
 		verifyStatisticsForCategories();
 		verifyStatisticsForThreads();
 		verifyAssetsForMessages();
 		verifyAssetsForThreads();
+		verifyUUIDModels();
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.message.boards.service)(release.schema.version=1.1.0))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	protected void verifyAssetsForMessages() throws Exception {
@@ -84,8 +102,10 @@ public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"Unable to update asset for message " +
-								message.getMessageId() + ": " + e.getMessage());
+							StringBundler.concat(
+								"Unable to update asset for message ",
+								String.valueOf(message.getMessageId()), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -119,8 +139,10 @@ public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"Unable to update asset for thread " +
-								thread.getThreadId() + ": " + e.getMessage());
+							StringBundler.concat(
+								"Unable to update asset for thread ",
+								String.valueOf(thread.getThreadId()), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -128,6 +150,23 @@ public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Assets verified for threads");
 			}
+		}
+	}
+
+	protected void verifyAuditedModels() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			_verifyAuditedModel.verify(
+				new MBDiscussionVerifiableModel(),
+				new MBThreadVerifiableModel(),
+				new MBThreadFlagVerifiableModel());
+		}
+	}
+
+	protected void verifyGroupedModels() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			_verifyGroupedModel.verify(
+				new MBDiscussionVerifiableModel(),
+				new MBThreadFlagVerifiableModel());
 		}
 	}
 
@@ -187,6 +226,15 @@ public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 		}
 	}
 
+	protected void verifyUUIDModels() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			VerifyUUID.verify(
+				new MBBanVerifiableModel(), new MBDiscussionVerifiableModel(),
+				new MBThreadVerifiableModel(),
+				new MBThreadFlagVerifiableModel());
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MessageBoardsServiceVerifyProcess.class);
 
@@ -198,5 +246,10 @@ public class MessageBoardsServiceVerifyProcess extends VerifyProcess {
 
 	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
+
+	private final VerifyAuditedModel _verifyAuditedModel =
+		new VerifyAuditedModel();
+	private final VerifyGroupedModel _verifyGroupedModel =
+		new VerifyGroupedModel();
 
 }

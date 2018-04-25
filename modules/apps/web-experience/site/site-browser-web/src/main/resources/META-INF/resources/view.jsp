@@ -24,73 +24,26 @@ String target = ParamUtil.getString(request, "target");
 
 User selUser = PortalUtil.getSelectedUser(request);
 
-String type = siteBrowserDisplayContext.getType();
-String[] types = siteBrowserDisplayContext.getTypes();
-
 GroupSearch groupSearch = siteBrowserDisplayContext.getGroupSearch();
 %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<c:choose>
-			<c:when test="<%= types.length == 1 %>">
-				<aui:nav-item label="sites" selected="<%= true %>" />
-			</c:when>
-			<c:when test="<%= types.length > 1 %>">
+<clay:navigation-bar
+	items="<%= siteBrowserDisplayContext.getNavigationItems() %>"
+/>
 
-				<%
-				for (String curType : types) {
-					PortletURL portletURL = siteBrowserDisplayContext.getPortletURL();
-
-					portletURL.setParameter("type", curType);
-				%>
-
-					<aui:nav-item href="<%= portletURL.toString() %>" label="<%= curType %>" selected="<%= curType.equals(type) %>" />
-
-				<%
-				}
-				%>
-
-			</c:when>
-		</c:choose>
-	</aui:nav>
-
-	<c:if test='<%= !type.equals("parent-sites") %>'>
-		<aui:nav-bar-search>
-			<aui:form action="<%= siteBrowserDisplayContext.getPortletURL() %>" name="searchFm">
-				<liferay-ui:input-search markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
-
-<liferay-frontend:management-bar>
-	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-filters>
-			<liferay-frontend:management-bar-navigation
-				navigationKeys='<%= new String[] {"all"} %>'
-				portletURL="<%= siteBrowserDisplayContext.getPortletURL() %>"
-			/>
-
-			<liferay-frontend:management-bar-sort
-				orderByCol="<%= groupSearch.getOrderByCol() %>"
-				orderByType="<%= groupSearch.getOrderByType() %>"
-				orderColumns='<%= new String[] {"name", "type"} %>'
-				portletURL="<%= siteBrowserDisplayContext.getPortletURL() %>"
-			/>
-		</liferay-frontend:management-bar-filters>
-
-		<liferay-portlet:actionURL name="changeDisplayStyle" varImpl="changeDisplayStyleURL">
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</liferay-portlet:actionURL>
-
-		<liferay-frontend:management-bar-display-buttons
-			displayViews='<%= new String[] {"list", "descriptive", "icon"} %>'
-			portletURL="<%= changeDisplayStyleURL %>"
-			selectedDisplayStyle="<%= displayStyle %>"
-		/>
-	</liferay-frontend:management-bar-buttons>
-</liferay-frontend:management-bar>
+<clay:management-toolbar
+	clearResultsURL="<%= siteBrowserDisplayContext.getClearResultsURL() %>"
+	componentId="siteBrowserWebManagementToolbar"
+	filterItems="<%= siteBrowserDisplayContext.getFilterDropdownItems() %>"
+	searchActionURL="<%= siteBrowserDisplayContext.getSearchActionURL() %>"
+	searchFormName="searchFm"
+	selectable="<%= false %>"
+	showSearch='<%= !Objects.equals(siteBrowserDisplayContext.getType(), "parent-sites") %>'
+	sortingOrder="<%= siteBrowserDisplayContext.getOrderByType() %>"
+	sortingURL="<%= siteBrowserDisplayContext.getSortingURL() %>"
+	totalItems="<%= siteBrowserDisplayContext.getTotalItems() %>"
+	viewTypes="<%= siteBrowserDisplayContext.getViewTypeItems() %>"
+/>
 
 <aui:form action="<%= siteBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="selectGroupFm">
 	<liferay-ui:search-container
@@ -194,7 +147,10 @@ GroupSearch groupSearch = siteBrowserDisplayContext.getGroupSearch();
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
 

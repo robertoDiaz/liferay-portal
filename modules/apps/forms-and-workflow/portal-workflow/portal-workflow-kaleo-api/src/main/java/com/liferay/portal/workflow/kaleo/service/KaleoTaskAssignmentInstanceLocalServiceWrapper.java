@@ -106,9 +106,9 @@ public class KaleoTaskAssignmentInstanceLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteKaleoDefinitionKaleoTaskAssignmentInstances(
-		long kaleoDefintionId) {
-		_kaleoTaskAssignmentInstanceLocalService.deleteKaleoDefinitionKaleoTaskAssignmentInstances(kaleoDefintionId);
+	public void deleteKaleoDefinitionVersionKaleoTaskAssignmentInstances(
+		long kaleoDefinitionId) {
+		_kaleoTaskAssignmentInstanceLocalService.deleteKaleoDefinitionVersionKaleoTaskAssignmentInstances(kaleoDefinitionId);
 	}
 
 	@Override

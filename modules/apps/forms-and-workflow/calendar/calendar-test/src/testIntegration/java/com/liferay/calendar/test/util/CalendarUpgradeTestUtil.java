@@ -28,17 +28,27 @@ import java.sql.SQLException;
  */
 public class CalendarUpgradeTestUtil {
 
+	public static UpgradeProcess getServiceUpgradeStep(
+		String upgradeStepClassName) {
+
+		return getUpgradeStep(
+			"com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade",
+			upgradeStepClassName);
+	}
+
 	public static UpgradeDatabaseTestHelper getUpgradeDatabaseTestHelper()
 		throws SQLException {
 
 		return new UpgradeDatabaseTestHelperImpl(DataAccess.getConnection());
 	}
 
-	public static UpgradeProcess getUpgradeStep(String upgradeStepClassName) {
+	public static UpgradeProcess getUpgradeStep(
+		String upgradeClassName, String upgradeStepClassName) {
+
 		Registry registry = RegistryUtil.getRegistry();
 
 		return registry.callService(
-			_UPGRADE_SERVICE_CLASS_NAME,
+			upgradeClassName,
 			(UpgradeStepRegistrator upgradeStepRegistror) -> {
 				SearchRegistry searchRegistry = new SearchRegistry(
 					upgradeStepClassName);
@@ -49,8 +59,13 @@ public class CalendarUpgradeTestUtil {
 			});
 	}
 
-	private static final String _UPGRADE_SERVICE_CLASS_NAME =
-		"com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade";
+	public static UpgradeProcess getWebUpgradeStep(
+		String upgradeStepClassName) {
+
+		return getUpgradeStep(
+			"com.liferay.calendar.web.internal.upgrade.CalendarWebUpgrade",
+			upgradeStepClassName);
+	}
 
 	private static class SearchRegistry
 		implements UpgradeStepRegistrator.Registry {
@@ -67,6 +82,15 @@ public class CalendarUpgradeTestUtil {
 		public void register(
 			String bundleSymbolicName, String fromSchemaVersionString,
 			String toSchemaVersionString, UpgradeStep... upgradeSteps) {
+
+			register(
+				fromSchemaVersionString, toSchemaVersionString, upgradeSteps);
+		}
+
+		@Override
+		public void register(
+			String fromSchemaVersionString, String toSchemaVersionString,
+			UpgradeStep... upgradeSteps) {
 
 			for (UpgradeStep upgradeStep : upgradeSteps) {
 				Class<?> clazz = upgradeStep.getClass();

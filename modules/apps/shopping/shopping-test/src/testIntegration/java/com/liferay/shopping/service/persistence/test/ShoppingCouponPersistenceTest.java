@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
@@ -192,8 +191,8 @@ public class ShoppingCouponPersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingShoppingCoupon.getEndDate()),
 			Time.getShortTimestamp(newShoppingCoupon.getEndDate()));
-		Assert.assertEquals(existingShoppingCoupon.getActive(),
-			newShoppingCoupon.getActive());
+		Assert.assertEquals(existingShoppingCoupon.isActive(),
+			newShoppingCoupon.isActive());
 		Assert.assertEquals(existingShoppingCoupon.getLimitCategories(),
 			newShoppingCoupon.getLimitCategories());
 		Assert.assertEquals(existingShoppingCoupon.getLimitSkus(),
@@ -215,9 +214,9 @@ public class ShoppingCouponPersistenceTest {
 
 	@Test
 	public void testCountByCode() throws Exception {
-		_persistence.countByCode(StringPool.BLANK);
+		_persistence.countByCode("");
 
-		_persistence.countByCode(StringPool.NULL);
+		_persistence.countByCode("null");
 
 		_persistence.countByCode((String)null);
 	}

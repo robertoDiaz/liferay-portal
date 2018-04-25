@@ -80,6 +80,7 @@ public interface AnnouncementsDeliveryLocalService extends BaseLocalService,
 	* @param deliveryId the primary key for the new announcements delivery
 	* @return the new announcements delivery
 	*/
+	@Transactional(enabled = false)
 	public AnnouncementsDelivery createAnnouncementsDelivery(long deliveryId);
 
 	/**
@@ -254,6 +255,15 @@ public interface AnnouncementsDeliveryLocalService extends BaseLocalService,
 	public AnnouncementsDelivery updateAnnouncementsDelivery(
 		AnnouncementsDelivery announcementsDelivery);
 
+	public AnnouncementsDelivery updateDelivery(long userId,
+		java.lang.String type, boolean email, boolean sms)
+		throws PortalException;
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link
+	#updateDelivery(long, String, boolean, boolean)}
+	*/
+	@java.lang.Deprecated
 	public AnnouncementsDelivery updateDelivery(long userId,
 		java.lang.String type, boolean email, boolean sms, boolean website)
 		throws PortalException;

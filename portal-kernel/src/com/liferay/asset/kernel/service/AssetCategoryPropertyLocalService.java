@@ -48,8 +48,11 @@ import java.util.List;
  * @see AssetCategoryPropertyLocalServiceUtil
  * @see com.liferay.portlet.asset.service.base.AssetCategoryPropertyLocalServiceBaseImpl
  * @see com.liferay.portlet.asset.service.impl.AssetCategoryPropertyLocalServiceImpl
+ * @deprecated As of 7.0.0, replaced by {@link
+            com.liferay.asset.category.property.service.impl.AssetCategoryPropertyLocalServiceImpl}
  * @generated
  */
+@Deprecated
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
@@ -81,6 +84,7 @@ public interface AssetCategoryPropertyLocalService extends BaseLocalService,
 	* @param categoryPropertyId the primary key for the new asset category property
 	* @return the new asset category property
 	*/
+	@Transactional(enabled = false)
 	public AssetCategoryProperty createAssetCategoryProperty(
 		long categoryPropertyId);
 

@@ -72,7 +72,7 @@ public interface KaleoTaskFormLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public KaleoTaskForm addKaleoTaskForm(KaleoTaskForm kaleoTaskForm);
 
-	public KaleoTaskForm addKaleoTaskForm(long kaleoDefinitionId,
+	public KaleoTaskForm addKaleoTaskForm(long kaleoDefinitionVersionId,
 		long kaleoNodeId, KaleoTask kaleoTask, TaskForm taskForm,
 		ServiceContext serviceContext) throws PortalException;
 
@@ -82,11 +82,13 @@ public interface KaleoTaskFormLocalService extends BaseLocalService,
 	* @param kaleoTaskFormId the primary key for the new kaleo task form
 	* @return the new kaleo task form
 	*/
+	@Transactional(enabled = false)
 	public KaleoTaskForm createKaleoTaskForm(long kaleoTaskFormId);
 
 	public void deleteCompanyKaleoTaskForms(long companyId);
 
-	public void deleteKaleoDefinitionKaleoTaskForms(long kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoTaskForms(
+		long kaleoDefinitionVersionId);
 
 	/**
 	* Deletes the kaleo task form from the database. Also notifies the appropriate model listeners.

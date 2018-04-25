@@ -110,6 +110,7 @@ public interface PortletLocalService extends BaseLocalService,
 	* @param id the primary key for the new portlet
 	* @return the new portlet
 	*/
+	@Transactional(enabled = false)
 	public Portlet createPortlet(long id);
 
 	/**
@@ -324,6 +325,9 @@ public interface PortletLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getPortletsCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getPortletsCount(long companyId);
 
 	@Skip
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

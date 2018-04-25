@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -239,10 +238,10 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("privateLayout", isPrivateLayout());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("master", getMaster());
+		attributes.put("master", isMaster());
 		attributes.put("logoId", getLogoId());
 		attributes.put("themeId", getThemeId());
 		attributes.put("colorSchemeId", getColorSchemeId());
@@ -250,7 +249,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		attributes.put("settings", getSettings());
 		attributes.put("layoutSetPrototypeUuid", getLayoutSetPrototypeUuid());
 		attributes.put("layoutSetPrototypeLinkEnabled",
-			getLayoutSetPrototypeLinkEnabled());
+			isLayoutSetPrototypeLinkEnabled());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -452,7 +451,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -464,7 +463,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -537,7 +536,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -563,7 +562,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -619,7 +618,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getThemeId() {
 		if (_themeId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _themeId;
@@ -635,7 +634,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getColorSchemeId() {
 		if (_colorSchemeId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _colorSchemeId;
@@ -651,7 +650,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getCss() {
 		if (_css == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _css;
@@ -667,7 +666,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getSettings() {
 		if (_settings == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _settings;
@@ -683,7 +682,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public String getLayoutSetPrototypeUuid() {
 		if (_layoutSetPrototypeUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _layoutSetPrototypeUuid;
@@ -752,17 +751,17 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		layoutSetBranchImpl.setUserName(getUserName());
 		layoutSetBranchImpl.setCreateDate(getCreateDate());
 		layoutSetBranchImpl.setModifiedDate(getModifiedDate());
-		layoutSetBranchImpl.setPrivateLayout(getPrivateLayout());
+		layoutSetBranchImpl.setPrivateLayout(isPrivateLayout());
 		layoutSetBranchImpl.setName(getName());
 		layoutSetBranchImpl.setDescription(getDescription());
-		layoutSetBranchImpl.setMaster(getMaster());
+		layoutSetBranchImpl.setMaster(isMaster());
 		layoutSetBranchImpl.setLogoId(getLogoId());
 		layoutSetBranchImpl.setThemeId(getThemeId());
 		layoutSetBranchImpl.setColorSchemeId(getColorSchemeId());
 		layoutSetBranchImpl.setCss(getCss());
 		layoutSetBranchImpl.setSettings(getSettings());
 		layoutSetBranchImpl.setLayoutSetPrototypeUuid(getLayoutSetPrototypeUuid());
-		layoutSetBranchImpl.setLayoutSetPrototypeLinkEnabled(getLayoutSetPrototypeLinkEnabled());
+		layoutSetBranchImpl.setLayoutSetPrototypeLinkEnabled(isLayoutSetPrototypeLinkEnabled());
 
 		layoutSetBranchImpl.resetOriginalValues();
 
@@ -882,7 +881,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			layoutSetBranchCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		layoutSetBranchCacheModel.privateLayout = getPrivateLayout();
+		layoutSetBranchCacheModel.privateLayout = isPrivateLayout();
 
 		layoutSetBranchCacheModel.name = getName();
 
@@ -900,7 +899,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			layoutSetBranchCacheModel.description = null;
 		}
 
-		layoutSetBranchCacheModel.master = getMaster();
+		layoutSetBranchCacheModel.master = isMaster();
 
 		layoutSetBranchCacheModel.logoId = getLogoId();
 
@@ -945,7 +944,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			layoutSetBranchCacheModel.layoutSetPrototypeUuid = null;
 		}
 
-		layoutSetBranchCacheModel.layoutSetPrototypeLinkEnabled = getLayoutSetPrototypeLinkEnabled();
+		layoutSetBranchCacheModel.layoutSetPrototypeLinkEnabled = isLayoutSetPrototypeLinkEnabled();
 
 		return layoutSetBranchCacheModel;
 	}
@@ -971,13 +970,13 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
 		sb.append(", privateLayout=");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append(", name=");
 		sb.append(getName());
 		sb.append(", description=");
 		sb.append(getDescription());
 		sb.append(", master=");
-		sb.append(getMaster());
+		sb.append(isMaster());
 		sb.append(", logoId=");
 		sb.append(getLogoId());
 		sb.append(", themeId=");
@@ -991,7 +990,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append(", layoutSetPrototypeUuid=");
 		sb.append(getLayoutSetPrototypeUuid());
 		sb.append(", layoutSetPrototypeLinkEnabled=");
-		sb.append(getLayoutSetPrototypeLinkEnabled());
+		sb.append(isLayoutSetPrototypeLinkEnabled());
 		sb.append("}");
 
 		return sb.toString();
@@ -1039,7 +1038,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>privateLayout</column-name><column-value><![CDATA[");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>name</column-name><column-value><![CDATA[");
@@ -1051,7 +1050,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>master</column-name><column-value><![CDATA[");
-		sb.append(getMaster());
+		sb.append(isMaster());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>logoId</column-name><column-value><![CDATA[");
@@ -1079,7 +1078,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>layoutSetPrototypeLinkEnabled</column-name><column-value><![CDATA[");
-		sb.append(getLayoutSetPrototypeLinkEnabled());
+		sb.append(isLayoutSetPrototypeLinkEnabled());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

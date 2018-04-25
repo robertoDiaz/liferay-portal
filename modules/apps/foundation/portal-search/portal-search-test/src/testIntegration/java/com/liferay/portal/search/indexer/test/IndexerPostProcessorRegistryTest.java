@@ -15,8 +15,8 @@
 package com.liferay.portal.search.indexer.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.message.boards.kernel.model.MBMessage;
-import com.liferay.message.boards.kernel.model.MBThread;
+import com.liferay.message.boards.model.MBMessage;
+import com.liferay.message.boards.model.MBThread;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
@@ -197,10 +197,9 @@ public class IndexerPostProcessorRegistryTest {
 			List<String> expectedClassNames = Arrays.asList(
 				TestSampleModelIndexerPostProcessor.class.getName());
 
-			Stream<IndexerPostProcessor> indexerPostProcessorsStream =
-				Stream.of(indexer.getIndexerPostProcessors());
-
-			List<String> actualClassNames = indexerPostProcessorsStream.map(
+			List<String> actualClassNames = Stream.of(
+				indexer.getIndexerPostProcessors()
+			).map(
 				IndexerPostProcessor::getClass
 			).map(
 				Class::getName

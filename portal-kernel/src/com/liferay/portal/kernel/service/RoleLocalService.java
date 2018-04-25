@@ -163,6 +163,7 @@ public interface RoleLocalService extends BaseLocalService,
 	* @param roleId the primary key for the new role
 	* @return the new role
 	*/
+	@Transactional(enabled = false)
 	public Role createRole(long roleId);
 
 	public void deleteGroupRole(long groupId, long roleId);
@@ -395,6 +396,10 @@ public interface RoleLocalService extends BaseLocalService,
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@java.lang.Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Role> getResourceBlockRoles(long resourceBlockId,
 		java.lang.String className, java.lang.String actionId);

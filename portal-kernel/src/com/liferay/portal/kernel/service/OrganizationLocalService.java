@@ -175,6 +175,7 @@ public interface OrganizationLocalService extends BaseLocalService,
 	* @param organizationId the primary key for the new organization
 	* @return the new organization
 	*/
+	@Transactional(enabled = false)
 	public Organization createOrganization(long organizationId);
 
 	public void deleteGroupOrganization(long groupId, long organizationId);
@@ -320,6 +321,9 @@ public interface OrganizationLocalService extends BaseLocalService,
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String[] getChildrenTypes(java.lang.String type);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		PortletDataContext portletDataContext);
 
@@ -458,6 +462,10 @@ public interface OrganizationLocalService extends BaseLocalService,
 	public List<Organization> getOrganizations(long companyId,
 		long parentOrganizationId, int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Organization> getOrganizations(long companyId,
+		java.lang.String treePath);
+
 	/**
 	* Returns the organizations with the primary keys.
 	*
@@ -591,6 +599,9 @@ public interface OrganizationLocalService extends BaseLocalService,
 	public List<Organization> getSubsetOrganizations(
 		List<Organization> allOrganizations,
 		List<Organization> availableOrganizations);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String[] getTypes();
 
 	/**
 	* Returns all the IDs of organizations with which the user is explicitly
@@ -736,6 +747,15 @@ public interface OrganizationLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasUserOrganizations(long userId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isCountryEnabled(java.lang.String type);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isCountryRequired(java.lang.String type);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isRootable(java.lang.String type);
 
 	/**
 	* Rebuilds the organization's tree.

@@ -112,6 +112,7 @@ public interface BackgroundTaskLocalService extends BaseLocalService,
 	* @param backgroundTaskId the primary key for the new background task
 	* @return the new background task
 	*/
+	@Transactional(enabled = false)
 	public BackgroundTask createBackgroundTask(long backgroundTaskId);
 
 	/**
@@ -293,6 +294,11 @@ public interface BackgroundTaskLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<BackgroundTask> getBackgroundTasks(long[] groupIds,
+		java.lang.String name, java.lang.String[] taskExecutorClassNames,
+		int start, int end, OrderByComparator<BackgroundTask> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<BackgroundTask> getBackgroundTasks(long[] groupIds,
 		java.lang.String[] taskExecutorClassNames);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -327,6 +333,16 @@ public interface BackgroundTaskLocalService extends BaseLocalService,
 		java.lang.String[] taskExecutorClassNames, int status, int start,
 		int end, OrderByComparator<BackgroundTask> orderByComparator);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<BackgroundTask> getBackgroundTasksByDuration(long[] groupIds,
+		java.lang.String[] taskExecutorClassNames, boolean completed,
+		int start, int end, boolean orderByType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<BackgroundTask> getBackgroundTasksByDuration(long[] groupIds,
+		java.lang.String[] taskExecutorClassNames, int start, int end,
+		boolean orderByType);
+
 	/**
 	* Returns the number of background tasks.
 	*
@@ -358,6 +374,10 @@ public interface BackgroundTaskLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getBackgroundTasksCount(long[] groupIds, java.lang.String name,
 		java.lang.String taskExecutorClassName, boolean completed);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getBackgroundTasksCount(long[] groupIds, java.lang.String name,
+		java.lang.String[] taskExecutorClassName);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getBackgroundTasksCount(long[] groupIds,

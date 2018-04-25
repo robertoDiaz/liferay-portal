@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
@@ -169,8 +168,8 @@ public class AssetDisplayTemplatePersistenceTest {
 			newAssetDisplayTemplate.getClassNameId());
 		Assert.assertEquals(existingAssetDisplayTemplate.getDDMTemplateId(),
 			newAssetDisplayTemplate.getDDMTemplateId());
-		Assert.assertEquals(existingAssetDisplayTemplate.getMain(),
-			newAssetDisplayTemplate.getMain());
+		Assert.assertEquals(existingAssetDisplayTemplate.isMain(),
+			newAssetDisplayTemplate.isMain());
 	}
 
 	@Test
@@ -182,9 +181,9 @@ public class AssetDisplayTemplatePersistenceTest {
 
 	@Test
 	public void testCountByG_LikeN() throws Exception {
-		_persistence.countByG_LikeN(RandomTestUtil.nextLong(), StringPool.BLANK);
+		_persistence.countByG_LikeN(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByG_LikeN(0L, StringPool.NULL);
+		_persistence.countByG_LikeN(0L, "null");
 
 		_persistence.countByG_LikeN(0L, (String)null);
 	}

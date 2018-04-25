@@ -46,8 +46,10 @@ import java.util.List;
  * @see ResourceTypePermissionLocalServiceUtil
  * @see com.liferay.portal.service.base.ResourceTypePermissionLocalServiceBaseImpl
  * @see com.liferay.portal.service.impl.ResourceTypePermissionLocalServiceImpl
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
@@ -75,6 +77,7 @@ public interface ResourceTypePermissionLocalService extends BaseLocalService,
 	* @param resourceTypePermissionId the primary key for the new resource type permission
 	* @return the new resource type permission
 	*/
+	@Transactional(enabled = false)
 	public ResourceTypePermission createResourceTypePermission(
 		long resourceTypePermissionId);
 

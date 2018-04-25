@@ -14,15 +14,14 @@
 
 package com.liferay.source.formatter.checkstyle.checks;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.source.formatter.checks.util.JavaSourceUtil;
 import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
 import com.liferay.source.formatter.util.ThreadSafeSortedClassLibraryBuilder;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
@@ -36,13 +35,15 @@ import com.thoughtworks.qdox.parser.ParseException;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * @author Hugo Huijser
  */
-public class UnprocessedExceptionCheck extends AbstractCheck {
+public class UnprocessedExceptionCheck extends BaseCheck {
 
 	@Override
 	public int[] getDefaultTokens() {
@@ -50,7 +51,7 @@ public class UnprocessedExceptionCheck extends AbstractCheck {
 	}
 
 	@Override
-	public void visitToken(DetailAST detailAST) {
+	protected void doVisitToken(DetailAST detailAST) {
 		FileContents fileContents = getFileContents();
 
 		String fileName = StringUtil.replace(
@@ -118,7 +119,7 @@ public class UnprocessedExceptionCheck extends AbstractCheck {
 
 		if (!exceptionClassName.contains(StringPool.PERIOD)) {
 			exceptionClassName =
-				JavaSourceUtil.getPackagePath(content) + StringPool.PERIOD +
+				JavaSourceUtil.getPackageName(content) + StringPool.PERIOD +
 					exceptionClassName;
 		}
 
@@ -188,6 +189,12 @@ public class UnprocessedExceptionCheck extends AbstractCheck {
 		DetailAST parameterDefAST = parentAST.findFirstToken(
 			TokenTypes.PARAMETER_DEF);
 
+		String exceptionClassName = _getExceptionClassName(parameterDefAST);
+
+		if (Objects.equals(exceptionClassName, "JSONException")) {
+			return;
+		}
+
 		String exceptionVariableName = _getName(parameterDefAST);
 
 		if (_containsVariable(
@@ -240,7 +247,9 @@ public class UnprocessedExceptionCheck extends AbstractCheck {
 
 		Collection<JavaSource> sources = javaProjectBuilder.getSources();
 
-		JavaSource javaSource = sources.iterator().next();
+		Iterator<JavaSource> iterator = sources.iterator();
+
+		JavaSource javaSource = iterator.next();
 
 		for (String importClassName : javaSource.getImports()) {
 			if (importClassName.endsWith("Exception")) {

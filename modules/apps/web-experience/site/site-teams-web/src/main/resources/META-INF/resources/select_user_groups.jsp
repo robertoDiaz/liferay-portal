@@ -60,19 +60,20 @@ userGroupSearchContainer.setResults(userGroups);
 RowChecker rowChecker = new UserGroupTeamChecker(renderResponse, team);
 %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="user-groups" selected="<%= true %>" />
-	</aui:nav>
-
-	<c:if test="<%= (userGroupsCount > 0) || searchTerms.isSearch() %>">
-		<aui:nav-bar-search>
-			<aui:form action="<%= portletURL.toString() %>" name="searchFm">
-				<liferay-ui:input-search markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(currentURL);
+						navigationItem.setLabel(LanguageUtil.get(request, "user-groups"));
+					});
+			}
+		}
+	%>"
+/>
 
 <liferay-frontend:management-bar
 	disabled="<%= userGroupsCount <= 0 %>"
@@ -91,6 +92,16 @@ RowChecker rowChecker = new UserGroupTeamChecker(renderResponse, team);
 			orderColumns='<%= new String[] {"name", "description"} %>'
 			portletURL="<%= PortletURLUtil.clone(portletURL, renderResponse) %>"
 		/>
+
+		<c:if test="<%= (userGroupsCount > 0) || searchTerms.isSearch() %>">
+			<li>
+				<aui:form action="<%= portletURL.toString() %>" name="searchFm">
+					<liferay-ui:input-search
+						markupView="lexicon"
+					/>
+				</aui:form>
+			</li>
+		</c:if>
 	</liferay-frontend:management-bar-filters>
 
 	<liferay-frontend:management-bar-buttons>
@@ -127,7 +138,10 @@ RowChecker rowChecker = new UserGroupTeamChecker(renderResponse, team);
 			<%@ include file="/user_group_columns.jspf" %>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
 
