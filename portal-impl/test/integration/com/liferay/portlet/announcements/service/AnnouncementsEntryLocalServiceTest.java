@@ -21,11 +21,10 @@ import com.liferay.announcements.kernel.model.AnnouncementsFlagConstants;
 import com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.announcements.kernel.service.AnnouncementsFlagLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
@@ -34,21 +33,14 @@ import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
-import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
-import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -58,7 +50,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,57 +65,12 @@ public class AnnouncementsEntryLocalServiceTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
-	@Before
-	public void setUp() throws Exception {
-		_company1 = CompanyTestUtil.addCompany();
-
-		_company2 = CompanyTestUtil.addCompany();
-
-		_user = UserTestUtil.addUser(_company1);
-	}
-
-	@Test
-	public void testDeleteEntriesInDifferentCompany() throws Exception {
-		addEntry(_user, 0, 0);
-		addEntry(_user, 0, 0);
-		addEntry(_user, 0, 0);
-
-		AnnouncementsEntryLocalServiceUtil.deleteEntries(
-			_company2.getCompanyId(), 0, 0);
-
-		List<AnnouncementsEntry> entries =
-			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_user.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		Assert.assertEquals(entries.toString(), 3, entries.size());
-	}
-
-	@Test
-	public void testDeleteEntriesInSameCompany() throws Exception {
-		addEntry(_user, 0, 0);
-		addEntry(_user, 0, 0);
-		addEntry(_user, 0, 0);
-
-		AnnouncementsEntryLocalServiceUtil.deleteEntries(
-			_user.getCompanyId(), 0, 0);
-
-		List<AnnouncementsEntry> entries =
-			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_user.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		Assert.assertEquals(entries.toString(), 0, entries.size());
-	}
-
 	@Test
 	public void testDeleteGroupAnnouncements() throws Exception {
-		Group group = GroupTestUtil.addGroup(
-			_user.getCompanyId(), _user.getUserId(),
-			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+		Group group = GroupTestUtil.addGroup();
 
 		AnnouncementsEntry entry = addEntry(
-			_user, group.getClassNameId(), group.getGroupId());
+			group.getClassNameId(), group.getGroupId());
 
 		Assert.assertNotNull(
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
@@ -139,17 +85,13 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testDeleteOrganizationAnnouncements() throws Exception {
-		Organization organization =
-			OrganizationLocalServiceUtil.addOrganization(
-				_user.getUserId(),
-				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-				RandomTestUtil.randomString(), false);
+		Organization organization = OrganizationTestUtil.addOrganization();
 
 		long classNameId = ClassNameLocalServiceUtil.getClassNameId(
 			Organization.class);
 
 		AnnouncementsEntry entry = addEntry(
-			_user, classNameId, organization.getOrganizationId());
+			classNameId, organization.getOrganizationId());
 
 		Assert.assertNotNull(
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
@@ -164,19 +106,14 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testDeleteOrganizationGroupAnnouncements() throws Exception {
-		Organization organization =
-			OrganizationLocalServiceUtil.addOrganization(
-				_user.getUserId(),
-				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-				RandomTestUtil.randomString(), false);
+		Organization organization = OrganizationTestUtil.addOrganization();
 
 		Group group = organization.getGroup();
 
 		long classNameId = ClassNameLocalServiceUtil.getClassNameId(
 			Group.class);
 
-		AnnouncementsEntry entry = addEntry(
-			_user, classNameId, group.getGroupId());
+		AnnouncementsEntry entry = addEntry(classNameId, group.getGroupId());
 
 		Assert.assertNotNull(
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
@@ -198,21 +135,13 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testDeleteUserGroupAnnouncements() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_company1.getGroupId());
-
-		UserGroup userGroup = UserGroupLocalServiceUtil.addUserGroup(
-			_user.getUserId(), _user.getCompanyId(),
-			RandomTestUtil.randomString(
-				NumericStringRandomizerBumper.INSTANCE,
-				UniqueStringRandomizerBumper.INSTANCE),
-			RandomTestUtil.randomString(50), serviceContext);
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
 
 		long classNameId = ClassNameLocalServiceUtil.getClassNameId(
 			UserGroup.class);
 
 		AnnouncementsEntry entry = addEntry(
-			_user, classNameId, userGroup.getUserGroupId());
+			classNameId, userGroup.getUserGroupId());
 
 		Assert.assertNotNull(
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
@@ -227,16 +156,14 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testGetEntries() throws Exception {
-		Group group = GroupTestUtil.addGroup(
-			_user.getCompanyId(), _user.getUserId(),
-			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+		Group group = GroupTestUtil.addGroup();
 
 		AnnouncementsEntry entry1 = addEntry(
-			_user, group.getClassNameId(), group.getGroupId());
+			group.getClassNameId(), group.getGroupId());
 		AnnouncementsEntry entry2 = addEntry(
-			_user, group.getClassNameId(), group.getGroupId());
+			group.getClassNameId(), group.getGroupId());
 		AnnouncementsEntry entry3 = addEntry(
-			_user, group.getClassNameId(), group.getGroupId());
+			group.getClassNameId(), group.getGroupId());
 
 		AnnouncementsFlagLocalServiceUtil.addFlag(
 			TestPropsValues.getUserId(), entry1.getEntryId(),
@@ -253,7 +180,7 @@ public class AnnouncementsEntryLocalServiceTest {
 
 		List<AnnouncementsEntry> hiddenEntries =
 			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_user.getUserId(), scopes, false,
+				TestPropsValues.getUserId(), scopes, false,
 				AnnouncementsFlagConstants.HIDDEN, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS);
 
@@ -261,7 +188,7 @@ public class AnnouncementsEntryLocalServiceTest {
 
 		List<AnnouncementsEntry> notHiddenEntries =
 			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_user.getUserId(), scopes, false,
+				TestPropsValues.getUserId(), scopes, false,
 				AnnouncementsFlagConstants.NOT_HIDDEN, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS);
 
@@ -275,31 +202,48 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testGetEntriesCountInDifferentCompany() throws Exception {
-		addEntry(_user, 0, 0);
+		addEntry(0, 0);
+
+		Company company = CompanyTestUtil.addCompany();
 
 		int entriesCount = AnnouncementsEntryLocalServiceUtil.getEntriesCount(
-			_company2.getCompanyId(), 0, 0, false);
+			company.getCompanyId(), 0, 0, false);
 
 		Assert.assertEquals(0, entriesCount);
 	}
 
 	@Test
 	public void testGetEntriesCountInSameCompany() throws Exception {
-		addEntry(_user, 0, 0);
+		resetCompanyEntries();
+
+		addEntry(0, 0);
 
 		int entriesCount = AnnouncementsEntryLocalServiceUtil.getEntriesCount(
-			_user.getCompanyId(), 0, 0, false);
+			TestPropsValues.getCompanyId(), 0, 0, false);
 
-		Assert.assertEquals(1, entriesCount);
+		Assert.assertEquals(0, entriesCount);
+	}
+
+	protected void resetCompanyEntries() throws PortalException {
+		List<AnnouncementsEntry> entries =
+			AnnouncementsEntryLocalServiceUtil.getEntries(
+				TestPropsValues.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		for (AnnouncementsEntry entry : entries) {
+			AnnouncementsEntryLocalServiceUtil.deleteEntry(entry.getEntryId());
+		}
 	}
 
 	@Test
 	public void testGetEntriesInDifferentCompany() throws Exception {
-		addEntry(_user, 0, 0);
+		addEntry(0, 0);
+
+		Company company = CompanyTestUtil.addCompany();
 
 		List<AnnouncementsEntry> entries =
 			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_company2.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				company.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS);
 
 		Assert.assertEquals(entries.toString(), 0, entries.size());
@@ -307,11 +251,13 @@ public class AnnouncementsEntryLocalServiceTest {
 
 	@Test
 	public void testGetEntriesInSameCompany() throws Exception {
-		AnnouncementsEntry entry = addEntry(_user, 0, 0);
+		resetCompanyEntries();
+
+		AnnouncementsEntry entry = addEntry(0, 0);
 
 		List<AnnouncementsEntry> entries =
 			AnnouncementsEntryLocalServiceUtil.getEntries(
-				_user.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
+				TestPropsValues.getCompanyId(), 0, 0, false, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS);
 
 		Assert.assertEquals(entries.toString(), 1, entries.size());
@@ -319,9 +265,10 @@ public class AnnouncementsEntryLocalServiceTest {
 		Assert.assertEquals(entry, entries.get(0));
 	}
 
-	protected AnnouncementsEntry addEntry(
-			User user, long classNameId, long classPK)
+	protected AnnouncementsEntry addEntry(long classNameId, long classPK)
 		throws Exception {
+
+		User user = TestPropsValues.getUser();
 
 		Date displayDate = PortalUtil.getDate(
 			1, 1, 1990, 1, 1, user.getTimeZone(),
@@ -331,21 +278,17 @@ public class AnnouncementsEntryLocalServiceTest {
 			EntryExpirationDateException.class);
 
 		return AnnouncementsEntryLocalServiceUtil.addEntry(
-			user.getUserId(), classNameId, classPK, StringUtil.randomString(),
-			StringUtil.randomString(), "http://localhost", "general",
-			displayDate, expirationDate, 1, false);
+			TestPropsValues.getUserId(), classNameId, classPK,
+			StringUtil.randomString(), StringUtil.randomString(),
+			"http://localhost", "general", displayDate, expirationDate, 1,
+			false);
 	}
 
 	protected void deleteRoleAnnouncements(int roleType) throws Exception {
-		Role role = RoleLocalServiceUtil.addRole(
-			_user.getUserId(), null, 0,
-			RandomTestUtil.randomString(
-				NumericStringRandomizerBumper.INSTANCE,
-				UniqueStringRandomizerBumper.INSTANCE),
-			null, null, roleType, null, null);
+		Role role = RoleTestUtil.addRole(roleType);
 
 		AnnouncementsEntry entry = addEntry(
-			_user, role.getClassNameId(), role.getRoleId());
+			role.getClassNameId(), role.getRoleId());
 
 		Assert.assertNotNull(
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
@@ -357,13 +300,5 @@ public class AnnouncementsEntryLocalServiceTest {
 			AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(
 				entry.getEntryId()));
 	}
-
-	@DeleteAfterTestRun
-	private Company _company1;
-
-	@DeleteAfterTestRun
-	private Company _company2;
-
-	private User _user;
 
 }
