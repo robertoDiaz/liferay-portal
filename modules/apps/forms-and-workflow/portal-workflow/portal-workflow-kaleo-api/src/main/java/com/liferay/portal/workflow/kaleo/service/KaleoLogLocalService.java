@@ -122,11 +122,13 @@ public interface KaleoLogLocalService extends BaseLocalService,
 	* @param kaleoLogId the primary key for the new kaleo log
 	* @return the new kaleo log
 	*/
+	@Transactional(enabled = false)
 	public KaleoLog createKaleoLog(long kaleoLogId);
 
 	public void deleteCompanyKaleoLogs(long companyId);
 
-	public void deleteKaleoDefinitionKaleoLogs(long kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoLogs(
+		long kaleoDefinitionVersionId);
 
 	public void deleteKaleoInstanceKaleoLogs(long kaleoInstanceId);
 

@@ -14,8 +14,11 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
@@ -27,6 +30,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -56,7 +62,7 @@ public class SiteMembershipsDisplayContext {
 		return _cur;
 	}
 
-	public Group getGroup() throws PortalException {
+	public Group getGroup() {
 		if (_group != null) {
 			return _group;
 		}
@@ -67,18 +73,39 @@ public class SiteMembershipsDisplayContext {
 		long groupId = ParamUtil.getLong(
 			_request, "groupId", themeDisplay.getSiteGroupIdOrLiveGroupId());
 
-		_group = GroupLocalServiceUtil.getGroup(groupId);
+		_group = GroupLocalServiceUtil.fetchGroup(groupId);
 
 		return _group;
 	}
 
-	public long getGroupId() throws PortalException {
+	public long getGroupId() {
 		Group group = getGroup();
+
+		if (group == null) {
+			return 0;
+		}
 
 		return group.getGroupId();
 	}
 
-	public PortletURL getPortletURL() throws PortalException {
+	public List<NavigationItem> getInfoPanelNavigationItems() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return new NavigationItemList() {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(themeDisplay.getURLCurrent());
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "details"));
+					});
+			}
+		};
+	}
+
+	public PortletURL getPortletURL() {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
 		portletURL.setParameter("mvcPath", "/view.jsp");
@@ -112,6 +139,23 @@ public class SiteMembershipsDisplayContext {
 		_selUser = PortalUtil.getSelectedUser(_request, false);
 
 		return _selUser;
+	}
+
+	public List<NavigationItem> getSiteRolesNavigationItems() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return new NavigationItemList() {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(themeDisplay.getURLCurrent());
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "site-roles"));
+					});
+			}
+		};
 	}
 
 	public String getTabs1() {
@@ -152,6 +196,42 @@ public class SiteMembershipsDisplayContext {
 		}
 
 		return 0;
+	}
+
+	public List<NavigationItem> getViewNavigationItems() {
+		return new NavigationItemList() {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(
+							Objects.equals(getTabs1(), "users"));
+						navigationItem.setHref(
+							getPortletURL(), "tabs1", "users");
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "users"));
+					});
+
+				add(
+					navigationItem -> {
+						navigationItem.setActive(
+							Objects.equals(getTabs1(), "organizations"));
+						navigationItem.setHref(
+							getPortletURL(), "tabs1", "organizations");
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "organizations"));
+					});
+
+				add(
+					navigationItem -> {
+						navigationItem.setActive(
+							Objects.equals(getTabs1(), "user-groups"));
+						navigationItem.setHref(
+							getPortletURL(), "tabs1", "user-groups");
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "user-groups"));
+					});
+			}
+		};
 	}
 
 	private Integer _cur;

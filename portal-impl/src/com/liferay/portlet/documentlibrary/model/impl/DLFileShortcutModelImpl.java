@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -170,7 +169,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 		model.setFolderId(soapModel.getFolderId());
 		model.setToFileEntryId(soapModel.getToFileEntryId());
 		model.setTreePath(soapModel.getTreePath());
-		model.setActive(soapModel.getActive());
+		model.setActive(soapModel.isActive());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 		model.setStatus(soapModel.getStatus());
 		model.setStatusByUserId(soapModel.getStatusByUserId());
@@ -252,7 +251,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 		attributes.put("folderId", getFolderId());
 		attributes.put("toFileEntryId", getToFileEntryId());
 		attributes.put("treePath", getTreePath());
-		attributes.put("active", getActive());
+		attributes.put("active", isActive());
 		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
@@ -380,7 +379,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -476,7 +475,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -488,7 +487,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -589,7 +588,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 	@Override
 	public String getTreePath() {
 		if (_treePath == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _treePath;
@@ -683,7 +682,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -695,7 +694,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusByUserName;
@@ -740,7 +739,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 
 		com.liferay.portal.kernel.trash.TrashHandler trashHandler = getTrashHandler();
 
-		if (!Validator.isNull(trashHandler.getContainerModelClassName(
+		if (Validator.isNotNull(trashHandler.getContainerModelClassName(
 						getPrimaryKey()))) {
 			ContainerModel containerModel = null;
 
@@ -978,7 +977,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 		dlFileShortcutImpl.setFolderId(getFolderId());
 		dlFileShortcutImpl.setToFileEntryId(getToFileEntryId());
 		dlFileShortcutImpl.setTreePath(getTreePath());
-		dlFileShortcutImpl.setActive(getActive());
+		dlFileShortcutImpl.setActive(isActive());
 		dlFileShortcutImpl.setLastPublishDate(getLastPublishDate());
 		dlFileShortcutImpl.setStatus(getStatus());
 		dlFileShortcutImpl.setStatusByUserId(getStatusByUserId());
@@ -1137,7 +1136,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 			dlFileShortcutCacheModel.treePath = null;
 		}
 
-		dlFileShortcutCacheModel.active = getActive();
+		dlFileShortcutCacheModel.active = isActive();
 
 		Date lastPublishDate = getLastPublishDate();
 
@@ -1201,7 +1200,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 		sb.append(", treePath=");
 		sb.append(getTreePath());
 		sb.append(", active=");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append(", lastPublishDate=");
 		sb.append(getLastPublishDate());
 		sb.append(", status=");
@@ -1275,7 +1274,7 @@ public class DLFileShortcutModelImpl extends BaseModelImpl<DLFileShortcut>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>active</column-name><column-value><![CDATA[");
-		sb.append(getActive());
+		sb.append(isActive());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lastPublishDate</column-name><column-value><![CDATA[");

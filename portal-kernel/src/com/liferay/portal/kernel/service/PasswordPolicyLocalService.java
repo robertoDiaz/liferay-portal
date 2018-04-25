@@ -93,6 +93,7 @@ public interface PasswordPolicyLocalService extends BaseLocalService,
 	* @param passwordPolicyId the primary key for the new password policy
 	* @return the new password policy
 	*/
+	@Transactional(enabled = false)
 	public PasswordPolicy createPasswordPolicy(long passwordPolicyId);
 
 	public void deleteNondefaultPasswordPolicies(long companyId)
@@ -258,6 +259,10 @@ public interface PasswordPolicyLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PasswordPolicy getPasswordPolicy(long passwordPolicyId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public PasswordPolicy getPasswordPolicy(long companyId,
+		boolean defaultPolicy) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PasswordPolicy getPasswordPolicy(long companyId,

@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -157,7 +156,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 		model.setServletContextNames(soapModel.getServletContextNames());
 		model.setTaskExecutorClassName(soapModel.getTaskExecutorClassName());
 		model.setTaskContextMap(soapModel.getTaskContextMap());
-		model.setCompleted(soapModel.getCompleted());
+		model.setCompleted(soapModel.isCompleted());
 		model.setCompletionDate(soapModel.getCompletionDate());
 		model.setStatus(soapModel.getStatus());
 		model.setStatusMessage(soapModel.getStatusMessage());
@@ -237,7 +236,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 		attributes.put("servletContextNames", getServletContextNames());
 		attributes.put("taskExecutorClassName", getTaskExecutorClassName());
 		attributes.put("taskContextMap", getTaskContextMap());
-		attributes.put("completed", getCompleted());
+		attributes.put("completed", isCompleted());
 		attributes.put("completionDate", getCompletionDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusMessage", getStatusMessage());
@@ -437,7 +436,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -449,7 +448,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -495,7 +494,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -521,7 +520,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 	@Override
 	public String getServletContextNames() {
 		if (_servletContextNames == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _servletContextNames;
@@ -537,7 +536,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 	@Override
 	public String getTaskExecutorClassName() {
 		if (_taskExecutorClassName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _taskExecutorClassName;
@@ -637,7 +636,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 	@Override
 	public String getStatusMessage() {
 		if (_statusMessage == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusMessage;
@@ -692,7 +691,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 		backgroundTaskImpl.setServletContextNames(getServletContextNames());
 		backgroundTaskImpl.setTaskExecutorClassName(getTaskExecutorClassName());
 		backgroundTaskImpl.setTaskContextMap(getTaskContextMap());
-		backgroundTaskImpl.setCompleted(getCompleted());
+		backgroundTaskImpl.setCompleted(isCompleted());
 		backgroundTaskImpl.setCompletionDate(getCompletionDate());
 		backgroundTaskImpl.setStatus(getStatus());
 		backgroundTaskImpl.setStatusMessage(getStatusMessage());
@@ -850,7 +849,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 
 		backgroundTaskCacheModel.taskContextMap = getTaskContextMap();
 
-		backgroundTaskCacheModel.completed = getCompleted();
+		backgroundTaskCacheModel.completed = isCompleted();
 
 		Date completionDate = getCompletionDate();
 
@@ -903,7 +902,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 		sb.append(", taskContextMap=");
 		sb.append(getTaskContextMap());
 		sb.append(", completed=");
-		sb.append(getCompleted());
+		sb.append(isCompleted());
 		sb.append(", completionDate=");
 		sb.append(getCompletionDate());
 		sb.append(", status=");
@@ -973,7 +972,7 @@ public class BackgroundTaskModelImpl extends BaseModelImpl<BackgroundTask>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>completed</column-name><column-value><![CDATA[");
-		sb.append(getCompleted());
+		sb.append(isCompleted());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>completionDate</column-name><column-value><![CDATA[");

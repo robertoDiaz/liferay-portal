@@ -16,12 +16,14 @@ package com.liferay.asset.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.exception.AssetTagException;
+import com.liferay.asset.kernel.exception.AssetTagNameException;
 import com.liferay.asset.kernel.exception.DuplicateTagException;
 import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.asset.kernel.model.AssetTagStats;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
-import com.liferay.asset.kernel.service.AssetTagStatsLocalServiceUtil;
-import com.liferay.asset.util.impl.AssetUtil;
+import com.liferay.asset.tag.stats.model.AssetTagStats;
+import com.liferay.asset.tag.stats.service.AssetTagStatsLocalServiceUtil;
+import com.liferay.asset.util.AssetHelper;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ListTypeConstants;
@@ -33,13 +35,11 @@ import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import org.junit.After;
@@ -55,7 +55,6 @@ import org.junit.runner.RunWith;
  * @author Manuel de la Peña
  */
 @RunWith(Arquillian.class)
-@Sync
 public class AssetTagLocalServiceTest {
 
 	@ClassRule
@@ -127,7 +126,7 @@ public class AssetTagLocalServiceTest {
 		Assert.assertEquals("tag", assetTag.getName());
 	}
 
-	@Test(expected = AssetTagException.class)
+	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithEmptyName() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -145,7 +144,7 @@ public class AssetTagLocalServiceTest {
 				_group.getGroupId(), TestPropsValues.getUserId());
 
 		String stringWithInvalidCharacters = String.valueOf(
-			AssetUtil.INVALID_CHARACTERS);
+			AssetHelper.INVALID_CHARACTERS);
 
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(),
@@ -165,7 +164,7 @@ public class AssetTagLocalServiceTest {
 		Assert.assertEquals("tag name", tag.getName());
 	}
 
-	@Test(expected = AssetTagException.class)
+	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithNullName() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -176,7 +175,7 @@ public class AssetTagLocalServiceTest {
 			serviceContext);
 	}
 
-	@Test(expected = AssetTagException.class)
+	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithOnlySpacesInName() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(

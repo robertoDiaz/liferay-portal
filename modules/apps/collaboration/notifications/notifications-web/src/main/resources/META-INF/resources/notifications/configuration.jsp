@@ -16,11 +16,19 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:nav-bar markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="notifications" selected="<%= true %>" />
-	</aui:nav>
-</aui:nav-bar>
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setLabel(LanguageUtil.get(request, "notifications"));
+					});
+			}
+		}
+	%>"
+/>
 
 <div class="manage-notifications-content portlet-configuration-setup">
 	<div class="manage-notifications" id="<portlet:namespace />manageNotifications">
@@ -130,9 +138,9 @@
 			<aui:input name="userNotificationDeliveryIds" type="hidden" value="<%= StringUtil.merge(userNotificationDeliveryIds) %>" />
 
 			<aui:button-row>
-				<aui:button cssClass="btn-lg" type="submit" value="save" />
+				<aui:button type="submit" value="save" />
 
-				<aui:button cssClass="btn-lg" type="cancel" />
+				<aui:button type="cancel" />
 			</aui:button-row>
 		</aui:form>
 	</div>

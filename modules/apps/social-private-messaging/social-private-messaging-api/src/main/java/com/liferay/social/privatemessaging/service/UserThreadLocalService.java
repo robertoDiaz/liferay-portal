@@ -16,7 +16,7 @@ package com.liferay.social.privatemessaging.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.model.MBMessage;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -95,6 +95,7 @@ public interface UserThreadLocalService extends BaseLocalService,
 	* @param userThreadId the primary key for the new user thread
 	* @return the new user thread
 	*/
+	@Transactional(enabled = false)
 	public UserThread createUserThread(long userThreadId);
 
 	/**

@@ -20,14 +20,14 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderException;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponseOutput;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
-import com.liferay.portal.kernel.workflow.WorkflowEngineManager;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 
 import java.util.ArrayList;
@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Marcellus Tavares
@@ -71,7 +73,7 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 			new KeyValuePair(
 				"no-workflow", LanguageUtil.get(locale, "no-workflow")));
 
-		if (!_workflowEngineManager.isDeployed()) {
+		if (_workflowDefinitionManager == null) {
 			return DDMDataProviderResponse.of(
 				DDMDataProviderResponseOutput.of(
 					"Default-Output", "list", data));
@@ -85,19 +87,16 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 				_workflowDefinitionManager.getActiveWorkflowDefinitions(
 					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
+			String languageId = LocaleUtil.toLanguageId(locale);
+
 			for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-				String version = LanguageUtil.format(
-					locale, "version-x", workflowDefinition.getVersion(),
-					false);
-
-				String label =
-					workflowDefinition.getName() + " (" + version + ")";
-
 				String value =
 					workflowDefinition.getName() + StringPool.AT +
 						workflowDefinition.getVersion();
 
-				data.add(new KeyValuePair(value, label));
+				data.add(
+					new KeyValuePair(
+						value, workflowDefinition.getTitle(languageId)));
 			}
 		}
 		catch (WorkflowException we) {
@@ -124,10 +123,11 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 	@Reference
 	private Portal _portal;
 
-	@Reference
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(proxy.bean=false)"
+	)
 	private WorkflowDefinitionManager _workflowDefinitionManager;
-
-	@Reference
-	private WorkflowEngineManager _workflowEngineManager;
 
 }

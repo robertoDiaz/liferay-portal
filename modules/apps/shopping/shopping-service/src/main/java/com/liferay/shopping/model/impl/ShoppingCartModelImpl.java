@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import com.liferay.shopping.model.ShoppingCart;
 import com.liferay.shopping.model.ShoppingCartModel;
@@ -162,7 +161,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 		attributes.put("itemIds", getItemIds());
 		attributes.put("couponCodes", getCouponCodes());
 		attributes.put("altShipping", getAltShipping());
-		attributes.put("insure", getInsure());
+		attributes.put("insure", isInsure());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -307,7 +306,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -322,7 +321,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -363,7 +362,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 	@Override
 	public String getItemIds() {
 		if (_itemIds == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _itemIds;
@@ -378,7 +377,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 	@Override
 	public String getCouponCodes() {
 		if (_couponCodes == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _couponCodes;
@@ -456,7 +455,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 		shoppingCartImpl.setItemIds(getItemIds());
 		shoppingCartImpl.setCouponCodes(getCouponCodes());
 		shoppingCartImpl.setAltShipping(getAltShipping());
-		shoppingCartImpl.setInsure(getInsure());
+		shoppingCartImpl.setInsure(isInsure());
 
 		shoppingCartImpl.resetOriginalValues();
 
@@ -588,7 +587,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 
 		shoppingCartCacheModel.altShipping = getAltShipping();
 
-		shoppingCartCacheModel.insure = getInsure();
+		shoppingCartCacheModel.insure = isInsure();
 
 		return shoppingCartCacheModel;
 	}
@@ -618,7 +617,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 		sb.append(", altShipping=");
 		sb.append(getAltShipping());
 		sb.append(", insure=");
-		sb.append(getInsure());
+		sb.append(isInsure());
 		sb.append("}");
 
 		return sb.toString();
@@ -674,7 +673,7 @@ public class ShoppingCartModelImpl extends BaseModelImpl<ShoppingCart>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>insure</column-name><column-value><![CDATA[");
-		sb.append(getInsure());
+		sb.append(isInsure());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

@@ -78,6 +78,7 @@ public interface PortalPreferencesLocalService extends BaseLocalService,
 	* @param portalPreferencesId the primary key for the new portal preferences
 	* @return the new portal preferences
 	*/
+	@Transactional(enabled = false)
 	public PortalPreferences createPortalPreferences(long portalPreferencesId);
 
 	/**
@@ -169,6 +170,9 @@ public interface PortalPreferencesLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PortalPreferences fetchPortalPreferences(long portalPreferencesId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public PortalPreferences fetchPortalPreferences(long ownerId, int ownerType);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();

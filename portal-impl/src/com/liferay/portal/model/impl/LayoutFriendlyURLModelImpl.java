@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -175,7 +174,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("plid", getPlid());
-		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("privateLayout", isPrivateLayout());
 		attributes.put("friendlyURL", getFriendlyURL());
 		attributes.put("languageId", getLanguageId());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -286,7 +285,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -378,7 +377,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -389,7 +388,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -479,7 +478,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 	@Override
 	public String getFriendlyURL() {
 		if (_friendlyURL == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _friendlyURL;
@@ -504,7 +503,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 	@Override
 	public String getLanguageId() {
 		if (_languageId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _languageId;
@@ -583,7 +582,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 		layoutFriendlyURLImpl.setCreateDate(getCreateDate());
 		layoutFriendlyURLImpl.setModifiedDate(getModifiedDate());
 		layoutFriendlyURLImpl.setPlid(getPlid());
-		layoutFriendlyURLImpl.setPrivateLayout(getPrivateLayout());
+		layoutFriendlyURLImpl.setPrivateLayout(isPrivateLayout());
 		layoutFriendlyURLImpl.setFriendlyURL(getFriendlyURL());
 		layoutFriendlyURLImpl.setLanguageId(getLanguageId());
 		layoutFriendlyURLImpl.setLastPublishDate(getLastPublishDate());
@@ -726,7 +725,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 
 		layoutFriendlyURLCacheModel.plid = getPlid();
 
-		layoutFriendlyURLCacheModel.privateLayout = getPrivateLayout();
+		layoutFriendlyURLCacheModel.privateLayout = isPrivateLayout();
 
 		layoutFriendlyURLCacheModel.friendlyURL = getFriendlyURL();
 
@@ -781,7 +780,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 		sb.append(", plid=");
 		sb.append(getPlid());
 		sb.append(", privateLayout=");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append(", friendlyURL=");
 		sb.append(getFriendlyURL());
 		sb.append(", languageId=");
@@ -843,7 +842,7 @@ public class LayoutFriendlyURLModelImpl extends BaseModelImpl<LayoutFriendlyURL>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>privateLayout</column-name><column-value><![CDATA[");
-		sb.append(getPrivateLayout());
+		sb.append(isPrivateLayout());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>friendlyURL</column-name><column-value><![CDATA[");

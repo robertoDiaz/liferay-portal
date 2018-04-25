@@ -14,11 +14,14 @@
 
 package com.liferay.source.formatter.util;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.ExcludeSyntax;
 import com.liferay.source.formatter.ExcludeSyntaxPattern;
 import com.liferay.source.formatter.SourceFormatterExcludes;
@@ -26,6 +29,8 @@ import com.liferay.source.formatter.checks.util.SourceUtil;
 
 import java.io.File;
 import java.io.IOException;
+
+import java.net.URL;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -39,8 +44,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -50,10 +58,13 @@ import java.util.regex.Pattern;
  */
 public class SourceFormatterUtil {
 
+	public static final String GIT_LIFERAY_PORTAL_BRANCH =
+		"git.liferay.portal.branch";
+
 	public static List<String> filterFileNames(
 		List<String> allFileNames, String[] excludes, String[] includes,
 		SourceFormatterExcludes sourceFormatterExcludes,
-		boolean forceIncludeSourceFormatterExcludes) {
+		boolean forceIncludeAllFiles) {
 
 		List<String> excludeRegexList = new ArrayList<>();
 		Map<String, List<String>> excludeRegexMap = new HashMap<>();
@@ -65,22 +76,7 @@ public class SourceFormatterUtil {
 			}
 		}
 
-		for (ExcludeSyntaxPattern excludeSyntaxPattern :
-				sourceFormatterExcludes.getDefaultExcludeSyntaxPatterns()) {
-
-			String excludePattern = excludeSyntaxPattern.getExcludePattern();
-			ExcludeSyntax excludeSyntax =
-				excludeSyntaxPattern.getExcludeSyntax();
-
-			if (excludeSyntax.equals(ExcludeSyntax.REGEX)) {
-				excludeRegexList.add(excludePattern);
-			}
-			else if (!excludePattern.contains(StringPool.DOLLAR)) {
-				excludeRegexList.add(_createRegex(excludePattern));
-			}
-		}
-
-		if (!forceIncludeSourceFormatterExcludes) {
+		if (!forceIncludeAllFiles) {
 			Map<String, List<ExcludeSyntaxPattern>> excludeSyntaxPatternsMap =
 				sourceFormatterExcludes.getExcludeSyntaxPatternsMap();
 
@@ -159,7 +155,7 @@ public class SourceFormatterUtil {
 	}
 
 	public static List<String> filterRecentChangesFileNames(
-			String baseDir, List<String> recentChangesFileNames,
+			String baseDirName, List<String> recentChangesFileNames,
 			String[] excludes, String[] includes,
 			SourceFormatterExcludes sourceFormatterExcludes,
 			boolean includeSubrepositories)
@@ -173,12 +169,76 @@ public class SourceFormatterUtil {
 			excludes, includes, sourceFormatterExcludes);
 
 		return _filterRecentChangesFileNames(
-			baseDir, recentChangesFileNames, pathMatchers);
+			baseDirName, recentChangesFileNames, pathMatchers);
 	}
 
-	public static File getFile(String baseDir, String fileName, int level) {
+	public static List<String> getAttributeNames(
+		CheckType checkType, String checkName,
+		Map<String, Properties> propertiesMap) {
+
+		checkName = checkName.replaceAll("([a-z])([A-Z])", "$1.$2");
+
+		checkName = checkName.replaceAll("([A-Z])([A-Z][a-z])", "$1.$2");
+
+		String keyPrefix = StringUtil.toLowerCase(checkName) + ".";
+
+		if (checkType != null) {
+			String checkTypeName = checkType.getValue();
+
+			checkTypeName = checkTypeName.replaceAll("([a-z])([A-Z])", "$1.$2");
+
+			checkTypeName = checkTypeName.replaceAll(
+				"([A-Z])([A-Z][a-z])", "$1.$2");
+
+			keyPrefix = StringUtil.toLowerCase(checkTypeName) + "." + keyPrefix;
+		}
+
+		Set<String> attributeNames = new HashSet<>();
+
+		for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
+			Properties properties = entry.getValue();
+
+			for (Object key : properties.keySet()) {
+				String s = (String)key;
+
+				if (s.startsWith(keyPrefix)) {
+					String attributeName = StringUtil.replaceFirst(
+						s, keyPrefix, StringPool.BLANK);
+
+					attributeNames.add(attributeName);
+				}
+			}
+		}
+
+		return ListUtil.fromCollection(attributeNames);
+	}
+
+	public static List<String> getAttributeNames(
+		String checkName, Map<String, Properties> propertiesMap) {
+
+		return getAttributeNames(null, checkName, propertiesMap);
+	}
+
+	public static String getContent(
+			String baseDirName, String fileName, int level)
+		throws Exception {
+
+		File file = getFile(baseDirName, fileName, level);
+
+		if (file != null) {
+			String content = FileUtil.read(file);
+
+			if (Validator.isNotNull(content)) {
+				return content;
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
+	public static File getFile(String baseDirName, String fileName, int level) {
 		for (int i = 0; i < level; i++) {
-			File file = new File(baseDir + fileName);
+			File file = new File(baseDirName + fileName);
 
 			if (file.exists()) {
 				return file;
@@ -190,6 +250,136 @@ public class SourceFormatterUtil {
 		return null;
 	}
 
+	public static String getPortalContent(
+			String baseDirName, String portalBranchName, String fileName)
+		throws Exception {
+
+		String content = getContent(
+			baseDirName, fileName, ToolsUtil.PORTAL_MAX_DIR_LEVEL);
+
+		if (Validator.isNotNull(content)) {
+			return content;
+		}
+
+		if (Validator.isNull(portalBranchName)) {
+			return null;
+		}
+
+		try {
+			URL url = new URL(
+				StringBundler.concat(
+					_GIT_LIFERAY_PORTAL_URL, portalBranchName, StringPool.SLASH,
+					fileName));
+
+			return StringUtil.read(url.openStream());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static String getPropertyValue(
+		String attributeName, CheckType checkType, String checkName,
+		Map<String, Properties> propertiesMap) {
+
+		checkName = checkName.replaceAll("([a-z])([A-Z])", "$1.$2");
+
+		checkName = checkName.replaceAll("([A-Z])([A-Z][a-z])", "$1.$2");
+
+		String key = StringBundler.concat(
+			StringUtil.toLowerCase(checkName), ".", attributeName);
+
+		if (checkType != null) {
+			String checkTypeName = checkType.getValue();
+
+			checkTypeName = checkTypeName.replaceAll("([a-z])([A-Z])", "$1.$2");
+
+			checkTypeName = checkTypeName.replaceAll(
+				"([A-Z])([A-Z][a-z])", "$1.$2");
+
+			key = StringUtil.toLowerCase(checkTypeName) + "." + key;
+		}
+
+		return getPropertyValue(key, propertiesMap);
+	}
+
+	public static String getPropertyValue(
+		String propertyName, Map<String, Properties> propertiesMap) {
+
+		StringBundler sb = new StringBundler(propertiesMap.size() * 2);
+
+		for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
+			Properties properties = entry.getValue();
+
+			String value = properties.getProperty(propertyName);
+
+			if (value != null) {
+				sb.append(value);
+				sb.append(CharPool.COMMA);
+			}
+		}
+
+		if (sb.index() > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		return sb.toString();
+	}
+
+	public static String getPropertyValue(
+		String attributeName, String checkName,
+		Map<String, Properties> propertiesMap) {
+
+		return getPropertyValue(attributeName, null, checkName, propertiesMap);
+	}
+
+	public static List<File> getSuppressionsFiles(
+			String baseDirName, List<String> allFileNames,
+			SourceFormatterExcludes sourceFormatterExcludes,
+			String... fileNames)
+		throws Exception {
+
+		List<File> suppressionsFiles = new ArrayList<>();
+
+		String[] includes = new String[fileNames.length];
+
+		for (int i = 0; i < fileNames.length; i++) {
+			String fileName = fileNames[i];
+
+			includes[i] = "**/" + fileName;
+
+			// Find suppressions files in any parent directory
+
+			String parentDirName = baseDirName;
+
+			for (int j = 0; j < ToolsUtil.PORTAL_MAX_DIR_LEVEL; j++) {
+				File suppressionsFile = new File(parentDirName + fileName);
+
+				if (suppressionsFile.exists()) {
+					suppressionsFiles.add(suppressionsFile);
+				}
+
+				parentDirName += "../";
+			}
+		}
+
+		// Find suppressions files in any child directory
+
+		List<String> moduleSuppressionsFileNames = filterFileNames(
+			allFileNames, new String[0], includes, sourceFormatterExcludes,
+			true);
+
+		for (String moduleSuppressionsFileName : moduleSuppressionsFileNames) {
+			moduleSuppressionsFileName = StringUtil.replace(
+				moduleSuppressionsFileName, CharPool.BACK_SLASH,
+				CharPool.SLASH);
+
+			suppressionsFiles.add(new File(moduleSuppressionsFileName));
+		}
+
+		return suppressionsFiles;
+	}
+
 	public static void printError(String fileName, File file) {
 		printError(fileName, file.toString());
 	}
@@ -199,7 +389,7 @@ public class SourceFormatterUtil {
 	}
 
 	public static List<String> scanForFiles(
-			String baseDir, String[] excludes, String[] includes,
+			String baseDirName, String[] excludes, String[] includes,
 			SourceFormatterExcludes sourceFormatterExcludes,
 			boolean includeSubrepositories)
 		throws Exception {
@@ -211,7 +401,7 @@ public class SourceFormatterUtil {
 		PathMatchers pathMatchers = _getPathMatchers(
 			excludes, includes, sourceFormatterExcludes);
 
-		return _scanForFiles(baseDir, pathMatchers, includeSubrepositories);
+		return _scanForFiles(baseDirName, pathMatchers, includeSubrepositories);
 	}
 
 	private static String _createRegex(String s) {
@@ -255,7 +445,7 @@ public class SourceFormatterUtil {
 	}
 
 	private static List<String> _filterRecentChangesFileNames(
-			String baseDir, List<String> recentChangesFileNames,
+			String baseDirName, List<String> recentChangesFileNames,
 			PathMatchers pathMatchers)
 		throws Exception {
 
@@ -263,7 +453,7 @@ public class SourceFormatterUtil {
 
 		recentChangesFileNamesLoop:
 		for (String fileName : recentChangesFileNames) {
-			fileName = baseDir.concat(fileName);
+			fileName = baseDirName.concat(fileName);
 
 			File file = new File(fileName);
 
@@ -347,10 +537,9 @@ public class SourceFormatterUtil {
 					pathMatchers.getIncludeFilePathMatchers()) {
 
 				if (pathMatcher.matches(filePath)) {
-					fileName = StringUtil.replace(
-						fileName, CharPool.SLASH, CharPool.BACK_SLASH);
+					Path curFilePath = Paths.get(fileName);
 
-					fileNames.add(fileName);
+					fileNames.add(curFilePath.toString());
 
 					continue recentChangesFileNamesLoop;
 				}
@@ -408,14 +597,14 @@ public class SourceFormatterUtil {
 	}
 
 	private static List<String> _scanForFiles(
-			final String baseDir, final PathMatchers pathMatchers,
+			final String baseDirName, final PathMatchers pathMatchers,
 			final boolean includeSubrepositories)
 		throws Exception {
 
 		final List<String> fileNames = new ArrayList<>();
 
 		Files.walkFileTree(
-			Paths.get(baseDir),
+			Paths.get(baseDirName),
 			new SimpleFileVisitor<Path>() {
 
 				@Override
@@ -432,7 +621,7 @@ public class SourceFormatterUtil {
 
 					if (!includeSubrepositories) {
 						String baseDirPath = SourceUtil.getAbsolutePath(
-							baseDir);
+							baseDirName);
 
 						if (!baseDirPath.equals(currentDirPath)) {
 							Path gitRepoPath = dirPath.resolve(".gitrepo");
@@ -537,6 +726,9 @@ public class SourceFormatterUtil {
 
 		return fileNames;
 	}
+
+	private static final String _GIT_LIFERAY_PORTAL_URL =
+		"https://raw.githubusercontent.com/liferay/liferay-portal/";
 
 	private static class PathMatchers {
 

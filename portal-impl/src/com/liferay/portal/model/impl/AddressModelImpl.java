@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -176,8 +175,8 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		model.setRegionId(soapModel.getRegionId());
 		model.setCountryId(soapModel.getCountryId());
 		model.setTypeId(soapModel.getTypeId());
-		model.setMailing(soapModel.getMailing());
-		model.setPrimary(soapModel.getPrimary());
+		model.setMailing(soapModel.isMailing());
+		model.setPrimary(soapModel.isPrimary());
 
 		return model;
 	}
@@ -260,8 +259,8 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		attributes.put("regionId", getRegionId());
 		attributes.put("countryId", getCountryId());
 		attributes.put("typeId", getTypeId());
-		attributes.put("mailing", getMailing());
-		attributes.put("primary", getPrimary());
+		attributes.put("mailing", isMailing());
+		attributes.put("primary", isPrimary());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -407,7 +406,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -488,7 +487,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -504,7 +503,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -549,7 +548,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getClassName() {
 		if (getClassNameId() <= 0) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		return PortalUtil.getClassName(getClassNameId());
@@ -616,7 +615,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getStreet1() {
 		if (_street1 == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _street1;
@@ -632,7 +631,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getStreet2() {
 		if (_street2 == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _street2;
@@ -648,7 +647,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getStreet3() {
 		if (_street3 == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _street3;
@@ -664,7 +663,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getCity() {
 		if (_city == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _city;
@@ -680,7 +679,7 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	@Override
 	public String getZip() {
 		if (_zip == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _zip;
@@ -838,8 +837,8 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		addressImpl.setRegionId(getRegionId());
 		addressImpl.setCountryId(getCountryId());
 		addressImpl.setTypeId(getTypeId());
-		addressImpl.setMailing(getMailing());
-		addressImpl.setPrimary(getPrimary());
+		addressImpl.setMailing(isMailing());
+		addressImpl.setPrimary(isPrimary());
 
 		addressImpl.resetOriginalValues();
 
@@ -1027,9 +1026,9 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 
 		addressCacheModel.typeId = getTypeId();
 
-		addressCacheModel.mailing = getMailing();
+		addressCacheModel.mailing = isMailing();
 
-		addressCacheModel.primary = getPrimary();
+		addressCacheModel.primary = isPrimary();
 
 		return addressCacheModel;
 	}
@@ -1075,9 +1074,9 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		sb.append(", typeId=");
 		sb.append(getTypeId());
 		sb.append(", mailing=");
-		sb.append(getMailing());
+		sb.append(isMailing());
 		sb.append(", primary=");
-		sb.append(getPrimary());
+		sb.append(isPrimary());
 		sb.append("}");
 
 		return sb.toString();
@@ -1165,11 +1164,11 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>mailing</column-name><column-value><![CDATA[");
-		sb.append(getMailing());
+		sb.append(isMailing());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>primary</column-name><column-value><![CDATA[");
-		sb.append(getPrimary());
+		sb.append(isPrimary());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

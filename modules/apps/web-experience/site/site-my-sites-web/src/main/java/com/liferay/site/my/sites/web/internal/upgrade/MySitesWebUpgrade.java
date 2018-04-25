@@ -17,7 +17,7 @@ package com.liferay.site.my.sites.web.internal.upgrade;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletId;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.site.my.sites.web.constants.MySitesPortletKeys;
+import com.liferay.site.my.sites.web.internal.constants.MySitesPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -29,12 +29,10 @@ public class MySitesWebUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register(
-			"com.liferay.site.my.sites.web", "0.0.0", "1.0.0",
-			new DummyUpgradeStep());
+		registry.register("0.0.0", "1.0.0", new DummyUpgradeStep());
 
 		registry.register(
-			"com.liferay.site.my.sites.web", "0.0.1", "1.0.0",
+			"0.0.1", "1.0.0",
 			new BaseUpgradePortletId() {
 
 				@Override

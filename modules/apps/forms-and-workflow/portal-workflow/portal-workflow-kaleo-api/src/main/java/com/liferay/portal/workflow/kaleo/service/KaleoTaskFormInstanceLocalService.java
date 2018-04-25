@@ -85,13 +85,14 @@ public interface KaleoTaskFormInstanceLocalService extends BaseLocalService,
 	* @param kaleoTaskFormInstanceId the primary key for the new kaleo task form instance
 	* @return the new kaleo task form instance
 	*/
+	@Transactional(enabled = false)
 	public KaleoTaskFormInstance createKaleoTaskFormInstance(
 		long kaleoTaskFormInstanceId);
 
 	public void deleteCompanyKaleoTaskFormInstances(long companyId);
 
-	public void deleteKaleoDefinitionKaleoTaskFormInstances(
-		long kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoTaskFormInstances(
+		long kaleoDefinitionVersionId);
 
 	public void deleteKaleoInstanceKaleoTaskFormInstances(long kaleoInstanceId);
 

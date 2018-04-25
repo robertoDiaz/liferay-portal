@@ -141,6 +141,7 @@ public interface AssetTagLocalService extends BaseLocalService,
 	* @param tagId the primary key for the new asset tag
 	* @return the new asset tag
 	*/
+	@Transactional(enabled = false)
 	public AssetTag createAssetTag(long tagId);
 
 	/**
@@ -519,6 +520,15 @@ public interface AssetTagLocalService extends BaseLocalService,
 	public long[] getTagIds(long[] groupIds, java.lang.String[] names);
 
 	/**
+	* Returns the primary keys of the asset tags with the names.
+	*
+	* @param name the name of the asset tags
+	* @return the primary keys of the asset tags with the names
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long[] getTagIds(java.lang.String name);
+
+	/**
 	* Returns the names of all the asset tags.
 	*
 	* @return the names of all the asset tags
@@ -586,6 +596,9 @@ public interface AssetTagLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getTagsSize(long groupId, long classNameId, java.lang.String name);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getTagsSize(long groupId, java.lang.String name);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasAssetEntryAssetTag(long entryId, long tagId);

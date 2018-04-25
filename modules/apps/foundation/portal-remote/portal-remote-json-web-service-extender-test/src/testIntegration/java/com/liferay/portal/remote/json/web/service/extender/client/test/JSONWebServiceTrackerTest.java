@@ -14,6 +14,7 @@
 
 package com.liferay.portal.remote.json.web.service.extender.client.test;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class JSONWebServiceTrackerTest {
 
 		String body = StringUtil.read(url.openStream());
 
-		Assert.assertTrue(body.contains("test"));
+		Assert.assertTrue(body, body.contains("test"));
 	}
 
 	@Test
@@ -95,7 +96,7 @@ public class JSONWebServiceTrackerTest {
 
 		String string = StringUtil.read(inputStream);
 
-		Assert.assertEquals(a + b, Integer.parseInt(string));
+		Assert.assertEquals(a + b, GetterUtil.getInteger(string));
 	}
 
 	@ArquillianResource

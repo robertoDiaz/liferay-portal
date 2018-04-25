@@ -17,6 +17,7 @@ package com.liferay.wiki.web.internal.display.context;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -48,7 +49,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -67,12 +67,12 @@ import com.liferay.wiki.model.WikiPageResource;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.wiki.service.WikiPageResourceLocalServiceUtil;
 import com.liferay.wiki.service.WikiPageServiceUtil;
-import com.liferay.wiki.service.permission.WikiNodePermissionChecker;
-import com.liferay.wiki.service.permission.WikiPagePermissionChecker;
 import com.liferay.wiki.util.comparator.PageVersionComparator;
 import com.liferay.wiki.web.internal.display.context.util.WikiRequestHelper;
-import com.liferay.wiki.web.util.WikiPortletUtil;
-import com.liferay.wiki.web.util.WikiWebComponentProvider;
+import com.liferay.wiki.web.internal.security.permission.resource.WikiNodePermission;
+import com.liferay.wiki.web.internal.security.permission.resource.WikiPagePermission;
+import com.liferay.wiki.web.internal.util.WikiPortletUtil;
+import com.liferay.wiki.web.internal.util.WikiWebComponentProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,7 +267,7 @@ public class DefaultWikiListPagesDisplayContext
 				if (permissionChecker.isContentReviewer(
 						_wikiRequestHelper.getCompanyId(),
 						_wikiRequestHelper.getScopeGroupId()) ||
-					WikiPagePermissionChecker.contains(
+					WikiPagePermission.contains(
 						permissionChecker, curPage, ActionKeys.UPDATE)) {
 
 					WikiPage lastPage = null;
@@ -393,8 +393,7 @@ public class DefaultWikiListPagesDisplayContext
 				links, searchContainer.getStart(), searchContainer.getEnd());
 		}
 		else if (navigation.equals("orphan-pages")) {
-			List<WikiPage> orphans = WikiPageServiceUtil.getOrphans(
-				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId());
+			List<WikiPage> orphans = WikiPageServiceUtil.getOrphans(_wikiNode);
 
 			total = orphans.size();
 
@@ -423,6 +422,13 @@ public class DefaultWikiListPagesDisplayContext
 			results = WikiPageServiceUtil.getRecentChanges(
 				themeDisplay.getScopeGroupId(), _wikiNode.getNodeId(),
 				searchContainer.getStart(), searchContainer.getEnd());
+
+			OrderByComparator<WikiPage> obc =
+				WikiPortletUtil.getPageOrderByComparator(
+					searchContainer.getOrderByCol(),
+					searchContainer.getOrderByType());
+
+			results = ListUtil.sort(results, obc);
 		}
 
 		searchContainer.setResults(results);
@@ -433,7 +439,7 @@ public class DefaultWikiListPagesDisplayContext
 		throws PortalException {
 
 		if (Validator.isNull(wikiPage.getContent()) ||
-			!WikiNodePermissionChecker.contains(
+			!WikiNodePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage.getNodeId(),
 				ActionKeys.ADD_PAGE)) {
 
@@ -499,9 +505,9 @@ public class DefaultWikiListPagesDisplayContext
 		throws PortalException {
 
 		if (!wikiPage.isDraft() &&
-			WikiPagePermissionChecker.contains(
-				_wikiRequestHelper.getPermissionChecker(), wikiPage.getNodeId(),
-				HtmlUtil.unescape(wikiPage.getTitle()), ActionKeys.DELETE)) {
+			WikiPagePermission.contains(
+				_wikiRequestHelper.getPermissionChecker(), wikiPage,
+				ActionKeys.DELETE)) {
 
 			DeleteMenuItem deleteMenuItem = new DeleteMenuItem();
 
@@ -541,7 +547,7 @@ public class DefaultWikiListPagesDisplayContext
 		}
 
 		if (wikiPage.isDraft() &&
-			WikiPagePermissionChecker.contains(
+			WikiPagePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage,
 				ActionKeys.DELETE)) {
 
@@ -573,10 +579,10 @@ public class DefaultWikiListPagesDisplayContext
 		}
 	}
 
-	protected void addEditMenuItem(
-		List<MenuItem> menuItems, WikiPage wikiPage) {
+	protected void addEditMenuItem(List<MenuItem> menuItems, WikiPage wikiPage)
+		throws PortalException {
 
-		if (!WikiPagePermissionChecker.contains(
+		if (!WikiPagePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage,
 				ActionKeys.UPDATE)) {
 
@@ -632,9 +638,10 @@ public class DefaultWikiListPagesDisplayContext
 	}
 
 	protected void addPermissionsMenuItem(
-		List<MenuItem> menuItems, WikiPage wikiPage) {
+			List<MenuItem> menuItems, WikiPage wikiPage)
+		throws PortalException {
 
-		if (!WikiPagePermissionChecker.contains(
+		if (!WikiPagePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage,
 				ActionKeys.PERMISSIONS)) {
 
@@ -670,10 +677,10 @@ public class DefaultWikiListPagesDisplayContext
 		throws PortalException {
 
 		try {
-			JavaScriptMenuItem javascriptMenuItem = new JavaScriptMenuItem();
+			JavaScriptMenuItem javaScriptMenuItem = new JavaScriptMenuItem();
 
-			javascriptMenuItem.setKey(WikiUIItemKeys.PRINT);
-			javascriptMenuItem.setLabel("print");
+			javaScriptMenuItem.setKey(WikiUIItemKeys.PRINT);
+			javaScriptMenuItem.setLabel("print");
 
 			StringBundler sb = new StringBundler(5);
 
@@ -698,16 +705,17 @@ public class DefaultWikiListPagesDisplayContext
 			sb.append("menubar=1,resizable=1,scrollbars=yes,status=0,");
 			sb.append("toolbar=0,top=180,width=640');");
 
-			javascriptMenuItem.setOnClick(sb.toString());
+			javaScriptMenuItem.setOnClick(sb.toString());
 
-			menuItems.add(javascriptMenuItem);
+			menuItems.add(javaScriptMenuItem);
 		}
 		catch (WindowStateException wse) {
 		}
 	}
 
 	protected void addSubscriptionMenuItem(
-		List<MenuItem> menuItems, WikiPage wikiPage) {
+			List<MenuItem> menuItems, WikiPage wikiPage)
+		throws PortalException {
 
 		ResultRow row = (ResultRow)_request.getAttribute(
 			WebKeys.SEARCH_CONTAINER_RESULT_ROW);
@@ -720,7 +728,7 @@ public class DefaultWikiListPagesDisplayContext
 			wikiGroupServiceOverriddenConfiguration =
 				_wikiRequestHelper.getWikiGroupServiceOverriddenConfiguration();
 
-		if (!WikiPagePermissionChecker.contains(
+		if (!WikiPagePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage,
 				ActionKeys.SUBSCRIBE) ||
 			(!wikiGroupServiceOverriddenConfiguration.emailPageAddedEnabled() &&
@@ -790,14 +798,14 @@ public class DefaultWikiListPagesDisplayContext
 	protected boolean isCopyPasteEnabled(WikiPage wikiPage)
 		throws PortalException {
 
-		if (!WikiPagePermissionChecker.contains(
+		if (!WikiPagePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage,
 				ActionKeys.UPDATE)) {
 
 			return false;
 		}
 
-		if (!WikiNodePermissionChecker.contains(
+		if (!WikiNodePermission.contains(
 				_wikiRequestHelper.getPermissionChecker(), wikiPage.getNodeId(),
 				ActionKeys.ADD_PAGE)) {
 

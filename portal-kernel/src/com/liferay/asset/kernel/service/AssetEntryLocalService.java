@@ -104,6 +104,7 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	* @param entryId the primary key for the new asset entry
 	* @return the new asset entry
 	*/
+	@Transactional(enabled = false)
 	public AssetEntry createAssetEntry(long entryId);
 
 	public void deleteAssetCategoryAssetEntries(long categoryId,
@@ -224,6 +225,9 @@ public interface AssetEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetEntry fetchEntry(long entryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetEntry fetchEntry(long classNameId, long classPK);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetEntry fetchEntry(long groupId, java.lang.String classUuid);
@@ -357,6 +361,12 @@ public interface AssetEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetEntry getEntry(java.lang.String className, long classPK)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public double getEntryPriority(long classNameId, long classPK);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public double getEntryPriority(java.lang.String className, long classPK);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetEntry> getGroupEntries(long groupId);
