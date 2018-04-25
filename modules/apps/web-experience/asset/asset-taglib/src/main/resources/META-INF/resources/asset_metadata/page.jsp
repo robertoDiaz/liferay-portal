@@ -29,7 +29,7 @@ String[] metadataFields = (String[])request.getAttribute("liferay-asset:asset-me
 			request.setAttribute("liferay-asset:asset-metadata:metadataField", metadataFields[0]);
 			%>
 
-			<liferay-util:include page="/asset_metadata/metadata_entry.jsp" />
+			<liferay-util:include page="/asset_metadata/metadata_entry.jsp" servletContext="<%= application %>" />
 		</c:when>
 		<c:otherwise>
 			<c:if test='<%= ArrayUtil.contains(metadataFields, String.valueOf("author")) %>'>
@@ -40,17 +40,19 @@ String[] metadataFields = (String[])request.getAttribute("liferay-asset:asset-me
 				metadataFields = ArrayUtil.remove(metadataFields, String.valueOf("author"));
 				%>
 
-				<liferay-util:include page="/asset_metadata/metadata_entry.jsp" />
+				<liferay-util:include page="/asset_metadata/metadata_entry.jsp" servletContext="<%= application %>" />
 			</c:if>
 
-			<liferay-util:buffer var="metadataPanelContent">
+			<liferay-util:buffer
+				var="metadataPanelContent"
+			>
 
 				<%
 				for (String metadataField : metadataFields) {
 					request.setAttribute("liferay-asset:asset-metadata:metadataField", metadataField);
 				%>
 
-					<liferay-util:include page="/asset_metadata/metadata_entry.jsp" />
+					<liferay-util:include page="/asset_metadata/metadata_entry.jsp" servletContext="<%= application %>" />
 
 				<%
 				}
@@ -59,7 +61,15 @@ String[] metadataFields = (String[])request.getAttribute("liferay-asset:asset-me
 			</liferay-util:buffer>
 
 			<c:if test="<%= Validator.isNotNull(metadataPanelContent) %>">
-				<liferay-ui:panel collapsible="<%= true %>" cssClass="asset-metadata-panel" defaultState="closed" extended="<%= false %>" id='<%= "metadataPanel" + assetEntry.getEntryId() %>' persistState="<%= false %>" title="more-details">
+				<liferay-ui:panel
+					collapsible="<%= true %>"
+					cssClass="asset-metadata-panel"
+					defaultState="closed"
+					extended="<%= false %>"
+					id='<%= "metadataPanel" + assetEntry.getEntryId() %>'
+					persistState="<%= false %>"
+					title="more-details"
+				>
 					<%= metadataPanelContent %>
 				</liferay-ui:panel>
 			</c:if>

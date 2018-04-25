@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -31,12 +32,12 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
-import com.liferay.portal.kernel.security.auth.FullNameGenerator;
-import com.liferay.portal.kernel.security.auth.FullNameGeneratorFactory;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -47,9 +48,11 @@ import com.liferay.portal.model.impl.ContactImpl;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -133,6 +136,8 @@ public class UserIndexer extends BaseIndexer<User> {
 			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
 			SearchContext searchContext)
 		throws Exception {
+
+		addHighlightFieldNames(searchContext);
 
 		addSearchTerm(searchQuery, searchContext, "city", false);
 		addSearchTerm(searchQuery, searchContext, "country", false);
@@ -233,6 +238,16 @@ public class UserIndexer extends BaseIndexer<User> {
 		}
 	}
 
+	protected void addHighlightFieldNames(SearchContext searchContext) {
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		if (!queryConfig.isHighlightEnabled()) {
+			return;
+		}
+
+		queryConfig.addHighlightFieldNames("fullName");
+	}
+
 	@Override
 	protected void doDelete(User user) throws Exception {
 		deleteDocument(user.getCompanyId(), user.getUserId());
@@ -255,12 +270,15 @@ public class UserIndexer extends BaseIndexer<User> {
 		long[] organizationIds = user.getOrganizationIds();
 
 		document.addKeyword(Field.COMPANY_ID, user.getCompanyId());
-		document.addKeyword(Field.GROUP_ID, user.getGroupIds());
+		document.addKeyword(
+			Field.GROUP_ID, getActiveTransitiveGroupIds(user.getUserId()));
 		document.addDate(Field.MODIFIED_DATE, user.getModifiedDate());
-		document.addKeyword(Field.SCOPE_GROUP_ID, user.getGroupIds());
+		document.addKeyword(
+			Field.SCOPE_GROUP_ID,
+			getActiveTransitiveGroupIds(user.getUserId()));
 		document.addKeyword(Field.STATUS, user.getStatus());
 		document.addKeyword(Field.USER_ID, user.getUserId());
-		document.addKeyword(Field.USER_NAME, user.getFullName());
+		document.addKeyword(Field.USER_NAME, user.getFullName(), true);
 		document.addKeyword(
 			"ancestorOrganizationIds",
 			getAncestorOrganizationIds(user.getOrganizationIds()));
@@ -289,19 +307,7 @@ public class UserIndexer extends BaseIndexer<User> {
 		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		String firstName = document.get("firstName");
-		String middleName = document.get("middleName");
-		String lastName = document.get("lastName");
-
-		FullNameGenerator fullNameGenerator =
-			FullNameGeneratorFactory.getInstance();
-
-		String title = fullNameGenerator.getFullName(
-			firstName, middleName, lastName);
-
-		String content = null;
-
-		return new Summary(title, content);
+		return createSummary(document, "fullName", null);
 	}
 
 	@Override
@@ -344,6 +350,28 @@ public class UserIndexer extends BaseIndexer<User> {
 				_log.debug(nsce, nsce);
 			}
 		}
+	}
+
+	protected long[] getActiveGroupIds(long userId) {
+		List<Long> groupIds = groupLocalService.getActiveGroupIds(userId);
+
+		return ArrayUtil.toArray(groupIds.toArray(new Long[groupIds.size()]));
+	}
+
+	protected long[] getActiveTransitiveGroupIds(long userId)
+		throws PortalException {
+
+		List<Group> groups = groupLocalService.getUserGroups(userId, true);
+
+		Stream<Group> stream = groups.stream();
+
+		return stream.filter(
+			Group::isSite
+		).filter(
+			Group::isActive
+		).mapToLong(
+			Group::getGroupId
+		).toArray();
 	}
 
 	protected long[] getAncestorOrganizationIds(long[] organizationIds)
@@ -398,6 +426,9 @@ public class UserIndexer extends BaseIndexer<User> {
 
 		indexableActionableDynamicQuery.performActions();
 	}
+
+	@Reference
+	protected GroupLocalService groupLocalService;
 
 	@Reference
 	protected IndexWriterHelper indexWriterHelper;

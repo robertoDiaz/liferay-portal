@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -222,8 +221,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		model.setDisplayDate(soapModel.getDisplayDate());
 		model.setExpirationDate(soapModel.getExpirationDate());
 		model.setReviewDate(soapModel.getReviewDate());
-		model.setIndexable(soapModel.getIndexable());
-		model.setSmallImage(soapModel.getSmallImage());
+		model.setIndexable(soapModel.isIndexable());
+		model.setSmallImage(soapModel.isSmallImage());
 		model.setSmallImageId(soapModel.getSmallImageId());
 		model.setSmallImageURL(soapModel.getSmallImageURL());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
@@ -319,8 +318,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		attributes.put("displayDate", getDisplayDate());
 		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("reviewDate", getReviewDate());
-		attributes.put("indexable", getIndexable());
-		attributes.put("smallImage", getSmallImage());
+		attributes.put("indexable", isIndexable());
+		attributes.put("smallImage", isSmallImage());
 		attributes.put("smallImageId", getSmallImageId());
 		attributes.put("smallImageURL", getSmallImageURL());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -540,7 +539,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -672,7 +671,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -688,7 +687,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -754,7 +753,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getClassName() {
 		if (getClassNameId() <= 0) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		return PortalUtil.getClassName(getClassNameId());
@@ -821,7 +820,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getTreePath() {
 		if (_treePath == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _treePath;
@@ -837,7 +836,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getArticleId() {
 		if (_articleId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _articleId;
@@ -886,7 +885,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getUrlTitle() {
 		if (_urlTitle == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _urlTitle;
@@ -912,7 +911,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getContent() {
 		if (_content == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _content;
@@ -928,7 +927,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getDDMStructureKey() {
 		if (_DDMStructureKey == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _DDMStructureKey;
@@ -954,7 +953,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getDDMTemplateKey() {
 		if (_DDMTemplateKey == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _DDMTemplateKey;
@@ -980,7 +979,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getDefaultLanguageId() {
 		if (_defaultLanguageId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _defaultLanguageId;
@@ -996,7 +995,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getLayoutUuid() {
 		if (_layoutUuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _layoutUuid;
@@ -1134,7 +1133,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getSmallImageURL() {
 		if (_smallImageURL == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _smallImageURL;
@@ -1199,7 +1198,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -1211,7 +1210,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusByUserName;
@@ -1263,7 +1262,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 		com.liferay.portal.kernel.trash.TrashHandler trashHandler = getTrashHandler();
 
-		if (!Validator.isNull(trashHandler.getContainerModelClassName(
+		if (Validator.isNotNull(trashHandler.getContainerModelClassName(
 						getPrimaryKey()))) {
 			ContainerModel containerModel = null;
 
@@ -1513,8 +1512,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		journalArticleImpl.setDisplayDate(getDisplayDate());
 		journalArticleImpl.setExpirationDate(getExpirationDate());
 		journalArticleImpl.setReviewDate(getReviewDate());
-		journalArticleImpl.setIndexable(getIndexable());
-		journalArticleImpl.setSmallImage(getSmallImage());
+		journalArticleImpl.setIndexable(isIndexable());
+		journalArticleImpl.setSmallImage(isSmallImage());
 		journalArticleImpl.setSmallImageId(getSmallImageId());
 		journalArticleImpl.setSmallImageURL(getSmallImageURL());
 		journalArticleImpl.setLastPublishDate(getLastPublishDate());
@@ -1810,9 +1809,9 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			journalArticleCacheModel.reviewDate = Long.MIN_VALUE;
 		}
 
-		journalArticleCacheModel.indexable = getIndexable();
+		journalArticleCacheModel.indexable = isIndexable();
 
-		journalArticleCacheModel.smallImage = getSmallImage();
+		journalArticleCacheModel.smallImage = isSmallImage();
 
 		journalArticleCacheModel.smallImageId = getSmallImageId();
 
@@ -1912,9 +1911,9 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		sb.append(", reviewDate=");
 		sb.append(getReviewDate());
 		sb.append(", indexable=");
-		sb.append(getIndexable());
+		sb.append(isIndexable());
 		sb.append(", smallImage=");
-		sb.append(getSmallImage());
+		sb.append(isSmallImage());
 		sb.append(", smallImageId=");
 		sb.append(getSmallImageId());
 		sb.append(", smallImageURL=");
@@ -2040,11 +2039,11 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>indexable</column-name><column-value><![CDATA[");
-		sb.append(getIndexable());
+		sb.append(isIndexable());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>smallImage</column-name><column-value><![CDATA[");
-		sb.append(getSmallImage());
+		sb.append(isSmallImage());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>smallImageId</column-name><column-value><![CDATA[");

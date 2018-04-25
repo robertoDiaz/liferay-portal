@@ -72,7 +72,7 @@ public interface KaleoTimerLocalService extends BaseLocalService,
 	public KaleoTimer addKaleoTimer(KaleoTimer kaleoTimer);
 
 	public KaleoTimer addKaleoTimer(java.lang.String kaleoClassName,
-		long kaleoClassPK, long kaleoDefinitionId, Timer timer,
+		long kaleoClassPK, long kaleoDefinitionVersionId, Timer timer,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -81,6 +81,7 @@ public interface KaleoTimerLocalService extends BaseLocalService,
 	* @param kaleoTimerId the primary key for the new kaleo timer
 	* @return the new kaleo timer
 	*/
+	@Transactional(enabled = false)
 	public KaleoTimer createKaleoTimer(long kaleoTimerId);
 
 	/**

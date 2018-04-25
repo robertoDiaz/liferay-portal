@@ -79,6 +79,7 @@ public interface PollsQuestionLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public PollsQuestion addPollsQuestion(PollsQuestion pollsQuestion);
 
+	@Indexable(type = IndexableType.REINDEX)
 	public PollsQuestion addQuestion(long userId,
 		Map<Locale, java.lang.String> titleMap,
 		Map<Locale, java.lang.String> descriptionMap, int expirationDateMonth,
@@ -109,6 +110,7 @@ public interface PollsQuestionLocalService extends BaseLocalService,
 	* @param questionId the primary key for the new polls question
 	* @return the new polls question
 	*/
+	@Transactional(enabled = false)
 	public PollsQuestion createPollsQuestion(long questionId);
 
 	/**
@@ -353,6 +355,7 @@ public interface PollsQuestionLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public PollsQuestion updatePollsQuestion(PollsQuestion pollsQuestion);
 
+	@Indexable(type = IndexableType.REINDEX)
 	public PollsQuestion updateQuestion(long userId, long questionId,
 		Map<Locale, java.lang.String> titleMap,
 		Map<Locale, java.lang.String> descriptionMap, int expirationDateMonth,

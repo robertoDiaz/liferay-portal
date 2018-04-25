@@ -14,9 +14,12 @@
 
 package com.liferay.layout.prototype.web.internal.display.context;
 
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.layout.prototype.constants.LayoutPrototypePortletKeys;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -83,6 +86,20 @@ public class LayoutPrototypeDisplayContext {
 		return _displayStyle;
 	}
 
+	public List<NavigationItem> getNavigationItems() {
+		return new NavigationItemList() {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(getPortletURL());
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "templates"));
+					});
+			}
+		};
+	}
+
 	public String getOrderByCol() {
 		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
@@ -117,14 +134,6 @@ public class LayoutPrototypeDisplayContext {
 		SearchContainer searchContainer = new SearchContainer(
 			_renderRequest, _renderResponse.createRenderURL(), null,
 			"there-are-no-page-templates");
-
-		if (isShowAddButton()) {
-			searchContainer.setEmptyResultsMessageCssClass(
-				"there-are-no-page-templates.-you-can-add-a-page-template-by-" +
-					"clicking-the-plus-button-on-the-bottom-right-corner");
-			searchContainer.setEmptyResultsMessageCssClass(
-				"taglib-empty-result-message-header-has-plus-btn");
-		}
 
 		searchContainer.setId("layoutPrototype");
 		searchContainer.setRowChecker(

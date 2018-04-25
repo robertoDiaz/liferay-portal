@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -144,7 +143,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 		model.setName(soapModel.getName());
 		model.setClassNameId(soapModel.getClassNameId());
 		model.setDDMTemplateId(soapModel.getDDMTemplateId());
-		model.setMain(soapModel.getMain());
+		model.setMain(soapModel.isMain());
 
 		return model;
 	}
@@ -220,7 +219,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 		attributes.put("name", getName());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("DDMTemplateId", getDDMTemplateId());
-		attributes.put("main", getMain());
+		attributes.put("main", isMain());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -362,7 +361,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -374,7 +373,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -418,7 +417,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -443,7 +442,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 	@Override
 	public String getClassName() {
 		if (getClassNameId() <= 0) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		return PortalUtil.getClassName(getClassNameId());
@@ -552,7 +551,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 		assetDisplayTemplateImpl.setName(getName());
 		assetDisplayTemplateImpl.setClassNameId(getClassNameId());
 		assetDisplayTemplateImpl.setDDMTemplateId(getDDMTemplateId());
-		assetDisplayTemplateImpl.setMain(getMain());
+		assetDisplayTemplateImpl.setMain(isMain());
 
 		assetDisplayTemplateImpl.resetOriginalValues();
 
@@ -678,7 +677,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 
 		assetDisplayTemplateCacheModel.DDMTemplateId = getDDMTemplateId();
 
-		assetDisplayTemplateCacheModel.main = getMain();
+		assetDisplayTemplateCacheModel.main = isMain();
 
 		return assetDisplayTemplateCacheModel;
 	}
@@ -708,7 +707,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 		sb.append(", DDMTemplateId=");
 		sb.append(getDDMTemplateId());
 		sb.append(", main=");
-		sb.append(getMain());
+		sb.append(isMain());
 		sb.append("}");
 
 		return sb.toString();
@@ -765,7 +764,7 @@ public class AssetDisplayTemplateModelImpl extends BaseModelImpl<AssetDisplayTem
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>main</column-name><column-value><![CDATA[");
-		sb.append(getMain());
+		sb.append(isMain());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

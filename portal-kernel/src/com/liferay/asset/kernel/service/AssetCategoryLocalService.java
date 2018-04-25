@@ -119,6 +119,7 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	* @param categoryId the primary key for the new asset category
 	* @return the new asset category
 	*/
+	@Transactional(enabled = false)
 	public AssetCategory createAssetCategory(long categoryId);
 
 	/**
@@ -400,6 +401,9 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	public int getChildCategoriesCount(long parentCategoryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetCategory> getDescendantCategories(AssetCategory category);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetCategory> getEntryCategories(long entryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -423,6 +427,10 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<java.lang.Long> getSubcategoryIds(long parentCategoryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long[] getViewableCategoryIds(java.lang.String className,
+		long classPK, long[] categoryIds) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetCategory> getVocabularyCategories(long vocabularyId,

@@ -14,15 +14,14 @@
 
 package com.liferay.blogs.verify;
 
-import com.liferay.blogs.internal.verify.model.BlogsEntryVerifiableModel;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.verify.VerifyProcess;
-import com.liferay.portal.verify.VerifyResourcePermissions;
 
 import java.util.List;
 
@@ -39,7 +38,6 @@ public class BlogsServiceVerifyProcess extends VerifyProcess {
 	@Override
 	protected void doVerify() throws Exception {
 		updateEntryAssets();
-		verifyResourcedModels();
 		verifyStatus();
 	}
 
@@ -68,8 +66,10 @@ public class BlogsServiceVerifyProcess extends VerifyProcess {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"Unable to update asset for entry " +
-								entry.getEntryId() + ": " + e.getMessage());
+							StringBundler.concat(
+								"Unable to update asset for entry ",
+								String.valueOf(entry.getEntryId()), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -77,12 +77,6 @@ public class BlogsServiceVerifyProcess extends VerifyProcess {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Assets verified for entries");
 			}
-		}
-	}
-
-	protected void verifyResourcedModels() throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			_verifyResourcePermissions.verify(new BlogsEntryVerifiableModel());
 		}
 	}
 
@@ -99,7 +93,5 @@ public class BlogsServiceVerifyProcess extends VerifyProcess {
 		BlogsServiceVerifyProcess.class);
 
 	private BlogsEntryLocalService _blogsEntryLocalService;
-	private final VerifyResourcePermissions _verifyResourcePermissions =
-		new VerifyResourcePermissions();
 
 }

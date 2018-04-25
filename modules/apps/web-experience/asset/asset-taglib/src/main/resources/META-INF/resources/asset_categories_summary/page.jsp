@@ -19,6 +19,7 @@
 <%
 String className = (String)request.getAttribute("liferay-asset:asset-categories-summary:className");
 long classPK = GetterUtil.getLong((String)request.getAttribute("liferay-asset:asset-categories-summary:classPK"));
+String displayStyle = GetterUtil.getString((String)request.getAttribute("liferay-asset:asset-categories-summary:displayStyle"), "default");
 String paramName = GetterUtil.getString((String)request.getAttribute("liferay-asset:asset-categories-summary:paramName"), "categoryId");
 PortletURL portletURL = (PortletURL)request.getAttribute("liferay-asset:asset-categories-summary:portletURL");
 
@@ -33,50 +34,84 @@ AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(className, classPK
 List<AssetVocabulary> vocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(PortalUtil.getCurrentAndAncestorSiteGroupIds((assetEntry != null) ? assetEntry.getGroupId() : scopeGroupId));
 
 for (AssetVocabulary vocabulary : vocabularies) {
-	vocabulary = vocabulary.toEscapedModel();
-
 	List<AssetCategory> curCategories = _filterCategories(categories, vocabulary);
 %>
 
 	<c:if test="<%= !curCategories.isEmpty() %>">
-		<span class="taglib-asset-categories-summary">
-			<%= HtmlUtil.escape(vocabulary.getUnambiguousTitle(vocabularies, themeDisplay.getSiteGroupId(), themeDisplay.getLocale())) %>:
+		<c:choose>
+			<c:when test='<%= displayStyle.equals("simple-category") %>'>
+				<span class="taglib-asset-categories-summary">
+					<c:choose>
+						<c:when test="<%= portletURL != null %>">
 
-			<c:choose>
-				<c:when test="<%= portletURL != null %>">
+							<%
+							for (AssetCategory category : curCategories) {
+								portletURL.setParameter(paramName, String.valueOf(category.getCategoryId()));
+							%>
 
-					<%
-					for (AssetCategory category : curCategories) {
-						category = category.toEscapedModel();
+								<a class="label label-dark label-lg" href="<%= HtmlUtil.escape(portletURL.toString()) %>"><%= HtmlUtil.escape(category.getTitle(themeDisplay.getLocale())) %></a>
 
-						portletURL.setParameter(paramName, String.valueOf(category.getCategoryId()));
-					%>
+							<%
+							}
+							%>
 
-						<a class="asset-category" href="<%= HtmlUtil.escape(portletURL.toString()) %>"><%= _buildCategoryPath(category, themeDisplay) %></a>
+						</c:when>
+						<c:otherwise>
 
-					<%
-					}
-					%>
+							<%
+							for (AssetCategory category : curCategories) {
+							%>
 
-				</c:when>
-				<c:otherwise>
+								<span class="label label-dark label-lg">
+									<%= HtmlUtil.escape(category.getTitle(themeDisplay.getLocale())) %>
+								</span>
 
-					<%
-					for (AssetCategory category : curCategories) {
-						category = category.toEscapedModel();
-					%>
+							<%
+							}
+							%>
 
-						<span class="asset-category">
-							<%= _buildCategoryPath(category, themeDisplay) %>
-						</span>
+						</c:otherwise>
+					</c:choose>
+				</span>
+			</c:when>
+			<c:otherwise>
+				<span class="taglib-asset-categories-summary">
+					<%= HtmlUtil.escape(vocabulary.getUnambiguousTitle(vocabularies, themeDisplay.getSiteGroupId(), themeDisplay.getLocale())) %>:
 
-					<%
-					}
-					%>
+					<c:choose>
+						<c:when test="<%= portletURL != null %>">
 
-				</c:otherwise>
-			</c:choose>
-		</span>
+							<%
+							for (AssetCategory category : curCategories) {
+								portletURL.setParameter(paramName, String.valueOf(category.getCategoryId()));
+							%>
+
+								<a class="asset-category" href="<%= HtmlUtil.escape(portletURL.toString()) %>"><%= _buildCategoryPath(category, themeDisplay) %></a>
+
+							<%
+							}
+							%>
+
+						</c:when>
+						<c:otherwise>
+
+							<%
+							for (AssetCategory category : curCategories) {
+							%>
+
+								<span class="asset-category">
+									<%= _buildCategoryPath(category, themeDisplay) %>
+								</span>
+
+							<%
+							}
+							%>
+
+						</c:otherwise>
+					</c:choose>
+				</span>
+			</c:otherwise>
+		</c:choose>
 	</c:if>
 
 <%
@@ -88,7 +123,7 @@ private String _buildCategoryPath(AssetCategory category, ThemeDisplay themeDisp
 	List<AssetCategory> ancestorCategories = category.getAncestors();
 
 	if (ancestorCategories.isEmpty()) {
-		return category.getTitle(themeDisplay.getLocale());
+		return HtmlUtil.escape(category.getTitle(themeDisplay.getLocale()));
 	}
 
 	Collections.reverse(ancestorCategories);
@@ -96,13 +131,11 @@ private String _buildCategoryPath(AssetCategory category, ThemeDisplay themeDisp
 	StringBundler sb = new StringBundler(ancestorCategories.size() * 2 + 1);
 
 	for (AssetCategory ancestorCategory : ancestorCategories) {
-		ancestorCategory = ancestorCategory.toEscapedModel();
-
-		sb.append(ancestorCategory.getTitle(themeDisplay.getLocale()));
+		sb.append(HtmlUtil.escape(ancestorCategory.getTitle(themeDisplay.getLocale())));
 		sb.append(" &raquo; ");
 	}
 
-	sb.append(category.getTitle(themeDisplay.getLocale()));
+	sb.append(HtmlUtil.escape(category.getTitle(themeDisplay.getLocale())));
 
 	return sb.toString();
 }

@@ -41,9 +41,9 @@ public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 	protected String doProcess(
 		String fileName, String absolutePath, String content) {
 
-		String packagePath = JavaSourceUtil.getPackagePath(content);
+		String packageName = JavaSourceUtil.getPackageName(content);
 
-		if (!packagePath.startsWith("com.liferay")) {
+		if (!packageName.startsWith("com.liferay")) {
 			return content;
 		}
 
@@ -73,7 +73,7 @@ public class JavaModuleIllegalImportsCheck extends BaseFileCheck {
 			addMessage(
 				fileName,
 				"Do not use com.liferay.util.dao.orm.CustomSQLUtil in " +
-					"modules, see LPS-64238");
+					"modules, see LPS-77361");
 		}
 
 		// LPS-64335

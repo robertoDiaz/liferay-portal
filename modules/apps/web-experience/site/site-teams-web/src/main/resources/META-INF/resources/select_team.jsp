@@ -36,19 +36,20 @@ int teamsCount = TeamLocalServiceUtil.searchCount(scopeGroupId, searchTerms.getK
 teamSearch.setTotal(teamsCount);
 %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="teams" selected="<%= true %>" />
-	</aui:nav>
-
-	<c:if test="<%= (teamsCount > 0) || searchTerms.isSearch() %>">
-		<aui:nav-bar-search>
-			<aui:form action="<%= portletURL %>" name="searchFm">
-				<liferay-ui:input-search markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(currentURL);
+						navigationItem.setLabel(LanguageUtil.get(request, "teams"));
+					});
+			}
+		}
+	%>"
+/>
 
 <liferay-frontend:management-bar
 	disabled="<%= (teamsCount <= 0) && !searchTerms.isSearch() %>"
@@ -66,6 +67,16 @@ teamSearch.setTotal(teamsCount);
 				orderColumns='<%= new String[] {"name"} %>'
 				portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
 			/>
+
+			<c:if test="<%= (teamsCount > 0) || searchTerms.isSearch() %>">
+				<li>
+					<aui:form action="<%= portletURL %>" name="searchFm">
+						<liferay-ui:input-search
+							markupView="lexicon"
+						/>
+					</aui:form>
+				</li>
+			</c:if>
 		</liferay-frontend:management-bar-filters>
 
 		<liferay-portlet:actionURL name="changeDisplayStyle" varImpl="changeDisplayStyleURL">
@@ -182,7 +193,10 @@ teamSearch.setTotal(teamsCount);
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
 

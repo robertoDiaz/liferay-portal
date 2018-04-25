@@ -74,7 +74,7 @@ public interface KaleoNotificationLocalService extends BaseLocalService,
 
 	public KaleoNotification addKaleoNotification(
 		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId, java.lang.String kaleoNodeName,
+		long kaleoDefinitionVersionId, java.lang.String kaleoNodeName,
 		Notification notification, ServiceContext serviceContext)
 		throws PortalException;
 
@@ -84,11 +84,13 @@ public interface KaleoNotificationLocalService extends BaseLocalService,
 	* @param kaleoNotificationId the primary key for the new kaleo notification
 	* @return the new kaleo notification
 	*/
+	@Transactional(enabled = false)
 	public KaleoNotification createKaleoNotification(long kaleoNotificationId);
 
 	public void deleteCompanyKaleoNotifications(long companyId);
 
-	public void deleteKaleoDefinitionKaleoNotifications(long kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoNotifications(
+		long kaleoDefinitionVersionId);
 
 	/**
 	* Deletes the kaleo notification from the database. Also notifies the appropriate model listeners.

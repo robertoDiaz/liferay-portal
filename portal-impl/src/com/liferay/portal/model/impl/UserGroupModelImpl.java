@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -147,7 +146,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		model.setParentUserGroupId(soapModel.getParentUserGroupId());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
-		model.setAddedByLDAPImport(soapModel.getAddedByLDAPImport());
+		model.setAddedByLDAPImport(soapModel.isAddedByLDAPImport());
 
 		return model;
 	}
@@ -250,7 +249,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		attributes.put("parentUserGroupId", getParentUserGroupId());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("addedByLDAPImport", getAddedByLDAPImport());
+		attributes.put("addedByLDAPImport", isAddedByLDAPImport());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -348,7 +347,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -421,7 +420,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -433,7 +432,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -500,7 +499,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -526,7 +525,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -603,7 +602,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		userGroupImpl.setParentUserGroupId(getParentUserGroupId());
 		userGroupImpl.setName(getName());
 		userGroupImpl.setDescription(getDescription());
-		userGroupImpl.setAddedByLDAPImport(getAddedByLDAPImport());
+		userGroupImpl.setAddedByLDAPImport(isAddedByLDAPImport());
 
 		userGroupImpl.resetOriginalValues();
 
@@ -745,7 +744,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 			userGroupCacheModel.description = null;
 		}
 
-		userGroupCacheModel.addedByLDAPImport = getAddedByLDAPImport();
+		userGroupCacheModel.addedByLDAPImport = isAddedByLDAPImport();
 
 		return userGroupCacheModel;
 	}
@@ -777,7 +776,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		sb.append(", description=");
 		sb.append(getDescription());
 		sb.append(", addedByLDAPImport=");
-		sb.append(getAddedByLDAPImport());
+		sb.append(isAddedByLDAPImport());
 		sb.append("}");
 
 		return sb.toString();
@@ -837,7 +836,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>addedByLDAPImport</column-name><column-value><![CDATA[");
-		sb.append(getAddedByLDAPImport());
+		sb.append(isAddedByLDAPImport());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");

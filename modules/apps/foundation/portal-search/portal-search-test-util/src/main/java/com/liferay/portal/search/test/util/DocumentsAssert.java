@@ -16,6 +16,9 @@ package com.liferay.portal.search.test.util;
 
 import com.liferay.portal.kernel.search.Document;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,15 +54,35 @@ public class DocumentsAssert {
 			actualValues.toString());
 	}
 
+	public static void assertValuesIgnoreRelevance(
+		String message, Document[] documents, String field,
+		Collection<String> expectedValues) {
+
+		List<String> actualValues = _getValues(field, documents);
+
+		Assert.assertEquals(
+			message + "->" + actualValues, _sort(expectedValues),
+			_sort(actualValues));
+	}
+
 	private static List<String> _getValues(
 		String field, Document... documents) {
 
-		Stream<Document> documentsStream = Stream.of(documents);
+		return Stream.of(
+			documents
+		).map(
+			document -> document.get(field)
+		).collect(
+			Collectors.toList()
+		);
+	}
 
-		Stream<String> valuesStream = documentsStream.map(
-			document -> document.get(field));
+	private static String _sort(Collection<String> collection) {
+		List<String> list = new ArrayList<>(collection);
 
-		return valuesStream.collect(Collectors.toList());
+		Collections.sort(list);
+
+		return list.toString();
 	}
 
 }

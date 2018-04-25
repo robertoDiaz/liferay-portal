@@ -52,19 +52,20 @@ List<User> users = UserLocalServiceUtil.search(company.getCompanyId(), searchTer
 userSearch.setResults(users);
 %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="users" selected="<%= true %>" />
-	</aui:nav>
-
-	<c:if test="<%= (usersCount > 0) || searchTerms.isSearch() %>">
-		<aui:nav-bar-search>
-			<aui:form action="<%= viewUsersURL.toString() %>" name="searchFm">
-				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
+<clay:navigation-bar
+	items="<%=
+		new JSPNavigationItemList(pageContext) {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(currentURL);
+						navigationItem.setLabel(LanguageUtil.get(request, "users"));
+					});
+			}
+		}
+	%>"
+/>
 
 <liferay-frontend:management-bar
 	disabled="<%= usersCount <= 0 %>"
@@ -96,6 +97,17 @@ userSearch.setResults(users);
 			orderColumns='<%= new String[] {"first-name", "screen-name"} %>'
 			portletURL="<%= PortletURLUtil.clone(viewUsersURL, renderResponse) %>"
 		/>
+
+		<c:if test="<%= (usersCount > 0) || searchTerms.isSearch() %>">
+			<li>
+				<aui:form action="<%= viewUsersURL.toString() %>" name="searchFm">
+					<liferay-ui:input-search
+						autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>"
+						markupView="lexicon"
+					/>
+				</aui:form>
+			</li>
+		</c:if>
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
@@ -122,7 +134,10 @@ userSearch.setResults(users);
 			<%@ include file="/user_columns.jspf" %>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= displayStyle %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
 

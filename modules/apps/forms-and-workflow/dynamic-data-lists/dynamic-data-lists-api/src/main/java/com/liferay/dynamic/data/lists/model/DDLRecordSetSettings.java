@@ -20,11 +20,25 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormRule;
 
 /**
  * @author Bruno Basto
  */
-@DDMForm
+@DDMForm(
+	rules = {
+		@DDMFormRule(
+			actions = {
+				"setVisible('emailFromAddress', getValue('sendEmailNotification'))",
+				"setVisible('emailFromName', getValue('sendEmailNotification'))",
+				"setVisible('emailSubject', getValue('sendEmailNotification'))",
+				"setVisible('emailToAddress', getValue('sendEmailNotification'))",
+				"setVisible('published', FALSE)"
+			},
+			condition = "TRUE"
+		)
+	}
+)
 @DDMFormLayout(
 	{
 		@DDMFormLayoutPage(
@@ -68,37 +82,29 @@ public interface DDLRecordSetSettings {
 	@DDMFormField(
 		label = "%from-address",
 		validationErrorMessage = "%please-enter-a-valid-email-address",
-		validationExpression = "isEmailAddress(emailFromAddress)",
-		visibilityExpression = "sendEmailNotification == TRUE"
+		validationExpression = "isEmailAddress(emailFromAddress)"
 	)
 	public String emailFromAddress();
 
-	@DDMFormField(
-		label = "%from-name",
-		visibilityExpression = "sendEmailNotification == TRUE"
-	)
+	@DDMFormField(label = "%from-name")
 	public String emailFromName();
 
-	@DDMFormField(
-		label = "%subject",
-		visibilityExpression = "sendEmailNotification == TRUE"
-	)
+	@DDMFormField(label = "%subject")
 	public String emailSubject();
 
 	@DDMFormField(
 		label = "%to-address",
-		validationErrorMessage = "%please-enter-a-valid-email-address",
-		validationExpression = "isEmailAddress(emailToAddress)",
-		visibilityExpression = "sendEmailNotification == TRUE"
+		validationErrorMessage = "%please-enter-valid-email-addresses-separated-by-commas",
+		validationExpression = "isEmailAddress(emailToAddress)"
 	)
 	public String emailToAddress();
 
-	@DDMFormField(visibilityExpression = "FALSE")
+	@DDMFormField
 	public boolean published();
 
 	@DDMFormField(
 		label = "%redirect-url-on-success",
-		properties = {"placeholder=%enter-a-valid-url"},
+		properties = "placeholder=%enter-a-valid-url",
 		validationErrorMessage = "%please-enter-a-valid-url",
 		validationExpression = "isURL(redirectURL)"
 	)
@@ -106,21 +112,21 @@ public interface DDLRecordSetSettings {
 
 	@DDMFormField(
 		label = "%require-user-authentication", predefinedValue = "false",
-		properties = {"showAsSwitcher=true"}
+		properties = "showAsSwitcher=true"
 	)
 	public default boolean requireAuthentication() {
 		return false;
 	}
 
 	@DDMFormField(
-		label = "%require-captcha", properties = {"showAsSwitcher=true"},
+		label = "%require-captcha", properties = "showAsSwitcher=true",
 		type = "checkbox"
 	)
 	public boolean requireCaptcha();
 
 	@DDMFormField(
 		label = "%send-an-email-notification-for-each-entry",
-		properties = {"showAsSwitcher=true"}, type = "checkbox"
+		properties = "showAsSwitcher=true", type = "checkbox"
 	)
 	public boolean sendEmailNotification();
 

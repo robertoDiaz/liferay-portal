@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.lock.model.Lock;
 import com.liferay.portal.lock.model.LockModel;
 
@@ -165,7 +164,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 		attributes.put("className", getClassName());
 		attributes.put("key", getKey());
 		attributes.put("owner", getOwner());
-		attributes.put("inheritable", getInheritable());
+		attributes.put("inheritable", isInheritable());
 		attributes.put("expirationDate", getExpirationDate());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -262,7 +261,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -332,7 +331,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -343,7 +342,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -368,7 +367,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	@Override
 	public String getClassName() {
 		if (_className == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _className;
@@ -393,7 +392,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	@Override
 	public String getKey() {
 		if (_key == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _key;
@@ -418,7 +417,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	@Override
 	public String getOwner() {
 		if (_owner == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _owner;
@@ -506,7 +505,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 		lockImpl.setClassName(getClassName());
 		lockImpl.setKey(getKey());
 		lockImpl.setOwner(getOwner());
-		lockImpl.setInheritable(getInheritable());
+		lockImpl.setInheritable(isInheritable());
 		lockImpl.setExpirationDate(getExpirationDate());
 
 		lockImpl.resetOriginalValues();
@@ -646,7 +645,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 			lockCacheModel.owner = null;
 		}
 
-		lockCacheModel.inheritable = getInheritable();
+		lockCacheModel.inheritable = isInheritable();
 
 		Date expirationDate = getExpirationDate();
 
@@ -685,7 +684,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 		sb.append(", owner=");
 		sb.append(getOwner());
 		sb.append(", inheritable=");
-		sb.append(getInheritable());
+		sb.append(isInheritable());
 		sb.append(", expirationDate=");
 		sb.append(getExpirationDate());
 		sb.append("}");
@@ -743,7 +742,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>inheritable</column-name><column-value><![CDATA[");
-		sb.append(getInheritable());
+		sb.append(isInheritable());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>expirationDate</column-name><column-value><![CDATA[");

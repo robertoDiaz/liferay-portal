@@ -111,6 +111,7 @@ public interface UserNotificationEventLocalService extends BaseLocalService,
 	* @param userNotificationEventId the primary key for the new user notification event
 	* @return the new user notification event
 	*/
+	@Transactional(enabled = false)
 	public UserNotificationEvent createUserNotificationEvent(
 		long userNotificationEventId);
 
@@ -147,6 +148,8 @@ public interface UserNotificationEventLocalService extends BaseLocalService,
 
 	public void deleteUserNotificationEvents(
 		Collection<java.lang.String> uuids, long companyId);
+
+	public void deleteUserNotificationEvents(long userId);
 
 	public DynamicQuery dynamicQuery();
 
