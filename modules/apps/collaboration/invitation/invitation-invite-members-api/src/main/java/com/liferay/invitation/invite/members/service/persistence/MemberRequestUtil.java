@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.invitation.invite.members.model.MemberRequest;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -118,7 +119,7 @@ public class MemberRequestUtil {
 	* @return the matching member request
 	* @throws NoSuchMemberRequestException if a matching member request could not be found
 	*/
-	public static MemberRequest findByKey(java.lang.String key)
+	public static MemberRequest findByKey(String key)
 		throws com.liferay.invitation.invite.members.exception.NoSuchMemberRequestException {
 		return getPersistence().findByKey(key);
 	}
@@ -129,7 +130,7 @@ public class MemberRequestUtil {
 	* @param key the key
 	* @return the matching member request, or <code>null</code> if a matching member request could not be found
 	*/
-	public static MemberRequest fetchByKey(java.lang.String key) {
+	public static MemberRequest fetchByKey(String key) {
 		return getPersistence().fetchByKey(key);
 	}
 
@@ -140,8 +141,7 @@ public class MemberRequestUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching member request, or <code>null</code> if a matching member request could not be found
 	*/
-	public static MemberRequest fetchByKey(java.lang.String key,
-		boolean retrieveFromCache) {
+	public static MemberRequest fetchByKey(String key, boolean retrieveFromCache) {
 		return getPersistence().fetchByKey(key, retrieveFromCache);
 	}
 
@@ -151,7 +151,7 @@ public class MemberRequestUtil {
 	* @param key the key
 	* @return the member request that was removed
 	*/
-	public static MemberRequest removeByKey(java.lang.String key)
+	public static MemberRequest removeByKey(String key)
 		throws com.liferay.invitation.invite.members.exception.NoSuchMemberRequestException {
 		return getPersistence().removeByKey(key);
 	}
@@ -162,7 +162,7 @@ public class MemberRequestUtil {
 	* @param key the key
 	* @return the number of matching member requests
 	*/
-	public static int countByKey(java.lang.String key) {
+	public static int countByKey(String key) {
 		return getPersistence().countByKey(key);
 	}
 
@@ -724,7 +724,7 @@ public class MemberRequestUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -732,6 +732,17 @@ public class MemberRequestUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MemberRequestPersistence, MemberRequestPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(MemberRequestPersistence.class);
+	private static ServiceTracker<MemberRequestPersistence, MemberRequestPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MemberRequestPersistence.class);
+
+		ServiceTracker<MemberRequestPersistence, MemberRequestPersistence> serviceTracker =
+			new ServiceTracker<MemberRequestPersistence, MemberRequestPersistence>(bundle.getBundleContext(),
+				MemberRequestPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -16,7 +16,8 @@ package com.liferay.portal.security.service.access.policy.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,9 +43,9 @@ public class SAPEntryLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.security.service.access.policy.service.impl.SAPEntryLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry addSAPEntry(
-		long userId, java.lang.String allowedServiceSignatures,
-		boolean defaultSAPEntry, boolean enabled, java.lang.String name,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		long userId, String allowedServiceSignatures, boolean defaultSAPEntry,
+		boolean enabled, String name,
+		java.util.Map<java.util.Locale, String> titleMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -198,7 +199,7 @@ public class SAPEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry fetchSAPEntry(
-		long companyId, java.lang.String name)
+		long companyId, String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().fetchSAPEntry(companyId, name);
 	}
@@ -211,7 +212,7 @@ public class SAPEntryLocalServiceUtil {
 	* @return the matching sap entry, or <code>null</code> if a matching sap entry could not be found
 	*/
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry fetchSAPEntryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService().fetchSAPEntryByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -253,7 +254,7 @@ public class SAPEntryLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -302,7 +303,7 @@ public class SAPEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry getSAPEntry(
-		long companyId, java.lang.String name)
+		long companyId, String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getSAPEntry(companyId, name);
 	}
@@ -316,15 +317,15 @@ public class SAPEntryLocalServiceUtil {
 	* @throws PortalException if a matching sap entry could not be found
 	*/
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry getSAPEntryByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
+		String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getSAPEntryByUuidAndCompanyId(uuid, companyId);
 	}
 
 	public static com.liferay.portal.security.service.access.policy.model.SAPEntry updateSAPEntry(
-		long sapEntryId, java.lang.String allowedServiceSignatures,
-		boolean defaultSAPEntry, boolean enabled, java.lang.String name,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
+		long sapEntryId, String allowedServiceSignatures,
+		boolean defaultSAPEntry, boolean enabled, String name,
+		java.util.Map<java.util.Locale, String> titleMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -347,6 +348,17 @@ public class SAPEntryLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<SAPEntryLocalService, SAPEntryLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(SAPEntryLocalService.class);
+	private static ServiceTracker<SAPEntryLocalService, SAPEntryLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(SAPEntryLocalService.class);
+
+		ServiceTracker<SAPEntryLocalService, SAPEntryLocalService> serviceTracker =
+			new ServiceTracker<SAPEntryLocalService, SAPEntryLocalService>(bundle.getBundleContext(),
+				SAPEntryLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

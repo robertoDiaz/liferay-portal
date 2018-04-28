@@ -16,13 +16,14 @@ package com.liferay.polls.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.polls.model.PollsVote;
 
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -117,7 +118,7 @@ public class PollsVoteUtil {
 	* @param uuid the uuid
 	* @return the matching polls votes
 	*/
-	public static List<PollsVote> findByUuid(java.lang.String uuid) {
+	public static List<PollsVote> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -133,8 +134,7 @@ public class PollsVoteUtil {
 	* @param end the upper bound of the range of polls votes (not inclusive)
 	* @return the range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid(java.lang.String uuid, int start,
-		int end) {
+	public static List<PollsVote> findByUuid(String uuid, int start, int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -151,8 +151,8 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid(java.lang.String uuid, int start,
-		int end, OrderByComparator<PollsVote> orderByComparator) {
+	public static List<PollsVote> findByUuid(String uuid, int start, int end,
+		OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -170,8 +170,8 @@ public class PollsVoteUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid(java.lang.String uuid, int start,
-		int end, OrderByComparator<PollsVote> orderByComparator,
+	public static List<PollsVote> findByUuid(String uuid, int start, int end,
+		OrderByComparator<PollsVote> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
@@ -186,7 +186,7 @@ public class PollsVoteUtil {
 	* @return the first matching polls vote
 	* @throws NoSuchVoteException if a matching polls vote could not be found
 	*/
-	public static PollsVote findByUuid_First(java.lang.String uuid,
+	public static PollsVote findByUuid_First(String uuid,
 		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -199,7 +199,7 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUuid_First(java.lang.String uuid,
+	public static PollsVote fetchByUuid_First(String uuid,
 		OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -212,7 +212,7 @@ public class PollsVoteUtil {
 	* @return the last matching polls vote
 	* @throws NoSuchVoteException if a matching polls vote could not be found
 	*/
-	public static PollsVote findByUuid_Last(java.lang.String uuid,
+	public static PollsVote findByUuid_Last(String uuid,
 		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -225,7 +225,7 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUuid_Last(java.lang.String uuid,
+	public static PollsVote fetchByUuid_Last(String uuid,
 		OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -239,8 +239,8 @@ public class PollsVoteUtil {
 	* @return the previous, current, and next polls vote
 	* @throws NoSuchVoteException if a polls vote with the primary key could not be found
 	*/
-	public static PollsVote[] findByUuid_PrevAndNext(long voteId,
-		java.lang.String uuid, OrderByComparator<PollsVote> orderByComparator)
+	public static PollsVote[] findByUuid_PrevAndNext(long voteId, String uuid,
+		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence()
 				   .findByUuid_PrevAndNext(voteId, uuid, orderByComparator);
@@ -251,7 +251,7 @@ public class PollsVoteUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -261,7 +261,7 @@ public class PollsVoteUtil {
 	* @param uuid the uuid
 	* @return the number of matching polls votes
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -273,7 +273,7 @@ public class PollsVoteUtil {
 	* @return the matching polls vote
 	* @throws NoSuchVoteException if a matching polls vote could not be found
 	*/
-	public static PollsVote findByUUID_G(java.lang.String uuid, long groupId)
+	public static PollsVote findByUUID_G(String uuid, long groupId)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -285,7 +285,7 @@ public class PollsVoteUtil {
 	* @param groupId the group ID
 	* @return the matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUUID_G(java.lang.String uuid, long groupId) {
+	public static PollsVote fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -297,7 +297,7 @@ public class PollsVoteUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUUID_G(java.lang.String uuid, long groupId,
+	public static PollsVote fetchByUUID_G(String uuid, long groupId,
 		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
@@ -309,7 +309,7 @@ public class PollsVoteUtil {
 	* @param groupId the group ID
 	* @return the polls vote that was removed
 	*/
-	public static PollsVote removeByUUID_G(java.lang.String uuid, long groupId)
+	public static PollsVote removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -321,7 +321,7 @@ public class PollsVoteUtil {
 	* @param groupId the group ID
 	* @return the number of matching polls votes
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -332,8 +332,7 @@ public class PollsVoteUtil {
 	* @param companyId the company ID
 	* @return the matching polls votes
 	*/
-	public static List<PollsVote> findByUuid_C(java.lang.String uuid,
-		long companyId) {
+	public static List<PollsVote> findByUuid_C(String uuid, long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -350,8 +349,8 @@ public class PollsVoteUtil {
 	* @param end the upper bound of the range of polls votes (not inclusive)
 	* @return the range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end) {
+	public static List<PollsVote> findByUuid_C(String uuid, long companyId,
+		int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -369,9 +368,8 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<PollsVote> orderByComparator) {
+	public static List<PollsVote> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
 	}
@@ -391,9 +389,8 @@ public class PollsVoteUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching polls votes
 	*/
-	public static List<PollsVote> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<PollsVote> orderByComparator,
+	public static List<PollsVote> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<PollsVote> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end,
@@ -409,8 +406,8 @@ public class PollsVoteUtil {
 	* @return the first matching polls vote
 	* @throws NoSuchVoteException if a matching polls vote could not be found
 	*/
-	public static PollsVote findByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<PollsVote> orderByComparator)
+	public static PollsVote findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence()
 				   .findByUuid_C_First(uuid, companyId, orderByComparator);
@@ -424,8 +421,8 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<PollsVote> orderByComparator) {
+	public static PollsVote fetchByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
 	}
@@ -439,8 +436,8 @@ public class PollsVoteUtil {
 	* @return the last matching polls vote
 	* @throws NoSuchVoteException if a matching polls vote could not be found
 	*/
-	public static PollsVote findByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<PollsVote> orderByComparator)
+	public static PollsVote findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence()
 				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -454,8 +451,8 @@ public class PollsVoteUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
-	public static PollsVote fetchByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<PollsVote> orderByComparator) {
+	public static PollsVote fetchByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<PollsVote> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
 	}
@@ -471,7 +468,7 @@ public class PollsVoteUtil {
 	* @throws NoSuchVoteException if a polls vote with the primary key could not be found
 	*/
 	public static PollsVote[] findByUuid_C_PrevAndNext(long voteId,
-		java.lang.String uuid, long companyId,
+		String uuid, long companyId,
 		OrderByComparator<PollsVote> orderByComparator)
 		throws com.liferay.polls.exception.NoSuchVoteException {
 		return getPersistence()
@@ -485,7 +482,7 @@ public class PollsVoteUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -496,7 +493,7 @@ public class PollsVoteUtil {
 	* @param companyId the company ID
 	* @return the number of matching polls votes
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -1137,7 +1134,7 @@ public class PollsVoteUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -1145,6 +1142,17 @@ public class PollsVoteUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PollsVotePersistence, PollsVotePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(PollsVotePersistence.class);
+	private static ServiceTracker<PollsVotePersistence, PollsVotePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PollsVotePersistence.class);
+
+		ServiceTracker<PollsVotePersistence, PollsVotePersistence> serviceTracker =
+			new ServiceTracker<PollsVotePersistence, PollsVotePersistence>(bundle.getBundleContext(),
+				PollsVotePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

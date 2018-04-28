@@ -16,12 +16,13 @@ package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -270,171 +271,182 @@ public class KaleoLogUtil {
 	}
 
 	/**
-	* Returns all the kaleo logs where kaleoDefinitionId = &#63;.
+	* Returns all the kaleo logs where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @return the matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKaleoDefinitionId(long kaleoDefinitionId) {
-		return getPersistence().findByKaleoDefinitionId(kaleoDefinitionId);
+	public static List<KaleoLog> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId) {
+		return getPersistence()
+				   .findByKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
-	* Returns a range of all the kaleo logs where kaleoDefinitionId = &#63;.
+	* Returns a range of all the kaleo logs where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoLogModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo logs
 	* @param end the upper bound of the range of kaleo logs (not inclusive)
 	* @return the range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end) {
+	public static List<KaleoLog> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end) {
 		return getPersistence()
-				   .findByKaleoDefinitionId(kaleoDefinitionId, start, end);
+				   .findByKaleoDefinitionVersionId(kaleoDefinitionVersionId,
+			start, end);
 	}
 
 	/**
-	* Returns an ordered range of all the kaleo logs where kaleoDefinitionId = &#63;.
+	* Returns an ordered range of all the kaleo logs where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoLogModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo logs
 	* @param end the upper bound of the range of kaleo logs (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end,
+	public static List<KaleoLog> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end,
 		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
-				   .findByKaleoDefinitionId(kaleoDefinitionId, start, end,
-			orderByComparator);
+				   .findByKaleoDefinitionVersionId(kaleoDefinitionVersionId,
+			start, end, orderByComparator);
 	}
 
 	/**
-	* Returns an ordered range of all the kaleo logs where kaleoDefinitionId = &#63;.
+	* Returns an ordered range of all the kaleo logs where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoLogModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo logs
 	* @param end the upper bound of the range of kaleo logs (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end,
+	public static List<KaleoLog> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end,
 		OrderByComparator<KaleoLog> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
-				   .findByKaleoDefinitionId(kaleoDefinitionId, start, end,
-			orderByComparator, retrieveFromCache);
+				   .findByKaleoDefinitionVersionId(kaleoDefinitionVersionId,
+			start, end, orderByComparator, retrieveFromCache);
 	}
 
 	/**
-	* Returns the first kaleo log in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the first kaleo log in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching kaleo log
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
-	public static KaleoLog findByKaleoDefinitionId_First(
-		long kaleoDefinitionId, OrderByComparator<KaleoLog> orderByComparator)
+	public static KaleoLog findByKaleoDefinitionVersionId_First(
+		long kaleoDefinitionVersionId,
+		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
-				   .findByKaleoDefinitionId_First(kaleoDefinitionId,
+				   .findByKaleoDefinitionVersionId_First(kaleoDefinitionVersionId,
 			orderByComparator);
 	}
 
 	/**
-	* Returns the first kaleo log in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the first kaleo log in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
-	public static KaleoLog fetchByKaleoDefinitionId_First(
-		long kaleoDefinitionId, OrderByComparator<KaleoLog> orderByComparator) {
+	public static KaleoLog fetchByKaleoDefinitionVersionId_First(
+		long kaleoDefinitionVersionId,
+		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
-				   .fetchByKaleoDefinitionId_First(kaleoDefinitionId,
+				   .fetchByKaleoDefinitionVersionId_First(kaleoDefinitionVersionId,
 			orderByComparator);
 	}
 
 	/**
-	* Returns the last kaleo log in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the last kaleo log in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching kaleo log
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
-	public static KaleoLog findByKaleoDefinitionId_Last(
-		long kaleoDefinitionId, OrderByComparator<KaleoLog> orderByComparator)
+	public static KaleoLog findByKaleoDefinitionVersionId_Last(
+		long kaleoDefinitionVersionId,
+		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
-				   .findByKaleoDefinitionId_Last(kaleoDefinitionId,
+				   .findByKaleoDefinitionVersionId_Last(kaleoDefinitionVersionId,
 			orderByComparator);
 	}
 
 	/**
-	* Returns the last kaleo log in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the last kaleo log in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
-	public static KaleoLog fetchByKaleoDefinitionId_Last(
-		long kaleoDefinitionId, OrderByComparator<KaleoLog> orderByComparator) {
+	public static KaleoLog fetchByKaleoDefinitionVersionId_Last(
+		long kaleoDefinitionVersionId,
+		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
-				   .fetchByKaleoDefinitionId_Last(kaleoDefinitionId,
+				   .fetchByKaleoDefinitionVersionId_Last(kaleoDefinitionVersionId,
 			orderByComparator);
 	}
 
 	/**
-	* Returns the kaleo logs before and after the current kaleo log in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the kaleo logs before and after the current kaleo log in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
 	* @param kaleoLogId the primary key of the current kaleo log
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next kaleo log
 	* @throws NoSuchLogException if a kaleo log with the primary key could not be found
 	*/
-	public static KaleoLog[] findByKaleoDefinitionId_PrevAndNext(
-		long kaleoLogId, long kaleoDefinitionId,
+	public static KaleoLog[] findByKaleoDefinitionVersionId_PrevAndNext(
+		long kaleoLogId, long kaleoDefinitionVersionId,
 		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
-				   .findByKaleoDefinitionId_PrevAndNext(kaleoLogId,
-			kaleoDefinitionId, orderByComparator);
+				   .findByKaleoDefinitionVersionId_PrevAndNext(kaleoLogId,
+			kaleoDefinitionVersionId, orderByComparator);
 	}
 
 	/**
-	* Removes all the kaleo logs where kaleoDefinitionId = &#63; from the database.
+	* Removes all the kaleo logs where kaleoDefinitionVersionId = &#63; from the database.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	*/
-	public static void removeByKaleoDefinitionId(long kaleoDefinitionId) {
-		getPersistence().removeByKaleoDefinitionId(kaleoDefinitionId);
+	public static void removeByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId) {
+		getPersistence()
+			.removeByKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
-	* Returns the number of kaleo logs where kaleoDefinitionId = &#63;.
+	* Returns the number of kaleo logs where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @return the number of matching kaleo logs
 	*/
-	public static int countByKaleoDefinitionId(long kaleoDefinitionId) {
-		return getPersistence().countByKaleoDefinitionId(kaleoDefinitionId);
+	public static int countByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId) {
+		return getPersistence()
+				   .countByKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -791,7 +803,7 @@ public class KaleoLogUtil {
 	* @return the matching kaleo logs
 	*/
 	public static List<KaleoLog> findByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type) {
+		String type) {
 		return getPersistence().findByKITI_T(kaleoInstanceTokenId, type);
 	}
 
@@ -809,7 +821,7 @@ public class KaleoLogUtil {
 	* @return the range of matching kaleo logs
 	*/
 	public static List<KaleoLog> findByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type, int start, int end) {
+		String type, int start, int end) {
 		return getPersistence()
 				   .findByKITI_T(kaleoInstanceTokenId, type, start, end);
 	}
@@ -829,7 +841,7 @@ public class KaleoLogUtil {
 	* @return the ordered range of matching kaleo logs
 	*/
 	public static List<KaleoLog> findByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type, int start, int end,
+		String type, int start, int end,
 		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .findByKITI_T(kaleoInstanceTokenId, type, start, end,
@@ -852,7 +864,7 @@ public class KaleoLogUtil {
 	* @return the ordered range of matching kaleo logs
 	*/
 	public static List<KaleoLog> findByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type, int start, int end,
+		String type, int start, int end,
 		OrderByComparator<KaleoLog> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByKITI_T(kaleoInstanceTokenId, type, start, end,
@@ -869,7 +881,7 @@ public class KaleoLogUtil {
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
 	public static KaleoLog findByKITI_T_First(long kaleoInstanceTokenId,
-		java.lang.String type, OrderByComparator<KaleoLog> orderByComparator)
+		String type, OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
 				   .findByKITI_T_First(kaleoInstanceTokenId, type,
@@ -885,7 +897,7 @@ public class KaleoLogUtil {
 	* @return the first matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
 	public static KaleoLog fetchByKITI_T_First(long kaleoInstanceTokenId,
-		java.lang.String type, OrderByComparator<KaleoLog> orderByComparator) {
+		String type, OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .fetchByKITI_T_First(kaleoInstanceTokenId, type,
 			orderByComparator);
@@ -901,7 +913,7 @@ public class KaleoLogUtil {
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
 	public static KaleoLog findByKITI_T_Last(long kaleoInstanceTokenId,
-		java.lang.String type, OrderByComparator<KaleoLog> orderByComparator)
+		String type, OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
 				   .findByKITI_T_Last(kaleoInstanceTokenId, type,
@@ -917,7 +929,7 @@ public class KaleoLogUtil {
 	* @return the last matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
 	public static KaleoLog fetchByKITI_T_Last(long kaleoInstanceTokenId,
-		java.lang.String type, OrderByComparator<KaleoLog> orderByComparator) {
+		String type, OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .fetchByKITI_T_Last(kaleoInstanceTokenId, type,
 			orderByComparator);
@@ -934,7 +946,7 @@ public class KaleoLogUtil {
 	* @throws NoSuchLogException if a kaleo log with the primary key could not be found
 	*/
 	public static KaleoLog[] findByKITI_T_PrevAndNext(long kaleoLogId,
-		long kaleoInstanceTokenId, java.lang.String type,
+		long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
@@ -948,8 +960,7 @@ public class KaleoLogUtil {
 	* @param kaleoInstanceTokenId the kaleo instance token ID
 	* @param type the type
 	*/
-	public static void removeByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type) {
+	public static void removeByKITI_T(long kaleoInstanceTokenId, String type) {
 		getPersistence().removeByKITI_T(kaleoInstanceTokenId, type);
 	}
 
@@ -960,8 +971,7 @@ public class KaleoLogUtil {
 	* @param type the type
 	* @return the number of matching kaleo logs
 	*/
-	public static int countByKITI_T(long kaleoInstanceTokenId,
-		java.lang.String type) {
+	public static int countByKITI_T(long kaleoInstanceTokenId, String type) {
 		return getPersistence().countByKITI_T(kaleoInstanceTokenId, type);
 	}
 
@@ -974,9 +984,8 @@ public class KaleoLogUtil {
 	* @param type the type
 	* @return the matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKCN_KCPK_KITI_T(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type) {
+	public static List<KaleoLog> findByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type) {
 		return getPersistence()
 				   .findByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type);
@@ -997,9 +1006,9 @@ public class KaleoLogUtil {
 	* @param end the upper bound of the range of kaleo logs (not inclusive)
 	* @return the range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKCN_KCPK_KITI_T(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type, int start, int end) {
+	public static List<KaleoLog> findByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type, int start,
+		int end) {
 		return getPersistence()
 				   .findByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type, start, end);
@@ -1021,10 +1030,9 @@ public class KaleoLogUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKCN_KCPK_KITI_T(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type, int start, int end,
-		OrderByComparator<KaleoLog> orderByComparator) {
+	public static List<KaleoLog> findByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type, int start,
+		int end, OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .findByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type, start, end, orderByComparator);
@@ -1047,10 +1055,10 @@ public class KaleoLogUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching kaleo logs
 	*/
-	public static List<KaleoLog> findByKCN_KCPK_KITI_T(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type, int start, int end,
-		OrderByComparator<KaleoLog> orderByComparator, boolean retrieveFromCache) {
+	public static List<KaleoLog> findByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type, int start,
+		int end, OrderByComparator<KaleoLog> orderByComparator,
+		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type, start, end, orderByComparator,
@@ -1068,9 +1076,8 @@ public class KaleoLogUtil {
 	* @return the first matching kaleo log
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
-	public static KaleoLog findByKCN_KCPK_KITI_T_First(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type,
+	public static KaleoLog findByKCN_KCPK_KITI_T_First(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
@@ -1088,9 +1095,8 @@ public class KaleoLogUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
-	public static KaleoLog fetchByKCN_KCPK_KITI_T_First(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type,
+	public static KaleoLog fetchByKCN_KCPK_KITI_T_First(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .fetchByKCN_KCPK_KITI_T_First(kaleoClassName, kaleoClassPK,
@@ -1108,9 +1114,8 @@ public class KaleoLogUtil {
 	* @return the last matching kaleo log
 	* @throws NoSuchLogException if a matching kaleo log could not be found
 	*/
-	public static KaleoLog findByKCN_KCPK_KITI_T_Last(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type,
+	public static KaleoLog findByKCN_KCPK_KITI_T_Last(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
@@ -1128,9 +1133,8 @@ public class KaleoLogUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching kaleo log, or <code>null</code> if a matching kaleo log could not be found
 	*/
-	public static KaleoLog fetchByKCN_KCPK_KITI_T_Last(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type,
+	public static KaleoLog fetchByKCN_KCPK_KITI_T_Last(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator) {
 		return getPersistence()
 				   .fetchByKCN_KCPK_KITI_T_Last(kaleoClassName, kaleoClassPK,
@@ -1150,8 +1154,8 @@ public class KaleoLogUtil {
 	* @throws NoSuchLogException if a kaleo log with the primary key could not be found
 	*/
 	public static KaleoLog[] findByKCN_KCPK_KITI_T_PrevAndNext(
-		long kaleoLogId, java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type,
+		long kaleoLogId, String kaleoClassName, long kaleoClassPK,
+		long kaleoInstanceTokenId, String type,
 		OrderByComparator<KaleoLog> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchLogException {
 		return getPersistence()
@@ -1168,9 +1172,8 @@ public class KaleoLogUtil {
 	* @param kaleoInstanceTokenId the kaleo instance token ID
 	* @param type the type
 	*/
-	public static void removeByKCN_KCPK_KITI_T(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoInstanceTokenId, java.lang.String type) {
+	public static void removeByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type) {
 		getPersistence()
 			.removeByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type);
@@ -1185,8 +1188,8 @@ public class KaleoLogUtil {
 	* @param type the type
 	* @return the number of matching kaleo logs
 	*/
-	public static int countByKCN_KCPK_KITI_T(java.lang.String kaleoClassName,
-		long kaleoClassPK, long kaleoInstanceTokenId, java.lang.String type) {
+	public static int countByKCN_KCPK_KITI_T(String kaleoClassName,
+		long kaleoClassPK, long kaleoInstanceTokenId, String type) {
 		return getPersistence()
 				   .countByKCN_KCPK_KITI_T(kaleoClassName, kaleoClassPK,
 			kaleoInstanceTokenId, type);
@@ -1339,7 +1342,7 @@ public class KaleoLogUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -1347,6 +1350,16 @@ public class KaleoLogUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoLogPersistence, KaleoLogPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoLogPersistence.class);
+	private static ServiceTracker<KaleoLogPersistence, KaleoLogPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoLogPersistence.class);
+
+		ServiceTracker<KaleoLogPersistence, KaleoLogPersistence> serviceTracker = new ServiceTracker<KaleoLogPersistence, KaleoLogPersistence>(bundle.getBundleContext(),
+				KaleoLogPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

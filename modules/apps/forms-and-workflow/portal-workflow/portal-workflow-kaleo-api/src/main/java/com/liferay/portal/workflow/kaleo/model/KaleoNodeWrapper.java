@@ -64,13 +64,13 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("name", getName());
 		attributes.put("metadata", getMetadata());
 		attributes.put("description", getDescription());
 		attributes.put("type", getType());
-		attributes.put("initial", getInitial());
-		attributes.put("terminal", getTerminal());
+		attributes.put("initial", isInitial());
+		attributes.put("terminal", isTerminal());
 
 		return attributes;
 	}
@@ -119,10 +119,11 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 			setModifiedDate(modifiedDate);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		String name = (String)attributes.get("name");
@@ -163,7 +164,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoNodeWrapper((KaleoNode)_kaleoNode.clone());
 	}
 
@@ -204,7 +205,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the description of this kaleo node
 	*/
 	@Override
-	public java.lang.String getDescription() {
+	public String getDescription() {
 		return _kaleoNode.getDescription();
 	}
 
@@ -234,13 +235,13 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo node.
+	* Returns the kaleo definition version ID of this kaleo node.
 	*
-	* @return the kaleo definition ID of this kaleo node
+	* @return the kaleo definition version ID of this kaleo node
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoNode.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoNode.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -254,7 +255,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	@Override
-	public KaleoTransition getKaleoTransition(java.lang.String name)
+	public KaleoTransition getKaleoTransition(String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kaleoNode.getKaleoTransition(name);
 	}
@@ -270,7 +271,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the metadata of this kaleo node
 	*/
 	@Override
-	public java.lang.String getMetadata() {
+	public String getMetadata() {
 		return _kaleoNode.getMetadata();
 	}
 
@@ -290,7 +291,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the name of this kaleo node
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _kaleoNode.getName();
 	}
 
@@ -325,7 +326,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the type of this kaleo node
 	*/
 	@Override
-	public java.lang.String getType() {
+	public String getType() {
 		return _kaleoNode.getType();
 	}
 
@@ -345,7 +346,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the user name of this kaleo node
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoNode.getUserName();
 	}
 
@@ -355,7 +356,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @return the user uuid of this kaleo node
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoNode.getUserUuid();
 	}
 
@@ -440,7 +441,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param description the description of this kaleo node
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
+	public void setDescription(String description) {
 		_kaleoNode.setDescription(description);
 	}
 
@@ -481,13 +482,13 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo node.
+	* Sets the kaleo definition version ID of this kaleo node.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo node
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo node
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoNode.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoNode.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -506,7 +507,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param metadata the metadata of this kaleo node
 	*/
 	@Override
-	public void setMetadata(java.lang.String metadata) {
+	public void setMetadata(String metadata) {
 		_kaleoNode.setMetadata(metadata);
 	}
 
@@ -526,7 +527,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param name the name of this kaleo node
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_kaleoNode.setName(name);
 	}
 
@@ -566,7 +567,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param type the type of this kaleo node
 	*/
 	@Override
-	public void setType(java.lang.String type) {
+	public void setType(String type) {
 		_kaleoNode.setType(type);
 	}
 
@@ -586,7 +587,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param userName the user name of this kaleo node
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoNode.setUserName(userName);
 	}
 
@@ -596,7 +597,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	* @param userUuid the user uuid of this kaleo node
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoNode.setUserUuid(userUuid);
 	}
 
@@ -611,7 +612,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoNode.toString();
 	}
 
@@ -621,7 +622,7 @@ public class KaleoNodeWrapper implements KaleoNode, ModelWrapper<KaleoNode> {
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoNode.toXmlString();
 	}
 

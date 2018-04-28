@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -120,8 +121,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param uuid the uuid
 	* @return the matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid(
-		java.lang.String uuid) {
+	public static List<DDMDataProviderInstance> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -137,8 +137,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param end the upper bound of the range of ddm data provider instances (not inclusive)
 	* @return the range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid(
-		java.lang.String uuid, int start, int end) {
+	public static List<DDMDataProviderInstance> findByUuid(String uuid,
+		int start, int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -155,8 +155,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid(
-		java.lang.String uuid, int start, int end,
+	public static List<DDMDataProviderInstance> findByUuid(String uuid,
+		int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
@@ -175,8 +175,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid(
-		java.lang.String uuid, int start, int end,
+	public static List<DDMDataProviderInstance> findByUuid(String uuid,
+		int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -192,8 +192,7 @@ public class DDMDataProviderInstanceUtil {
 	* @return the first matching ddm data provider instance
 	* @throws NoSuchDataProviderInstanceException if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance findByUuid_First(
-		java.lang.String uuid,
+	public static DDMDataProviderInstance findByUuid_First(String uuid,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -206,8 +205,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUuid_First(
-		java.lang.String uuid,
+	public static DDMDataProviderInstance fetchByUuid_First(String uuid,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -220,8 +218,7 @@ public class DDMDataProviderInstanceUtil {
 	* @return the last matching ddm data provider instance
 	* @throws NoSuchDataProviderInstanceException if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance findByUuid_Last(
-		java.lang.String uuid,
+	public static DDMDataProviderInstance findByUuid_Last(String uuid,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -234,8 +231,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUuid_Last(
-		java.lang.String uuid,
+	public static DDMDataProviderInstance fetchByUuid_Last(String uuid,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -250,7 +246,7 @@ public class DDMDataProviderInstanceUtil {
 	* @throws NoSuchDataProviderInstanceException if a ddm data provider instance with the primary key could not be found
 	*/
 	public static DDMDataProviderInstance[] findByUuid_PrevAndNext(
-		long dataProviderInstanceId, java.lang.String uuid,
+		long dataProviderInstanceId, String uuid,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence()
@@ -263,7 +259,7 @@ public class DDMDataProviderInstanceUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -273,7 +269,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param uuid the uuid
 	* @return the number of matching ddm data provider instances
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -285,8 +281,7 @@ public class DDMDataProviderInstanceUtil {
 	* @return the matching ddm data provider instance
 	* @throws NoSuchDataProviderInstanceException if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance findByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static DDMDataProviderInstance findByUUID_G(String uuid, long groupId)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -298,7 +293,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param groupId the group ID
 	* @return the matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUUID_G(java.lang.String uuid,
+	public static DDMDataProviderInstance fetchByUUID_G(String uuid,
 		long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
@@ -311,7 +306,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUUID_G(java.lang.String uuid,
+	public static DDMDataProviderInstance fetchByUUID_G(String uuid,
 		long groupId, boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
@@ -323,8 +318,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param groupId the group ID
 	* @return the ddm data provider instance that was removed
 	*/
-	public static DDMDataProviderInstance removeByUUID_G(
-		java.lang.String uuid, long groupId)
+	public static DDMDataProviderInstance removeByUUID_G(String uuid,
+		long groupId)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -336,7 +331,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param groupId the group ID
 	* @return the number of matching ddm data provider instances
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -347,8 +342,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param companyId the company ID
 	* @return the matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid_C(
-		java.lang.String uuid, long companyId) {
+	public static List<DDMDataProviderInstance> findByUuid_C(String uuid,
+		long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -365,8 +360,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param end the upper bound of the range of ddm data provider instances (not inclusive)
 	* @return the range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end) {
+	public static List<DDMDataProviderInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -384,8 +379,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<DDMDataProviderInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
@@ -406,8 +401,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm data provider instances
 	*/
-	public static List<DDMDataProviderInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<DDMDataProviderInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -424,8 +419,8 @@ public class DDMDataProviderInstanceUtil {
 	* @return the first matching ddm data provider instance
 	* @throws NoSuchDataProviderInstanceException if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance findByUuid_C_First(
-		java.lang.String uuid, long companyId,
+	public static DDMDataProviderInstance findByUuid_C_First(String uuid,
+		long companyId,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence()
@@ -440,8 +435,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUuid_C_First(
-		java.lang.String uuid, long companyId,
+	public static DDMDataProviderInstance fetchByUuid_C_First(String uuid,
+		long companyId,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
@@ -456,8 +451,8 @@ public class DDMDataProviderInstanceUtil {
 	* @return the last matching ddm data provider instance
 	* @throws NoSuchDataProviderInstanceException if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance findByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static DDMDataProviderInstance findByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence()
@@ -472,8 +467,8 @@ public class DDMDataProviderInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm data provider instance, or <code>null</code> if a matching ddm data provider instance could not be found
 	*/
-	public static DDMDataProviderInstance fetchByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static DDMDataProviderInstance fetchByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -490,7 +485,7 @@ public class DDMDataProviderInstanceUtil {
 	* @throws NoSuchDataProviderInstanceException if a ddm data provider instance with the primary key could not be found
 	*/
 	public static DDMDataProviderInstance[] findByUuid_C_PrevAndNext(
-		long dataProviderInstanceId, java.lang.String uuid, long companyId,
+		long dataProviderInstanceId, String uuid, long companyId,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException {
 		return getPersistence()
@@ -504,7 +499,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -515,7 +510,7 @@ public class DDMDataProviderInstanceUtil {
 	* @param companyId the company ID
 	* @return the number of matching ddm data provider instances
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -1215,7 +1210,7 @@ public class DDMDataProviderInstanceUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -1223,6 +1218,17 @@ public class DDMDataProviderInstanceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDMDataProviderInstancePersistence, DDMDataProviderInstancePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(DDMDataProviderInstancePersistence.class);
+	private static ServiceTracker<DDMDataProviderInstancePersistence, DDMDataProviderInstancePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDMDataProviderInstancePersistence.class);
+
+		ServiceTracker<DDMDataProviderInstancePersistence, DDMDataProviderInstancePersistence> serviceTracker =
+			new ServiceTracker<DDMDataProviderInstancePersistence, DDMDataProviderInstancePersistence>(bundle.getBundleContext(),
+				DDMDataProviderInstancePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

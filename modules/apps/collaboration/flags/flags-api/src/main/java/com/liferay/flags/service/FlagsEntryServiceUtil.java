@@ -16,7 +16,8 @@ package com.liferay.flags.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -41,10 +42,9 @@ public class FlagsEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.flags.service.impl.FlagsEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static void addEntry(java.lang.String className, long classPK,
-		java.lang.String reporterEmailAddress, long reportedUserId,
-		java.lang.String contentTitle, java.lang.String contentURL,
-		java.lang.String reason,
+	public static void addEntry(String className, long classPK,
+		String reporterEmailAddress, long reportedUserId, String contentTitle,
+		String contentURL, String reason,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
@@ -57,7 +57,7 @@ public class FlagsEntryServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -65,6 +65,16 @@ public class FlagsEntryServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<FlagsEntryService, FlagsEntryService> _serviceTracker =
-		ServiceTrackerFactory.open(FlagsEntryService.class);
+	private static ServiceTracker<FlagsEntryService, FlagsEntryService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(FlagsEntryService.class);
+
+		ServiceTracker<FlagsEntryService, FlagsEntryService> serviceTracker = new ServiceTracker<FlagsEntryService, FlagsEntryService>(bundle.getBundleContext(),
+				FlagsEntryService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -66,7 +66,103 @@ public interface JournalArticleService extends BaseService {
 	 */
 
 	/**
-	* Adds a web content article with additional parameters.
+	* Adds a web content article with additional parameters. All scheduling
+	* parameters (display date, expiration date, and review date) use the
+	* current user's timezone.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param folderId the primary key of the web content article folder
+	* @param classNameId the primary key of the DDMStructure class if the web
+	content article is related to a DDM structure, the primary key of
+	the class name associated with the article, or
+	JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	module otherwise
+	* @param classPK the primary key of the DDM structure, if the primary key
+	of the DDMStructure class is given as the
+	<code>classNameId</code> parameter, the primary key of the class
+	associated with the web content article, or <code>0</code>
+	otherwise
+	* @param articleId the primary key of the web content article
+	* @param autoArticleId whether to auto generate the web content article ID
+	* @param titleMap the web content article's locales and localized titles
+	* @param descriptionMap the web content article's locales and localized
+	descriptions
+	* @param friendlyURLMap the web content article's locales and localized
+	friendly URLs
+	* @param content the HTML content wrapped in XML. For more information,
+	see the content example in the {@link #updateArticle(long, long,
+	String, double, String, ServiceContext)} description.
+	* @param ddmStructureKey the primary key of the web content article's DDM
+	structure, if the article is related to a DDM structure, or
+	<code>null</code> otherwise
+	* @param ddmTemplateKey the primary key of the web content article's DDM
+	template
+	* @param layoutUuid the unique string identifying the web content
+	article's display page
+	* @param displayDateMonth the month the web content article is set to
+	display
+	* @param displayDateDay the calendar day the web content article is set to
+	display
+	* @param displayDateYear the year the web content article is set to
+	display
+	* @param displayDateHour the hour the web content article is set to
+	display
+	* @param displayDateMinute the minute the web content article is set to
+	display
+	* @param expirationDateMonth the month the web content article is set to
+	expire
+	* @param expirationDateDay the calendar day the web content article is set
+	to expire
+	* @param expirationDateYear the year the web content article is set to
+	expire
+	* @param expirationDateHour the hour the web content article is set to
+	expire
+	* @param expirationDateMinute the minute the web content article is set to
+	expire
+	* @param neverExpire whether the web content article is not set to auto
+	expire
+	* @param reviewDateMonth the month the web content article is set for
+	review
+	* @param reviewDateDay the calendar day the web content article is set for
+	review
+	* @param reviewDateYear the year the web content article is set for review
+	* @param reviewDateHour the hour the web content article is set for review
+	* @param reviewDateMinute the minute the web content article is set for
+	review
+	* @param neverReview whether the web content article is not set for review
+	* @param indexable whether the web content article is searchable
+	* @param smallImage whether the web content article has a small image
+	* @param smallImageURL the web content article's small image URL
+	* @param smallFile the web content article's small image file
+	* @param images the web content's images
+	* @param articleURL the web content article's accessible URL
+	* @param serviceContext the service context to be applied. Can set the
+	UUID, creation date, modification date, expando bridge
+	attributes, guest permissions, group permissions, asset category
+	IDs, asset tag names, asset link entry IDs, asset priority, URL
+	title, and workflow actions for the web content article. Can also
+	set whether to add the default guest and group permissions.
+	* @return the web content article
+	*/
+	public JournalArticle addArticle(long groupId, long folderId,
+		long classNameId, long classPK, String articleId,
+		boolean autoArticleId, Map<Locale, String> titleMap,
+		Map<Locale, String> descriptionMap, Map<Locale, String> friendlyURLMap,
+		String content, String ddmStructureKey, String ddmTemplateKey,
+		String layoutUuid, int displayDateMonth, int displayDateDay,
+		int displayDateYear, int displayDateHour, int displayDateMinute,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
+		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
+		int reviewDateHour, int reviewDateMinute, boolean neverReview,
+		boolean indexable, boolean smallImage, String smallImageURL,
+		File smallFile, Map<String, byte[]> images, String articleURL,
+		ServiceContext serviceContext) throws PortalException;
+
+	/**
+	* Adds a web content article with additional parameters. All scheduling
+	* parameters (display date, expiration date, and review date) use the
+	* current user's timezone.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
@@ -141,23 +237,24 @@ public interface JournalArticleService extends BaseService {
 	* @return the web content article
 	*/
 	public JournalArticle addArticle(long groupId, long folderId,
-		long classNameId, long classPK, java.lang.String articleId,
-		boolean autoArticleId, Map<Locale, java.lang.String> titleMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String content,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		java.lang.String layoutUuid, int displayDateMonth, int displayDateDay,
-		int displayDateYear, int displayDateHour, int displayDateMinute,
-		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
-		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
-		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
-		int reviewDateHour, int reviewDateMinute, boolean neverReview,
-		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
-		File smallFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, ServiceContext serviceContext)
-		throws PortalException;
+		long classNameId, long classPK, String articleId,
+		boolean autoArticleId, Map<Locale, String> titleMap,
+		Map<Locale, String> descriptionMap, String content,
+		String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+		int reviewDateDay, int reviewDateYear, int reviewDateHour,
+		int reviewDateMinute, boolean neverReview, boolean indexable,
+		boolean smallImage, String smallImageURL, File smallFile,
+		Map<String, byte[]> images, String articleURL,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
-	* Adds a web content article without any images.
+	* Adds a web content article without any images. All scheduling parameters
+	* (display date, expiration date, and review date) use the current user's
+	* timezone.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
@@ -226,18 +323,18 @@ public interface JournalArticleService extends BaseService {
 	* @return the web content article
 	*/
 	public JournalArticle addArticle(long groupId, long folderId,
-		long classNameId, long classPK, java.lang.String articleId,
-		boolean autoArticleId, Map<Locale, java.lang.String> titleMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String content,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		java.lang.String layoutUuid, int displayDateMonth, int displayDateDay,
-		int displayDateYear, int displayDateHour, int displayDateMinute,
-		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
-		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
-		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
-		int reviewDateHour, int reviewDateMinute, boolean neverReview,
-		boolean indexable, java.lang.String articleURL,
-		ServiceContext serviceContext) throws PortalException;
+		long classNameId, long classPK, String articleId,
+		boolean autoArticleId, Map<Locale, String> titleMap,
+		Map<Locale, String> descriptionMap, String content,
+		String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+		int reviewDateDay, int reviewDateYear, int reviewDateHour,
+		int reviewDateMinute, boolean neverReview, boolean indexable,
+		String articleURL, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Copies the web content article matching the group, article ID, and
@@ -251,9 +348,9 @@ public interface JournalArticleService extends BaseService {
 	* @param version the web content article's version
 	* @return the new web content article
 	*/
-	public JournalArticle copyArticle(long groupId,
-		java.lang.String oldArticleId, java.lang.String newArticleId,
-		boolean autoArticleId, double version) throws PortalException;
+	public JournalArticle copyArticle(long groupId, String oldArticleId,
+		String newArticleId, boolean autoArticleId, double version)
+		throws PortalException;
 
 	/**
 	* Deletes the web content article and its resources matching the group,
@@ -268,9 +365,9 @@ public interface JournalArticleService extends BaseService {
 	portlet preferences that include email information to notify
 	recipients of the unapproved web content article's denial.
 	*/
-	public void deleteArticle(long groupId, java.lang.String articleId,
-		double version, java.lang.String articleURL,
-		ServiceContext serviceContext) throws PortalException;
+	public void deleteArticle(long groupId, String articleId, double version,
+		String articleURL, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Deletes all web content articles and their resources matching the group
@@ -284,8 +381,8 @@ public interface JournalArticleService extends BaseService {
 	portlet preferences that include email information to notify
 	recipients of the unapproved web content article's denial.
 	*/
-	public void deleteArticle(long groupId, java.lang.String articleId,
-		java.lang.String articleURL, ServiceContext serviceContext)
+	public void deleteArticle(long groupId, String articleId,
+		String articleURL, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -306,9 +403,8 @@ public interface JournalArticleService extends BaseService {
 	considered a web content add activity.
 	* @return the web content article
 	*/
-	public JournalArticle expireArticle(long groupId,
-		java.lang.String articleId, double version,
-		java.lang.String articleURL, ServiceContext serviceContext)
+	public JournalArticle expireArticle(long groupId, String articleId,
+		double version, String articleURL, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -329,12 +425,12 @@ public interface JournalArticleService extends BaseService {
 	is considered a web content update activity; otherwise it is
 	considered a web content add activity.
 	*/
-	public void expireArticle(long groupId, java.lang.String articleId,
-		java.lang.String articleURL, ServiceContext serviceContext)
+	public void expireArticle(long groupId, String articleId,
+		String articleURL, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle fetchArticle(long groupId, java.lang.String articleId)
+	public JournalArticle fetchArticle(long groupId, String articleId)
 		throws PortalException;
 
 	/**
@@ -356,7 +452,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getArticle(long groupId, java.lang.String articleId)
+	public JournalArticle getArticle(long groupId, String articleId)
 		throws PortalException;
 
 	/**
@@ -369,7 +465,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getArticle(long groupId, java.lang.String articleId,
+	public JournalArticle getArticle(long groupId, String articleId,
 		double version) throws PortalException;
 
 	/**
@@ -389,7 +485,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getArticle(long groupId, java.lang.String className,
+	public JournalArticle getArticle(long groupId, String className,
 		long classPK) throws PortalException;
 
 	/**
@@ -402,8 +498,8 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getArticleByUrlTitle(long groupId,
-		java.lang.String urlTitle) throws PortalException;
+	public JournalArticle getArticleByUrlTitle(long groupId, String urlTitle)
+		throws PortalException;
 
 	/**
 	* Returns the web content from the web content article matching the group,
@@ -418,10 +514,10 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getArticleContent(long groupId,
-		java.lang.String articleId, double version,
-		java.lang.String languageId, PortletRequestModel portletRequestModel,
-		ThemeDisplay themeDisplay) throws PortalException;
+	public String getArticleContent(long groupId, String articleId,
+		double version, String languageId,
+		PortletRequestModel portletRequestModel, ThemeDisplay themeDisplay)
+		throws PortalException;
 
 	/**
 	* Returns the web content from the web content article matching the group,
@@ -436,11 +532,10 @@ public interface JournalArticleService extends BaseService {
 	* @deprecated As of 4.0.0, replaced by {@link #getArticleContent(long,
 	String, double, String, PortletRequestModel, ThemeDisplay)}
 	*/
-	@java.lang.Deprecated
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getArticleContent(long groupId,
-		java.lang.String articleId, double version,
-		java.lang.String languageId, ThemeDisplay themeDisplay)
+	public String getArticleContent(long groupId, String articleId,
+		double version, String languageId, ThemeDisplay themeDisplay)
 		throws PortalException;
 
 	/**
@@ -455,10 +550,9 @@ public interface JournalArticleService extends BaseService {
 	* @return the matching web content
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getArticleContent(long groupId,
-		java.lang.String articleId, java.lang.String languageId,
-		PortletRequestModel portletRequestModel, ThemeDisplay themeDisplay)
-		throws PortalException;
+	public String getArticleContent(long groupId, String articleId,
+		String languageId, PortletRequestModel portletRequestModel,
+		ThemeDisplay themeDisplay) throws PortalException;
 
 	/**
 	* Returns the latest web content from the web content article matching the
@@ -472,11 +566,10 @@ public interface JournalArticleService extends BaseService {
 	* @deprecated As of 4.0.0, replaced by {@link #getArticleContent(long,
 	String, String, PortletRequestModel, ThemeDisplay)}
 	*/
-	@java.lang.Deprecated
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getArticleContent(long groupId,
-		java.lang.String articleId, java.lang.String languageId,
-		ThemeDisplay themeDisplay) throws PortalException;
+	public String getArticleContent(long groupId, String articleId,
+		String languageId, ThemeDisplay themeDisplay) throws PortalException;
 
 	/**
 	* Returns all the web content articles matching the group and folder.
@@ -541,7 +634,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getArticlesByArticleId(long groupId,
-		java.lang.String articleId, int start, int end,
+		String articleId, int start, int end,
 		OrderByComparator<JournalArticle> obc);
 
 	/**
@@ -554,7 +647,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getArticlesByLayoutUuid(long groupId,
-		java.lang.String layoutUuid);
+		String layoutUuid);
 
 	/**
 	* Returns an ordered range of all the web content articles matching the
@@ -591,8 +684,8 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getArticlesByStructureId(long groupId,
-		long classNameId, java.lang.String ddmStructureKey, int status,
-		int start, int end, OrderByComparator<JournalArticle> obc);
+		long classNameId, String ddmStructureKey, int status, int start,
+		int end, OrderByComparator<JournalArticle> obc);
 
 	/**
 	* Returns an ordered range of all the web content articles matching the
@@ -621,7 +714,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getArticlesByStructureId(long groupId,
-		java.lang.String ddmStructureKey, int status, int start, int end,
+		String ddmStructureKey, int status, int start, int end,
 		OrderByComparator<JournalArticle> obc);
 
 	/**
@@ -651,7 +744,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getArticlesByStructureId(long groupId,
-		java.lang.String ddmStructureKey, int start, int end,
+		String ddmStructureKey, int start, int end,
 		OrderByComparator<JournalArticle> obc);
 
 	/**
@@ -687,8 +780,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the number of matching web content articles
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getArticlesCountByArticleId(long groupId,
-		java.lang.String articleId);
+	public int getArticlesCountByArticleId(long groupId, String articleId);
 
 	/**
 	* Returns the number of web content articles matching the group, class name
@@ -709,7 +801,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getArticlesCountByStructureId(long groupId, long classNameId,
-		java.lang.String ddmStructureKey, int status);
+		String ddmStructureKey, int status);
 
 	/**
 	* Returns the number of web content articles matching the group, default
@@ -722,7 +814,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getArticlesCountByStructureId(long groupId,
-		java.lang.String ddmStructureKey);
+		String ddmStructureKey);
 
 	/**
 	* Returns the number of web content articles matching the group, default
@@ -738,7 +830,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getArticlesCountByStructureId(long groupId,
-		java.lang.String ddmStructureKey, int status);
+		String ddmStructureKey, int status);
 
 	/**
 	* Returns the web content article matching the URL title that is currently
@@ -752,7 +844,7 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public JournalArticle getDisplayArticleByUrlTitle(long groupId,
-		java.lang.String urlTitle) throws PortalException;
+		String urlTitle) throws PortalException;
 
 	/**
 	* Returns the number of folders containing web content articles belonging
@@ -764,8 +856,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the number of matching folders containing web content articles
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFoldersAndArticlesCount(long groupId,
-		List<java.lang.Long> folderIds);
+	public int getFoldersAndArticlesCount(long groupId, List<Long> folderIds);
 
 	/**
 	* Returns an ordered range of all the web content articles matching the
@@ -936,8 +1027,8 @@ public interface JournalArticleService extends BaseService {
 	* @return the latest matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getLatestArticle(long groupId,
-		java.lang.String articleId, int status) throws PortalException;
+	public JournalArticle getLatestArticle(long groupId, String articleId,
+		int status) throws PortalException;
 
 	/**
 	* Returns the latest web content article matching the group, class name ID,
@@ -955,8 +1046,8 @@ public interface JournalArticleService extends BaseService {
 	* @return the latest matching web content article
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalArticle getLatestArticle(long groupId,
-		java.lang.String className, long classPK) throws PortalException;
+	public JournalArticle getLatestArticle(long groupId, String className,
+		long classPK) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getLayoutArticles(long groupId);
@@ -966,7 +1057,7 @@ public interface JournalArticleService extends BaseService {
 	*
 	* @return the OSGi service identifier
 	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public String getOSGiServiceIdentifier();
 
 	/**
 	* Moves all versions of the web content article matching the group and
@@ -979,9 +1070,9 @@ public interface JournalArticleService extends BaseService {
 	* @deprecated As of 4.0.0, replaced by {@link #moveArticle(long, String,
 	long, ServiceContext)}
 	*/
-	@java.lang.Deprecated
-	public void moveArticle(long groupId, java.lang.String articleId,
-		long newFolderId) throws PortalException;
+	@Deprecated
+	public void moveArticle(long groupId, String articleId, long newFolderId)
+		throws PortalException;
 
 	/**
 	* Moves all versions of the web content article matching the group and
@@ -1000,9 +1091,8 @@ public interface JournalArticleService extends BaseService {
 	is considered a web content update activity; otherwise it is
 	considered a web content add activity.
 	*/
-	public void moveArticle(long groupId, java.lang.String articleId,
-		long newFolderId, ServiceContext serviceContext)
-		throws PortalException;
+	public void moveArticle(long groupId, String articleId, long newFolderId,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Moves the web content article from the Recycle Bin to the folder.
@@ -1044,9 +1134,9 @@ public interface JournalArticleService extends BaseService {
 	* @return the updated web content article, which was moved from the Recycle
 	Bin to the folder
 	*/
-	public JournalArticle moveArticleFromTrash(long groupId,
-		java.lang.String articleId, long newFolderId,
-		ServiceContext serviceContext) throws PortalException;
+	public JournalArticle moveArticleFromTrash(long groupId, String articleId,
+		long newFolderId, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Moves the latest version of the web content article matching the group
@@ -1057,8 +1147,8 @@ public interface JournalArticleService extends BaseService {
 	* @return the moved web content article or <code>null</code> if no matching
 	article was found
 	*/
-	public JournalArticle moveArticleToTrash(long groupId,
-		java.lang.String articleId) throws PortalException;
+	public JournalArticle moveArticleToTrash(long groupId, String articleId)
+		throws PortalException;
 
 	/**
 	* Removes the web content of all the company's web content articles
@@ -1067,7 +1157,7 @@ public interface JournalArticleService extends BaseService {
 	* @param companyId the primary key of the web content article's company
 	* @param languageId the primary key of the language locale to remove
 	*/
-	public void removeArticleLocale(long companyId, java.lang.String languageId)
+	public void removeArticleLocale(long companyId, String languageId)
 		throws PortalException;
 
 	/**
@@ -1080,9 +1170,8 @@ public interface JournalArticleService extends BaseService {
 	* @param languageId the primary key of the language locale to remove
 	* @return the updated web content article with the locale removed
 	*/
-	public JournalArticle removeArticleLocale(long groupId,
-		java.lang.String articleId, double version, java.lang.String languageId)
-		throws PortalException;
+	public JournalArticle removeArticleLocale(long groupId, String articleId,
+		double version, String languageId) throws PortalException;
 
 	/**
 	* Restores the web content article associated with the resource primary key
@@ -1099,7 +1188,7 @@ public interface JournalArticleService extends BaseService {
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	*/
-	public void restoreArticleFromTrash(long groupId, java.lang.String articleId)
+	public void restoreArticleFromTrash(long groupId, String articleId)
 		throws PortalException;
 
 	/**
@@ -1192,9 +1281,8 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> search(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String keywords, java.lang.Double version,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		List<Long> folderIds, long classNameId, String keywords,
+		Double version, String ddmStructureKey, String ddmTemplateKey,
 		Date displayDateGT, Date displayDateLT, int status, Date reviewDate,
 		int start, int end, OrderByComparator<JournalArticle> obc);
 
@@ -1262,11 +1350,9 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> search(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String articleId, java.lang.Double version,
-		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String ddmStructureKey,
-		java.lang.String ddmTemplateKey, Date displayDateGT,
+		List<Long> folderIds, long classNameId, String articleId,
+		Double version, String title, String description, String content,
+		String ddmStructureKey, String ddmTemplateKey, Date displayDateGT,
 		Date displayDateLT, int status, Date reviewDate, boolean andOperator,
 		int start, int end, OrderByComparator<JournalArticle> obc);
 
@@ -1336,13 +1422,12 @@ public interface JournalArticleService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> search(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String articleId, java.lang.Double version,
-		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String[] ddmStructureKeys,
-		java.lang.String[] ddmTemplateKeys, Date displayDateGT,
-		Date displayDateLT, int status, Date reviewDate, boolean andOperator,
-		int start, int end, OrderByComparator<JournalArticle> obc);
+		List<Long> folderIds, long classNameId, String articleId,
+		Double version, String title, String description, String content,
+		String[] ddmStructureKeys, String[] ddmTemplateKeys,
+		Date displayDateGT, Date displayDateLT, int status, Date reviewDate,
+		boolean andOperator, int start, int end,
+		OrderByComparator<JournalArticle> obc);
 
 	/**
 	* Returns the number of web content articles matching the parameters,
@@ -1385,11 +1470,10 @@ public interface JournalArticleService extends BaseService {
 	* @return the number of matching web content articles
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String keywords, java.lang.Double version,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		Date displayDateGT, Date displayDateLT, int status, Date reviewDate);
+	public int searchCount(long companyId, long groupId, List<Long> folderIds,
+		long classNameId, String keywords, Double version,
+		String ddmStructureKey, String ddmTemplateKey, Date displayDateGT,
+		Date displayDateLT, int status, Date reviewDate);
 
 	/**
 	* Returns the number of web content articles matching the parameters,
@@ -1438,13 +1522,11 @@ public interface JournalArticleService extends BaseService {
 	* @return the number of matching web content articles
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String articleId, java.lang.Double version,
-		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String ddmStructureKey,
-		java.lang.String ddmTemplateKey, Date displayDateGT,
-		Date displayDateLT, int status, Date reviewDate, boolean andOperator);
+	public int searchCount(long companyId, long groupId, List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String ddmStructureKey,
+		String ddmTemplateKey, Date displayDateGT, Date displayDateLT,
+		int status, Date reviewDate, boolean andOperator);
 
 	/**
 	* Returns the number of web content articles matching the parameters,
@@ -1495,13 +1577,11 @@ public interface JournalArticleService extends BaseService {
 	* @return the number of matching web content articles
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long groupId,
-		List<java.lang.Long> folderIds, long classNameId,
-		java.lang.String articleId, java.lang.Double version,
-		java.lang.String title, java.lang.String description,
-		java.lang.String content, java.lang.String[] ddmStructureKeys,
-		java.lang.String[] ddmTemplateKeys, Date displayDateGT,
-		Date displayDateLT, int status, Date reviewDate, boolean andOperator);
+	public int searchCount(long companyId, long groupId, List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String[] ddmStructureKeys,
+		String[] ddmTemplateKeys, Date displayDateGT, Date displayDateLT,
+		int status, Date reviewDate, boolean andOperator);
 
 	public void subscribe(long groupId, long articleId)
 		throws PortalException;
@@ -1561,14 +1641,108 @@ public interface JournalArticleService extends BaseService {
 	* @return the updated web content article
 	*/
 	public JournalArticle updateArticle(long userId, long groupId,
-		long folderId, java.lang.String articleId, double version,
-		Map<Locale, java.lang.String> titleMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String content,
-		java.lang.String layoutUuid, ServiceContext serviceContext)
+		long folderId, String articleId, double version,
+		Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+		String content, String layoutUuid, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
-	* Updates the web content article with additional parameters.
+	* Updates the web content article with additional parameters. All
+	* scheduling parameters (display date, expiration date, and review date)
+	* use the current user's timezone.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param folderId the primary key of the web content article folder
+	* @param articleId the primary key of the web content article
+	* @param version the web content article's version
+	* @param titleMap the web content article's locales and localized titles
+	* @param descriptionMap the web content article's locales and localized
+	descriptions
+	* @param friendlyURLMap the web content article's locales and localized
+	friendly URLs
+	* @param content the HTML content wrapped in XML. For more information,
+	see the content example in the {@link #updateArticle(long, long,
+	String, double, String, ServiceContext)} description.
+	* @param ddmStructureKey the primary key of the web content article's DDM
+	structure, if the article is related to a DDM structure, or
+	<code>null</code> otherwise
+	* @param ddmTemplateKey the primary key of the web content article's DDM
+	template
+	* @param layoutUuid the unique string identifying the web content
+	article's display page
+	* @param displayDateMonth the month the web content article is set to
+	display
+	* @param displayDateDay the calendar day the web content article is set to
+	display
+	* @param displayDateYear the year the web content article is set to
+	display
+	* @param displayDateHour the hour the web content article is set to
+	display
+	* @param displayDateMinute the minute the web content article is set to
+	display
+	* @param expirationDateMonth the month the web content article is set to
+	expire
+	* @param expirationDateDay the calendar day the web content article is set
+	to expire
+	* @param expirationDateYear the year the web content article is set to
+	expire
+	* @param expirationDateHour the hour the web content article is set to
+	expire
+	* @param expirationDateMinute the minute the web content article is set to
+	expire
+	* @param neverExpire whether the web content article is not set to auto
+	expire
+	* @param reviewDateMonth the month the web content article is set for
+	review
+	* @param reviewDateDay the calendar day the web content article is set for
+	review
+	* @param reviewDateYear the year the web content article is set for review
+	* @param reviewDateHour the hour the web content article is set for review
+	* @param reviewDateMinute the minute the web content article is set for
+	review
+	* @param neverReview whether the web content article is not set for review
+	* @param indexable whether the web content is searchable
+	* @param smallImage whether to update web content article's a small image.
+	A file must be passed in as <code>smallImageFile</code> value,
+	otherwise the current small image is deleted.
+	* @param smallImageURL the web content article's small image URL
+	(optionally <code>null</code>)
+	* @param smallFile the web content article's new small image file
+	(optionally <code>null</code>). Must pass in
+	<code>smallImage</code> value of <code>true</code> to replace the
+	article's small image file.
+	* @param images the web content's images (optionally <code>null</code>)
+	* @param articleURL the web content article's accessible URL (optionally
+	<code>null</code>)
+	* @param serviceContext the service context to be applied. Can set the
+	modification date, expando bridge attributes, asset category IDs,
+	asset tag names, asset link entry IDs, asset priority, workflow
+	actions, URL title, and can set whether to add the default
+	command update for the web content article. With respect to
+	social activities, by setting the service context's command to
+	{@link com.liferay.portal.kernel.util.Constants#UPDATE}, the
+	invocation is considered a web content update activity; otherwise
+	it is considered a web content add activity.
+	* @return the updated web content article
+	*/
+	public JournalArticle updateArticle(long groupId, long folderId,
+		String articleId, double version, Map<Locale, String> titleMap,
+		Map<Locale, String> descriptionMap, Map<Locale, String> friendlyURLMap,
+		String content, String ddmStructureKey, String ddmTemplateKey,
+		String layoutUuid, int displayDateMonth, int displayDateDay,
+		int displayDateYear, int displayDateHour, int displayDateMinute,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
+		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
+		int reviewDateHour, int reviewDateMinute, boolean neverReview,
+		boolean indexable, boolean smallImage, String smallImageURL,
+		File smallFile, Map<String, byte[]> images, String articleURL,
+		ServiceContext serviceContext) throws PortalException;
+
+	/**
+	* Updates the web content article with additional parameters. All
+	* scheduling parameters (display date, expiration date, and review date)
+	* use the current user's timezone.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
@@ -1643,20 +1817,18 @@ public interface JournalArticleService extends BaseService {
 	* @return the updated web content article
 	*/
 	public JournalArticle updateArticle(long groupId, long folderId,
-		java.lang.String articleId, double version,
-		Map<Locale, java.lang.String> titleMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String content,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
-		java.lang.String layoutUuid, int displayDateMonth, int displayDateDay,
-		int displayDateYear, int displayDateHour, int displayDateMinute,
-		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
-		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
-		int reviewDateMonth, int reviewDateDay, int reviewDateYear,
-		int reviewDateHour, int reviewDateMinute, boolean neverReview,
-		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
-		File smallFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, ServiceContext serviceContext)
-		throws PortalException;
+		String articleId, double version, Map<Locale, String> titleMap,
+		Map<Locale, String> descriptionMap, String content,
+		String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+		int displayDateMonth, int displayDateDay, int displayDateYear,
+		int displayDateHour, int displayDateMinute, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, int expirationDateHour,
+		int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+		int reviewDateDay, int reviewDateYear, int reviewDateHour,
+		int reviewDateMinute, boolean neverReview, boolean indexable,
+		boolean smallImage, String smallImageURL, File smallFile,
+		Map<String, byte[]> images, String articleURL,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Updates the web content article matching the version, replacing its
@@ -1698,7 +1870,7 @@ public interface JournalArticleService extends BaseService {
 	* @return the updated web content article
 	*/
 	public JournalArticle updateArticle(long groupId, long folderId,
-		java.lang.String articleId, double version, java.lang.String content,
+		String articleId, double version, String content,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -1719,9 +1891,8 @@ public interface JournalArticleService extends BaseService {
 	* @return the updated web content article
 	*/
 	public JournalArticle updateArticleTranslation(long groupId,
-		java.lang.String articleId, double version, Locale locale,
-		java.lang.String title, java.lang.String description,
-		java.lang.String content, Map<java.lang.String, byte[]> images,
+		String articleId, double version, Locale locale, String title,
+		String description, String content, Map<String, byte[]> images,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -1736,9 +1907,8 @@ public interface JournalArticleService extends BaseService {
 	String, double, String, ServiceContext)} description.
 	* @return the updated web content article
 	*/
-	public JournalArticle updateContent(long groupId,
-		java.lang.String articleId, double version, java.lang.String content)
-		throws PortalException;
+	public JournalArticle updateContent(long groupId, String articleId,
+		double version, String content) throws PortalException;
 
 	/**
 	* Updates the workflow status of the web content article matching the
@@ -1756,8 +1926,7 @@ public interface JournalArticleService extends BaseService {
 	add the default command update for the web content article.
 	* @return the updated web content article
 	*/
-	public JournalArticle updateStatus(long groupId,
-		java.lang.String articleId, double version, int status,
-		java.lang.String articleURL, ServiceContext serviceContext)
-		throws PortalException;
+	public JournalArticle updateStatus(long groupId, String articleId,
+		double version, int status, String articleURL,
+		ServiceContext serviceContext) throws PortalException;
 }

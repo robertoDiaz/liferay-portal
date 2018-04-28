@@ -8,7 +8,9 @@
 
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="ProductMenu#gotoControlPanelSites">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Sites" />
+			<var name="panel" value="Control Panel" />
 			<var name="portlet" value="Sites" />
 		</execute>
 
@@ -16,13 +18,14 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoControlPanelSites">
-			<var name="portlet" value="Sites" />
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Build" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Site Pages" />
 		</execute>
 
-		<execute macro="Page#add">
+		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Test Page Name" />
-			<var name="siteName" value="Site Name" />
 		</execute>
 	</set-up>
 
@@ -48,7 +51,9 @@
 			<var name="site" value="Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesContent">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Web Content" />
 		</execute>
 
@@ -83,7 +88,7 @@
 		<execute function="Refresh" />
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="language" value="Spanish (Spain)" />
+			<var name="locale" value="es-es" />
 		</execute>
 
 		<execute function="Refresh" />
@@ -97,7 +102,8 @@
 			<var name="webContentTitle" value="WC Titulo" />
 		</execute>
 
-		<execute macro="WebContent#selectLocale">
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Titulo" />
 			<var name="locale" value="es-ES" />
 		</execute>
 
@@ -114,7 +120,7 @@
 		<execute function="Refresh" />
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="language" value="German (Germany)" />
+			<var name="locale" value="de-de" />
 		</execute>
 
 		<execute function="Refresh" />
@@ -128,8 +134,9 @@
 			<var name="webContentTitle" value="WC Titel" />
 		</execute>
 
-		<execute macro="WebContent#selectLocale">
-			<var name="locale" value="de-DE" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Titel" />
+			<var name="locale" value="nl-NL" />
 		</execute>
 
 		<execute macro="WebContent#viewCP">
@@ -145,7 +152,7 @@
 		<execute function="Refresh" />
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="language" value="Finnish (Finland)" />
+			<var name="locale" value="fi-fi" />
 		</execute>
 
 		<execute function="Refresh" />
@@ -159,7 +166,8 @@
 			<var name="webContentTitle" value="WC Otsikko" />
 		</execute>
 
-		<execute macro="WebContent#selectLocale">
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Otsikko" />
 			<var name="locale" value="fi-FI" />
 		</execute>
 
@@ -178,7 +186,9 @@
 			<var name="site" value="Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesContent">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Web Content" />
 		</execute>
 
@@ -189,8 +199,8 @@
 			<var name="webContentTitle" value="WC Title" />
 		</execute>
 
-		<execute macro="WebContent#addLocale">
-			<var name="language" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Title" />
 			<var name="locale" value="es-ES" />
 		</execute>
 
@@ -215,7 +225,7 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="language" value="Spanish (Spain)" />
+			<var name="locale" value="es-es" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaWCD">
@@ -227,7 +237,8 @@
 			<var name="webContentTitle" value="WC Titulo" />
 		</execute>
 
-		<execute macro="WebContent#selectLocale">
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Title" />
 			<var name="locale" value="es-ES" />
 		</execute>
 
@@ -270,12 +281,16 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
+		<execute macro="LanguagePortlet#viewLanguageCurrent">
+			<var name="locale" value="en-us" />
+		</execute>
+
 		<execute macro="LanguagePortlet#viewLanguagesAbsent">
-			<var name="missingLanguages" value="ARABIC,CHINESE,FRENCH,HUNGARIAN,JAPANESE,PORTUGUESE" />
+			<var name="missingLocales" value="fr-fr,hu-hu,iw-il,ja-jp,pt-br,zh-cn" />
 		</execute>
 
 		<execute macro="LanguagePortlet#viewLanguagesPresent">
-			<var name="currentLanguages" value="ENGLISH,GERMAN,SPANISH" />
+			<var name="currentLocales" value="de-de,es-es" />
 		</execute>
 	</command>
 
@@ -283,7 +298,9 @@
 		<property name="test.name.skip.portal.instance" value="LanguageUsecase#ViewChangedDefaultPortalLanguageViaWebContent" />
 		<property name="testray.component.names" value="Localization" />
 
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Control Panel" />
 			<var name="portlet" value="Instance Settings" />
 		</execute>
 
@@ -295,13 +312,15 @@
 			<var name="site" value="Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesContent">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Web Content" />
 		</execute>
 
 		<execute macro="WebContentNavigator#gotoAddCP" />
 
-		<execute macro="WebContent#viewDefaultLanguage">
+		<execute macro="PortletEntry#viewLocale">
 			<var name="locale" value="es-ES" />
 		</execute>
 	</command>
@@ -337,8 +356,8 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="LanguagePortlet#viewDisplayTemplateIconMenu">
-			<var name="language" value="Deutsch" />
+		<execute macro="LanguagePortlet#viewLanguageCurrent">
+			<var name="locale" value="nl-nl" />
 		</execute>
 
 		<execute macro="Navigator#gotoSitePage">
@@ -411,7 +430,9 @@
 			<var name="portletName" value="Language Selector" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Control Panel" />
 			<var name="portlet" value="Instance Settings" />
 		</execute>
 
@@ -424,12 +445,16 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
+		<execute macro="LanguagePortlet#viewLanguageCurrent">
+			<var name="locale" value="en-us" />
+		</execute>
+
 		<execute macro="LanguagePortlet#viewLanguagesAbsent">
-			<var name="missingLanguages" value="ARABIC,GERMAN,HUNGARIAN,JAPANESE,PORTUGUESE,SPANISH" />
+			<var name="missingLocales" value="de-de,es-es,hu-hu,iw-il,ja-jp,pt-br" />
 		</execute>
 
 		<execute macro="LanguagePortlet#viewLanguagesPresent">
-			<var name="currentLanguages" value="CHINESE,FRENCH,ENGLISH" />
+			<var name="currentLocales" value="fr-fr,zh-cn" />
 		</execute>
 
 		<execute macro="Portlet#gotoPortletOptions">
@@ -458,7 +483,9 @@
 			<var name="site" value="Site Name" />
 		</execute>
 
-		<execute macro="ProductMenu#gotoSitesConfiguration">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Site Administration" />
 			<var name="portlet" value="Site Settings" />
 		</execute>
 
@@ -473,12 +500,16 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
+		<execute macro="LanguagePortlet#viewLanguageCurrent">
+			<var name="locale" value="en-us" />
+		</execute>
+
 		<execute macro="LanguagePortlet#viewLanguagesAbsent">
-			<var name="missingLanguages" value="CHINESE,FRENCH,HUNGARIAN,JAPANESE,PORTUGUESE" />
+			<var name="missingLocales" value="fr-fr,hu-hu,ja-jp,pt-br,zh-cn" />
 		</execute>
 
 		<execute macro="LanguagePortlet#viewLanguagesPresent">
-			<var name="currentLanguages" value="ENGLISH,GERMAN,SPANISH" />
+			<var name="currentLocales" value="de-de,es-es" />
 		</execute>
 
 		<execute macro="Portlet#gotoPortletOptions">

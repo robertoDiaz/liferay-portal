@@ -60,59 +60,63 @@ public interface DDMDataProviderInstanceService extends BaseService {
 	 * Never modify or reference this interface directly. Always use {@link DDMDataProviderInstanceServiceUtil} to access the ddm data provider instance remote service. Add custom service methods to {@link com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public DDMDataProviderInstance addDataProviderInstance(long groupId,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap,
-		DDMFormValues ddmFormValues, java.lang.String type,
-		ServiceContext serviceContext) throws PortalException;
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+		DDMFormValues ddmFormValues, String type, ServiceContext serviceContext)
+		throws PortalException;
+
+	public void deleteDataProviderInstance(long dataProviderInstanceId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMDataProviderInstance fetchDataProviderInstance(
 		long dataProviderInstanceId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMDataProviderInstance fetchDataProviderInstanceByUuid(
-		java.lang.String uuid) throws PortalException;
+	public DDMDataProviderInstance fetchDataProviderInstanceByUuid(String uuid)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMDataProviderInstance getDataProviderInstance(
 		long dataProviderInstanceId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMDataProviderInstance getDataProviderInstanceByUuid(
-		java.lang.String uuid) throws PortalException;
-
-	public DDMDataProviderInstance updateDataProviderInstance(
-		long dataProviderInstanceId, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap,
-		DDMFormValues ddmFormValues, ServiceContext serviceContext)
+	public DDMDataProviderInstance getDataProviderInstanceByUuid(String uuid)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds,
-		java.lang.String keywords);
+	public List<DDMDataProviderInstance> getDataProviderInstances(
+		long companyId, long[] groupIds, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds,
-		java.lang.String name, java.lang.String description, boolean andOperator);
+	public int getDataProviderInstancesCount(long companyId, long[] groupIds);
 
 	/**
 	* Returns the OSGi service identifier.
 	*
 	* @return the OSGi service identifier
 	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMDataProviderInstance> search(long companyId,
-		long[] groupIds, java.lang.String keywords, int start, int end,
+		long[] groupIds, String keywords, int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMDataProviderInstance> search(long companyId,
-		long[] groupIds, java.lang.String name, java.lang.String description,
-		boolean andOperator, int start, int end,
+		long[] groupIds, String name, String description, boolean andOperator,
+		int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator);
 
-	public void deleteDataProviderInstance(long dataProviderInstanceId)
-		throws PortalException;
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, String keywords);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, String name,
+		String description, boolean andOperator);
+
+	public DDMDataProviderInstance updateDataProviderInstance(
+		long dataProviderInstanceId, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, DDMFormValues ddmFormValues,
+		ServiceContext serviceContext) throws PortalException;
 }

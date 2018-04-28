@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.model.BookmarksFolder;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -117,7 +118,7 @@ public class BookmarksFolderUtil {
 	* @param uuid the uuid
 	* @return the matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid(java.lang.String uuid) {
+	public static List<BookmarksFolder> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -133,8 +134,8 @@ public class BookmarksFolderUtil {
 	* @param end the upper bound of the range of bookmarks folders (not inclusive)
 	* @return the range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid(java.lang.String uuid,
-		int start, int end) {
+	public static List<BookmarksFolder> findByUuid(String uuid, int start,
+		int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -151,8 +152,8 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid(java.lang.String uuid,
-		int start, int end, OrderByComparator<BookmarksFolder> orderByComparator) {
+	public static List<BookmarksFolder> findByUuid(String uuid, int start,
+		int end, OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -170,9 +171,8 @@ public class BookmarksFolderUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid(java.lang.String uuid,
-		int start, int end,
-		OrderByComparator<BookmarksFolder> orderByComparator,
+	public static List<BookmarksFolder> findByUuid(String uuid, int start,
+		int end, OrderByComparator<BookmarksFolder> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
@@ -187,7 +187,7 @@ public class BookmarksFolderUtil {
 	* @return the first matching bookmarks folder
 	* @throws NoSuchFolderException if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder findByUuid_First(java.lang.String uuid,
+	public static BookmarksFolder findByUuid_First(String uuid,
 		OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -200,7 +200,7 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUuid_First(java.lang.String uuid,
+	public static BookmarksFolder fetchByUuid_First(String uuid,
 		OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -213,7 +213,7 @@ public class BookmarksFolderUtil {
 	* @return the last matching bookmarks folder
 	* @throws NoSuchFolderException if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder findByUuid_Last(java.lang.String uuid,
+	public static BookmarksFolder findByUuid_Last(String uuid,
 		OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -226,7 +226,7 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUuid_Last(java.lang.String uuid,
+	public static BookmarksFolder fetchByUuid_Last(String uuid,
 		OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -241,8 +241,7 @@ public class BookmarksFolderUtil {
 	* @throws NoSuchFolderException if a bookmarks folder with the primary key could not be found
 	*/
 	public static BookmarksFolder[] findByUuid_PrevAndNext(long folderId,
-		java.lang.String uuid,
-		OrderByComparator<BookmarksFolder> orderByComparator)
+		String uuid, OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence()
 				   .findByUuid_PrevAndNext(folderId, uuid, orderByComparator);
@@ -253,7 +252,7 @@ public class BookmarksFolderUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -263,7 +262,7 @@ public class BookmarksFolderUtil {
 	* @param uuid the uuid
 	* @return the number of matching bookmarks folders
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -275,8 +274,7 @@ public class BookmarksFolderUtil {
 	* @return the matching bookmarks folder
 	* @throws NoSuchFolderException if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder findByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static BookmarksFolder findByUUID_G(String uuid, long groupId)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -288,8 +286,7 @@ public class BookmarksFolderUtil {
 	* @param groupId the group ID
 	* @return the matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUUID_G(java.lang.String uuid,
-		long groupId) {
+	public static BookmarksFolder fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -301,8 +298,8 @@ public class BookmarksFolderUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUUID_G(java.lang.String uuid,
-		long groupId, boolean retrieveFromCache) {
+	public static BookmarksFolder fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
 
@@ -313,8 +310,7 @@ public class BookmarksFolderUtil {
 	* @param groupId the group ID
 	* @return the bookmarks folder that was removed
 	*/
-	public static BookmarksFolder removeByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static BookmarksFolder removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -326,7 +322,7 @@ public class BookmarksFolderUtil {
 	* @param groupId the group ID
 	* @return the number of matching bookmarks folders
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -337,8 +333,7 @@ public class BookmarksFolderUtil {
 	* @param companyId the company ID
 	* @return the matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid_C(java.lang.String uuid,
-		long companyId) {
+	public static List<BookmarksFolder> findByUuid_C(String uuid, long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -355,7 +350,7 @@ public class BookmarksFolderUtil {
 	* @param end the upper bound of the range of bookmarks folders (not inclusive)
 	* @return the range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid_C(java.lang.String uuid,
+	public static List<BookmarksFolder> findByUuid_C(String uuid,
 		long companyId, int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
@@ -374,7 +369,7 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid_C(java.lang.String uuid,
+	public static List<BookmarksFolder> findByUuid_C(String uuid,
 		long companyId, int start, int end,
 		OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence()
@@ -396,7 +391,7 @@ public class BookmarksFolderUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching bookmarks folders
 	*/
-	public static List<BookmarksFolder> findByUuid_C(java.lang.String uuid,
+	public static List<BookmarksFolder> findByUuid_C(String uuid,
 		long companyId, int start, int end,
 		OrderByComparator<BookmarksFolder> orderByComparator,
 		boolean retrieveFromCache) {
@@ -414,7 +409,7 @@ public class BookmarksFolderUtil {
 	* @return the first matching bookmarks folder
 	* @throws NoSuchFolderException if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder findByUuid_C_First(java.lang.String uuid,
+	public static BookmarksFolder findByUuid_C_First(String uuid,
 		long companyId, OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence()
@@ -429,7 +424,7 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUuid_C_First(java.lang.String uuid,
+	public static BookmarksFolder fetchByUuid_C_First(String uuid,
 		long companyId, OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
@@ -444,7 +439,7 @@ public class BookmarksFolderUtil {
 	* @return the last matching bookmarks folder
 	* @throws NoSuchFolderException if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder findByUuid_C_Last(java.lang.String uuid,
+	public static BookmarksFolder findByUuid_C_Last(String uuid,
 		long companyId, OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence()
@@ -459,7 +454,7 @@ public class BookmarksFolderUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching bookmarks folder, or <code>null</code> if a matching bookmarks folder could not be found
 	*/
-	public static BookmarksFolder fetchByUuid_C_Last(java.lang.String uuid,
+	public static BookmarksFolder fetchByUuid_C_Last(String uuid,
 		long companyId, OrderByComparator<BookmarksFolder> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -476,7 +471,7 @@ public class BookmarksFolderUtil {
 	* @throws NoSuchFolderException if a bookmarks folder with the primary key could not be found
 	*/
 	public static BookmarksFolder[] findByUuid_C_PrevAndNext(long folderId,
-		java.lang.String uuid, long companyId,
+		String uuid, long companyId,
 		OrderByComparator<BookmarksFolder> orderByComparator)
 		throws com.liferay.bookmarks.exception.NoSuchFolderException {
 		return getPersistence()
@@ -490,7 +485,7 @@ public class BookmarksFolderUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -501,7 +496,7 @@ public class BookmarksFolderUtil {
 	* @param companyId the company ID
 	* @return the number of matching bookmarks folders
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -2254,7 +2249,7 @@ public class BookmarksFolderUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -2262,6 +2257,17 @@ public class BookmarksFolderUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<BookmarksFolderPersistence, BookmarksFolderPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(BookmarksFolderPersistence.class);
+	private static ServiceTracker<BookmarksFolderPersistence, BookmarksFolderPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(BookmarksFolderPersistence.class);
+
+		ServiceTracker<BookmarksFolderPersistence, BookmarksFolderPersistence> serviceTracker =
+			new ServiceTracker<BookmarksFolderPersistence, BookmarksFolderPersistence>(bundle.getBundleContext(),
+				BookmarksFolderPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

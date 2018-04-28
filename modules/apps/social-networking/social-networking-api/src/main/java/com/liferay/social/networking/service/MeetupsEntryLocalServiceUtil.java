@@ -16,7 +16,8 @@ package com.liferay.social.networking.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,11 +43,11 @@ public class MeetupsEntryLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.social.networking.service.impl.MeetupsEntryLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.social.networking.model.MeetupsEntry addMeetupsEntry(
-		long userId, java.lang.String title, java.lang.String description,
-		int startDateMonth, int startDateDay, int startDateYear,
-		int startDateHour, int startDateMinute, int endDateMonth,
-		int endDateDay, int endDateYear, int endDateHour, int endDateMinute,
-		int totalAttendees, int maxAttendees, double price, byte[] thumbnail)
+		long userId, String title, String description, int startDateMonth,
+		int startDateDay, int startDateYear, int startDateHour,
+		int startDateMinute, int endDateMonth, int endDateDay, int endDateYear,
+		int endDateHour, int endDateMinute, int totalAttendees,
+		int maxAttendees, double price, byte[] thumbnail)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addMeetupsEntry(userId, title, description, startDateMonth,
@@ -254,7 +255,7 @@ public class MeetupsEntryLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -265,12 +266,11 @@ public class MeetupsEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.social.networking.model.MeetupsEntry updateMeetupsEntry(
-		long userId, long meetupsEntryId, java.lang.String title,
-		java.lang.String description, int startDateMonth, int startDateDay,
-		int startDateYear, int startDateHour, int startDateMinute,
-		int endDateMonth, int endDateDay, int endDateYear, int endDateHour,
-		int endDateMinute, int totalAttendees, int maxAttendees, double price,
-		byte[] thumbnail)
+		long userId, long meetupsEntryId, String title, String description,
+		int startDateMonth, int startDateDay, int startDateYear,
+		int startDateHour, int startDateMinute, int endDateMonth,
+		int endDateDay, int endDateYear, int endDateHour, int endDateMinute,
+		int totalAttendees, int maxAttendees, double price, byte[] thumbnail)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateMeetupsEntry(userId, meetupsEntryId, title,
@@ -295,6 +295,17 @@ public class MeetupsEntryLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(MeetupsEntryLocalService.class);
+	private static ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MeetupsEntryLocalService.class);
+
+		ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService> serviceTracker =
+			new ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService>(bundle.getBundleContext(),
+				MeetupsEntryLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

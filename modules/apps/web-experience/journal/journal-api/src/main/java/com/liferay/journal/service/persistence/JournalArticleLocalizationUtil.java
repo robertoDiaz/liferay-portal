@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.journal.model.JournalArticleLocalization;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -292,7 +293,7 @@ public class JournalArticleLocalizationUtil {
 	* @throws NoSuchArticleLocalizationException if a matching journal article localization could not be found
 	*/
 	public static JournalArticleLocalization findByA_L(long articlePK,
-		java.lang.String languageId)
+		String languageId)
 		throws com.liferay.journal.exception.NoSuchArticleLocalizationException {
 		return getPersistence().findByA_L(articlePK, languageId);
 	}
@@ -305,7 +306,7 @@ public class JournalArticleLocalizationUtil {
 	* @return the matching journal article localization, or <code>null</code> if a matching journal article localization could not be found
 	*/
 	public static JournalArticleLocalization fetchByA_L(long articlePK,
-		java.lang.String languageId) {
+		String languageId) {
 		return getPersistence().fetchByA_L(articlePK, languageId);
 	}
 
@@ -318,7 +319,7 @@ public class JournalArticleLocalizationUtil {
 	* @return the matching journal article localization, or <code>null</code> if a matching journal article localization could not be found
 	*/
 	public static JournalArticleLocalization fetchByA_L(long articlePK,
-		java.lang.String languageId, boolean retrieveFromCache) {
+		String languageId, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByA_L(articlePK, languageId, retrieveFromCache);
 	}
@@ -331,7 +332,7 @@ public class JournalArticleLocalizationUtil {
 	* @return the journal article localization that was removed
 	*/
 	public static JournalArticleLocalization removeByA_L(long articlePK,
-		java.lang.String languageId)
+		String languageId)
 		throws com.liferay.journal.exception.NoSuchArticleLocalizationException {
 		return getPersistence().removeByA_L(articlePK, languageId);
 	}
@@ -343,7 +344,7 @@ public class JournalArticleLocalizationUtil {
 	* @param languageId the language ID
 	* @return the number of matching journal article localizations
 	*/
-	public static int countByA_L(long articlePK, java.lang.String languageId) {
+	public static int countByA_L(long articlePK, String languageId) {
 		return getPersistence().countByA_L(articlePK, languageId);
 	}
 
@@ -504,6 +505,17 @@ public class JournalArticleLocalizationUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<JournalArticleLocalizationPersistence, JournalArticleLocalizationPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(JournalArticleLocalizationPersistence.class);
+	private static ServiceTracker<JournalArticleLocalizationPersistence, JournalArticleLocalizationPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(JournalArticleLocalizationPersistence.class);
+
+		ServiceTracker<JournalArticleLocalizationPersistence, JournalArticleLocalizationPersistence> serviceTracker =
+			new ServiceTracker<JournalArticleLocalizationPersistence, JournalArticleLocalizationPersistence>(bundle.getBundleContext(),
+				JournalArticleLocalizationPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

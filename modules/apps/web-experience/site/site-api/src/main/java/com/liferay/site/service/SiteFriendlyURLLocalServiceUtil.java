@@ -16,7 +16,8 @@ package com.liferay.site.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,8 +43,8 @@ public class SiteFriendlyURLLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.site.service.impl.SiteFriendlyURLLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.site.model.SiteFriendlyURL addSiteFriendlyURL(
-		long userId, long companyId, long groupId,
-		java.lang.String friendlyURL, java.lang.String languageId,
+		long userId, long companyId, long groupId, String friendlyURL,
+		String languageId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -64,7 +65,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 
 	public static java.util.List<com.liferay.site.model.SiteFriendlyURL> addSiteFriendlyURLs(
 		long userId, long companyId, long groupId,
-		java.util.Map<java.util.Locale, java.lang.String> friendlyURLMap,
+		java.util.Map<java.util.Locale, String> friendlyURLMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -106,7 +107,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	}
 
 	public static com.liferay.site.model.SiteFriendlyURL deleteSiteFriendlyURL(
-		long companyId, long groupId, java.lang.String languageId)
+		long companyId, long groupId, String languageId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteSiteFriendlyURL(companyId, groupId, languageId);
 	}
@@ -210,12 +211,12 @@ public class SiteFriendlyURLLocalServiceUtil {
 	}
 
 	public static com.liferay.site.model.SiteFriendlyURL fetchSiteFriendlyURL(
-		long companyId, long groupId, java.lang.String languageId) {
+		long companyId, long groupId, String languageId) {
 		return getService().fetchSiteFriendlyURL(companyId, groupId, languageId);
 	}
 
 	public static com.liferay.site.model.SiteFriendlyURL fetchSiteFriendlyURLByFriendlyURL(
-		long companyId, java.lang.String friendlyURL) {
+		long companyId, String friendlyURL) {
 		return getService()
 				   .fetchSiteFriendlyURLByFriendlyURL(companyId, friendlyURL);
 	}
@@ -228,7 +229,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	* @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	*/
 	public static com.liferay.site.model.SiteFriendlyURL fetchSiteFriendlyURLByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService().fetchSiteFriendlyURLByUuidAndGroupId(uuid, groupId);
 	}
 
@@ -250,7 +251,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -282,7 +283,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	* @throws PortalException if a matching site friendly url could not be found
 	*/
 	public static com.liferay.site.model.SiteFriendlyURL getSiteFriendlyURLByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getSiteFriendlyURLByUuidAndGroupId(uuid, groupId);
 	}
@@ -316,7 +317,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	* @return the matching site friendly urls, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.site.model.SiteFriendlyURL> getSiteFriendlyURLsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService()
 				   .getSiteFriendlyURLsByUuidAndCompanyId(uuid, companyId);
 	}
@@ -332,7 +333,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 	* @return the range of matching site friendly urls, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.site.model.SiteFriendlyURL> getSiteFriendlyURLsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.site.model.SiteFriendlyURL> orderByComparator) {
 		return getService()
 				   .getSiteFriendlyURLsByUuidAndCompanyId(uuid, companyId,
@@ -349,8 +350,8 @@ public class SiteFriendlyURLLocalServiceUtil {
 	}
 
 	public static com.liferay.site.model.SiteFriendlyURL updateSiteFriendlyURL(
-		long userId, long companyId, long groupId,
-		java.lang.String friendlyURL, java.lang.String languageId,
+		long userId, long companyId, long groupId, String friendlyURL,
+		String languageId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -371,7 +372,7 @@ public class SiteFriendlyURLLocalServiceUtil {
 
 	public static java.util.List<com.liferay.site.model.SiteFriendlyURL> updateSiteFriendlyURLs(
 		long userId, long companyId, long groupId,
-		java.util.Map<java.util.Locale, java.lang.String> friendlyURLMap,
+		java.util.Map<java.util.Locale, String> friendlyURLMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -383,6 +384,17 @@ public class SiteFriendlyURLLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<SiteFriendlyURLLocalService, SiteFriendlyURLLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(SiteFriendlyURLLocalService.class);
+	private static ServiceTracker<SiteFriendlyURLLocalService, SiteFriendlyURLLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(SiteFriendlyURLLocalService.class);
+
+		ServiceTracker<SiteFriendlyURLLocalService, SiteFriendlyURLLocalService> serviceTracker =
+			new ServiceTracker<SiteFriendlyURLLocalService, SiteFriendlyURLLocalService>(bundle.getBundleContext(),
+				SiteFriendlyURLLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -47,13 +47,13 @@ public class KaleoTimerLocalServiceWrapper implements KaleoTimerLocalService,
 
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoTimer addKaleoTimer(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId,
+		String kaleoClassName, long kaleoClassPK,
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.workflow.kaleo.definition.Timer timer,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kaleoTimerLocalService.addKaleoTimer(kaleoClassName,
-			kaleoClassPK, kaleoDefinitionId, timer, serviceContext);
+			kaleoClassPK, kaleoDefinitionVersionId, timer, serviceContext);
 	}
 
 	/**
@@ -238,14 +238,14 @@ public class KaleoTimerLocalServiceWrapper implements KaleoTimerLocalService,
 
 	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTimer> getKaleoTimers(
-		java.lang.String kaleoClassName, long kaleoClassPK) {
+		String kaleoClassName, long kaleoClassPK) {
 		return _kaleoTimerLocalService.getKaleoTimers(kaleoClassName,
 			kaleoClassPK);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTimer> getKaleoTimers(
-		java.lang.String kaleoClassName, long kaleoClassPK, boolean blocking) {
+		String kaleoClassName, long kaleoClassPK, boolean blocking) {
 		return _kaleoTimerLocalService.getKaleoTimers(kaleoClassName,
 			kaleoClassPK, blocking);
 	}
@@ -266,7 +266,7 @@ public class KaleoTimerLocalServiceWrapper implements KaleoTimerLocalService,
 	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _kaleoTimerLocalService.getOSGiServiceIdentifier();
 	}
 

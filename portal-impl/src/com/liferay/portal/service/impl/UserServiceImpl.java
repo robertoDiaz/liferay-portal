@@ -2556,8 +2556,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			announcementsDeliveryService.updateDelivery(
 				userId, announcementsDelivery.getType(),
 				announcementsDelivery.getEmail(),
-				announcementsDelivery.getSms(),
-				announcementsDelivery.getWebsite());
+				announcementsDelivery.getSms());
 		}
 	}
 
@@ -2643,7 +2642,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			fields.add("firstName");
 		}
 
-		if (male != contact.getMale()) {
+		if (male != contact.isMale()) {
 			fields.add("gender");
 		}
 

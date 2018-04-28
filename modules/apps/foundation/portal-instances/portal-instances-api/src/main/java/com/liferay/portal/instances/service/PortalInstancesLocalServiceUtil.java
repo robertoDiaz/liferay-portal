@@ -16,7 +16,8 @@ package com.liferay.portal.instances.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -67,24 +68,24 @@ public class PortalInstancesLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static java.lang.String[] getWebIds() {
+	public static String[] getWebIds() {
 		return getService().getWebIds();
 	}
 
 	public static void initializePortalInstance(
-		javax.servlet.ServletContext servletContext, java.lang.String webId) {
+		javax.servlet.ServletContext servletContext, String webId) {
 		getService().initializePortalInstance(servletContext, webId);
 	}
 
-	public static boolean isAutoLoginIgnoreHost(java.lang.String host) {
+	public static boolean isAutoLoginIgnoreHost(String host) {
 		return getService().isAutoLoginIgnoreHost(host);
 	}
 
-	public static boolean isAutoLoginIgnorePath(java.lang.String path) {
+	public static boolean isAutoLoginIgnorePath(String path) {
 		return getService().isAutoLoginIgnorePath(path);
 	}
 
@@ -92,11 +93,11 @@ public class PortalInstancesLocalServiceUtil {
 		return getService().isCompanyActive(companyId);
 	}
 
-	public static boolean isVirtualHostsIgnoreHost(java.lang.String host) {
+	public static boolean isVirtualHostsIgnoreHost(String host) {
 		return getService().isVirtualHostsIgnoreHost(host);
 	}
 
-	public static boolean isVirtualHostsIgnorePath(java.lang.String path) {
+	public static boolean isVirtualHostsIgnorePath(String path) {
 		return getService().isVirtualHostsIgnorePath(path);
 	}
 
@@ -116,6 +117,17 @@ public class PortalInstancesLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(PortalInstancesLocalService.class);
+	private static ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PortalInstancesLocalService.class);
+
+		ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService> serviceTracker =
+			new ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService>(bundle.getBundleContext(),
+				PortalInstancesLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

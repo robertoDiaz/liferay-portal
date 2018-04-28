@@ -64,9 +64,8 @@ public interface DDMContentLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMContentLocalServiceUtil} to access the ddm content local service. Add custom service methods to {@link com.liferay.dynamic.data.mapping.service.impl.DDMContentLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public DDMContent addContent(long userId, long groupId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String data, ServiceContext serviceContext)
+	public DDMContent addContent(long userId, long groupId, String name,
+		String description, String data, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -84,7 +83,12 @@ public interface DDMContentLocalService extends BaseLocalService,
 	* @param contentId the primary key for the new ddm content
 	* @return the new ddm content
 	*/
+	@Transactional(enabled = false)
 	public DDMContent createDDMContent(long contentId);
+
+	public void deleteContent(DDMContent content);
+
+	public void deleteContents(long groupId);
 
 	/**
 	* Deletes the ddm content from the database. Also notifies the appropriate model listeners.
@@ -106,70 +110,6 @@ public interface DDMContentLocalService extends BaseLocalService,
 	public DDMContent deleteDDMContent(long contentId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMContent fetchDDMContent(long contentId);
-
-	/**
-	* Returns the ddm content matching the UUID and group.
-	*
-	* @param uuid the ddm content's UUID
-	* @param groupId the primary key of the group
-	* @return the matching ddm content, or <code>null</code> if a matching ddm content could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMContent fetchDDMContentByUuidAndGroupId(java.lang.String uuid,
-		long groupId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMContent getContent(long contentId) throws PortalException;
-
-	/**
-	* Returns the ddm content with the primary key.
-	*
-	* @param contentId the primary key of the ddm content
-	* @return the ddm content
-	* @throws PortalException if a ddm content with the primary key could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMContent getDDMContent(long contentId) throws PortalException;
-
-	/**
-	* Returns the ddm content matching the UUID and group.
-	*
-	* @param uuid the ddm content's UUID
-	* @param groupId the primary key of the group
-	* @return the matching ddm content
-	* @throws PortalException if a matching ddm content could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMContent getDDMContentByUuidAndGroupId(java.lang.String uuid,
-		long groupId) throws PortalException;
-
-	public DDMContent updateContent(long contentId, java.lang.String name,
-		java.lang.String description, java.lang.String data,
-		ServiceContext serviceContext) throws PortalException;
-
-	/**
-	* Updates the ddm content in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param ddmContent the ddm content
-	* @return the ddm content that was updated
-	*/
-	@Indexable(type = IndexableType.REINDEX)
-	public DDMContent updateDDMContent(DDMContent ddmContent);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ActionableDynamicQuery getActionableDynamicQuery();
-
-	public DynamicQuery dynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
-
 	/**
 	* @throws PortalException
 	*/
@@ -177,28 +117,7 @@ public interface DDMContentLocalService extends BaseLocalService,
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getContentsCount(long groupId);
-
-	/**
-	* Returns the number of ddm contents.
-	*
-	* @return the number of ddm contents
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getDDMContentsCount();
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -239,6 +158,43 @@ public interface DDMContentLocalService extends BaseLocalService,
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end, OrderByComparator<T> orderByComparator);
 
+	/**
+	* Returns the number of rows matching the dynamic query.
+	*
+	* @param dynamicQuery the dynamic query
+	* @return the number of rows matching the dynamic query
+	*/
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
+
+	/**
+	* Returns the number of rows matching the dynamic query.
+	*
+	* @param dynamicQuery the dynamic query
+	* @param projection the projection to apply to the query
+	* @return the number of rows matching the dynamic query
+	*/
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMContent fetchDDMContent(long contentId);
+
+	/**
+	* Returns the ddm content matching the UUID and group.
+	*
+	* @param uuid the ddm content's UUID
+	* @param groupId the primary key of the group
+	* @return the matching ddm content, or <code>null</code> if a matching ddm content could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMContent fetchDDMContentByUuidAndGroupId(String uuid, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMContent getContent(long contentId) throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMContent> getContents();
 
@@ -247,6 +203,31 @@ public interface DDMContentLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMContent> getContents(long groupId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getContentsCount(long groupId);
+
+	/**
+	* Returns the ddm content with the primary key.
+	*
+	* @param contentId the primary key of the ddm content
+	* @return the ddm content
+	* @throws PortalException if a ddm content with the primary key could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMContent getDDMContent(long contentId) throws PortalException;
+
+	/**
+	* Returns the ddm content matching the UUID and group.
+	*
+	* @param uuid the ddm content's UUID
+	* @param groupId the primary key of the group
+	* @return the matching ddm content
+	* @throws PortalException if a matching ddm content could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMContent getDDMContentByUuidAndGroupId(String uuid, long groupId)
+		throws PortalException;
 
 	/**
 	* Returns a range of all the ddm contents.
@@ -270,8 +251,8 @@ public interface DDMContentLocalService extends BaseLocalService,
 	* @return the matching ddm contents, or an empty list if no matches were found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMContent> getDDMContentsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId);
+	public List<DDMContent> getDDMContentsByUuidAndCompanyId(String uuid,
+		long companyId);
 
 	/**
 	* Returns a range of ddm contents matching the UUID and company.
@@ -284,29 +265,47 @@ public interface DDMContentLocalService extends BaseLocalService,
 	* @return the range of matching ddm contents, or an empty list if no matches were found
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMContent> getDDMContentsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+	public List<DDMContent> getDDMContentsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<DDMContent> orderByComparator);
 
 	/**
-	* Returns the number of rows matching the dynamic query.
+	* Returns the number of ddm contents.
 	*
-	* @param dynamicQuery the dynamic query
-	* @return the number of rows matching the dynamic query
+	* @return the number of ddm contents
 	*/
-	public long dynamicQueryCount(DynamicQuery dynamicQuery);
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getDDMContentsCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		PortletDataContext portletDataContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
-	* Returns the number of rows matching the dynamic query.
+	* Returns the OSGi service identifier.
 	*
-	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows matching the dynamic query
+	* @return the OSGi service identifier
 	*/
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection);
+	public String getOSGiServiceIdentifier();
 
-	public void deleteContent(DDMContent content);
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
-	public void deleteContents(long groupId);
+	public DDMContent updateContent(long contentId, String name,
+		String description, String data, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	* Updates the ddm content in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param ddmContent the ddm content
+	* @return the ddm content that was updated
+	*/
+	@Indexable(type = IndexableType.REINDEX)
+	public DDMContent updateDDMContent(DDMContent ddmContent);
 }

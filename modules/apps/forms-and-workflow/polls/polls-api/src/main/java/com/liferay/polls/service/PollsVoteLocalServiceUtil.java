@@ -16,7 +16,8 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -192,7 +193,7 @@ public class PollsVoteLocalServiceUtil {
 	* @return the matching polls vote, or <code>null</code> if a matching polls vote could not be found
 	*/
 	public static com.liferay.polls.model.PollsVote fetchPollsVoteByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService().fetchPollsVoteByUuidAndGroupId(uuid, groupId);
 	}
 
@@ -228,7 +229,7 @@ public class PollsVoteLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -259,7 +260,7 @@ public class PollsVoteLocalServiceUtil {
 	* @throws PortalException if a matching polls vote could not be found
 	*/
 	public static com.liferay.polls.model.PollsVote getPollsVoteByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPollsVoteByUuidAndGroupId(uuid, groupId);
 	}
@@ -288,7 +289,7 @@ public class PollsVoteLocalServiceUtil {
 	* @return the matching polls votes, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.polls.model.PollsVote> getPollsVotesByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService().getPollsVotesByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -303,7 +304,7 @@ public class PollsVoteLocalServiceUtil {
 	* @return the range of matching polls votes, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.polls.model.PollsVote> getPollsVotesByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.polls.model.PollsVote> orderByComparator) {
 		return getService()
 				   .getPollsVotesByUuidAndCompanyId(uuid, companyId, start,
@@ -343,6 +344,17 @@ public class PollsVoteLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PollsVoteLocalService, PollsVoteLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(PollsVoteLocalService.class);
+	private static ServiceTracker<PollsVoteLocalService, PollsVoteLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PollsVoteLocalService.class);
+
+		ServiceTracker<PollsVoteLocalService, PollsVoteLocalService> serviceTracker =
+			new ServiceTracker<PollsVoteLocalService, PollsVoteLocalService>(bundle.getBundleContext(),
+				PollsVoteLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

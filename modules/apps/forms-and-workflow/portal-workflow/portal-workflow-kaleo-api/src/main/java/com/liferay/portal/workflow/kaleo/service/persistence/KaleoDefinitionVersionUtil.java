@@ -16,12 +16,13 @@ package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -284,7 +285,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the matching kaleo definition versions
 	*/
 	public static List<KaleoDefinitionVersion> findByC_N(long companyId,
-		java.lang.String name) {
+		String name) {
 		return getPersistence().findByC_N(companyId, name);
 	}
 
@@ -302,7 +303,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the range of matching kaleo definition versions
 	*/
 	public static List<KaleoDefinitionVersion> findByC_N(long companyId,
-		java.lang.String name, int start, int end) {
+		String name, int start, int end) {
 		return getPersistence().findByC_N(companyId, name, start, end);
 	}
 
@@ -321,7 +322,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the ordered range of matching kaleo definition versions
 	*/
 	public static List<KaleoDefinitionVersion> findByC_N(long companyId,
-		java.lang.String name, int start, int end,
+		String name, int start, int end,
 		OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
 		return getPersistence()
 				   .findByC_N(companyId, name, start, end, orderByComparator);
@@ -343,7 +344,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the ordered range of matching kaleo definition versions
 	*/
 	public static List<KaleoDefinitionVersion> findByC_N(long companyId,
-		java.lang.String name, int start, int end,
+		String name, int start, int end,
 		OrderByComparator<KaleoDefinitionVersion> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -361,8 +362,7 @@ public class KaleoDefinitionVersionUtil {
 	* @throws NoSuchDefinitionVersionException if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion findByC_N_First(long companyId,
-		java.lang.String name,
-		OrderByComparator<KaleoDefinitionVersion> orderByComparator)
+		String name, OrderByComparator<KaleoDefinitionVersion> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionVersionException {
 		return getPersistence()
 				   .findByC_N_First(companyId, name, orderByComparator);
@@ -377,8 +377,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the first matching kaleo definition version, or <code>null</code> if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion fetchByC_N_First(long companyId,
-		java.lang.String name,
-		OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
+		String name, OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByC_N_First(companyId, name, orderByComparator);
 	}
@@ -393,8 +392,7 @@ public class KaleoDefinitionVersionUtil {
 	* @throws NoSuchDefinitionVersionException if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion findByC_N_Last(long companyId,
-		java.lang.String name,
-		OrderByComparator<KaleoDefinitionVersion> orderByComparator)
+		String name, OrderByComparator<KaleoDefinitionVersion> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionVersionException {
 		return getPersistence()
 				   .findByC_N_Last(companyId, name, orderByComparator);
@@ -409,8 +407,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the last matching kaleo definition version, or <code>null</code> if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion fetchByC_N_Last(long companyId,
-		java.lang.String name,
-		OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
+		String name, OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByC_N_Last(companyId, name, orderByComparator);
 	}
@@ -426,7 +423,7 @@ public class KaleoDefinitionVersionUtil {
 	* @throws NoSuchDefinitionVersionException if a kaleo definition version with the primary key could not be found
 	*/
 	public static KaleoDefinitionVersion[] findByC_N_PrevAndNext(
-		long kaleoDefinitionVersionId, long companyId, java.lang.String name,
+		long kaleoDefinitionVersionId, long companyId, String name,
 		OrderByComparator<KaleoDefinitionVersion> orderByComparator)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionVersionException {
 		return getPersistence()
@@ -440,7 +437,7 @@ public class KaleoDefinitionVersionUtil {
 	* @param companyId the company ID
 	* @param name the name
 	*/
-	public static void removeByC_N(long companyId, java.lang.String name) {
+	public static void removeByC_N(long companyId, String name) {
 		getPersistence().removeByC_N(companyId, name);
 	}
 
@@ -451,7 +448,7 @@ public class KaleoDefinitionVersionUtil {
 	* @param name the name
 	* @return the number of matching kaleo definition versions
 	*/
-	public static int countByC_N(long companyId, java.lang.String name) {
+	public static int countByC_N(long companyId, String name) {
 		return getPersistence().countByC_N(companyId, name);
 	}
 
@@ -465,7 +462,7 @@ public class KaleoDefinitionVersionUtil {
 	* @throws NoSuchDefinitionVersionException if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion findByC_N_V(long companyId,
-		java.lang.String name, java.lang.String version)
+		String name, String version)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionVersionException {
 		return getPersistence().findByC_N_V(companyId, name, version);
 	}
@@ -479,7 +476,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the matching kaleo definition version, or <code>null</code> if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion fetchByC_N_V(long companyId,
-		java.lang.String name, java.lang.String version) {
+		String name, String version) {
 		return getPersistence().fetchByC_N_V(companyId, name, version);
 	}
 
@@ -493,8 +490,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the matching kaleo definition version, or <code>null</code> if a matching kaleo definition version could not be found
 	*/
 	public static KaleoDefinitionVersion fetchByC_N_V(long companyId,
-		java.lang.String name, java.lang.String version,
-		boolean retrieveFromCache) {
+		String name, String version, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByC_N_V(companyId, name, version, retrieveFromCache);
 	}
@@ -508,7 +504,7 @@ public class KaleoDefinitionVersionUtil {
 	* @return the kaleo definition version that was removed
 	*/
 	public static KaleoDefinitionVersion removeByC_N_V(long companyId,
-		java.lang.String name, java.lang.String version)
+		String name, String version)
 		throws com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionVersionException {
 		return getPersistence().removeByC_N_V(companyId, name, version);
 	}
@@ -521,8 +517,7 @@ public class KaleoDefinitionVersionUtil {
 	* @param version the version
 	* @return the number of matching kaleo definition versions
 	*/
-	public static int countByC_N_V(long companyId, java.lang.String name,
-		java.lang.String version) {
+	public static int countByC_N_V(long companyId, String name, String version) {
 		return getPersistence().countByC_N_V(companyId, name, version);
 	}
 
@@ -683,6 +678,17 @@ public class KaleoDefinitionVersionUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoDefinitionVersionPersistence, KaleoDefinitionVersionPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoDefinitionVersionPersistence.class);
+	private static ServiceTracker<KaleoDefinitionVersionPersistence, KaleoDefinitionVersionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoDefinitionVersionPersistence.class);
+
+		ServiceTracker<KaleoDefinitionVersionPersistence, KaleoDefinitionVersionPersistence> serviceTracker =
+			new ServiceTracker<KaleoDefinitionVersionPersistence, KaleoDefinitionVersionPersistence>(bundle.getBundleContext(),
+				KaleoDefinitionVersionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

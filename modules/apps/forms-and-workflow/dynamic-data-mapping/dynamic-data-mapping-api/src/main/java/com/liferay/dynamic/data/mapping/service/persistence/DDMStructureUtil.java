@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -117,7 +118,7 @@ public class DDMStructureUtil {
 	* @param uuid the uuid
 	* @return the matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid(java.lang.String uuid) {
+	public static List<DDMStructure> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -133,8 +134,7 @@ public class DDMStructureUtil {
 	* @param end the upper bound of the range of ddm structures (not inclusive)
 	* @return the range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid(java.lang.String uuid,
-		int start, int end) {
+	public static List<DDMStructure> findByUuid(String uuid, int start, int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -151,8 +151,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid(java.lang.String uuid,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+	public static List<DDMStructure> findByUuid(String uuid, int start,
+		int end, OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -170,8 +170,8 @@ public class DDMStructureUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid(java.lang.String uuid,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator,
+	public static List<DDMStructure> findByUuid(String uuid, int start,
+		int end, OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
@@ -186,7 +186,7 @@ public class DDMStructureUtil {
 	* @return the first matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByUuid_First(java.lang.String uuid,
+	public static DDMStructure findByUuid_First(String uuid,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -199,7 +199,7 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUuid_First(java.lang.String uuid,
+	public static DDMStructure fetchByUuid_First(String uuid,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -212,7 +212,7 @@ public class DDMStructureUtil {
 	* @return the last matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByUuid_Last(java.lang.String uuid,
+	public static DDMStructure findByUuid_Last(String uuid,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -225,7 +225,7 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUuid_Last(java.lang.String uuid,
+	public static DDMStructure fetchByUuid_Last(String uuid,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -240,7 +240,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] findByUuid_PrevAndNext(long structureId,
-		java.lang.String uuid, OrderByComparator<DDMStructure> orderByComparator)
+		String uuid, OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .findByUuid_PrevAndNext(structureId, uuid, orderByComparator);
@@ -251,7 +251,7 @@ public class DDMStructureUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -261,7 +261,7 @@ public class DDMStructureUtil {
 	* @param uuid the uuid
 	* @return the number of matching ddm structures
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -273,7 +273,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByUUID_G(java.lang.String uuid, long groupId)
+	public static DDMStructure findByUUID_G(String uuid, long groupId)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -285,7 +285,7 @@ public class DDMStructureUtil {
 	* @param groupId the group ID
 	* @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUUID_G(java.lang.String uuid, long groupId) {
+	public static DDMStructure fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -297,8 +297,8 @@ public class DDMStructureUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUUID_G(java.lang.String uuid,
-		long groupId, boolean retrieveFromCache) {
+	public static DDMStructure fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
 
@@ -309,8 +309,7 @@ public class DDMStructureUtil {
 	* @param groupId the group ID
 	* @return the ddm structure that was removed
 	*/
-	public static DDMStructure removeByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static DDMStructure removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -322,7 +321,7 @@ public class DDMStructureUtil {
 	* @param groupId the group ID
 	* @return the number of matching ddm structures
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -333,8 +332,7 @@ public class DDMStructureUtil {
 	* @param companyId the company ID
 	* @return the matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid_C(java.lang.String uuid,
-		long companyId) {
+	public static List<DDMStructure> findByUuid_C(String uuid, long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -351,8 +349,8 @@ public class DDMStructureUtil {
 	* @param end the upper bound of the range of ddm structures (not inclusive)
 	* @return the range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end) {
+	public static List<DDMStructure> findByUuid_C(String uuid, long companyId,
+		int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -370,9 +368,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<DDMStructure> orderByComparator) {
+	public static List<DDMStructure> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
 	}
@@ -392,9 +389,8 @@ public class DDMStructureUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<DDMStructure> orderByComparator,
+	public static List<DDMStructure> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end,
@@ -410,8 +406,8 @@ public class DDMStructureUtil {
 	* @return the first matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<DDMStructure> orderByComparator)
+	public static DDMStructure findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .findByUuid_C_First(uuid, companyId, orderByComparator);
@@ -425,8 +421,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<DDMStructure> orderByComparator) {
+	public static DDMStructure fetchByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
 	}
@@ -440,8 +436,8 @@ public class DDMStructureUtil {
 	* @return the last matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<DDMStructure> orderByComparator)
+	public static DDMStructure findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -455,8 +451,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<DDMStructure> orderByComparator) {
+	public static DDMStructure fetchByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
 	}
@@ -472,7 +468,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] findByUuid_C_PrevAndNext(long structureId,
-		java.lang.String uuid, long companyId,
+		String uuid, long companyId,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -486,7 +482,7 @@ public class DDMStructureUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -497,7 +493,7 @@ public class DDMStructureUtil {
 	* @param companyId the company ID
 	* @return the number of matching ddm structures
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -1210,8 +1206,7 @@ public class DDMStructureUtil {
 	* @param structureKey the structure key
 	* @return the matching ddm structures
 	*/
-	public static List<DDMStructure> findByStructureKey(
-		java.lang.String structureKey) {
+	public static List<DDMStructure> findByStructureKey(String structureKey) {
 		return getPersistence().findByStructureKey(structureKey);
 	}
 
@@ -1227,8 +1222,8 @@ public class DDMStructureUtil {
 	* @param end the upper bound of the range of ddm structures (not inclusive)
 	* @return the range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByStructureKey(
-		java.lang.String structureKey, int start, int end) {
+	public static List<DDMStructure> findByStructureKey(String structureKey,
+		int start, int end) {
 		return getPersistence().findByStructureKey(structureKey, start, end);
 	}
 
@@ -1245,9 +1240,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByStructureKey(
-		java.lang.String structureKey, int start, int end,
-		OrderByComparator<DDMStructure> orderByComparator) {
+	public static List<DDMStructure> findByStructureKey(String structureKey,
+		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .findByStructureKey(structureKey, start, end,
 			orderByComparator);
@@ -1267,9 +1261,8 @@ public class DDMStructureUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByStructureKey(
-		java.lang.String structureKey, int start, int end,
-		OrderByComparator<DDMStructure> orderByComparator,
+	public static List<DDMStructure> findByStructureKey(String structureKey,
+		int start, int end, OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByStructureKey(structureKey, start, end,
@@ -1284,8 +1277,7 @@ public class DDMStructureUtil {
 	* @return the first matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByStructureKey_First(
-		java.lang.String structureKey,
+	public static DDMStructure findByStructureKey_First(String structureKey,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -1299,8 +1291,7 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByStructureKey_First(
-		java.lang.String structureKey,
+	public static DDMStructure fetchByStructureKey_First(String structureKey,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByStructureKey_First(structureKey, orderByComparator);
@@ -1314,8 +1305,7 @@ public class DDMStructureUtil {
 	* @return the last matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByStructureKey_Last(
-		java.lang.String structureKey,
+	public static DDMStructure findByStructureKey_Last(String structureKey,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -1329,8 +1319,7 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByStructureKey_Last(
-		java.lang.String structureKey,
+	public static DDMStructure fetchByStructureKey_Last(String structureKey,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByStructureKey_Last(structureKey, orderByComparator);
@@ -1346,7 +1335,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] findByStructureKey_PrevAndNext(
-		long structureId, java.lang.String structureKey,
+		long structureId, String structureKey,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -1359,7 +1348,7 @@ public class DDMStructureUtil {
 	*
 	* @param structureKey the structure key
 	*/
-	public static void removeByStructureKey(java.lang.String structureKey) {
+	public static void removeByStructureKey(String structureKey) {
 		getPersistence().removeByStructureKey(structureKey);
 	}
 
@@ -1369,7 +1358,7 @@ public class DDMStructureUtil {
 	* @param structureKey the structure key
 	* @return the number of matching ddm structures
 	*/
-	public static int countByStructureKey(java.lang.String structureKey) {
+	public static int countByStructureKey(String structureKey) {
 		return getPersistence().countByStructureKey(structureKey);
 	}
 
@@ -2233,7 +2222,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
 	public static DDMStructure findByG_C_S(long groupId, long classNameId,
-		java.lang.String structureKey)
+		String structureKey)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().findByG_C_S(groupId, classNameId, structureKey);
 	}
@@ -2247,7 +2236,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
 	public static DDMStructure fetchByG_C_S(long groupId, long classNameId,
-		java.lang.String structureKey) {
+		String structureKey) {
 		return getPersistence().fetchByG_C_S(groupId, classNameId, structureKey);
 	}
 
@@ -2261,7 +2250,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
 	public static DDMStructure fetchByG_C_S(long groupId, long classNameId,
-		java.lang.String structureKey, boolean retrieveFromCache) {
+		String structureKey, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByG_C_S(groupId, classNameId, structureKey,
 			retrieveFromCache);
@@ -2276,7 +2265,7 @@ public class DDMStructureUtil {
 	* @return the ddm structure that was removed
 	*/
 	public static DDMStructure removeByG_C_S(long groupId, long classNameId,
-		java.lang.String structureKey)
+		String structureKey)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence().removeByG_C_S(groupId, classNameId, structureKey);
 	}
@@ -2290,7 +2279,7 @@ public class DDMStructureUtil {
 	* @return the number of matching ddm structures
 	*/
 	public static int countByG_C_S(long groupId, long classNameId,
-		java.lang.String structureKey) {
+		String structureKey) {
 		return getPersistence().countByG_C_S(groupId, classNameId, structureKey);
 	}
 
@@ -2302,8 +2291,8 @@ public class DDMStructureUtil {
 	* @param description the description
 	* @return the matching ddm structures
 	*/
-	public static List<DDMStructure> findByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description) {
+	public static List<DDMStructure> findByG_N_D(long groupId, String name,
+		String description) {
 		return getPersistence().findByG_N_D(groupId, name, description);
 	}
 
@@ -2321,8 +2310,8 @@ public class DDMStructureUtil {
 	* @param end the upper bound of the range of ddm structures (not inclusive)
 	* @return the range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description, int start, int end) {
+	public static List<DDMStructure> findByG_N_D(long groupId, String name,
+		String description, int start, int end) {
 		return getPersistence()
 				   .findByG_N_D(groupId, name, description, start, end);
 	}
@@ -2342,9 +2331,9 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description, int start,
-		int end, OrderByComparator<DDMStructure> orderByComparator) {
+	public static List<DDMStructure> findByG_N_D(long groupId, String name,
+		String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .findByG_N_D(groupId, name, description, start, end,
 			orderByComparator);
@@ -2366,9 +2355,9 @@ public class DDMStructureUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching ddm structures
 	*/
-	public static List<DDMStructure> findByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description, int start,
-		int end, OrderByComparator<DDMStructure> orderByComparator,
+	public static List<DDMStructure> findByG_N_D(long groupId, String name,
+		String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByG_N_D(groupId, name, description, start, end,
@@ -2385,9 +2374,8 @@ public class DDMStructureUtil {
 	* @return the first matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByG_N_D_First(long groupId,
-		java.lang.String name, java.lang.String description,
-		OrderByComparator<DDMStructure> orderByComparator)
+	public static DDMStructure findByG_N_D_First(long groupId, String name,
+		String description, OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .findByG_N_D_First(groupId, name, description,
@@ -2403,9 +2391,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByG_N_D_First(long groupId,
-		java.lang.String name, java.lang.String description,
-		OrderByComparator<DDMStructure> orderByComparator) {
+	public static DDMStructure fetchByG_N_D_First(long groupId, String name,
+		String description, OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_D_First(groupId, name, description,
 			orderByComparator);
@@ -2421,9 +2408,8 @@ public class DDMStructureUtil {
 	* @return the last matching ddm structure
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
-	public static DDMStructure findByG_N_D_Last(long groupId,
-		java.lang.String name, java.lang.String description,
-		OrderByComparator<DDMStructure> orderByComparator)
+	public static DDMStructure findByG_N_D_Last(long groupId, String name,
+		String description, OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .findByG_N_D_Last(groupId, name, description,
@@ -2439,9 +2425,8 @@ public class DDMStructureUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
-	public static DDMStructure fetchByG_N_D_Last(long groupId,
-		java.lang.String name, java.lang.String description,
-		OrderByComparator<DDMStructure> orderByComparator) {
+	public static DDMStructure fetchByG_N_D_Last(long groupId, String name,
+		String description, OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_D_Last(groupId, name, description,
 			orderByComparator);
@@ -2459,7 +2444,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] findByG_N_D_PrevAndNext(long structureId,
-		long groupId, java.lang.String name, java.lang.String description,
+		long groupId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -2476,7 +2461,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		return getPersistence().filterFindByG_N_D(groupId, name, description);
 	}
 
@@ -2495,7 +2480,7 @@ public class DDMStructureUtil {
 	* @return the range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description, int start, int end) {
+		String name, String description, int start, int end) {
 		return getPersistence()
 				   .filterFindByG_N_D(groupId, name, description, start, end);
 	}
@@ -2516,8 +2501,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_N_D(long groupId,
-		java.lang.String name, java.lang.String description, int start,
-		int end, OrderByComparator<DDMStructure> orderByComparator) {
+		String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_N_D(groupId, name, description, start, end,
 			orderByComparator);
@@ -2535,8 +2520,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] filterFindByG_N_D_PrevAndNext(
-		long structureId, long groupId, java.lang.String name,
-		java.lang.String description,
+		long structureId, long groupId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -2551,8 +2535,8 @@ public class DDMStructureUtil {
 	* @param name the name
 	* @param description the description
 	*/
-	public static void removeByG_N_D(long groupId, java.lang.String name,
-		java.lang.String description) {
+	public static void removeByG_N_D(long groupId, String name,
+		String description) {
 		getPersistence().removeByG_N_D(groupId, name, description);
 	}
 
@@ -2564,8 +2548,7 @@ public class DDMStructureUtil {
 	* @param description the description
 	* @return the number of matching ddm structures
 	*/
-	public static int countByG_N_D(long groupId, java.lang.String name,
-		java.lang.String description) {
+	public static int countByG_N_D(long groupId, String name, String description) {
 		return getPersistence().countByG_N_D(groupId, name, description);
 	}
 
@@ -2577,8 +2560,8 @@ public class DDMStructureUtil {
 	* @param description the description
 	* @return the number of matching ddm structures that the user has permission to view
 	*/
-	public static int filterCountByG_N_D(long groupId, java.lang.String name,
-		java.lang.String description) {
+	public static int filterCountByG_N_D(long groupId, String name,
+		String description) {
 		return getPersistence().filterCountByG_N_D(groupId, name, description);
 	}
 
@@ -2592,7 +2575,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description) {
+		long classNameId, String name, String description) {
 		return getPersistence()
 				   .findByG_C_N_D(groupId, classNameId, name, description);
 	}
@@ -2613,8 +2596,7 @@ public class DDMStructureUtil {
 	* @return the range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end) {
+		long classNameId, String name, String description, int start, int end) {
 		return getPersistence()
 				   .findByG_C_N_D(groupId, classNameId, name, description,
 			start, end);
@@ -2637,8 +2619,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .findByG_C_N_D(groupId, classNameId, name, description,
 			start, end, orderByComparator);
@@ -2662,8 +2644,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator,
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByG_C_N_D(groupId, classNameId, name, description,
@@ -2682,7 +2664,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
 	public static DDMStructure findByG_C_N_D_First(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
+		long classNameId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -2701,7 +2683,7 @@ public class DDMStructureUtil {
 	* @return the first matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
 	public static DDMStructure fetchByG_C_N_D_First(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
+		long classNameId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_C_N_D_First(groupId, classNameId, name,
@@ -2720,7 +2702,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a matching ddm structure could not be found
 	*/
 	public static DDMStructure findByG_C_N_D_Last(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
+		long classNameId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -2739,7 +2721,7 @@ public class DDMStructureUtil {
 	* @return the last matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
 	*/
 	public static DDMStructure fetchByG_C_N_D_Last(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
+		long classNameId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_C_N_D_Last(groupId, classNameId, name,
@@ -2759,8 +2741,7 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] findByG_C_N_D_PrevAndNext(long structureId,
-		long groupId, long classNameId, java.lang.String name,
-		java.lang.String description,
+		long groupId, long classNameId, String name, String description,
 		OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
@@ -2778,7 +2759,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description) {
+		long classNameId, String name, String description) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupId, classNameId, name, description);
 	}
@@ -2799,8 +2780,7 @@ public class DDMStructureUtil {
 	* @return the range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end) {
+		long classNameId, String name, String description, int start, int end) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupId, classNameId, name,
 			description, start, end);
@@ -2823,8 +2803,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long groupId,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupId, classNameId, name,
 			description, start, end, orderByComparator);
@@ -2843,9 +2823,8 @@ public class DDMStructureUtil {
 	* @throws NoSuchStructureException if a ddm structure with the primary key could not be found
 	*/
 	public static DDMStructure[] filterFindByG_C_N_D_PrevAndNext(
-		long structureId, long groupId, long classNameId,
-		java.lang.String name, java.lang.String description,
-		OrderByComparator<DDMStructure> orderByComparator)
+		long structureId, long groupId, long classNameId, String name,
+		String description, OrderByComparator<DDMStructure> orderByComparator)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureException {
 		return getPersistence()
 				   .filterFindByG_C_N_D_PrevAndNext(structureId, groupId,
@@ -2862,7 +2841,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description) {
+		long classNameId, String name, String description) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupIds, classNameId, name, description);
 	}
@@ -2883,8 +2862,7 @@ public class DDMStructureUtil {
 	* @return the range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end) {
+		long classNameId, String name, String description, int start, int end) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupIds, classNameId, name,
 			description, start, end);
@@ -2907,8 +2885,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures that the user has permission to view
 	*/
 	public static List<DDMStructure> filterFindByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_C_N_D(groupIds, classNameId, name,
 			description, start, end, orderByComparator);
@@ -2928,7 +2906,7 @@ public class DDMStructureUtil {
 	* @return the matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description) {
+		long classNameId, String name, String description) {
 		return getPersistence()
 				   .findByG_C_N_D(groupIds, classNameId, name, description);
 	}
@@ -2949,8 +2927,7 @@ public class DDMStructureUtil {
 	* @return the range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end) {
+		long classNameId, String name, String description, int start, int end) {
 		return getPersistence()
 				   .findByG_C_N_D(groupIds, classNameId, name, description,
 			start, end);
@@ -2973,8 +2950,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
 		return getPersistence()
 				   .findByG_C_N_D(groupIds, classNameId, name, description,
 			start, end, orderByComparator);
@@ -2998,8 +2975,8 @@ public class DDMStructureUtil {
 	* @return the ordered range of matching ddm structures
 	*/
 	public static List<DDMStructure> findByG_C_N_D(long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator,
+		long classNameId, String name, String description, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByG_C_N_D(groupIds, classNameId, name, description,
@@ -3015,7 +2992,7 @@ public class DDMStructureUtil {
 	* @param description the description
 	*/
 	public static void removeByG_C_N_D(long groupId, long classNameId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		getPersistence().removeByG_C_N_D(groupId, classNameId, name, description);
 	}
 
@@ -3029,7 +3006,7 @@ public class DDMStructureUtil {
 	* @return the number of matching ddm structures
 	*/
 	public static int countByG_C_N_D(long groupId, long classNameId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		return getPersistence()
 				   .countByG_C_N_D(groupId, classNameId, name, description);
 	}
@@ -3044,7 +3021,7 @@ public class DDMStructureUtil {
 	* @return the number of matching ddm structures
 	*/
 	public static int countByG_C_N_D(long[] groupIds, long classNameId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		return getPersistence()
 				   .countByG_C_N_D(groupIds, classNameId, name, description);
 	}
@@ -3059,7 +3036,7 @@ public class DDMStructureUtil {
 	* @return the number of matching ddm structures that the user has permission to view
 	*/
 	public static int filterCountByG_C_N_D(long groupId, long classNameId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		return getPersistence()
 				   .filterCountByG_C_N_D(groupId, classNameId, name, description);
 	}
@@ -3074,7 +3051,7 @@ public class DDMStructureUtil {
 	* @return the number of matching ddm structures that the user has permission to view
 	*/
 	public static int filterCountByG_C_N_D(long[] groupIds, long classNameId,
-		java.lang.String name, java.lang.String description) {
+		String name, String description) {
 		return getPersistence()
 				   .filterCountByG_C_N_D(groupIds, classNameId, name,
 			description);
@@ -3228,7 +3205,7 @@ public class DDMStructureUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -3236,6 +3213,17 @@ public class DDMStructureUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDMStructurePersistence, DDMStructurePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(DDMStructurePersistence.class);
+	private static ServiceTracker<DDMStructurePersistence, DDMStructurePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDMStructurePersistence.class);
+
+		ServiceTracker<DDMStructurePersistence, DDMStructurePersistence> serviceTracker =
+			new ServiceTracker<DDMStructurePersistence, DDMStructurePersistence>(bundle.getBundleContext(),
+				DDMStructurePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

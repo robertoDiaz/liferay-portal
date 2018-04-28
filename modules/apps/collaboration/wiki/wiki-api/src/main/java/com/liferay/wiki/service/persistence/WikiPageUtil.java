@@ -16,13 +16,14 @@ package com.liferay.wiki.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import com.liferay.wiki.model.WikiPage;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -282,7 +283,7 @@ public class WikiPageUtil {
 	* @param uuid the uuid
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid(java.lang.String uuid) {
+	public static List<WikiPage> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -298,8 +299,7 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid(java.lang.String uuid, int start,
-		int end) {
+	public static List<WikiPage> findByUuid(String uuid, int start, int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -316,8 +316,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid(java.lang.String uuid, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
+	public static List<WikiPage> findByUuid(String uuid, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -335,9 +335,8 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid(java.lang.String uuid, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
+	public static List<WikiPage> findByUuid(String uuid, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
 			retrieveFromCache);
@@ -351,7 +350,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByUuid_First(java.lang.String uuid,
+	public static WikiPage findByUuid_First(String uuid,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -364,7 +363,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUuid_First(java.lang.String uuid,
+	public static WikiPage fetchByUuid_First(String uuid,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -377,7 +376,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByUuid_Last(java.lang.String uuid,
+	public static WikiPage findByUuid_Last(String uuid,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -390,7 +389,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUuid_Last(java.lang.String uuid,
+	public static WikiPage fetchByUuid_Last(String uuid,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -404,8 +403,8 @@ public class WikiPageUtil {
 	* @return the previous, current, and next wiki page
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
-	public static WikiPage[] findByUuid_PrevAndNext(long pageId,
-		java.lang.String uuid, OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage[] findByUuid_PrevAndNext(long pageId, String uuid,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByUuid_PrevAndNext(pageId, uuid, orderByComparator);
@@ -416,7 +415,7 @@ public class WikiPageUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -426,7 +425,7 @@ public class WikiPageUtil {
 	* @param uuid the uuid
 	* @return the number of matching wiki pages
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -438,7 +437,7 @@ public class WikiPageUtil {
 	* @return the matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByUUID_G(java.lang.String uuid, long groupId)
+	public static WikiPage findByUUID_G(String uuid, long groupId)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -450,7 +449,7 @@ public class WikiPageUtil {
 	* @param groupId the group ID
 	* @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUUID_G(java.lang.String uuid, long groupId) {
+	public static WikiPage fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -462,7 +461,7 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUUID_G(java.lang.String uuid, long groupId,
+	public static WikiPage fetchByUUID_G(String uuid, long groupId,
 		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
@@ -474,7 +473,7 @@ public class WikiPageUtil {
 	* @param groupId the group ID
 	* @return the wiki page that was removed
 	*/
-	public static WikiPage removeByUUID_G(java.lang.String uuid, long groupId)
+	public static WikiPage removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -486,7 +485,7 @@ public class WikiPageUtil {
 	* @param groupId the group ID
 	* @return the number of matching wiki pages
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -497,8 +496,7 @@ public class WikiPageUtil {
 	* @param companyId the company ID
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid_C(java.lang.String uuid,
-		long companyId) {
+	public static List<WikiPage> findByUuid_C(String uuid, long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -515,8 +513,8 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end) {
+	public static List<WikiPage> findByUuid_C(String uuid, long companyId,
+		int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -534,9 +532,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static List<WikiPage> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
 	}
@@ -556,9 +553,9 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByUuid_C(java.lang.String uuid,
-		long companyId, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
+	public static List<WikiPage> findByUuid_C(String uuid, long companyId,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
+		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end,
 			orderByComparator, retrieveFromCache);
@@ -573,8 +570,8 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByUuid_C_First(uuid, companyId, orderByComparator);
@@ -588,8 +585,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUuid_C_First(java.lang.String uuid,
-		long companyId, OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByUuid_C_First(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
 	}
@@ -603,8 +600,8 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -618,8 +615,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByUuid_C_Last(java.lang.String uuid,
-		long companyId, OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
 	}
@@ -634,9 +631,8 @@ public class WikiPageUtil {
 	* @return the previous, current, and next wiki page
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
-	public static WikiPage[] findByUuid_C_PrevAndNext(long pageId,
-		java.lang.String uuid, long companyId,
-		OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage[] findByUuid_C_PrevAndNext(long pageId, String uuid,
+		long companyId, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByUuid_C_PrevAndNext(pageId, uuid, companyId,
@@ -649,7 +645,7 @@ public class WikiPageUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -660,7 +656,7 @@ public class WikiPageUtil {
 	* @param companyId the company ID
 	* @return the number of matching wiki pages
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -823,7 +819,7 @@ public class WikiPageUtil {
 	* @param format the format
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByFormat(java.lang.String format) {
+	public static List<WikiPage> findByFormat(String format) {
 		return getPersistence().findByFormat(format);
 	}
 
@@ -839,8 +835,7 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByFormat(java.lang.String format,
-		int start, int end) {
+	public static List<WikiPage> findByFormat(String format, int start, int end) {
 		return getPersistence().findByFormat(format, start, end);
 	}
 
@@ -857,8 +852,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByFormat(java.lang.String format,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+	public static List<WikiPage> findByFormat(String format, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByFormat(format, start, end, orderByComparator);
 	}
@@ -877,8 +872,8 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByFormat(java.lang.String format,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator,
+	public static List<WikiPage> findByFormat(String format, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByFormat(format, start, end, orderByComparator,
@@ -893,7 +888,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByFormat_First(java.lang.String format,
+	public static WikiPage findByFormat_First(String format,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByFormat_First(format, orderByComparator);
@@ -906,7 +901,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByFormat_First(java.lang.String format,
+	public static WikiPage fetchByFormat_First(String format,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().fetchByFormat_First(format, orderByComparator);
 	}
@@ -919,7 +914,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByFormat_Last(java.lang.String format,
+	public static WikiPage findByFormat_Last(String format,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByFormat_Last(format, orderByComparator);
@@ -932,7 +927,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByFormat_Last(java.lang.String format,
+	public static WikiPage fetchByFormat_Last(String format,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().fetchByFormat_Last(format, orderByComparator);
 	}
@@ -947,7 +942,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByFormat_PrevAndNext(long pageId,
-		java.lang.String format, OrderByComparator<WikiPage> orderByComparator)
+		String format, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByFormat_PrevAndNext(pageId, format, orderByComparator);
@@ -958,7 +953,7 @@ public class WikiPageUtil {
 	*
 	* @param format the format
 	*/
-	public static void removeByFormat(java.lang.String format) {
+	public static void removeByFormat(String format) {
 		getPersistence().removeByFormat(format);
 	}
 
@@ -968,7 +963,7 @@ public class WikiPageUtil {
 	* @param format the format
 	* @return the number of matching wiki pages
 	*/
-	public static int countByFormat(java.lang.String format) {
+	public static int countByFormat(String format) {
 		return getPersistence().countByFormat(format);
 	}
 
@@ -1325,7 +1320,7 @@ public class WikiPageUtil {
 	* @param title the title
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T(long nodeId, java.lang.String title) {
+	public static List<WikiPage> findByN_T(long nodeId, String title) {
 		return getPersistence().findByN_T(nodeId, title);
 	}
 
@@ -1342,7 +1337,7 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T(long nodeId, java.lang.String title,
+	public static List<WikiPage> findByN_T(long nodeId, String title,
 		int start, int end) {
 		return getPersistence().findByN_T(nodeId, title, start, end);
 	}
@@ -1361,7 +1356,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T(long nodeId, java.lang.String title,
+	public static List<WikiPage> findByN_T(long nodeId, String title,
 		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_T(nodeId, title, start, end, orderByComparator);
@@ -1382,7 +1377,7 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T(long nodeId, java.lang.String title,
+	public static List<WikiPage> findByN_T(long nodeId, String title,
 		int start, int end, OrderByComparator<WikiPage> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -1399,7 +1394,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_First(long nodeId, java.lang.String title,
+	public static WikiPage findByN_T_First(long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByN_T_First(nodeId, title, orderByComparator);
@@ -1413,8 +1408,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_First(long nodeId,
-		java.lang.String title, OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByN_T_First(long nodeId, String title,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_T_First(nodeId, title, orderByComparator);
 	}
@@ -1428,7 +1423,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_Last(long nodeId, java.lang.String title,
+	public static WikiPage findByN_T_Last(long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByN_T_Last(nodeId, title, orderByComparator);
@@ -1442,7 +1437,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_Last(long nodeId, java.lang.String title,
+	public static WikiPage fetchByN_T_Last(long nodeId, String title,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence().fetchByN_T_Last(nodeId, title, orderByComparator);
 	}
@@ -1458,7 +1453,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_T_PrevAndNext(long pageId, long nodeId,
-		java.lang.String title, OrderByComparator<WikiPage> orderByComparator)
+		String title, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_PrevAndNext(pageId, nodeId, title,
@@ -1471,7 +1466,7 @@ public class WikiPageUtil {
 	* @param nodeId the node ID
 	* @param title the title
 	*/
-	public static void removeByN_T(long nodeId, java.lang.String title) {
+	public static void removeByN_T(long nodeId, String title) {
 		getPersistence().removeByN_T(nodeId, title);
 	}
 
@@ -1482,7 +1477,7 @@ public class WikiPageUtil {
 	* @param title the title
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_T(long nodeId, java.lang.String title) {
+	public static int countByN_T(long nodeId, String title) {
 		return getPersistence().countByN_T(nodeId, title);
 	}
 
@@ -1660,8 +1655,7 @@ public class WikiPageUtil {
 	* @param parentTitle the parent title
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByN_P(long nodeId,
-		java.lang.String parentTitle) {
+	public static List<WikiPage> findByN_P(long nodeId, String parentTitle) {
 		return getPersistence().findByN_P(nodeId, parentTitle);
 	}
 
@@ -1678,8 +1672,8 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_P(long nodeId,
-		java.lang.String parentTitle, int start, int end) {
+	public static List<WikiPage> findByN_P(long nodeId, String parentTitle,
+		int start, int end) {
 		return getPersistence().findByN_P(nodeId, parentTitle, start, end);
 	}
 
@@ -1697,9 +1691,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_P(long nodeId,
-		java.lang.String parentTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static List<WikiPage> findByN_P(long nodeId, String parentTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_P(nodeId, parentTitle, start, end, orderByComparator);
 	}
@@ -1719,9 +1712,9 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_P(long nodeId,
-		java.lang.String parentTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
+	public static List<WikiPage> findByN_P(long nodeId, String parentTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
+		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_P(nodeId, parentTitle, start, end,
 			orderByComparator, retrieveFromCache);
@@ -1736,8 +1729,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_P_First(long nodeId,
-		java.lang.String parentTitle,
+	public static WikiPage findByN_P_First(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -1752,8 +1744,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_P_First(long nodeId,
-		java.lang.String parentTitle,
+	public static WikiPage fetchByN_P_First(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_P_First(nodeId, parentTitle, orderByComparator);
@@ -1768,8 +1759,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_P_Last(long nodeId,
-		java.lang.String parentTitle,
+	public static WikiPage findByN_P_Last(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -1784,8 +1774,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_P_Last(long nodeId,
-		java.lang.String parentTitle,
+	public static WikiPage fetchByN_P_Last(long nodeId, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_P_Last(nodeId, parentTitle, orderByComparator);
@@ -1802,8 +1791,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_P_PrevAndNext(long pageId, long nodeId,
-		java.lang.String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_P_PrevAndNext(pageId, nodeId, parentTitle,
@@ -1816,7 +1804,7 @@ public class WikiPageUtil {
 	* @param nodeId the node ID
 	* @param parentTitle the parent title
 	*/
-	public static void removeByN_P(long nodeId, java.lang.String parentTitle) {
+	public static void removeByN_P(long nodeId, String parentTitle) {
 		getPersistence().removeByN_P(nodeId, parentTitle);
 	}
 
@@ -1827,7 +1815,7 @@ public class WikiPageUtil {
 	* @param parentTitle the parent title
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_P(long nodeId, java.lang.String parentTitle) {
+	public static int countByN_P(long nodeId, String parentTitle) {
 		return getPersistence().countByN_P(nodeId, parentTitle);
 	}
 
@@ -1838,8 +1826,7 @@ public class WikiPageUtil {
 	* @param redirectTitle the redirect title
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByN_R(long nodeId,
-		java.lang.String redirectTitle) {
+	public static List<WikiPage> findByN_R(long nodeId, String redirectTitle) {
 		return getPersistence().findByN_R(nodeId, redirectTitle);
 	}
 
@@ -1856,8 +1843,8 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_R(long nodeId,
-		java.lang.String redirectTitle, int start, int end) {
+	public static List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end) {
 		return getPersistence().findByN_R(nodeId, redirectTitle, start, end);
 	}
 
@@ -1875,9 +1862,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_R(long nodeId,
-		java.lang.String redirectTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_R(nodeId, redirectTitle, start, end,
 			orderByComparator);
@@ -1898,9 +1884,9 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_R(long nodeId,
-		java.lang.String redirectTitle, int start, int end,
-		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
+	public static List<WikiPage> findByN_R(long nodeId, String redirectTitle,
+		int start, int end, OrderByComparator<WikiPage> orderByComparator,
+		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_R(nodeId, redirectTitle, start, end,
 			orderByComparator, retrieveFromCache);
@@ -1915,8 +1901,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_R_First(long nodeId,
-		java.lang.String redirectTitle,
+	public static WikiPage findByN_R_First(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -1931,8 +1916,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_R_First(long nodeId,
-		java.lang.String redirectTitle,
+	public static WikiPage fetchByN_R_First(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_R_First(nodeId, redirectTitle, orderByComparator);
@@ -1947,8 +1931,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_R_Last(long nodeId,
-		java.lang.String redirectTitle,
+	public static WikiPage findByN_R_Last(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -1963,8 +1946,7 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_R_Last(long nodeId,
-		java.lang.String redirectTitle,
+	public static WikiPage fetchByN_R_Last(long nodeId, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_R_Last(nodeId, redirectTitle, orderByComparator);
@@ -1981,8 +1963,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_R_PrevAndNext(long pageId, long nodeId,
-		java.lang.String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_R_PrevAndNext(pageId, nodeId, redirectTitle,
@@ -1995,7 +1976,7 @@ public class WikiPageUtil {
 	* @param nodeId the node ID
 	* @param redirectTitle the redirect title
 	*/
-	public static void removeByN_R(long nodeId, java.lang.String redirectTitle) {
+	public static void removeByN_R(long nodeId, String redirectTitle) {
 		getPersistence().removeByN_R(nodeId, redirectTitle);
 	}
 
@@ -2006,7 +1987,7 @@ public class WikiPageUtil {
 	* @param redirectTitle the redirect title
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_R(long nodeId, java.lang.String redirectTitle) {
+	public static int countByN_R(long nodeId, String redirectTitle) {
 		return getPersistence().countByN_R(nodeId, redirectTitle);
 	}
 
@@ -3375,8 +3356,8 @@ public class WikiPageUtil {
 	* @return the matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_V(long nodeId, java.lang.String title,
-		double version) throws com.liferay.wiki.exception.NoSuchPageException {
+	public static WikiPage findByN_T_V(long nodeId, String title, double version)
+		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().findByN_T_V(nodeId, title, version);
 	}
 
@@ -3388,7 +3369,7 @@ public class WikiPageUtil {
 	* @param version the version
 	* @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_V(long nodeId, java.lang.String title,
+	public static WikiPage fetchByN_T_V(long nodeId, String title,
 		double version) {
 		return getPersistence().fetchByN_T_V(nodeId, title, version);
 	}
@@ -3402,7 +3383,7 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_V(long nodeId, java.lang.String title,
+	public static WikiPage fetchByN_T_V(long nodeId, String title,
 		double version, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByN_T_V(nodeId, title, version, retrieveFromCache);
@@ -3416,7 +3397,7 @@ public class WikiPageUtil {
 	* @param version the version
 	* @return the wiki page that was removed
 	*/
-	public static WikiPage removeByN_T_V(long nodeId, java.lang.String title,
+	public static WikiPage removeByN_T_V(long nodeId, String title,
 		double version) throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence().removeByN_T_V(nodeId, title, version);
 	}
@@ -3429,8 +3410,7 @@ public class WikiPageUtil {
 	* @param version the version
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_T_V(long nodeId, java.lang.String title,
-		double version) {
+	public static int countByN_T_V(long nodeId, String title, double version) {
 		return getPersistence().countByN_T_V(nodeId, title, version);
 	}
 
@@ -3442,8 +3422,8 @@ public class WikiPageUtil {
 	* @param head the head
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_H(long nodeId,
-		java.lang.String title, boolean head) {
+	public static List<WikiPage> findByN_T_H(long nodeId, String title,
+		boolean head) {
 		return getPersistence().findByN_T_H(nodeId, title, head);
 	}
 
@@ -3461,8 +3441,8 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_H(long nodeId,
-		java.lang.String title, boolean head, int start, int end) {
+	public static List<WikiPage> findByN_T_H(long nodeId, String title,
+		boolean head, int start, int end) {
 		return getPersistence().findByN_T_H(nodeId, title, head, start, end);
 	}
 
@@ -3481,8 +3461,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_H(long nodeId,
-		java.lang.String title, boolean head, int start, int end,
+	public static List<WikiPage> findByN_T_H(long nodeId, String title,
+		boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_T_H(nodeId, title, head, start, end,
@@ -3505,8 +3485,8 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_H(long nodeId,
-		java.lang.String title, boolean head, int start, int end,
+	public static List<WikiPage> findByN_T_H(long nodeId, String title,
+		boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_T_H(nodeId, title, head, start, end,
@@ -3523,9 +3503,8 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_H_First(long nodeId,
-		java.lang.String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByN_T_H_First(long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_H_First(nodeId, title, head, orderByComparator);
@@ -3540,9 +3519,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_H_First(long nodeId,
-		java.lang.String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByN_T_H_First(long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_T_H_First(nodeId, title, head, orderByComparator);
 	}
@@ -3557,9 +3535,8 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_H_Last(long nodeId,
-		java.lang.String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByN_T_H_Last(long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_H_Last(nodeId, title, head, orderByComparator);
@@ -3574,9 +3551,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_H_Last(long nodeId,
-		java.lang.String title, boolean head,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByN_T_H_Last(long nodeId, String title,
+		boolean head, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_T_H_Last(nodeId, title, head, orderByComparator);
 	}
@@ -3593,7 +3569,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_T_H_PrevAndNext(long pageId, long nodeId,
-		java.lang.String title, boolean head,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -3608,8 +3584,7 @@ public class WikiPageUtil {
 	* @param title the title
 	* @param head the head
 	*/
-	public static void removeByN_T_H(long nodeId, java.lang.String title,
-		boolean head) {
+	public static void removeByN_T_H(long nodeId, String title, boolean head) {
 		getPersistence().removeByN_T_H(nodeId, title, head);
 	}
 
@@ -3621,8 +3596,7 @@ public class WikiPageUtil {
 	* @param head the head
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_T_H(long nodeId, java.lang.String title,
-		boolean head) {
+	public static int countByN_T_H(long nodeId, String title, boolean head) {
 		return getPersistence().countByN_T_H(nodeId, title, head);
 	}
 
@@ -3634,8 +3608,8 @@ public class WikiPageUtil {
 	* @param status the status
 	* @return the matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_S(long nodeId,
-		java.lang.String title, int status) {
+	public static List<WikiPage> findByN_T_S(long nodeId, String title,
+		int status) {
 		return getPersistence().findByN_T_S(nodeId, title, status);
 	}
 
@@ -3653,8 +3627,8 @@ public class WikiPageUtil {
 	* @param end the upper bound of the range of wiki pages (not inclusive)
 	* @return the range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_S(long nodeId,
-		java.lang.String title, int status, int start, int end) {
+	public static List<WikiPage> findByN_T_S(long nodeId, String title,
+		int status, int start, int end) {
 		return getPersistence().findByN_T_S(nodeId, title, status, start, end);
 	}
 
@@ -3673,8 +3647,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_S(long nodeId,
-		java.lang.String title, int status, int start, int end,
+	public static List<WikiPage> findByN_T_S(long nodeId, String title,
+		int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_T_S(nodeId, title, status, start, end,
@@ -3697,8 +3671,8 @@ public class WikiPageUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching wiki pages
 	*/
-	public static List<WikiPage> findByN_T_S(long nodeId,
-		java.lang.String title, int status, int start, int end,
+	public static List<WikiPage> findByN_T_S(long nodeId, String title,
+		int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_T_S(nodeId, title, status, start, end,
@@ -3715,9 +3689,8 @@ public class WikiPageUtil {
 	* @return the first matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_S_First(long nodeId,
-		java.lang.String title, int status,
-		OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByN_T_S_First(long nodeId, String title,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_S_First(nodeId, title, status, orderByComparator);
@@ -3732,9 +3705,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_S_First(long nodeId,
-		java.lang.String title, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByN_T_S_First(long nodeId, String title,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_T_S_First(nodeId, title, status, orderByComparator);
 	}
@@ -3749,9 +3721,8 @@ public class WikiPageUtil {
 	* @return the last matching wiki page
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
-	public static WikiPage findByN_T_S_Last(long nodeId,
-		java.lang.String title, int status,
-		OrderByComparator<WikiPage> orderByComparator)
+	public static WikiPage findByN_T_S_Last(long nodeId, String title,
+		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_S_Last(nodeId, title, status, orderByComparator);
@@ -3766,9 +3737,8 @@ public class WikiPageUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
-	public static WikiPage fetchByN_T_S_Last(long nodeId,
-		java.lang.String title, int status,
-		OrderByComparator<WikiPage> orderByComparator) {
+	public static WikiPage fetchByN_T_S_Last(long nodeId, String title,
+		int status, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_T_S_Last(nodeId, title, status, orderByComparator);
 	}
@@ -3785,8 +3755,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_T_S_PrevAndNext(long pageId, long nodeId,
-		java.lang.String title, int status,
-		OrderByComparator<WikiPage> orderByComparator)
+		String title, int status, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_T_S_PrevAndNext(pageId, nodeId, title, status,
@@ -3800,8 +3769,7 @@ public class WikiPageUtil {
 	* @param title the title
 	* @param status the status
 	*/
-	public static void removeByN_T_S(long nodeId, java.lang.String title,
-		int status) {
+	public static void removeByN_T_S(long nodeId, String title, int status) {
 		getPersistence().removeByN_T_S(nodeId, title, status);
 	}
 
@@ -3813,8 +3781,7 @@ public class WikiPageUtil {
 	* @param status the status
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_T_S(long nodeId, java.lang.String title,
-		int status) {
+	public static int countByN_T_S(long nodeId, String title, int status) {
 		return getPersistence().countByN_T_S(nodeId, title, status);
 	}
 
@@ -3827,7 +3794,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle) {
+		String parentTitle) {
 		return getPersistence().findByN_H_P(nodeId, head, parentTitle);
 	}
 
@@ -3846,7 +3813,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle, int start, int end) {
+		String parentTitle, int start, int end) {
 		return getPersistence()
 				   .findByN_H_P(nodeId, head, parentTitle, start, end);
 	}
@@ -3867,7 +3834,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle, int start, int end,
+		String parentTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_P(nodeId, head, parentTitle, start, end,
@@ -3891,7 +3858,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle, int start, int end,
+		String parentTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_P(nodeId, head, parentTitle, start, end,
@@ -3909,8 +3876,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_First(long nodeId, boolean head,
-		java.lang.String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_H_P_First(nodeId, head, parentTitle,
@@ -3927,8 +3893,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_First(long nodeId, boolean head,
-		java.lang.String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_First(nodeId, head, parentTitle,
 			orderByComparator);
@@ -3945,8 +3910,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_Last(long nodeId, boolean head,
-		java.lang.String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_H_P_Last(nodeId, head, parentTitle,
@@ -3963,8 +3927,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_Last(long nodeId, boolean head,
-		java.lang.String parentTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
+		String parentTitle, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_Last(nodeId, head, parentTitle,
 			orderByComparator);
@@ -3982,7 +3945,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_P_PrevAndNext(long pageId, long nodeId,
-		boolean head, java.lang.String parentTitle,
+		boolean head, String parentTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -3998,7 +3961,7 @@ public class WikiPageUtil {
 	* @param parentTitle the parent title
 	*/
 	public static void removeByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle) {
+		String parentTitle) {
 		getPersistence().removeByN_H_P(nodeId, head, parentTitle);
 	}
 
@@ -4010,8 +3973,7 @@ public class WikiPageUtil {
 	* @param parentTitle the parent title
 	* @return the number of matching wiki pages
 	*/
-	public static int countByN_H_P(long nodeId, boolean head,
-		java.lang.String parentTitle) {
+	public static int countByN_H_P(long nodeId, boolean head, String parentTitle) {
 		return getPersistence().countByN_H_P(nodeId, head, parentTitle);
 	}
 
@@ -4024,7 +3986,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle) {
+		String redirectTitle) {
 		return getPersistence().findByN_H_R(nodeId, head, redirectTitle);
 	}
 
@@ -4043,7 +4005,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle, int start, int end) {
+		String redirectTitle, int start, int end) {
 		return getPersistence()
 				   .findByN_H_R(nodeId, head, redirectTitle, start, end);
 	}
@@ -4064,7 +4026,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle, int start, int end,
+		String redirectTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_R(nodeId, head, redirectTitle, start, end,
@@ -4088,7 +4050,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle, int start, int end,
+		String redirectTitle, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_R(nodeId, head, redirectTitle, start, end,
@@ -4106,8 +4068,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_First(long nodeId, boolean head,
-		java.lang.String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_H_R_First(nodeId, head, redirectTitle,
@@ -4124,8 +4085,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_First(long nodeId, boolean head,
-		java.lang.String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_First(nodeId, head, redirectTitle,
 			orderByComparator);
@@ -4142,8 +4102,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator)
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
 				   .findByN_H_R_Last(nodeId, head, redirectTitle,
@@ -4160,8 +4119,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle,
-		OrderByComparator<WikiPage> orderByComparator) {
+		String redirectTitle, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_Last(nodeId, head, redirectTitle,
 			orderByComparator);
@@ -4179,7 +4137,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_R_PrevAndNext(long pageId, long nodeId,
-		boolean head, java.lang.String redirectTitle,
+		boolean head, String redirectTitle,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -4195,7 +4153,7 @@ public class WikiPageUtil {
 	* @param redirectTitle the redirect title
 	*/
 	public static void removeByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle) {
+		String redirectTitle) {
 		getPersistence().removeByN_H_R(nodeId, head, redirectTitle);
 	}
 
@@ -4208,7 +4166,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByN_H_R(long nodeId, boolean head,
-		java.lang.String redirectTitle) {
+		String redirectTitle) {
 		return getPersistence().countByN_H_R(nodeId, head, redirectTitle);
 	}
 
@@ -4895,7 +4853,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head) {
+		String title, boolean head) {
 		return getPersistence().findByG_N_T_H(groupId, nodeId, title, head);
 	}
 
@@ -4915,7 +4873,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head, int start, int end) {
+		String title, boolean head, int start, int end) {
 		return getPersistence()
 				   .findByG_N_T_H(groupId, nodeId, title, head, start, end);
 	}
@@ -4937,7 +4895,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head, int start, int end,
+		String title, boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByG_N_T_H(groupId, nodeId, title, head, start, end,
@@ -4962,7 +4920,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head, int start, int end,
+		String title, boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByG_N_T_H(groupId, nodeId, title, head, start, end,
@@ -4981,7 +4939,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByG_N_T_H_First(long groupId, long nodeId,
-		java.lang.String title, boolean head,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5000,7 +4958,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByG_N_T_H_First(long groupId, long nodeId,
-		java.lang.String title, boolean head,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_T_H_First(groupId, nodeId, title, head,
@@ -5019,7 +4977,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByG_N_T_H_Last(long groupId, long nodeId,
-		java.lang.String title, boolean head,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5038,7 +4996,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByG_N_T_H_Last(long groupId, long nodeId,
-		java.lang.String title, boolean head,
+		String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_T_H_Last(groupId, nodeId, title, head,
@@ -5058,7 +5016,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByG_N_T_H_PrevAndNext(long pageId,
-		long groupId, long nodeId, java.lang.String title, boolean head,
+		long groupId, long nodeId, String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5076,7 +5034,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head) {
+		String title, boolean head) {
 		return getPersistence().filterFindByG_N_T_H(groupId, nodeId, title, head);
 	}
 
@@ -5096,7 +5054,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head, int start, int end) {
+		String title, boolean head, int start, int end) {
 		return getPersistence()
 				   .filterFindByG_N_T_H(groupId, nodeId, title, head, start, end);
 	}
@@ -5118,7 +5076,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head, int start, int end,
+		String title, boolean head, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_N_T_H(groupId, nodeId, title, head, start,
@@ -5138,7 +5096,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] filterFindByG_N_T_H_PrevAndNext(long pageId,
-		long groupId, long nodeId, java.lang.String title, boolean head,
+		long groupId, long nodeId, String title, boolean head,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5154,8 +5112,8 @@ public class WikiPageUtil {
 	* @param title the title
 	* @param head the head
 	*/
-	public static void removeByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head) {
+	public static void removeByG_N_T_H(long groupId, long nodeId, String title,
+		boolean head) {
 		getPersistence().removeByG_N_T_H(groupId, nodeId, title, head);
 	}
 
@@ -5168,8 +5126,8 @@ public class WikiPageUtil {
 	* @param head the head
 	* @return the number of matching wiki pages
 	*/
-	public static int countByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head) {
+	public static int countByG_N_T_H(long groupId, long nodeId, String title,
+		boolean head) {
 		return getPersistence().countByG_N_T_H(groupId, nodeId, title, head);
 	}
 
@@ -5183,7 +5141,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages that the user has permission to view
 	*/
 	public static int filterCountByG_N_T_H(long groupId, long nodeId,
-		java.lang.String title, boolean head) {
+		String title, boolean head) {
 		return getPersistence()
 				   .filterCountByG_N_T_H(groupId, nodeId, title, head);
 	}
@@ -5499,7 +5457,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		return getPersistence().findByN_H_P_S(nodeId, head, parentTitle, status);
 	}
 
@@ -5519,7 +5477,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end) {
+		String parentTitle, int status, int start, int end) {
 		return getPersistence()
 				   .findByN_H_P_S(nodeId, head, parentTitle, status, start, end);
 	}
@@ -5541,7 +5499,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end,
+		String parentTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_P_S(nodeId, head, parentTitle, status, start,
@@ -5566,7 +5524,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end,
+		String parentTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_P_S(nodeId, head, parentTitle, status, start,
@@ -5585,7 +5543,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_S_First(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5604,7 +5562,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_S_First(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_S_First(nodeId, head, parentTitle, status,
@@ -5623,7 +5581,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_S_Last(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5642,7 +5600,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_S_Last(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_S_Last(nodeId, head, parentTitle, status,
@@ -5662,7 +5620,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_P_S_PrevAndNext(long pageId,
-		long nodeId, boolean head, java.lang.String parentTitle, int status,
+		long nodeId, boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5679,7 +5637,7 @@ public class WikiPageUtil {
 	* @param status the status
 	*/
 	public static void removeByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		getPersistence().removeByN_H_P_S(nodeId, head, parentTitle, status);
 	}
 
@@ -5693,7 +5651,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByN_H_P_S(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		return getPersistence().countByN_H_P_S(nodeId, head, parentTitle, status);
 	}
 
@@ -5707,7 +5665,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		return getPersistence()
 				   .findByN_H_P_NotS(nodeId, head, parentTitle, status);
 	}
@@ -5728,7 +5686,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end) {
+		String parentTitle, int status, int start, int end) {
 		return getPersistence()
 				   .findByN_H_P_NotS(nodeId, head, parentTitle, status, start,
 			end);
@@ -5751,7 +5709,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end,
+		String parentTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_P_NotS(nodeId, head, parentTitle, status, start,
@@ -5776,7 +5734,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status, int start, int end,
+		String parentTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_P_NotS(nodeId, head, parentTitle, status, start,
@@ -5795,7 +5753,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_NotS_First(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5814,7 +5772,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_NotS_First(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_NotS_First(nodeId, head, parentTitle, status,
@@ -5833,7 +5791,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_P_NotS_Last(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5852,7 +5810,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_P_NotS_Last(long nodeId, boolean head,
-		java.lang.String parentTitle, int status,
+		String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_P_NotS_Last(nodeId, head, parentTitle, status,
@@ -5872,7 +5830,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_P_NotS_PrevAndNext(long pageId,
-		long nodeId, boolean head, java.lang.String parentTitle, int status,
+		long nodeId, boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -5889,7 +5847,7 @@ public class WikiPageUtil {
 	* @param status the status
 	*/
 	public static void removeByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		getPersistence().removeByN_H_P_NotS(nodeId, head, parentTitle, status);
 	}
 
@@ -5903,7 +5861,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByN_H_P_NotS(long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		return getPersistence()
 				   .countByN_H_P_NotS(nodeId, head, parentTitle, status);
 	}
@@ -5918,7 +5876,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		return getPersistence()
 				   .findByN_H_R_S(nodeId, head, redirectTitle, status);
 	}
@@ -5939,7 +5897,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end) {
+		String redirectTitle, int status, int start, int end) {
 		return getPersistence()
 				   .findByN_H_R_S(nodeId, head, redirectTitle, status, start,
 			end);
@@ -5962,7 +5920,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end,
+		String redirectTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_R_S(nodeId, head, redirectTitle, status, start,
@@ -5987,7 +5945,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end,
+		String redirectTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_R_S(nodeId, head, redirectTitle, status, start,
@@ -6006,7 +5964,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_S_First(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6025,7 +5983,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_S_First(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_S_First(nodeId, head, redirectTitle, status,
@@ -6044,7 +6002,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_S_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6063,7 +6021,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_S_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_S_Last(nodeId, head, redirectTitle, status,
@@ -6083,7 +6041,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_R_S_PrevAndNext(long pageId,
-		long nodeId, boolean head, java.lang.String redirectTitle, int status,
+		long nodeId, boolean head, String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6100,7 +6058,7 @@ public class WikiPageUtil {
 	* @param status the status
 	*/
 	public static void removeByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		getPersistence().removeByN_H_R_S(nodeId, head, redirectTitle, status);
 	}
 
@@ -6114,7 +6072,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByN_H_R_S(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		return getPersistence()
 				   .countByN_H_R_S(nodeId, head, redirectTitle, status);
 	}
@@ -6129,7 +6087,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		return getPersistence()
 				   .findByN_H_R_NotS(nodeId, head, redirectTitle, status);
 	}
@@ -6150,7 +6108,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end) {
+		String redirectTitle, int status, int start, int end) {
 		return getPersistence()
 				   .findByN_H_R_NotS(nodeId, head, redirectTitle, status,
 			start, end);
@@ -6173,7 +6131,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end,
+		String redirectTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByN_H_R_NotS(nodeId, head, redirectTitle, status,
@@ -6198,7 +6156,7 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status, int start, int end,
+		String redirectTitle, int status, int start, int end,
 		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByN_H_R_NotS(nodeId, head, redirectTitle, status,
@@ -6217,7 +6175,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_NotS_First(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6236,7 +6194,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_NotS_First(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_NotS_First(nodeId, head, redirectTitle,
@@ -6255,7 +6213,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByN_H_R_NotS_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6274,7 +6232,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByN_H_R_NotS_Last(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status,
+		String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByN_H_R_NotS_Last(nodeId, head, redirectTitle, status,
@@ -6294,7 +6252,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByN_H_R_NotS_PrevAndNext(long pageId,
-		long nodeId, boolean head, java.lang.String redirectTitle, int status,
+		long nodeId, boolean head, String redirectTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6311,7 +6269,7 @@ public class WikiPageUtil {
 	* @param status the status
 	*/
 	public static void removeByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		getPersistence().removeByN_H_R_NotS(nodeId, head, redirectTitle, status);
 	}
 
@@ -6325,7 +6283,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByN_H_R_NotS(long nodeId, boolean head,
-		java.lang.String redirectTitle, int status) {
+		String redirectTitle, int status) {
 		return getPersistence()
 				   .countByN_H_R_NotS(nodeId, head, redirectTitle, status);
 	}
@@ -6341,7 +6299,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status) {
+		boolean head, String parentTitle, int status) {
 		return getPersistence()
 				   .findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status);
 	}
@@ -6363,8 +6321,7 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status, int start,
-		int end) {
+		boolean head, String parentTitle, int status, int start, int end) {
 		return getPersistence()
 				   .findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
 			start, end);
@@ -6388,8 +6345,8 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator) {
+		boolean head, String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
 			start, end, orderByComparator);
@@ -6414,9 +6371,8 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages
 	*/
 	public static List<WikiPage> findByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status, int start,
-		int end, OrderByComparator<WikiPage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean head, String parentTitle, int status, int start, int end,
+		OrderByComparator<WikiPage> orderByComparator, boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByG_N_H_P_S(groupId, nodeId, head, parentTitle, status,
 			start, end, orderByComparator, retrieveFromCache);
@@ -6435,7 +6391,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByG_N_H_P_S_First(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6455,7 +6411,7 @@ public class WikiPageUtil {
 	* @return the first matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByG_N_H_P_S_First(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_H_P_S_First(groupId, nodeId, head, parentTitle,
@@ -6475,7 +6431,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a matching wiki page could not be found
 	*/
 	public static WikiPage findByG_N_H_P_S_Last(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6495,7 +6451,7 @@ public class WikiPageUtil {
 	* @return the last matching wiki page, or <code>null</code> if a matching wiki page could not be found
 	*/
 	public static WikiPage fetchByG_N_H_P_S_Last(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status,
+		boolean head, String parentTitle, int status,
 		OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_N_H_P_S_Last(groupId, nodeId, head, parentTitle,
@@ -6516,7 +6472,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] findByG_N_H_P_S_PrevAndNext(long pageId,
-		long groupId, long nodeId, boolean head, java.lang.String parentTitle,
+		long groupId, long nodeId, boolean head, String parentTitle,
 		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6535,7 +6491,7 @@ public class WikiPageUtil {
 	* @return the matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_H_P_S(long groupId,
-		long nodeId, boolean head, java.lang.String parentTitle, int status) {
+		long nodeId, boolean head, String parentTitle, int status) {
 		return getPersistence()
 				   .filterFindByG_N_H_P_S(groupId, nodeId, head, parentTitle,
 			status);
@@ -6558,8 +6514,8 @@ public class WikiPageUtil {
 	* @return the range of matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_H_P_S(long groupId,
-		long nodeId, boolean head, java.lang.String parentTitle, int status,
-		int start, int end) {
+		long nodeId, boolean head, String parentTitle, int status, int start,
+		int end) {
 		return getPersistence()
 				   .filterFindByG_N_H_P_S(groupId, nodeId, head, parentTitle,
 			status, start, end);
@@ -6583,8 +6539,8 @@ public class WikiPageUtil {
 	* @return the ordered range of matching wiki pages that the user has permission to view
 	*/
 	public static List<WikiPage> filterFindByG_N_H_P_S(long groupId,
-		long nodeId, boolean head, java.lang.String parentTitle, int status,
-		int start, int end, OrderByComparator<WikiPage> orderByComparator) {
+		long nodeId, boolean head, String parentTitle, int status, int start,
+		int end, OrderByComparator<WikiPage> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_N_H_P_S(groupId, nodeId, head, parentTitle,
 			status, start, end, orderByComparator);
@@ -6604,7 +6560,7 @@ public class WikiPageUtil {
 	* @throws NoSuchPageException if a wiki page with the primary key could not be found
 	*/
 	public static WikiPage[] filterFindByG_N_H_P_S_PrevAndNext(long pageId,
-		long groupId, long nodeId, boolean head, java.lang.String parentTitle,
+		long groupId, long nodeId, boolean head, String parentTitle,
 		int status, OrderByComparator<WikiPage> orderByComparator)
 		throws com.liferay.wiki.exception.NoSuchPageException {
 		return getPersistence()
@@ -6622,7 +6578,7 @@ public class WikiPageUtil {
 	* @param status the status
 	*/
 	public static void removeByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status) {
+		boolean head, String parentTitle, int status) {
 		getPersistence()
 			.removeByG_N_H_P_S(groupId, nodeId, head, parentTitle, status);
 	}
@@ -6638,7 +6594,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages
 	*/
 	public static int countByG_N_H_P_S(long groupId, long nodeId, boolean head,
-		java.lang.String parentTitle, int status) {
+		String parentTitle, int status) {
 		return getPersistence()
 				   .countByG_N_H_P_S(groupId, nodeId, head, parentTitle, status);
 	}
@@ -6654,7 +6610,7 @@ public class WikiPageUtil {
 	* @return the number of matching wiki pages that the user has permission to view
 	*/
 	public static int filterCountByG_N_H_P_S(long groupId, long nodeId,
-		boolean head, java.lang.String parentTitle, int status) {
+		boolean head, String parentTitle, int status) {
 		return getPersistence()
 				   .filterCountByG_N_H_P_S(groupId, nodeId, head, parentTitle,
 			status);
@@ -6807,7 +6763,7 @@ public class WikiPageUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -6815,6 +6771,16 @@ public class WikiPageUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<WikiPagePersistence, WikiPagePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(WikiPagePersistence.class);
+	private static ServiceTracker<WikiPagePersistence, WikiPagePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(WikiPagePersistence.class);
+
+		ServiceTracker<WikiPagePersistence, WikiPagePersistence> serviceTracker = new ServiceTracker<WikiPagePersistence, WikiPagePersistence>(bundle.getBundleContext(),
+				WikiPagePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

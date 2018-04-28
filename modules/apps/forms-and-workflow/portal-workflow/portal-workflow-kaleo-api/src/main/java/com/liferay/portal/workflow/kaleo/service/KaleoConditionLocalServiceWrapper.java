@@ -48,11 +48,11 @@ public class KaleoConditionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoCondition addKaleoCondition(
-		long kaleoDefinitionId, long kaleoNodeId,
+		long kaleoDefinitionVersionId, long kaleoNodeId,
 		com.liferay.portal.workflow.kaleo.definition.Condition condition,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _kaleoConditionLocalService.addKaleoCondition(kaleoDefinitionId,
+		return _kaleoConditionLocalService.addKaleoCondition(kaleoDefinitionVersionId,
 			kaleoNodeId, condition, serviceContext);
 	}
 
@@ -100,8 +100,9 @@ public class KaleoConditionLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteKaleoDefinitionKaleoCondition(long kaleoDefinitionId) {
-		_kaleoConditionLocalService.deleteKaleoDefinitionKaleoCondition(kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoCondition(
+		long kaleoDefinitionVersionId) {
+		_kaleoConditionLocalService.deleteKaleoDefinitionVersionKaleoCondition(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -269,7 +270,7 @@ public class KaleoConditionLocalServiceWrapper
 	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _kaleoConditionLocalService.getOSGiServiceIdentifier();
 	}
 

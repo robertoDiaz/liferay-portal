@@ -14,20 +14,20 @@
 
 package com.liferay.portal.store.db;
 
+import com.liferay.document.library.content.exception.NoSuchContentException;
+import com.liferay.document.library.content.model.DLContent;
+import com.liferay.document.library.content.model.DLContentDataBlobModel;
+import com.liferay.document.library.content.service.DLContentLocalService;
 import com.liferay.document.library.kernel.exception.DuplicateFileException;
-import com.liferay.document.library.kernel.exception.NoSuchContentException;
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
-import com.liferay.document.library.kernel.model.DLContent;
-import com.liferay.document.library.kernel.model.DLContentDataBlobModel;
-import com.liferay.document.library.kernel.service.DLContentLocalService;
 import com.liferay.document.library.kernel.store.BaseStore;
 import com.liferay.document.library.kernel.store.Store;
+import com.liferay.petra.io.AutoDeleteFileInputStream;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.AutoDeleteFileInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

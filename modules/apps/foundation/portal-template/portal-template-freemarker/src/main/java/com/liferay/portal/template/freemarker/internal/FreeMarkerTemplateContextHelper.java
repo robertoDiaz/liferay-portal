@@ -14,13 +14,14 @@
 
 package com.liferay.portal.template.freemarker.internal;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.TemplateContextHelper;
@@ -83,13 +84,13 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 
 			contextObjects.put(
 				"fullCssPath",
-				StringPool.SLASH + servletContextName +
-					theme.getFreeMarkerTemplateLoader() + theme.getCssPath());
+				StringBundler.concat(
+					StringPool.SLASH, servletContextName,
+					theme.getFreeMarkerTemplateLoader(), theme.getCssPath()));
 
-			String fullTemplatesPath =
-				StringPool.SLASH + servletContextName +
-					theme.getFreeMarkerTemplateLoader() +
-						theme.getTemplatesPath();
+			String fullTemplatesPath = StringBundler.concat(
+				StringPool.SLASH, servletContextName,
+				theme.getFreeMarkerTemplateLoader(), theme.getTemplatesPath());
 
 			contextObjects.put("fullTemplatesPath", fullTemplatesPath);
 
@@ -126,11 +127,11 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_freemarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
+		_freeMarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
 			FreeMarkerEngineConfiguration.class, properties);
 
 		_restrictedVariables = SetUtil.fromArray(
-			_freemarkerEngineConfiguration.restrictedVariables());
+			_freeMarkerEngineConfiguration.restrictedVariables());
 	}
 
 	@Override
@@ -177,7 +178,7 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 	}
 
 	private volatile FreeMarkerEngineConfiguration
-		_freemarkerEngineConfiguration;
+		_freeMarkerEngineConfiguration;
 	private Set<String> _restrictedVariables;
 	private final List<TemplateContextContributor>
 		_templateContextContributors = new CopyOnWriteArrayList<>();

@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -55,7 +56,7 @@ public class KaleoInstanceTokenLocalServiceUtil {
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken addKaleoInstanceToken(
 		long parentKaleoInstanceTokenId,
-		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
+		java.util.Map<String, java.io.Serializable> workflowContext,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -84,9 +85,10 @@ public class KaleoInstanceTokenLocalServiceUtil {
 		getService().deleteCompanyKaleoInstanceTokens(companyId);
 	}
 
-	public static void deleteKaleoDefinitionKaleoInstanceTokens(
-		long kaleoDefinitionId) {
-		getService().deleteKaleoDefinitionKaleoInstanceTokens(kaleoDefinitionId);
+	public static void deleteKaleoDefinitionVersionKaleoInstanceTokens(
+		long kaleoDefinitionVersionId) {
+		getService()
+			.deleteKaleoDefinitionVersionKaleoInstanceTokens(kaleoDefinitionVersionId);
 	}
 
 	public static void deleteKaleoInstanceKaleoInstanceTokens(
@@ -293,7 +295,7 @@ public class KaleoInstanceTokenLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -305,7 +307,7 @@ public class KaleoInstanceTokenLocalServiceUtil {
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken getRootKaleoInstanceToken(
 		long kaleoInstanceId,
-		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
+		java.util.Map<String, java.io.Serializable> workflowContext,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -336,6 +338,17 @@ public class KaleoInstanceTokenLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoInstanceTokenLocalService, KaleoInstanceTokenLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoInstanceTokenLocalService.class);
+	private static ServiceTracker<KaleoInstanceTokenLocalService, KaleoInstanceTokenLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoInstanceTokenLocalService.class);
+
+		ServiceTracker<KaleoInstanceTokenLocalService, KaleoInstanceTokenLocalService> serviceTracker =
+			new ServiceTracker<KaleoInstanceTokenLocalService, KaleoInstanceTokenLocalService>(bundle.getBundleContext(),
+				KaleoInstanceTokenLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

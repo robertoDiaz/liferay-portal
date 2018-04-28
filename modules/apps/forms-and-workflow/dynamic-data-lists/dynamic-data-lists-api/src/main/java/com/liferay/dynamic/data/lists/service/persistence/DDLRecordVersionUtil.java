@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -279,7 +280,7 @@ public class DDLRecordVersionUtil {
 	* @return the matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByR_R(long recordSetId,
-		java.lang.String recordSetVersion) {
+		String recordSetVersion) {
 		return getPersistence().findByR_R(recordSetId, recordSetVersion);
 	}
 
@@ -297,7 +298,7 @@ public class DDLRecordVersionUtil {
 	* @return the range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByR_R(long recordSetId,
-		java.lang.String recordSetVersion, int start, int end) {
+		String recordSetVersion, int start, int end) {
 		return getPersistence()
 				   .findByR_R(recordSetId, recordSetVersion, start, end);
 	}
@@ -317,7 +318,7 @@ public class DDLRecordVersionUtil {
 	* @return the ordered range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByR_R(long recordSetId,
-		java.lang.String recordSetVersion, int start, int end,
+		String recordSetVersion, int start, int end,
 		OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .findByR_R(recordSetId, recordSetVersion, start, end,
@@ -340,7 +341,7 @@ public class DDLRecordVersionUtil {
 	* @return the ordered range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByR_R(long recordSetId,
-		java.lang.String recordSetVersion, int start, int end,
+		String recordSetVersion, int start, int end,
 		OrderByComparator<DDLRecordVersion> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -358,7 +359,7 @@ public class DDLRecordVersionUtil {
 	* @throws NoSuchRecordVersionException if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion findByR_R_First(long recordSetId,
-		java.lang.String recordSetVersion,
+		String recordSetVersion,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -375,7 +376,7 @@ public class DDLRecordVersionUtil {
 	* @return the first matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion fetchByR_R_First(long recordSetId,
-		java.lang.String recordSetVersion,
+		String recordSetVersion,
 		OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByR_R_First(recordSetId, recordSetVersion,
@@ -392,7 +393,7 @@ public class DDLRecordVersionUtil {
 	* @throws NoSuchRecordVersionException if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion findByR_R_Last(long recordSetId,
-		java.lang.String recordSetVersion,
+		String recordSetVersion,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -409,7 +410,7 @@ public class DDLRecordVersionUtil {
 	* @return the last matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion fetchByR_R_Last(long recordSetId,
-		java.lang.String recordSetVersion,
+		String recordSetVersion,
 		OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByR_R_Last(recordSetId, recordSetVersion,
@@ -427,8 +428,7 @@ public class DDLRecordVersionUtil {
 	* @throws NoSuchRecordVersionException if a ddl record version with the primary key could not be found
 	*/
 	public static DDLRecordVersion[] findByR_R_PrevAndNext(
-		long recordVersionId, long recordSetId,
-		java.lang.String recordSetVersion,
+		long recordVersionId, long recordSetId, String recordSetVersion,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -442,8 +442,7 @@ public class DDLRecordVersionUtil {
 	* @param recordSetId the record set ID
 	* @param recordSetVersion the record set version
 	*/
-	public static void removeByR_R(long recordSetId,
-		java.lang.String recordSetVersion) {
+	public static void removeByR_R(long recordSetId, String recordSetVersion) {
 		getPersistence().removeByR_R(recordSetId, recordSetVersion);
 	}
 
@@ -454,8 +453,7 @@ public class DDLRecordVersionUtil {
 	* @param recordSetVersion the record set version
 	* @return the number of matching ddl record versions
 	*/
-	public static int countByR_R(long recordSetId,
-		java.lang.String recordSetVersion) {
+	public static int countByR_R(long recordSetId, String recordSetVersion) {
 		return getPersistence().countByR_R(recordSetId, recordSetVersion);
 	}
 
@@ -467,8 +465,7 @@ public class DDLRecordVersionUtil {
 	* @return the matching ddl record version
 	* @throws NoSuchRecordVersionException if a matching ddl record version could not be found
 	*/
-	public static DDLRecordVersion findByR_V(long recordId,
-		java.lang.String version)
+	public static DDLRecordVersion findByR_V(long recordId, String version)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence().findByR_V(recordId, version);
 	}
@@ -480,8 +477,7 @@ public class DDLRecordVersionUtil {
 	* @param version the version
 	* @return the matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
-	public static DDLRecordVersion fetchByR_V(long recordId,
-		java.lang.String version) {
+	public static DDLRecordVersion fetchByR_V(long recordId, String version) {
 		return getPersistence().fetchByR_V(recordId, version);
 	}
 
@@ -493,8 +489,8 @@ public class DDLRecordVersionUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
-	public static DDLRecordVersion fetchByR_V(long recordId,
-		java.lang.String version, boolean retrieveFromCache) {
+	public static DDLRecordVersion fetchByR_V(long recordId, String version,
+		boolean retrieveFromCache) {
 		return getPersistence().fetchByR_V(recordId, version, retrieveFromCache);
 	}
 
@@ -505,8 +501,7 @@ public class DDLRecordVersionUtil {
 	* @param version the version
 	* @return the ddl record version that was removed
 	*/
-	public static DDLRecordVersion removeByR_V(long recordId,
-		java.lang.String version)
+	public static DDLRecordVersion removeByR_V(long recordId, String version)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence().removeByR_V(recordId, version);
 	}
@@ -518,7 +513,7 @@ public class DDLRecordVersionUtil {
 	* @param version the version
 	* @return the number of matching ddl record versions
 	*/
-	public static int countByR_V(long recordId, java.lang.String version) {
+	public static int countByR_V(long recordId, String version) {
 		return getPersistence().countByR_V(recordId, version);
 	}
 
@@ -706,7 +701,7 @@ public class DDLRecordVersionUtil {
 	* @return the matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByU_R_R_S(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status) {
+		long recordSetId, String recordSetVersion, int status) {
 		return getPersistence()
 				   .findByU_R_R_S(userId, recordSetId, recordSetVersion, status);
 	}
@@ -727,8 +722,8 @@ public class DDLRecordVersionUtil {
 	* @return the range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByU_R_R_S(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
-		int start, int end) {
+		long recordSetId, String recordSetVersion, int status, int start,
+		int end) {
 		return getPersistence()
 				   .findByU_R_R_S(userId, recordSetId, recordSetVersion,
 			status, start, end);
@@ -751,9 +746,8 @@ public class DDLRecordVersionUtil {
 	* @return the ordered range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByU_R_R_S(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
-		int start, int end,
-		OrderByComparator<DDLRecordVersion> orderByComparator) {
+		long recordSetId, String recordSetVersion, int status, int start,
+		int end, OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .findByU_R_R_S(userId, recordSetId, recordSetVersion,
 			status, start, end, orderByComparator);
@@ -777,9 +771,8 @@ public class DDLRecordVersionUtil {
 	* @return the ordered range of matching ddl record versions
 	*/
 	public static List<DDLRecordVersion> findByU_R_R_S(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
-		int start, int end,
-		OrderByComparator<DDLRecordVersion> orderByComparator,
+		long recordSetId, String recordSetVersion, int status, int start,
+		int end, OrderByComparator<DDLRecordVersion> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByU_R_R_S(userId, recordSetId, recordSetVersion,
@@ -798,7 +791,7 @@ public class DDLRecordVersionUtil {
 	* @throws NoSuchRecordVersionException if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion findByU_R_R_S_First(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
+		long recordSetId, String recordSetVersion, int status,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -817,7 +810,7 @@ public class DDLRecordVersionUtil {
 	* @return the first matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion fetchByU_R_R_S_First(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
+		long recordSetId, String recordSetVersion, int status,
 		OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByU_R_R_S_First(userId, recordSetId, recordSetVersion,
@@ -836,7 +829,7 @@ public class DDLRecordVersionUtil {
 	* @throws NoSuchRecordVersionException if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion findByU_R_R_S_Last(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
+		long recordSetId, String recordSetVersion, int status,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -855,7 +848,7 @@ public class DDLRecordVersionUtil {
 	* @return the last matching ddl record version, or <code>null</code> if a matching ddl record version could not be found
 	*/
 	public static DDLRecordVersion fetchByU_R_R_S_Last(long userId,
-		long recordSetId, java.lang.String recordSetVersion, int status,
+		long recordSetId, String recordSetVersion, int status,
 		OrderByComparator<DDLRecordVersion> orderByComparator) {
 		return getPersistence()
 				   .fetchByU_R_R_S_Last(userId, recordSetId, recordSetVersion,
@@ -876,7 +869,7 @@ public class DDLRecordVersionUtil {
 	*/
 	public static DDLRecordVersion[] findByU_R_R_S_PrevAndNext(
 		long recordVersionId, long userId, long recordSetId,
-		java.lang.String recordSetVersion, int status,
+		String recordSetVersion, int status,
 		OrderByComparator<DDLRecordVersion> orderByComparator)
 		throws com.liferay.dynamic.data.lists.exception.NoSuchRecordVersionException {
 		return getPersistence()
@@ -893,7 +886,7 @@ public class DDLRecordVersionUtil {
 	* @param status the status
 	*/
 	public static void removeByU_R_R_S(long userId, long recordSetId,
-		java.lang.String recordSetVersion, int status) {
+		String recordSetVersion, int status) {
 		getPersistence()
 			.removeByU_R_R_S(userId, recordSetId, recordSetVersion, status);
 	}
@@ -908,7 +901,7 @@ public class DDLRecordVersionUtil {
 	* @return the number of matching ddl record versions
 	*/
 	public static int countByU_R_R_S(long userId, long recordSetId,
-		java.lang.String recordSetVersion, int status) {
+		String recordSetVersion, int status) {
 		return getPersistence()
 				   .countByU_R_R_S(userId, recordSetId, recordSetVersion, status);
 	}
@@ -1065,6 +1058,17 @@ public class DDLRecordVersionUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordVersionPersistence, DDLRecordVersionPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordVersionPersistence.class);
+	private static ServiceTracker<DDLRecordVersionPersistence, DDLRecordVersionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordVersionPersistence.class);
+
+		ServiceTracker<DDLRecordVersionPersistence, DDLRecordVersionPersistence> serviceTracker =
+			new ServiceTracker<DDLRecordVersionPersistence, DDLRecordVersionPersistence>(bundle.getBundleContext(),
+				DDLRecordVersionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

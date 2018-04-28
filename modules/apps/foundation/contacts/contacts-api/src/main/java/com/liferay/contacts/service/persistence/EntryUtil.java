@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.contacts.model.Entry;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -269,7 +270,7 @@ public class EntryUtil {
 	* @return the matching entry
 	* @throws NoSuchEntryException if a matching entry could not be found
 	*/
-	public static Entry findByU_EA(long userId, java.lang.String emailAddress)
+	public static Entry findByU_EA(long userId, String emailAddress)
 		throws com.liferay.contacts.exception.NoSuchEntryException {
 		return getPersistence().findByU_EA(userId, emailAddress);
 	}
@@ -281,7 +282,7 @@ public class EntryUtil {
 	* @param emailAddress the email address
 	* @return the matching entry, or <code>null</code> if a matching entry could not be found
 	*/
-	public static Entry fetchByU_EA(long userId, java.lang.String emailAddress) {
+	public static Entry fetchByU_EA(long userId, String emailAddress) {
 		return getPersistence().fetchByU_EA(userId, emailAddress);
 	}
 
@@ -293,7 +294,7 @@ public class EntryUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching entry, or <code>null</code> if a matching entry could not be found
 	*/
-	public static Entry fetchByU_EA(long userId, java.lang.String emailAddress,
+	public static Entry fetchByU_EA(long userId, String emailAddress,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByU_EA(userId, emailAddress, retrieveFromCache);
@@ -306,7 +307,7 @@ public class EntryUtil {
 	* @param emailAddress the email address
 	* @return the entry that was removed
 	*/
-	public static Entry removeByU_EA(long userId, java.lang.String emailAddress)
+	public static Entry removeByU_EA(long userId, String emailAddress)
 		throws com.liferay.contacts.exception.NoSuchEntryException {
 		return getPersistence().removeByU_EA(userId, emailAddress);
 	}
@@ -318,7 +319,7 @@ public class EntryUtil {
 	* @param emailAddress the email address
 	* @return the number of matching entries
 	*/
-	public static int countByU_EA(long userId, java.lang.String emailAddress) {
+	public static int countByU_EA(long userId, String emailAddress) {
 		return getPersistence().countByU_EA(userId, emailAddress);
 	}
 
@@ -473,6 +474,16 @@ public class EntryUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<EntryPersistence, EntryPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(EntryPersistence.class);
+	private static ServiceTracker<EntryPersistence, EntryPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(EntryPersistence.class);
+
+		ServiceTracker<EntryPersistence, EntryPersistence> serviceTracker = new ServiceTracker<EntryPersistence, EntryPersistence>(bundle.getBundleContext(),
+				EntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

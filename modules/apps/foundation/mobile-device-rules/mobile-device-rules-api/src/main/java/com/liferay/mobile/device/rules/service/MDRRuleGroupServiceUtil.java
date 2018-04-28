@@ -16,7 +16,8 @@ package com.liferay.mobile.device.rules.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,9 +43,8 @@ public class MDRRuleGroupServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.mobile.device.rules.service.impl.MDRRuleGroupServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroup addRuleGroup(
-		long groupId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long groupId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -75,7 +75,7 @@ public class MDRRuleGroupServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -95,9 +95,8 @@ public class MDRRuleGroupServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroup updateRuleGroup(
-		long ruleGroupId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long ruleGroupId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -109,6 +108,16 @@ public class MDRRuleGroupServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MDRRuleGroupService, MDRRuleGroupService> _serviceTracker =
-		ServiceTrackerFactory.open(MDRRuleGroupService.class);
+	private static ServiceTracker<MDRRuleGroupService, MDRRuleGroupService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MDRRuleGroupService.class);
+
+		ServiceTracker<MDRRuleGroupService, MDRRuleGroupService> serviceTracker = new ServiceTracker<MDRRuleGroupService, MDRRuleGroupService>(bundle.getBundleContext(),
+				MDRRuleGroupService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

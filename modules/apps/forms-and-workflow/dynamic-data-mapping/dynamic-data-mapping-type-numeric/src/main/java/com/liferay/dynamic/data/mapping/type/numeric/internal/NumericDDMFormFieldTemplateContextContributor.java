@@ -14,12 +14,14 @@
 
 package com.liferay.dynamic.data.mapping.type.numeric.internal;
 
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormFieldEvaluationResult;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.HtmlUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -47,27 +49,69 @@ public class NumericDDMFormFieldTemplateContextContributor
 
 		Map<String, Object> parameters = new HashMap<>();
 
+		parameters.put(
+			"dataType",
+			getDataType(ddmFormField, ddmFormFieldRenderingContext));
+
 		LocalizedValue placeholder = (LocalizedValue)ddmFormField.getProperty(
 			"placeholder");
 
 		Locale locale = ddmFormFieldRenderingContext.getLocale();
 
-		parameters.put("placeholder", getValueString(placeholder, locale));
+		parameters.put(
+			"placeholder",
+			getValueString(placeholder, locale, ddmFormFieldRenderingContext));
+		parameters.put(
+			"predefinedValue",
+			getValueString(
+				ddmFormField.getPredefinedValue(), locale,
+				ddmFormFieldRenderingContext));
 
 		LocalizedValue tooltip = (LocalizedValue)ddmFormField.getProperty(
 			"tooltip");
 
-		parameters.put("tooltip", getValueString(tooltip, locale));
+		parameters.put(
+			"tooltip",
+			getValueString(tooltip, locale, ddmFormFieldRenderingContext));
 
 		return parameters;
 	}
 
-	protected String getValueString(Value value, Locale locale) {
-		if (value != null) {
-			return value.getString(locale);
+	protected String getDataType(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
+			(DDMFormFieldEvaluationResult)ddmFormFieldRenderingContext.
+				getProperty("ddmFormFieldEvaluationResult");
+
+		if (ddmFormFieldEvaluationResult != null) {
+			String dataType = ddmFormFieldEvaluationResult.getProperty(
+				"dataType");
+
+			if (dataType != null) {
+				return dataType;
+			}
 		}
 
-		return StringPool.BLANK;
+		return ddmFormField.getDataType();
+	}
+
+	protected String getValueString(
+		Value value, Locale locale,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		if (value == null) {
+			return StringPool.BLANK;
+		}
+
+		String valueString = value.getString(locale);
+
+		if (ddmFormFieldRenderingContext.isViewMode()) {
+			valueString = HtmlUtil.extractText(value.getString(locale));
+		}
+
+		return valueString;
 	}
 
 }

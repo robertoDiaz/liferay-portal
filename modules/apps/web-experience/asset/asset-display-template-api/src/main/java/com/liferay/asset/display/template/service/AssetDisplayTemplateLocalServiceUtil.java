@@ -16,7 +16,8 @@ package com.liferay.asset.display.template.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,9 +55,8 @@ public class AssetDisplayTemplateLocalServiceUtil {
 	}
 
 	public static com.liferay.asset.display.template.model.AssetDisplayTemplate addAssetDisplayTemplate(
-		long groupId, long userId, java.lang.String name, long classNameId,
-		java.lang.String language, java.lang.String scriptContent,
-		boolean main,
+		long groupId, long userId, String name, long classNameId,
+		String language, String scriptContent, boolean main,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -245,12 +245,12 @@ public class AssetDisplayTemplateLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.asset.display.template.model.AssetDisplayTemplate> getAssetDisplayTemplates(
-		long groupId, java.lang.String name) {
+		long groupId, String name) {
 		return getService().getAssetDisplayTemplates(groupId, name);
 	}
 
 	public static java.util.List<com.liferay.asset.display.template.model.AssetDisplayTemplate> getAssetDisplayTemplates(
-		long groupId, java.lang.String name, int start, int end,
+		long groupId, String name, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.asset.display.template.model.AssetDisplayTemplate> orderByComparator) {
 		return getService()
 				   .getAssetDisplayTemplates(groupId, name, start, end,
@@ -270,8 +270,7 @@ public class AssetDisplayTemplateLocalServiceUtil {
 		return getService().getAssetDisplayTemplatesCount(groupId);
 	}
 
-	public static int getAssetDisplayTemplatesCount(long groupId,
-		java.lang.String name) {
+	public static int getAssetDisplayTemplatesCount(long groupId, String name) {
 		return getService().getAssetDisplayTemplatesCount(groupId, name);
 	}
 
@@ -284,7 +283,7 @@ public class AssetDisplayTemplateLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -306,9 +305,8 @@ public class AssetDisplayTemplateLocalServiceUtil {
 	}
 
 	public static com.liferay.asset.display.template.model.AssetDisplayTemplate updateAssetDisplayTemplate(
-		long assetDisplayTemplateId, java.lang.String name, long classNameId,
-		java.lang.String language, java.lang.String scriptContent,
-		boolean main,
+		long assetDisplayTemplateId, String name, long classNameId,
+		String language, String scriptContent, boolean main,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -320,6 +318,17 @@ public class AssetDisplayTemplateLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<AssetDisplayTemplateLocalService, AssetDisplayTemplateLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(AssetDisplayTemplateLocalService.class);
+	private static ServiceTracker<AssetDisplayTemplateLocalService, AssetDisplayTemplateLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(AssetDisplayTemplateLocalService.class);
+
+		ServiceTracker<AssetDisplayTemplateLocalService, AssetDisplayTemplateLocalService> serviceTracker =
+			new ServiceTracker<AssetDisplayTemplateLocalService, AssetDisplayTemplateLocalService>(bundle.getBundleContext(),
+				AssetDisplayTemplateLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

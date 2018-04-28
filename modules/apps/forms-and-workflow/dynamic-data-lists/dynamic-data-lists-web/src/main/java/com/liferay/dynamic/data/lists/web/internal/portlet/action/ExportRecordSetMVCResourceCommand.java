@@ -19,11 +19,13 @@ import com.liferay.dynamic.data.lists.exporter.DDLExporter;
 import com.liferay.dynamic.data.lists.exporter.DDLExporterFactory;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
+import com.liferay.dynamic.data.lists.util.comparator.DDLRecordModifiedDateComparator;
+import com.liferay.petra.string.CharPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -74,7 +76,8 @@ public class ExportRecordSetMVCResourceCommand extends BaseMVCResourceCommand {
 		exporter.setLocale(themeDisplay.getLocale());
 
 		byte[] bytes = exporter.export(
-			recordSetId, WorkflowConstants.STATUS_APPROVED);
+			recordSetId, WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, new DDLRecordModifiedDateComparator(true));
 
 		String contentType = MimeTypesUtil.getContentType(fileName);
 

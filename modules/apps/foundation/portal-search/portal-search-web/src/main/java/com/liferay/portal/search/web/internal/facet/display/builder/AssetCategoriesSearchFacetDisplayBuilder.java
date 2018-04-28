@@ -16,11 +16,11 @@ package com.liferay.portal.search.web.internal.facet.display.builder;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext;
@@ -110,10 +110,9 @@ public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
 	}
 
 	public void setParameterValues(String... parameterValues) {
-		Stream<String> parameterValuesStream = Stream.of(
-			Objects.requireNonNull(parameterValues));
-
-		_selectedCategoryIds = parameterValuesStream.map(
+		_selectedCategoryIds = Stream.of(
+			Objects.requireNonNull(parameterValues)
+		).map(
 			GetterUtil::getLong
 		).filter(
 			categoryId -> categoryId > 0
@@ -244,12 +243,11 @@ public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
 	protected Optional<AssetCategoriesSearchFacetTermDisplayContext>
 		getEmptyTermDisplayContext(long assetCategoryId) {
 
-		Optional<AssetCategory> assetCategoryOptional = Optional.ofNullable(
-			_fetchAssetCategory(assetCategoryId));
-
-		return assetCategoryOptional.map(
-			assetCategory -> buildTermDisplayContext(
-				assetCategory, 0, true, 1));
+		return Optional.ofNullable(
+			_fetchAssetCategory(assetCategoryId)
+		).map(
+			assetCategory -> buildTermDisplayContext(assetCategory, 0, true, 1)
+		);
 	}
 
 	protected List<AssetCategoriesSearchFacetTermDisplayContext>

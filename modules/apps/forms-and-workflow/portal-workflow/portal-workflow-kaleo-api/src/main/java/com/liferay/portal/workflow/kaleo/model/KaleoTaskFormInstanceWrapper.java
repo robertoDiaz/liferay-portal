@@ -66,7 +66,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoInstanceId", getKaleoInstanceId());
 		attributes.put("kaleoTaskId", getKaleoTaskId());
 		attributes.put("kaleoTaskInstanceTokenId", getKaleoTaskInstanceTokenId());
@@ -125,10 +125,11 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 			setModifiedDate(modifiedDate);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		Long kaleoInstanceId = (Long)attributes.get("kaleoInstanceId");
@@ -189,7 +190,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoTaskFormInstanceWrapper((KaleoTaskFormInstance)_kaleoTaskFormInstance.clone());
 	}
 
@@ -249,7 +250,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @return the form value entry uuid of this kaleo task form instance
 	*/
 	@Override
-	public java.lang.String getFormValueEntryUuid() {
+	public String getFormValueEntryUuid() {
 		return _kaleoTaskFormInstance.getFormValueEntryUuid();
 	}
 
@@ -259,7 +260,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @return the form values of this kaleo task form instance
 	*/
 	@Override
-	public java.lang.String getFormValues() {
+	public String getFormValues() {
 		return _kaleoTaskFormInstance.getFormValues();
 	}
 
@@ -274,13 +275,13 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo task form instance.
+	* Returns the kaleo definition version ID of this kaleo task form instance.
 	*
-	* @return the kaleo definition ID of this kaleo task form instance
+	* @return the kaleo definition version ID of this kaleo task form instance
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoTaskFormInstance.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoTaskFormInstance.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -339,7 +340,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @return the metadata of this kaleo task form instance
 	*/
 	@Override
-	public java.lang.String getMetadata() {
+	public String getMetadata() {
 		return _kaleoTaskFormInstance.getMetadata();
 	}
 
@@ -384,7 +385,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @return the user name of this kaleo task form instance
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoTaskFormInstance.getUserName();
 	}
 
@@ -394,7 +395,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @return the user uuid of this kaleo task form instance
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoTaskFormInstance.getUserUuid();
 	}
 
@@ -490,7 +491,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @param formValueEntryUuid the form value entry uuid of this kaleo task form instance
 	*/
 	@Override
-	public void setFormValueEntryUuid(java.lang.String formValueEntryUuid) {
+	public void setFormValueEntryUuid(String formValueEntryUuid) {
 		_kaleoTaskFormInstance.setFormValueEntryUuid(formValueEntryUuid);
 	}
 
@@ -500,7 +501,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @param formValues the form values of this kaleo task form instance
 	*/
 	@Override
-	public void setFormValues(java.lang.String formValues) {
+	public void setFormValues(String formValues) {
 		_kaleoTaskFormInstance.setFormValues(formValues);
 	}
 
@@ -515,13 +516,13 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo task form instance.
+	* Sets the kaleo definition version ID of this kaleo task form instance.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo task form instance
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo task form instance
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoTaskFormInstance.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoTaskFormInstance.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -580,7 +581,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @param metadata the metadata of this kaleo task form instance
 	*/
 	@Override
-	public void setMetadata(java.lang.String metadata) {
+	public void setMetadata(String metadata) {
 		_kaleoTaskFormInstance.setMetadata(metadata);
 	}
 
@@ -630,7 +631,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @param userName the user name of this kaleo task form instance
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoTaskFormInstance.setUserName(userName);
 	}
 
@@ -640,7 +641,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	* @param userUuid the user uuid of this kaleo task form instance
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoTaskFormInstance.setUserUuid(userUuid);
 	}
 
@@ -655,7 +656,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoTaskFormInstance.toString();
 	}
 
@@ -665,7 +666,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoTaskFormInstance.toXmlString();
 	}
 

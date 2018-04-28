@@ -44,6 +44,10 @@ public class AssetCategoriesSummaryTag<R> extends IncludeTag {
 		_classPK = classPK;
 	}
 
+	public void setDisplayStyle(String displayStyle) {
+		_displayStyle = displayStyle;
+	}
+
 	public void setMessage(String message) {
 		_message = message;
 	}
@@ -65,8 +69,11 @@ public class AssetCategoriesSummaryTag<R> extends IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_className = null;
 		_classPK = 0;
+		_displayStyle = null;
 		_message = null;
 		_paramName = null;
 		_portletURL = null;
@@ -99,6 +106,9 @@ public class AssetCategoriesSummaryTag<R> extends IncludeTag {
 			"liferay-asset:asset-categories-summary:classPK",
 			String.valueOf(_classPK));
 		request.setAttribute(
+			"liferay-asset:asset-categories-summary:displayStyle",
+			_displayStyle);
+		request.setAttribute(
 			"liferay-asset:asset-categories-summary:message", _message);
 		request.setAttribute(
 			"liferay-asset:asset-categories-summary:paramName", _paramName);
@@ -110,6 +120,7 @@ public class AssetCategoriesSummaryTag<R> extends IncludeTag {
 
 	private String _className;
 	private long _classPK;
+	private String _displayStyle;
 	private String _message;
 	private String _paramName;
 	private PortletURL _portletURL;

@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -47,7 +48,7 @@ public class DDLRecordVersionServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -76,7 +77,7 @@ public class DDLRecordVersionServiceUtil {
 	user do not have the required permission to access the record set
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordVersion getRecordVersion(
-		long recordId, java.lang.String version)
+		long recordId, String version)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRecordVersion(recordId, version);
 	}
@@ -139,6 +140,17 @@ public class DDLRecordVersionServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordVersionService, DDLRecordVersionService> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordVersionService.class);
+	private static ServiceTracker<DDLRecordVersionService, DDLRecordVersionService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordVersionService.class);
+
+		ServiceTracker<DDLRecordVersionService, DDLRecordVersionService> serviceTracker =
+			new ServiceTracker<DDLRecordVersionService, DDLRecordVersionService>(bundle.getBundleContext(),
+				DDLRecordVersionService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

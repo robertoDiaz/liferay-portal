@@ -53,6 +53,7 @@ AUI.add(
 
 				TYPE_EDITOR: {
 					'checkbox': A.CheckboxCellEditor,
+					'ddm-color': FormBuilder.CUSTOM_CELL_EDITORS['color-cell-editor'],
 					'ddm-date': A.DateCellEditor,
 					'ddm-decimal': A.TextCellEditor,
 					'ddm-documentlibrary': FormBuilder.CUSTOM_CELL_EDITORS['document-library-file-entry-cell-editor'],
@@ -143,6 +144,20 @@ AUI.add(
 						}
 
 						scrollableElement.set('scrollLeft', scrollTo);
+					},
+
+					_afterSelectionKey: function(event) {
+						var instance = this;
+
+						var activeCell = instance.get('activeCell');
+
+						var alignNode = event.alignNode || activeCell;
+
+						var column = instance.getColumn(alignNode);
+
+						if (activeCell && (event.keyCode === 13) && (column.type !== 'textarea')) {
+							instance._onEditCell(activeCell);
+						}
 					},
 
 					_normalizeFieldData: function(item, record, fieldsDisplayValues, normalized) {
@@ -394,7 +409,17 @@ AUI.add(
 								};
 
 								config.inputFormatter = function(value) {
-									return String(value.length > 0);
+									if (Array.isArray(value) && value.length > 0) {
+										value = value[0];
+									}
+
+									var checkedValue = 'false';
+
+									if (value === 'true') {
+										checkedValue = value;
+									}
+
+									return checkedValue;
 								};
 
 								item.formatter = function(obj) {

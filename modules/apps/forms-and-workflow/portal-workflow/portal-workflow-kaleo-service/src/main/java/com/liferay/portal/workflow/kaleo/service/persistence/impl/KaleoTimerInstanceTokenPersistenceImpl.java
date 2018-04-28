@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchTimerInstanceTokenException;
@@ -312,7 +311,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append("kaleoInstanceId=");
 		msg.append(kaleoInstanceId);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -365,7 +364,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append("kaleoInstanceId=");
 		msg.append(kaleoInstanceId);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -651,7 +650,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 			msg.append(", kaleoTimerId=");
 			msg.append(kaleoTimerId);
 
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
+			msg.append("}");
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(msg.toString());
@@ -979,7 +978,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 			if ((list != null) && !list.isEmpty()) {
 				for (KaleoTimerInstanceToken kaleoTimerInstanceToken : list) {
 					if ((kaleoInstanceTokenId != kaleoTimerInstanceToken.getKaleoInstanceTokenId()) ||
-							(completed != kaleoTimerInstanceToken.getCompleted())) {
+							(completed != kaleoTimerInstanceToken.isCompleted())) {
 						list = null;
 
 						break;
@@ -1090,7 +1089,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append(", completed=");
 		msg.append(completed);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -1148,7 +1147,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append(", completed=");
 		msg.append(completed);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -1553,8 +1552,8 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 			if ((list != null) && !list.isEmpty()) {
 				for (KaleoTimerInstanceToken kaleoTimerInstanceToken : list) {
 					if ((kaleoInstanceTokenId != kaleoTimerInstanceToken.getKaleoInstanceTokenId()) ||
-							(blocking != kaleoTimerInstanceToken.getBlocking()) ||
-							(completed != kaleoTimerInstanceToken.getCompleted())) {
+							(blocking != kaleoTimerInstanceToken.isBlocking()) ||
+							(completed != kaleoTimerInstanceToken.isCompleted())) {
 						list = null;
 
 						break;
@@ -1673,7 +1672,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append(", completed=");
 		msg.append(completed);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -1736,7 +1735,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		msg.append(", completed=");
 		msg.append(completed);
 
-		msg.append(StringPool.CLOSE_CURLY_BRACE);
+		msg.append("}");
 
 		throw new NoSuchTimerInstanceTokenException(msg.toString());
 	}
@@ -2327,7 +2326,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 
 			args = new Object[] {
 					kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-					kaleoTimerInstanceTokenModelImpl.getCompleted()
+					kaleoTimerInstanceTokenModelImpl.isCompleted()
 				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KITI_C, args);
@@ -2336,8 +2335,8 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 
 			args = new Object[] {
 					kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-					kaleoTimerInstanceTokenModelImpl.getBlocking(),
-					kaleoTimerInstanceTokenModelImpl.getCompleted()
+					kaleoTimerInstanceTokenModelImpl.isBlocking(),
+					kaleoTimerInstanceTokenModelImpl.isCompleted()
 				};
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_KITI_B_C, args);
@@ -2384,7 +2383,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 
 				args = new Object[] {
 						kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-						kaleoTimerInstanceTokenModelImpl.getCompleted()
+						kaleoTimerInstanceTokenModelImpl.isCompleted()
 					};
 
 				finderCache.removeResult(FINDER_PATH_COUNT_BY_KITI_C, args);
@@ -2406,8 +2405,8 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 
 				args = new Object[] {
 						kaleoTimerInstanceTokenModelImpl.getKaleoInstanceTokenId(),
-						kaleoTimerInstanceTokenModelImpl.getBlocking(),
-						kaleoTimerInstanceTokenModelImpl.getCompleted()
+						kaleoTimerInstanceTokenModelImpl.isBlocking(),
+						kaleoTimerInstanceTokenModelImpl.isCompleted()
 					};
 
 				finderCache.removeResult(FINDER_PATH_COUNT_BY_KITI_B_C, args);
@@ -2449,7 +2448,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		kaleoTimerInstanceTokenImpl.setModifiedDate(kaleoTimerInstanceToken.getModifiedDate());
 		kaleoTimerInstanceTokenImpl.setKaleoClassName(kaleoTimerInstanceToken.getKaleoClassName());
 		kaleoTimerInstanceTokenImpl.setKaleoClassPK(kaleoTimerInstanceToken.getKaleoClassPK());
-		kaleoTimerInstanceTokenImpl.setKaleoDefinitionId(kaleoTimerInstanceToken.getKaleoDefinitionId());
+		kaleoTimerInstanceTokenImpl.setKaleoDefinitionVersionId(kaleoTimerInstanceToken.getKaleoDefinitionVersionId());
 		kaleoTimerInstanceTokenImpl.setKaleoInstanceId(kaleoTimerInstanceToken.getKaleoInstanceId());
 		kaleoTimerInstanceTokenImpl.setKaleoInstanceTokenId(kaleoTimerInstanceToken.getKaleoInstanceTokenId());
 		kaleoTimerInstanceTokenImpl.setKaleoTaskInstanceTokenId(kaleoTimerInstanceToken.getKaleoTaskInstanceTokenId());
@@ -2617,12 +2616,12 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 		for (Serializable primaryKey : uncachedPrimaryKeys) {
 			query.append((long)primaryKey);
 
-			query.append(StringPool.COMMA);
+			query.append(",");
 		}
 
 		query.setIndex(query.index() - 1);
 
-		query.append(StringPool.CLOSE_PARENTHESIS);
+		query.append(")");
 
 		String sql = query.toString();
 

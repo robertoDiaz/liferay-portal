@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarResource;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -117,7 +118,7 @@ public class CalendarResourceUtil {
 	* @param uuid the uuid
 	* @return the matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid(java.lang.String uuid) {
+	public static List<CalendarResource> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -133,8 +134,8 @@ public class CalendarResourceUtil {
 	* @param end the upper bound of the range of calendar resources (not inclusive)
 	* @return the range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid(java.lang.String uuid,
-		int start, int end) {
+	public static List<CalendarResource> findByUuid(String uuid, int start,
+		int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -151,9 +152,8 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid(java.lang.String uuid,
-		int start, int end,
-		OrderByComparator<CalendarResource> orderByComparator) {
+	public static List<CalendarResource> findByUuid(String uuid, int start,
+		int end, OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -171,9 +171,8 @@ public class CalendarResourceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid(java.lang.String uuid,
-		int start, int end,
-		OrderByComparator<CalendarResource> orderByComparator,
+	public static List<CalendarResource> findByUuid(String uuid, int start,
+		int end, OrderByComparator<CalendarResource> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
@@ -188,7 +187,7 @@ public class CalendarResourceUtil {
 	* @return the first matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByUuid_First(java.lang.String uuid,
+	public static CalendarResource findByUuid_First(String uuid,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -201,7 +200,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUuid_First(java.lang.String uuid,
+	public static CalendarResource fetchByUuid_First(String uuid,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -214,7 +213,7 @@ public class CalendarResourceUtil {
 	* @return the last matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByUuid_Last(java.lang.String uuid,
+	public static CalendarResource findByUuid_Last(String uuid,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -227,7 +226,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUuid_Last(java.lang.String uuid,
+	public static CalendarResource fetchByUuid_Last(String uuid,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -242,7 +241,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a calendar resource with the primary key could not be found
 	*/
 	public static CalendarResource[] findByUuid_PrevAndNext(
-		long calendarResourceId, java.lang.String uuid,
+		long calendarResourceId, String uuid,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -255,7 +254,7 @@ public class CalendarResourceUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -265,7 +264,7 @@ public class CalendarResourceUtil {
 	* @param uuid the uuid
 	* @return the number of matching calendar resources
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -277,8 +276,7 @@ public class CalendarResourceUtil {
 	* @return the matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static CalendarResource findByUUID_G(String uuid, long groupId)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -290,8 +288,7 @@ public class CalendarResourceUtil {
 	* @param groupId the group ID
 	* @return the matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUUID_G(java.lang.String uuid,
-		long groupId) {
+	public static CalendarResource fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -303,8 +300,8 @@ public class CalendarResourceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUUID_G(java.lang.String uuid,
-		long groupId, boolean retrieveFromCache) {
+	public static CalendarResource fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
 
@@ -315,8 +312,7 @@ public class CalendarResourceUtil {
 	* @param groupId the group ID
 	* @return the calendar resource that was removed
 	*/
-	public static CalendarResource removeByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static CalendarResource removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -328,7 +324,7 @@ public class CalendarResourceUtil {
 	* @param groupId the group ID
 	* @return the number of matching calendar resources
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -339,7 +335,7 @@ public class CalendarResourceUtil {
 	* @param companyId the company ID
 	* @return the matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid_C(java.lang.String uuid,
+	public static List<CalendarResource> findByUuid_C(String uuid,
 		long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
@@ -357,7 +353,7 @@ public class CalendarResourceUtil {
 	* @param end the upper bound of the range of calendar resources (not inclusive)
 	* @return the range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid_C(java.lang.String uuid,
+	public static List<CalendarResource> findByUuid_C(String uuid,
 		long companyId, int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
@@ -376,7 +372,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid_C(java.lang.String uuid,
+	public static List<CalendarResource> findByUuid_C(String uuid,
 		long companyId, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
@@ -398,7 +394,7 @@ public class CalendarResourceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByUuid_C(java.lang.String uuid,
+	public static List<CalendarResource> findByUuid_C(String uuid,
 		long companyId, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator,
 		boolean retrieveFromCache) {
@@ -416,7 +412,7 @@ public class CalendarResourceUtil {
 	* @return the first matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByUuid_C_First(java.lang.String uuid,
+	public static CalendarResource findByUuid_C_First(String uuid,
 		long companyId, OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -431,7 +427,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUuid_C_First(java.lang.String uuid,
+	public static CalendarResource fetchByUuid_C_First(String uuid,
 		long companyId, OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
@@ -446,7 +442,7 @@ public class CalendarResourceUtil {
 	* @return the last matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByUuid_C_Last(java.lang.String uuid,
+	public static CalendarResource findByUuid_C_Last(String uuid,
 		long companyId, OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -461,7 +457,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByUuid_C_Last(java.lang.String uuid,
+	public static CalendarResource fetchByUuid_C_Last(String uuid,
 		long companyId, OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -478,7 +474,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a calendar resource with the primary key could not be found
 	*/
 	public static CalendarResource[] findByUuid_C_PrevAndNext(
-		long calendarResourceId, java.lang.String uuid, long companyId,
+		long calendarResourceId, String uuid, long companyId,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -492,7 +488,7 @@ public class CalendarResourceUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -503,7 +499,7 @@ public class CalendarResourceUtil {
 	* @param companyId the company ID
 	* @return the number of matching calendar resources
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -905,8 +901,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the matching calendar resources
 	*/
-	public static List<CalendarResource> findByG_C(long groupId,
-		java.lang.String code) {
+	public static List<CalendarResource> findByG_C(long groupId, String code) {
 		return getPersistence().findByG_C(groupId, code);
 	}
 
@@ -923,8 +918,8 @@ public class CalendarResourceUtil {
 	* @param end the upper bound of the range of calendar resources (not inclusive)
 	* @return the range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByG_C(long groupId,
-		java.lang.String code, int start, int end) {
+	public static List<CalendarResource> findByG_C(long groupId, String code,
+		int start, int end) {
 		return getPersistence().findByG_C(groupId, code, start, end);
 	}
 
@@ -942,8 +937,8 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByG_C(long groupId,
-		java.lang.String code, int start, int end,
+	public static List<CalendarResource> findByG_C(long groupId, String code,
+		int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .findByG_C(groupId, code, start, end, orderByComparator);
@@ -964,8 +959,8 @@ public class CalendarResourceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching calendar resources
 	*/
-	public static List<CalendarResource> findByG_C(long groupId,
-		java.lang.String code, int start, int end,
+	public static List<CalendarResource> findByG_C(long groupId, String code,
+		int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -982,8 +977,7 @@ public class CalendarResourceUtil {
 	* @return the first matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByG_C_First(long groupId,
-		java.lang.String code,
+	public static CalendarResource findByG_C_First(long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().findByG_C_First(groupId, code, orderByComparator);
@@ -997,8 +991,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByG_C_First(long groupId,
-		java.lang.String code,
+	public static CalendarResource fetchByG_C_First(long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .fetchByG_C_First(groupId, code, orderByComparator);
@@ -1013,8 +1006,7 @@ public class CalendarResourceUtil {
 	* @return the last matching calendar resource
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
-	public static CalendarResource findByG_C_Last(long groupId,
-		java.lang.String code,
+	public static CalendarResource findByG_C_Last(long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence().findByG_C_Last(groupId, code, orderByComparator);
@@ -1028,8 +1020,7 @@ public class CalendarResourceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
-	public static CalendarResource fetchByG_C_Last(long groupId,
-		java.lang.String code,
+	public static CalendarResource fetchByG_C_Last(long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence().fetchByG_C_Last(groupId, code, orderByComparator);
 	}
@@ -1045,7 +1036,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a calendar resource with the primary key could not be found
 	*/
 	public static CalendarResource[] findByG_C_PrevAndNext(
-		long calendarResourceId, long groupId, java.lang.String code,
+		long calendarResourceId, long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -1061,7 +1052,7 @@ public class CalendarResourceUtil {
 	* @return the matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long groupId,
-		java.lang.String code) {
+		String code) {
 		return getPersistence().filterFindByG_C(groupId, code);
 	}
 
@@ -1079,7 +1070,7 @@ public class CalendarResourceUtil {
 	* @return the range of matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long groupId,
-		java.lang.String code, int start, int end) {
+		String code, int start, int end) {
 		return getPersistence().filterFindByG_C(groupId, code, start, end);
 	}
 
@@ -1098,7 +1089,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long groupId,
-		java.lang.String code, int start, int end,
+		String code, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_C(groupId, code, start, end, orderByComparator);
@@ -1115,7 +1106,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a calendar resource with the primary key could not be found
 	*/
 	public static CalendarResource[] filterFindByG_C_PrevAndNext(
-		long calendarResourceId, long groupId, java.lang.String code,
+		long calendarResourceId, long groupId, String code,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -1131,7 +1122,7 @@ public class CalendarResourceUtil {
 	* @return the matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long[] groupIds,
-		java.lang.String code) {
+		String code) {
 		return getPersistence().filterFindByG_C(groupIds, code);
 	}
 
@@ -1149,7 +1140,7 @@ public class CalendarResourceUtil {
 	* @return the range of matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long[] groupIds,
-		java.lang.String code, int start, int end) {
+		String code, int start, int end) {
 		return getPersistence().filterFindByG_C(groupIds, code, start, end);
 	}
 
@@ -1168,7 +1159,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources that the user has permission to view
 	*/
 	public static List<CalendarResource> filterFindByG_C(long[] groupIds,
-		java.lang.String code, int start, int end,
+		String code, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .filterFindByG_C(groupIds, code, start, end,
@@ -1186,8 +1177,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the matching calendar resources
 	*/
-	public static List<CalendarResource> findByG_C(long[] groupIds,
-		java.lang.String code) {
+	public static List<CalendarResource> findByG_C(long[] groupIds, String code) {
 		return getPersistence().findByG_C(groupIds, code);
 	}
 
@@ -1205,7 +1195,7 @@ public class CalendarResourceUtil {
 	* @return the range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByG_C(long[] groupIds,
-		java.lang.String code, int start, int end) {
+		String code, int start, int end) {
 		return getPersistence().findByG_C(groupIds, code, start, end);
 	}
 
@@ -1224,7 +1214,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByG_C(long[] groupIds,
-		java.lang.String code, int start, int end,
+		String code, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .findByG_C(groupIds, code, start, end, orderByComparator);
@@ -1246,7 +1236,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByG_C(long[] groupIds,
-		java.lang.String code, int start, int end,
+		String code, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -1260,7 +1250,7 @@ public class CalendarResourceUtil {
 	* @param groupId the group ID
 	* @param code the code
 	*/
-	public static void removeByG_C(long groupId, java.lang.String code) {
+	public static void removeByG_C(long groupId, String code) {
 		getPersistence().removeByG_C(groupId, code);
 	}
 
@@ -1271,7 +1261,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the number of matching calendar resources
 	*/
-	public static int countByG_C(long groupId, java.lang.String code) {
+	public static int countByG_C(long groupId, String code) {
 		return getPersistence().countByG_C(groupId, code);
 	}
 
@@ -1282,7 +1272,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the number of matching calendar resources
 	*/
-	public static int countByG_C(long[] groupIds, java.lang.String code) {
+	public static int countByG_C(long[] groupIds, String code) {
 		return getPersistence().countByG_C(groupIds, code);
 	}
 
@@ -1293,7 +1283,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the number of matching calendar resources that the user has permission to view
 	*/
-	public static int filterCountByG_C(long groupId, java.lang.String code) {
+	public static int filterCountByG_C(long groupId, String code) {
 		return getPersistence().filterCountByG_C(groupId, code);
 	}
 
@@ -1304,7 +1294,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @return the number of matching calendar resources that the user has permission to view
 	*/
-	public static int filterCountByG_C(long[] groupIds, java.lang.String code) {
+	public static int filterCountByG_C(long[] groupIds, String code) {
 		return getPersistence().filterCountByG_C(groupIds, code);
 	}
 
@@ -1634,7 +1624,7 @@ public class CalendarResourceUtil {
 	* @return the matching calendar resources
 	*/
 	public static List<CalendarResource> findByC_C_A(long companyId,
-		java.lang.String code, boolean active) {
+		String code, boolean active) {
 		return getPersistence().findByC_C_A(companyId, code, active);
 	}
 
@@ -1653,7 +1643,7 @@ public class CalendarResourceUtil {
 	* @return the range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByC_C_A(long companyId,
-		java.lang.String code, boolean active, int start, int end) {
+		String code, boolean active, int start, int end) {
 		return getPersistence().findByC_C_A(companyId, code, active, start, end);
 	}
 
@@ -1673,7 +1663,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByC_C_A(long companyId,
-		java.lang.String code, boolean active, int start, int end,
+		String code, boolean active, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .findByC_C_A(companyId, code, active, start, end,
@@ -1697,7 +1687,7 @@ public class CalendarResourceUtil {
 	* @return the ordered range of matching calendar resources
 	*/
 	public static List<CalendarResource> findByC_C_A(long companyId,
-		java.lang.String code, boolean active, int start, int end,
+		String code, boolean active, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -1716,7 +1706,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
 	public static CalendarResource findByC_C_A_First(long companyId,
-		java.lang.String code, boolean active,
+		String code, boolean active,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -1733,7 +1723,7 @@ public class CalendarResourceUtil {
 	* @return the first matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
 	public static CalendarResource fetchByC_C_A_First(long companyId,
-		java.lang.String code, boolean active,
+		String code, boolean active,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .fetchByC_C_A_First(companyId, code, active,
@@ -1751,7 +1741,7 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a matching calendar resource could not be found
 	*/
 	public static CalendarResource findByC_C_A_Last(long companyId,
-		java.lang.String code, boolean active,
+		String code, boolean active,
 		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
@@ -1768,7 +1758,7 @@ public class CalendarResourceUtil {
 	* @return the last matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	*/
 	public static CalendarResource fetchByC_C_A_Last(long companyId,
-		java.lang.String code, boolean active,
+		String code, boolean active,
 		OrderByComparator<CalendarResource> orderByComparator) {
 		return getPersistence()
 				   .fetchByC_C_A_Last(companyId, code, active, orderByComparator);
@@ -1786,8 +1776,8 @@ public class CalendarResourceUtil {
 	* @throws NoSuchResourceException if a calendar resource with the primary key could not be found
 	*/
 	public static CalendarResource[] findByC_C_A_PrevAndNext(
-		long calendarResourceId, long companyId, java.lang.String code,
-		boolean active, OrderByComparator<CalendarResource> orderByComparator)
+		long calendarResourceId, long companyId, String code, boolean active,
+		OrderByComparator<CalendarResource> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchResourceException {
 		return getPersistence()
 				   .findByC_C_A_PrevAndNext(calendarResourceId, companyId,
@@ -1801,8 +1791,7 @@ public class CalendarResourceUtil {
 	* @param code the code
 	* @param active the active
 	*/
-	public static void removeByC_C_A(long companyId, java.lang.String code,
-		boolean active) {
+	public static void removeByC_C_A(long companyId, String code, boolean active) {
 		getPersistence().removeByC_C_A(companyId, code, active);
 	}
 
@@ -1814,8 +1803,7 @@ public class CalendarResourceUtil {
 	* @param active the active
 	* @return the number of matching calendar resources
 	*/
-	public static int countByC_C_A(long companyId, java.lang.String code,
-		boolean active) {
+	public static int countByC_C_A(long companyId, String code, boolean active) {
 		return getPersistence().countByC_C_A(companyId, code, active);
 	}
 
@@ -1967,7 +1955,7 @@ public class CalendarResourceUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -1975,6 +1963,17 @@ public class CalendarResourceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<CalendarResourcePersistence, CalendarResourcePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(CalendarResourcePersistence.class);
+	private static ServiceTracker<CalendarResourcePersistence, CalendarResourcePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(CalendarResourcePersistence.class);
+
+		ServiceTracker<CalendarResourcePersistence, CalendarResourcePersistence> serviceTracker =
+			new ServiceTracker<CalendarResourcePersistence, CalendarResourcePersistence>(bundle.getBundleContext(),
+				CalendarResourcePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

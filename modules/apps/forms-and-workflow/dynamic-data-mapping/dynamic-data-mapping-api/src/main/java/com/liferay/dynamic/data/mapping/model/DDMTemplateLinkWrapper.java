@@ -100,64 +100,13 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	}
 
 	@Override
-	public DDMTemplate getTemplate()
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmTemplateLink.getTemplate();
-	}
-
-	@Override
-	public DDMTemplateLink toEscapedModel() {
-		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toEscapedModel());
-	}
-
-	@Override
-	public DDMTemplateLink toUnescapedModel() {
-		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toUnescapedModel());
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddmTemplateLink.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddmTemplateLink.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddmTemplateLink.isNew();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddmTemplateLink.getExpandoBridge();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDMTemplateLink> toCacheModel() {
-		return _ddmTemplateLink.toCacheModel();
+	public Object clone() {
+		return new DDMTemplateLinkWrapper((DDMTemplateLink)_ddmTemplateLink.clone());
 	}
 
 	@Override
 	public int compareTo(DDMTemplateLink ddmTemplateLink) {
 		return _ddmTemplateLink.compareTo(ddmTemplateLink);
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddmTemplateLink.hashCode();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddmTemplateLink.getPrimaryKeyObj();
-	}
-
-	@Override
-	public java.lang.Object clone() {
-		return new DDMTemplateLinkWrapper((DDMTemplateLink)_ddmTemplateLink.clone());
 	}
 
 	/**
@@ -166,18 +115,8 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	* @return the fully qualified class name of this ddm template link
 	*/
 	@Override
-	public java.lang.String getClassName() {
+	public String getClassName() {
 		return _ddmTemplateLink.getClassName();
-	}
-
-	@Override
-	public java.lang.String toString() {
-		return _ddmTemplateLink.toString();
-	}
-
-	@Override
-	public java.lang.String toXmlString() {
-		return _ddmTemplateLink.toXmlString();
 	}
 
 	/**
@@ -210,6 +149,11 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 		return _ddmTemplateLink.getCompanyId();
 	}
 
+	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return _ddmTemplateLink.getExpandoBridge();
+	}
+
 	/**
 	* Returns the primary key of this ddm template link.
 	*
@@ -218,6 +162,17 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	@Override
 	public long getPrimaryKey() {
 		return _ddmTemplateLink.getPrimaryKey();
+	}
+
+	@Override
+	public Serializable getPrimaryKeyObj() {
+		return _ddmTemplateLink.getPrimaryKeyObj();
+	}
+
+	@Override
+	public DDMTemplate getTemplate()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmTemplateLink.getTemplate();
 	}
 
 	/**
@@ -241,6 +196,26 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	}
 
 	@Override
+	public int hashCode() {
+		return _ddmTemplateLink.hashCode();
+	}
+
+	@Override
+	public boolean isCachedModel() {
+		return _ddmTemplateLink.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _ddmTemplateLink.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _ddmTemplateLink.isNew();
+	}
+
+	@Override
 	public void persist() {
 		_ddmTemplateLink.persist();
 	}
@@ -251,7 +226,7 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	}
 
 	@Override
-	public void setClassName(java.lang.String className) {
+	public void setClassName(String className) {
 		_ddmTemplateLink.setClassName(className);
 	}
 
@@ -286,14 +261,14 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddmTemplateLink.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
 		_ddmTemplateLink.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
+		_ddmTemplateLink.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
@@ -339,6 +314,31 @@ public class DDMTemplateLinkWrapper implements DDMTemplateLink,
 	@Override
 	public void setTemplateLinkId(long templateLinkId) {
 		_ddmTemplateLink.setTemplateLinkId(templateLinkId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.CacheModel<DDMTemplateLink> toCacheModel() {
+		return _ddmTemplateLink.toCacheModel();
+	}
+
+	@Override
+	public DDMTemplateLink toEscapedModel() {
+		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toEscapedModel());
+	}
+
+	@Override
+	public String toString() {
+		return _ddmTemplateLink.toString();
+	}
+
+	@Override
+	public DDMTemplateLink toUnescapedModel() {
+		return new DDMTemplateLinkWrapper(_ddmTemplateLink.toUnescapedModel());
+	}
+
+	@Override
+	public String toXmlString() {
+		return _ddmTemplateLink.toXmlString();
 	}
 
 	@Override

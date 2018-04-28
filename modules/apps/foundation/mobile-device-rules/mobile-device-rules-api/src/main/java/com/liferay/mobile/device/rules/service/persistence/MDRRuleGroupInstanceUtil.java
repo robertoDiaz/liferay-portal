@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -118,7 +119,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param uuid the uuid
 	* @return the matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid(java.lang.String uuid) {
+	public static List<MDRRuleGroupInstance> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -134,8 +135,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param end the upper bound of the range of mdr rule group instances (not inclusive)
 	* @return the range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid(java.lang.String uuid,
-		int start, int end) {
+	public static List<MDRRuleGroupInstance> findByUuid(String uuid, int start,
+		int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -152,9 +153,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid(java.lang.String uuid,
-		int start, int end,
-		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
+	public static List<MDRRuleGroupInstance> findByUuid(String uuid, int start,
+		int end, OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
 
@@ -172,9 +172,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid(java.lang.String uuid,
-		int start, int end,
-		OrderByComparator<MDRRuleGroupInstance> orderByComparator,
+	public static List<MDRRuleGroupInstance> findByUuid(String uuid, int start,
+		int end, OrderByComparator<MDRRuleGroupInstance> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByUuid(uuid, start, end, orderByComparator,
@@ -189,7 +188,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @return the first matching mdr rule group instance
 	* @throws NoSuchRuleGroupInstanceException if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance findByUuid_First(java.lang.String uuid,
+	public static MDRRuleGroupInstance findByUuid_First(String uuid,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -202,8 +201,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUuid_First(
-		java.lang.String uuid,
+	public static MDRRuleGroupInstance fetchByUuid_First(String uuid,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -216,7 +214,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @return the last matching mdr rule group instance
 	* @throws NoSuchRuleGroupInstanceException if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance findByUuid_Last(java.lang.String uuid,
+	public static MDRRuleGroupInstance findByUuid_Last(String uuid,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -229,7 +227,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUuid_Last(java.lang.String uuid,
+	public static MDRRuleGroupInstance fetchByUuid_Last(String uuid,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -244,7 +242,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @throws NoSuchRuleGroupInstanceException if a mdr rule group instance with the primary key could not be found
 	*/
 	public static MDRRuleGroupInstance[] findByUuid_PrevAndNext(
-		long ruleGroupInstanceId, java.lang.String uuid,
+		long ruleGroupInstanceId, String uuid,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence()
@@ -257,7 +255,7 @@ public class MDRRuleGroupInstanceUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -267,7 +265,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param uuid the uuid
 	* @return the number of matching mdr rule group instances
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -279,8 +277,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @return the matching mdr rule group instance
 	* @throws NoSuchRuleGroupInstanceException if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance findByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static MDRRuleGroupInstance findByUUID_G(String uuid, long groupId)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -292,8 +289,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param groupId the group ID
 	* @return the matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUUID_G(java.lang.String uuid,
-		long groupId) {
+	public static MDRRuleGroupInstance fetchByUUID_G(String uuid, long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -305,8 +301,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUUID_G(java.lang.String uuid,
-		long groupId, boolean retrieveFromCache) {
+	public static MDRRuleGroupInstance fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
 
@@ -317,8 +313,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param groupId the group ID
 	* @return the mdr rule group instance that was removed
 	*/
-	public static MDRRuleGroupInstance removeByUUID_G(java.lang.String uuid,
-		long groupId)
+	public static MDRRuleGroupInstance removeByUUID_G(String uuid, long groupId)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -330,7 +325,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param groupId the group ID
 	* @return the number of matching mdr rule group instances
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -341,8 +336,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param companyId the company ID
 	* @return the matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid_C(
-		java.lang.String uuid, long companyId) {
+	public static List<MDRRuleGroupInstance> findByUuid_C(String uuid,
+		long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -359,8 +354,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param end the upper bound of the range of mdr rule group instances (not inclusive)
 	* @return the range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end) {
+	public static List<MDRRuleGroupInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -378,8 +373,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<MDRRuleGroupInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
@@ -400,8 +395,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching mdr rule group instances
 	*/
-	public static List<MDRRuleGroupInstance> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<MDRRuleGroupInstance> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -418,8 +413,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @return the first matching mdr rule group instance
 	* @throws NoSuchRuleGroupInstanceException if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance findByUuid_C_First(
-		java.lang.String uuid, long companyId,
+	public static MDRRuleGroupInstance findByUuid_C_First(String uuid,
+		long companyId,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence()
@@ -434,8 +429,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUuid_C_First(
-		java.lang.String uuid, long companyId,
+	public static MDRRuleGroupInstance fetchByUuid_C_First(String uuid,
+		long companyId,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
@@ -450,8 +445,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @return the last matching mdr rule group instance
 	* @throws NoSuchRuleGroupInstanceException if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance findByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static MDRRuleGroupInstance findByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence()
@@ -466,8 +461,8 @@ public class MDRRuleGroupInstanceUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
-	public static MDRRuleGroupInstance fetchByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static MDRRuleGroupInstance fetchByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -484,7 +479,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @throws NoSuchRuleGroupInstanceException if a mdr rule group instance with the primary key could not be found
 	*/
 	public static MDRRuleGroupInstance[] findByUuid_C_PrevAndNext(
-		long ruleGroupInstanceId, java.lang.String uuid, long companyId,
+		long ruleGroupInstanceId, String uuid, long companyId,
 		OrderByComparator<MDRRuleGroupInstance> orderByComparator)
 		throws com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException {
 		return getPersistence()
@@ -498,7 +493,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -509,7 +504,7 @@ public class MDRRuleGroupInstanceUtil {
 	* @param companyId the company ID
 	* @return the number of matching mdr rule group instances
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -1599,7 +1594,7 @@ public class MDRRuleGroupInstanceUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -1607,6 +1602,17 @@ public class MDRRuleGroupInstanceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MDRRuleGroupInstancePersistence, MDRRuleGroupInstancePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(MDRRuleGroupInstancePersistence.class);
+	private static ServiceTracker<MDRRuleGroupInstancePersistence, MDRRuleGroupInstancePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MDRRuleGroupInstancePersistence.class);
+
+		ServiceTracker<MDRRuleGroupInstancePersistence, MDRRuleGroupInstancePersistence> serviceTracker =
+			new ServiceTracker<MDRRuleGroupInstancePersistence, MDRRuleGroupInstancePersistence>(bundle.getBundleContext(),
+				MDRRuleGroupInstancePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

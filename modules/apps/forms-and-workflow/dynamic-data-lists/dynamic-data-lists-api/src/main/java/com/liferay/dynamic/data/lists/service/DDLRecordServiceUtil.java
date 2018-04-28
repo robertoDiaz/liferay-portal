@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -115,7 +116,7 @@ public class DDLRecordServiceUtil {
 	@Deprecated
 	public static com.liferay.dynamic.data.lists.model.DDLRecord addRecord(
 		long groupId, long recordSetId, int displayIndex,
-		java.util.Map<java.lang.String, java.io.Serializable> fieldsMap,
+		java.util.Map<String, java.io.Serializable> fieldsMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -159,7 +160,7 @@ public class DDLRecordServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -198,7 +199,7 @@ public class DDLRecordServiceUtil {
 	the record modified date.
 	* @throws PortalException if a portal exception occurred
 	*/
-	public static void revertRecord(long recordId, java.lang.String version,
+	public static void revertRecord(long recordId, String version,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().revertRecord(recordId, version, serviceContext);
@@ -209,8 +210,7 @@ public class DDLRecordServiceUtil {
 	ServiceContext)}
 	*/
 	@Deprecated
-	public static void revertRecordVersion(long recordId,
-		java.lang.String version,
+	public static void revertRecordVersion(long recordId, String version,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().revertRecordVersion(recordId, version, serviceContext);
@@ -292,7 +292,7 @@ public class DDLRecordServiceUtil {
 	@Deprecated
 	public static com.liferay.dynamic.data.lists.model.DDLRecord updateRecord(
 		long recordId, int displayIndex,
-		java.util.Map<java.lang.String, java.io.Serializable> fieldsMap,
+		java.util.Map<String, java.io.Serializable> fieldsMap,
 		boolean mergeFields,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -305,6 +305,16 @@ public class DDLRecordServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordService, DDLRecordService> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordService.class);
+	private static ServiceTracker<DDLRecordService, DDLRecordService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordService.class);
+
+		ServiceTracker<DDLRecordService, DDLRecordService> serviceTracker = new ServiceTracker<DDLRecordService, DDLRecordService>(bundle.getBundleContext(),
+				DDLRecordService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

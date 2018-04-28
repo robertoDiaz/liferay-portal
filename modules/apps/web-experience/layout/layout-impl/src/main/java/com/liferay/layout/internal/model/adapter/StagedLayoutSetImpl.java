@@ -89,7 +89,9 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 		}
 
 		try {
-			_userId = _layoutSet.getGroup().getCreatorUserId();
+			Group layoutSetGroup = _layoutSet.getGroup();
+
+			_userId = layoutSetGroup.getCreatorUserId();
 
 			User user = UserLocalServiceUtil.getUser(_userId);
 
@@ -178,7 +180,7 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 
 	@Override
 	public boolean getLayoutSetPrototypeLinkEnabled() {
-		return _layoutSet.getLayoutSetPrototypeLinkEnabled();
+		return _layoutSet.isLayoutSetPrototypeLinkEnabled();
 	}
 
 	@Override
@@ -248,7 +250,7 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 
 	@Override
 	public boolean getPrivateLayout() {
-		return _layoutSet.getPrivateLayout();
+		return _layoutSet.isPrivateLayout();
 	}
 
 	@Override

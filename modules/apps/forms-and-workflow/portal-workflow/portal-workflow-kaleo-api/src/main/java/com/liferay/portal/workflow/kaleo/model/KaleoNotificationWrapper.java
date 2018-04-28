@@ -67,7 +67,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("kaleoClassName", getKaleoClassName());
 		attributes.put("kaleoClassPK", getKaleoClassPK());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoNodeName", getKaleoNodeName());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
@@ -135,10 +135,11 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 			setKaleoClassPK(kaleoClassPK);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		String kaleoNodeName = (String)attributes.get("kaleoNodeName");
@@ -185,7 +186,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoNotificationWrapper((KaleoNotification)_kaleoNotification.clone());
 	}
 
@@ -220,7 +221,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the description of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getDescription() {
+	public String getDescription() {
 		return _kaleoNotification.getDescription();
 	}
 
@@ -230,7 +231,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the execution type of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getExecutionType() {
+	public String getExecutionType() {
 		return _kaleoNotification.getExecutionType();
 	}
 
@@ -255,7 +256,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the kaleo class name of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getKaleoClassName() {
+	public String getKaleoClassName() {
 		return _kaleoNotification.getKaleoClassName();
 	}
 
@@ -270,13 +271,13 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo notification.
+	* Returns the kaleo definition version ID of this kaleo notification.
 	*
-	* @return the kaleo definition ID of this kaleo notification
+	* @return the kaleo definition version ID of this kaleo notification
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoNotification.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoNotification.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -285,7 +286,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the kaleo node name of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getKaleoNodeName() {
+	public String getKaleoNodeName() {
 		return _kaleoNotification.getKaleoNodeName();
 	}
 
@@ -315,7 +316,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the name of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _kaleoNotification.getName();
 	}
 
@@ -325,7 +326,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the notification types of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getNotificationTypes() {
+	public String getNotificationTypes() {
 		return _kaleoNotification.getNotificationTypes();
 	}
 
@@ -350,7 +351,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the template of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getTemplate() {
+	public String getTemplate() {
 		return _kaleoNotification.getTemplate();
 	}
 
@@ -360,7 +361,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the template language of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getTemplateLanguage() {
+	public String getTemplateLanguage() {
 		return _kaleoNotification.getTemplateLanguage();
 	}
 
@@ -380,7 +381,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the user name of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoNotification.getUserName();
 	}
 
@@ -390,7 +391,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @return the user uuid of this kaleo notification
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoNotification.getUserUuid();
 	}
 
@@ -450,7 +451,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param description the description of this kaleo notification
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
+	public void setDescription(String description) {
 		_kaleoNotification.setDescription(description);
 	}
 
@@ -460,7 +461,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param executionType the execution type of this kaleo notification
 	*/
 	@Override
-	public void setExecutionType(java.lang.String executionType) {
+	public void setExecutionType(String executionType) {
 		_kaleoNotification.setExecutionType(executionType);
 	}
 
@@ -496,7 +497,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param kaleoClassName the kaleo class name of this kaleo notification
 	*/
 	@Override
-	public void setKaleoClassName(java.lang.String kaleoClassName) {
+	public void setKaleoClassName(String kaleoClassName) {
 		_kaleoNotification.setKaleoClassName(kaleoClassName);
 	}
 
@@ -511,13 +512,13 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo notification.
+	* Sets the kaleo definition version ID of this kaleo notification.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo notification
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo notification
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoNotification.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoNotification.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -526,7 +527,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param kaleoNodeName the kaleo node name of this kaleo notification
 	*/
 	@Override
-	public void setKaleoNodeName(java.lang.String kaleoNodeName) {
+	public void setKaleoNodeName(String kaleoNodeName) {
 		_kaleoNotification.setKaleoNodeName(kaleoNodeName);
 	}
 
@@ -556,7 +557,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param name the name of this kaleo notification
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_kaleoNotification.setName(name);
 	}
 
@@ -571,7 +572,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param notificationTypes the notification types of this kaleo notification
 	*/
 	@Override
-	public void setNotificationTypes(java.lang.String notificationTypes) {
+	public void setNotificationTypes(String notificationTypes) {
 		_kaleoNotification.setNotificationTypes(notificationTypes);
 	}
 
@@ -596,7 +597,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param template the template of this kaleo notification
 	*/
 	@Override
-	public void setTemplate(java.lang.String template) {
+	public void setTemplate(String template) {
 		_kaleoNotification.setTemplate(template);
 	}
 
@@ -606,7 +607,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param templateLanguage the template language of this kaleo notification
 	*/
 	@Override
-	public void setTemplateLanguage(java.lang.String templateLanguage) {
+	public void setTemplateLanguage(String templateLanguage) {
 		_kaleoNotification.setTemplateLanguage(templateLanguage);
 	}
 
@@ -626,7 +627,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param userName the user name of this kaleo notification
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoNotification.setUserName(userName);
 	}
 
@@ -636,7 +637,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	* @param userUuid the user uuid of this kaleo notification
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoNotification.setUserUuid(userUuid);
 	}
 
@@ -651,7 +652,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoNotification.toString();
 	}
 
@@ -661,7 +662,7 @@ public class KaleoNotificationWrapper implements KaleoNotification,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoNotification.toXmlString();
 	}
 

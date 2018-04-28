@@ -31,7 +31,11 @@ long totalMemory = runtime.totalMemory();
 long usedMemory = totalMemory - runtime.freeMemory();
 %>
 
-<liferay-ui:panel-container extended="<%= true %>" id="adminServerAdministrationActionsPanelContainer" persistState="<%= true %>">
+<liferay-ui:panel-container
+	extended="<%= true %>"
+	id="adminServerAdministrationActionsPanelContainer"
+	persistState="<%= true %>"
+>
 	<div class="panel panel-default server-admin-tabs" id="adminServerInformationPanel">
 		<div class="panel-body">
 			<div class="alert alert-info">
@@ -96,7 +100,15 @@ long usedMemory = totalMemory - runtime.freeMemory();
 		</div>
 	</div>
 
-	<liferay-ui:panel collapsible="<%= true %>" cssClass="server-admin-actions-panel" extended="<%= true %>" id="adminServerAdministrationSystemActionsPanel" markupView="lexicon" persistState="<%= true %>" title="system-actions">
+	<liferay-ui:panel
+		collapsible="<%= true %>"
+		cssClass="server-admin-actions-panel"
+		extended="<%= true %>"
+		id="adminServerAdministrationSystemActionsPanel"
+		markupView="lexicon"
+		persistState="<%= true %>"
+		title="system-actions"
+	>
 		<ul class="list-group system-action-group">
 			<li class="clearfix list-group-item">
 				<div class="pull-left">
@@ -119,7 +131,15 @@ long usedMemory = totalMemory - runtime.freeMemory();
 		</ul>
 	</liferay-ui:panel>
 
-	<liferay-ui:panel collapsible="<%= true %>" cssClass="server-admin-actions-panel" extended="<%= true %>" id="adminServerAdministrationCacheActionsPanel" markupView="lexicon" persistState="<%= true %>" title="cache-actions">
+	<liferay-ui:panel
+		collapsible="<%= true %>"
+		cssClass="server-admin-actions-panel"
+		extended="<%= true %>"
+		id="adminServerAdministrationCacheActionsPanel"
+		markupView="lexicon"
+		persistState="<%= true %>"
+		title="cache-actions"
+	>
 		<ul class="list-group system-action-group">
 			<li class="clearfix list-group-item">
 				<div class="pull-left">
@@ -160,102 +180,15 @@ long usedMemory = totalMemory - runtime.freeMemory();
 		</ul>
 	</liferay-ui:panel>
 
-	<liferay-ui:panel collapsible="<%= true %>" cssClass="server-admin-actions-panel" extended="<%= true %>" id="adminServerAdministrationIndexActionsPanel" markupView="lexicon" persistState="<%= true %>" title="index-actions">
-
-		<%
-		Map<String, BackgroundTaskDisplay> classNameToBackgroundTaskDisplayMap = new HashMap<>();
-
-		List<BackgroundTask> reindexPortalBackgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(CompanyConstants.SYSTEM, "com.liferay.portal.search.internal.background.task.ReindexPortalBackgroundTaskExecutor", BackgroundTaskConstants.STATUS_IN_PROGRESS);
-		List<BackgroundTask> reindexSingleBackgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(CompanyConstants.SYSTEM, "com.liferay.portal.search.internal.background.task.ReindexSingleIndexerBackgroundTaskExecutor", BackgroundTaskConstants.STATUS_IN_PROGRESS);
-
-		if (!reindexSingleBackgroundTasks.isEmpty()) {
-			for (BackgroundTask backgroundTask : reindexSingleBackgroundTasks) {
-				Map<String, Serializable> taskContextMap = backgroundTask.getTaskContextMap();
-
-				String className = (String)taskContextMap.get("className");
-
-				classNameToBackgroundTaskDisplayMap.put(className, BackgroundTaskDisplayFactoryUtil.getBackgroundTaskDisplay(backgroundTask));
-			}
-		}
-		%>
-
-		<ul class="list-group system-action-group">
-			<li class="clearfix list-group-item">
-				<div class="pull-left">
-					<h5><liferay-ui:message key="reindex-all-search-indexes" /></h5>
-				</div>
-
-				<%
-				BackgroundTask backgroundTask = null;
-				BackgroundTaskDisplay backgroundTaskDisplay = null;
-
-				if (!reindexPortalBackgroundTasks.isEmpty()) {
-					backgroundTask = reindexPortalBackgroundTasks.get(0);
-
-					backgroundTaskDisplay = BackgroundTaskDisplayFactoryUtil.getBackgroundTaskDisplay(backgroundTask);
-				}
-				%>
-
-				<div class="index-action-wrapper pull-right" data-type="portal">
-					<c:choose>
-						<c:when test="<%= (backgroundTaskDisplay == null) || !backgroundTaskDisplay.hasPercentage() %>">
-
-							<%
-							long timeout = ParamUtil.getLong(request, "timeout");
-							%>
-
-							<aui:button cssClass="save-server-button" data-blocking='<%= ParamUtil.getBoolean(request, "blocking") %>' data-cmd="reindex" data-timeout="<%= (timeout == 0) ? StringPool.BLANK : timeout %>" value="execute" />
-						</c:when>
-						<c:otherwise>
-							<%= backgroundTaskDisplay.renderDisplayTemplate() %>
-						</c:otherwise>
-					</c:choose>
-				</div>
-			</li>
-			<li class="clearfix list-group-item">
-				<div class="pull-left">
-					<h5><liferay-ui:message key="reindex-all-spell-check-indexes" /></h5>
-				</div>
-
-				<div class="pull-right">
-					<aui:button cssClass="save-server-button" data-cmd="reindexDictionaries" value="execute" />
-				</div>
-			</li>
-
-			<%
-			List<Indexer<?>> indexers = new ArrayList<>(IndexerRegistryUtil.getIndexers());
-
-			Collections.sort(indexers, new IndexerClassNameComparator(true));
-
-			for (Indexer<?> indexer : indexers) {
-				backgroundTaskDisplay = classNameToBackgroundTaskDisplayMap.get(indexer.getClassName());
-			%>
-
-				<li class="clearfix list-group-item">
-					<div class="pull-left">
-						<h5><liferay-ui:message arguments="<%= indexer.getClassName() %>" key="reindex-x" /></h5>
-					</div>
-
-					<div class="index-action-wrapper pull-right" data-type="<%= indexer.getClassName() %>">
-						<c:choose>
-							<c:when test="<%= (backgroundTaskDisplay == null) || !backgroundTaskDisplay.hasPercentage() %>">
-								<aui:button cssClass="save-server-button" data-classname="<%= indexer.getClassName() %>" data-cmd="reindex" disabled="<%= !indexer.isIndexerEnabled() %>" value="execute" />
-							</c:when>
-							<c:otherwise>
-								<%= backgroundTaskDisplay.renderDisplayTemplate() %>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</li>
-
-			<%
-			}
-			%>
-
-		</ul>
-	</liferay-ui:panel>
-
-	<liferay-ui:panel collapsible="<%= true %>" cssClass="server-admin-actions-panel" extended="<%= true %>" id="adminServerAdministrationVerificationActionsPanel" markupView="lexicon" persistState="<%= true %>" title="verification-actions">
+	<liferay-ui:panel
+		collapsible="<%= true %>"
+		cssClass="server-admin-actions-panel"
+		extended="<%= true %>"
+		id="adminServerAdministrationVerificationActionsPanel"
+		markupView="lexicon"
+		persistState="<%= true %>"
+		title="verification-actions"
+	>
 		<ul class="list-group system-action-group">
 			<li class="clearfix list-group-item">
 				<div class="pull-left">
@@ -278,7 +211,15 @@ long usedMemory = totalMemory - runtime.freeMemory();
 		</ul>
 	</liferay-ui:panel>
 
-	<liferay-ui:panel collapsible="<%= true %>" cssClass="server-admin-actions-panel" extended="<%= true %>" id="adminServerAdministrationCleanUpActionsPanel" markupView="lexicon" persistState="<%= true %>" title="clean-up-actions">
+	<liferay-ui:panel
+		collapsible="<%= true %>"
+		cssClass="server-admin-actions-panel"
+		extended="<%= true %>"
+		id="adminServerAdministrationCleanUpActionsPanel"
+		markupView="lexicon"
+		persistState="<%= true %>"
+		title="clean-up-actions"
+	>
 		<ul class="list-group system-action-group">
 			<li class="clearfix list-group-item">
 				<div class="pull-left">

@@ -94,13 +94,19 @@ if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 %>
 
 <c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-	<liferay-ui:icon-menu direction="left-side" icon="<%= StringPool.BLANK %>" markupView="lexicon" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+	<liferay-ui:icon-menu
+		direction="left-side"
+		icon="<%= StringPool.BLANK %>"
+		markupView="lexicon"
+		message="<%= StringPool.BLANK %>"
+		showWhenSingleIcon="<%= true %>"
+	>
 
 		<%
 		boolean hasViewPermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.VIEW);
 		%>
 
-		<c:if test="<%= hasViewPermission %>">
+		<c:if test="<%= hasViewPermission && ((folder == null) || !folder.isMountPoint()) %>">
 			<portlet:resourceURL id="/document_library/download_folder" var="downloadURL">
 				<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 				<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
@@ -337,11 +343,7 @@ if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 			/>
 		</c:if>
 
-		<%
-		boolean hasDeletePermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.DELETE);
-		%>
-
-		<c:if test="<%= (folder != null) && hasDeletePermission %>">
+		<c:if test="<%= (folder != null) && DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.DELETE) %>">
 
 			<%
 			String mvcRenderCommandName = "/image_gallery_display/view";
@@ -368,7 +370,10 @@ if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 						<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 					</portlet:actionURL>
 
-					<liferay-ui:icon-delete trash="<%= ((folder.getModel() instanceof DLFolder) && dlTrashUtil.isTrashEnabled(scopeGroupId, repositoryId)) %>" url="<%= deleteURL %>" />
+					<liferay-ui:icon-delete
+						trash="<%= ((folder.getModel() instanceof DLFolder) && dlTrashUtil.isTrashEnabled(scopeGroupId, repositoryId)) %>"
+						url="<%= deleteURL %>"
+					/>
 				</c:when>
 				<c:otherwise>
 					<portlet:renderURL var="redirectURL">
@@ -382,9 +387,29 @@ if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 						<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 					</portlet:actionURL>
 
-					<liferay-ui:icon-delete url="<%= deleteURL %>" />
+					<liferay-ui:icon-delete
+						url="<%= deleteURL %>"
+					/>
 				</c:otherwise>
 			</c:choose>
+		</c:if>
+
+		<%
+		boolean documentLibraryAdmin = portletName.equals(DLPortletKeys.DOCUMENT_LIBRARY_ADMIN);
+		boolean hasExportImportPortletInfoPermission = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.EXPORT_IMPORT_PORTLET_INFO);
+		boolean inStagingGroup = stagingGroupHelper.isStagingGroup(scopeGroupId);
+		boolean portletStaged = stagingGroupHelper.isStagedPortlet(scopeGroupId, DLPortletKeys.DOCUMENT_LIBRARY);
+		%>
+
+		<c:if test="<%= (folder != null) && documentLibraryAdmin && hasExportImportPortletInfoPermission && inStagingGroup && portletStaged %>">
+			<portlet:actionURL name="/document_library/publish_folder" var="publishFolderURL">
+				<portlet:param name="folderId" value="<%= String.valueOf(folder.getFolderId()) %>" />
+			</portlet:actionURL>
+
+			<liferay-ui:icon
+				message="publish"
+				url="<%= publishFolderURL %>"
+			/>
 		</c:if>
 	</liferay-ui:icon-menu>
 

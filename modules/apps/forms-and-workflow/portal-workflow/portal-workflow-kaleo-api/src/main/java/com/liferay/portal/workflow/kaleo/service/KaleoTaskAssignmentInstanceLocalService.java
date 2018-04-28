@@ -77,18 +77,18 @@ public interface KaleoTaskAssignmentInstanceLocalService
 
 	public KaleoTaskAssignmentInstance addKaleoTaskAssignmentInstance(
 		long groupId, KaleoTaskInstanceToken kaleoTaskInstanceToken,
-		java.lang.String assigneeClassName, long assigneeClassPK,
+		String assigneeClassName, long assigneeClassPK,
 		ServiceContext serviceContext) throws PortalException;
 
 	public List<KaleoTaskAssignmentInstance> addTaskAssignmentInstances(
 		KaleoTaskInstanceToken kaleoTaskInstanceToken,
 		Collection<KaleoTaskAssignment> kaleoTaskAssignments,
-		Map<java.lang.String, Serializable> workflowContext,
-		ServiceContext serviceContext) throws PortalException;
+		Map<String, Serializable> workflowContext, ServiceContext serviceContext)
+		throws PortalException;
 
 	public KaleoTaskAssignmentInstance assignKaleoTaskAssignmentInstance(
 		KaleoTaskInstanceToken kaleoTaskInstanceToken,
-		java.lang.String assigneeClassName, long assigneeClassPK,
+		String assigneeClassName, long assigneeClassPK,
 		ServiceContext serviceContext) throws PortalException;
 
 	public KaleoTaskAssignmentInstance completeKaleoTaskInstanceToken(
@@ -101,13 +101,14 @@ public interface KaleoTaskAssignmentInstanceLocalService
 	* @param kaleoTaskAssignmentInstanceId the primary key for the new kaleo task assignment instance
 	* @return the new kaleo task assignment instance
 	*/
+	@Transactional(enabled = false)
 	public KaleoTaskAssignmentInstance createKaleoTaskAssignmentInstance(
 		long kaleoTaskAssignmentInstanceId);
 
 	public void deleteCompanyKaleoTaskAssignmentInstances(long companyId);
 
-	public void deleteKaleoDefinitionKaleoTaskAssignmentInstances(
-		long kaleoDefintionId);
+	public void deleteKaleoDefinitionVersionKaleoTaskAssignmentInstances(
+		long kaleoDefinitionId);
 
 	public void deleteKaleoInstanceKaleoTaskAssignmentInstances(
 		long kaleoInstanceId);
@@ -264,7 +265,7 @@ public interface KaleoTaskAssignmentInstanceLocalService
 	*
 	* @return the OSGi service identifier
 	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

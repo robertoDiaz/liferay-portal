@@ -138,133 +138,13 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	}
 
 	@Override
-	public DDMFormLayout getDDMFormLayout() {
-		return _ddmStructureLayout.getDDMFormLayout();
-	}
-
-	@Override
-	public DDMStructureLayout toEscapedModel() {
-		return new DDMStructureLayoutWrapper(_ddmStructureLayout.toEscapedModel());
-	}
-
-	@Override
-	public DDMStructureLayout toUnescapedModel() {
-		return new DDMStructureLayoutWrapper(_ddmStructureLayout.toUnescapedModel());
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _ddmStructureLayout.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _ddmStructureLayout.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _ddmStructureLayout.isNew();
-	}
-
-	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _ddmStructureLayout.getExpandoBridge();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.CacheModel<DDMStructureLayout> toCacheModel() {
-		return _ddmStructureLayout.toCacheModel();
+	public Object clone() {
+		return new DDMStructureLayoutWrapper((DDMStructureLayout)_ddmStructureLayout.clone());
 	}
 
 	@Override
 	public int compareTo(DDMStructureLayout ddmStructureLayout) {
 		return _ddmStructureLayout.compareTo(ddmStructureLayout);
-	}
-
-	@Override
-	public int hashCode() {
-		return _ddmStructureLayout.hashCode();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _ddmStructureLayout.getPrimaryKeyObj();
-	}
-
-	@Override
-	public java.lang.Object clone() {
-		return new DDMStructureLayoutWrapper((DDMStructureLayout)_ddmStructureLayout.clone());
-	}
-
-	/**
-	* Returns the definition of this ddm structure layout.
-	*
-	* @return the definition of this ddm structure layout
-	*/
-	@Override
-	public java.lang.String getDefinition() {
-		return _ddmStructureLayout.getDefinition();
-	}
-
-	/**
-	* Returns the user name of this ddm structure layout.
-	*
-	* @return the user name of this ddm structure layout
-	*/
-	@Override
-	public java.lang.String getUserName() {
-		return _ddmStructureLayout.getUserName();
-	}
-
-	/**
-	* Returns the user uuid of this ddm structure layout.
-	*
-	* @return the user uuid of this ddm structure layout
-	*/
-	@Override
-	public java.lang.String getUserUuid() {
-		return _ddmStructureLayout.getUserUuid();
-	}
-
-	/**
-	* Returns the uuid of this ddm structure layout.
-	*
-	* @return the uuid of this ddm structure layout
-	*/
-	@Override
-	public java.lang.String getUuid() {
-		return _ddmStructureLayout.getUuid();
-	}
-
-	@Override
-	public java.lang.String toString() {
-		return _ddmStructureLayout.toString();
-	}
-
-	@Override
-	public java.lang.String toXmlString() {
-		return _ddmStructureLayout.toXmlString();
-	}
-
-	/**
-	* Returns the create date of this ddm structure layout.
-	*
-	* @return the create date of this ddm structure layout
-	*/
-	@Override
-	public Date getCreateDate() {
-		return _ddmStructureLayout.getCreateDate();
-	}
-
-	/**
-	* Returns the modified date of this ddm structure layout.
-	*
-	* @return the modified date of this ddm structure layout
-	*/
-	@Override
-	public Date getModifiedDate() {
-		return _ddmStructureLayout.getModifiedDate();
 	}
 
 	/**
@@ -278,6 +158,36 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	}
 
 	/**
+	* Returns the create date of this ddm structure layout.
+	*
+	* @return the create date of this ddm structure layout
+	*/
+	@Override
+	public Date getCreateDate() {
+		return _ddmStructureLayout.getCreateDate();
+	}
+
+	@Override
+	public DDMFormLayout getDDMFormLayout() {
+		return _ddmStructureLayout.getDDMFormLayout();
+	}
+
+	/**
+	* Returns the definition of this ddm structure layout.
+	*
+	* @return the definition of this ddm structure layout
+	*/
+	@Override
+	public String getDefinition() {
+		return _ddmStructureLayout.getDefinition();
+	}
+
+	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return _ddmStructureLayout.getExpandoBridge();
+	}
+
+	/**
 	* Returns the group ID of this ddm structure layout.
 	*
 	* @return the group ID of this ddm structure layout
@@ -288,6 +198,16 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	}
 
 	/**
+	* Returns the modified date of this ddm structure layout.
+	*
+	* @return the modified date of this ddm structure layout
+	*/
+	@Override
+	public Date getModifiedDate() {
+		return _ddmStructureLayout.getModifiedDate();
+	}
+
+	/**
 	* Returns the primary key of this ddm structure layout.
 	*
 	* @return the primary key of this ddm structure layout
@@ -295,6 +215,11 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	@Override
 	public long getPrimaryKey() {
 		return _ddmStructureLayout.getPrimaryKey();
+	}
+
+	@Override
+	public Serializable getPrimaryKeyObj() {
+		return _ddmStructureLayout.getPrimaryKeyObj();
 	}
 
 	/**
@@ -325,6 +250,56 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	@Override
 	public long getUserId() {
 		return _ddmStructureLayout.getUserId();
+	}
+
+	/**
+	* Returns the user name of this ddm structure layout.
+	*
+	* @return the user name of this ddm structure layout
+	*/
+	@Override
+	public String getUserName() {
+		return _ddmStructureLayout.getUserName();
+	}
+
+	/**
+	* Returns the user uuid of this ddm structure layout.
+	*
+	* @return the user uuid of this ddm structure layout
+	*/
+	@Override
+	public String getUserUuid() {
+		return _ddmStructureLayout.getUserUuid();
+	}
+
+	/**
+	* Returns the uuid of this ddm structure layout.
+	*
+	* @return the uuid of this ddm structure layout
+	*/
+	@Override
+	public String getUuid() {
+		return _ddmStructureLayout.getUuid();
+	}
+
+	@Override
+	public int hashCode() {
+		return _ddmStructureLayout.hashCode();
+	}
+
+	@Override
+	public boolean isCachedModel() {
+		return _ddmStructureLayout.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _ddmStructureLayout.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _ddmStructureLayout.isNew();
 	}
 
 	@Override
@@ -363,19 +338,19 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	* @param definition the definition of this ddm structure layout
 	*/
 	@Override
-	public void setDefinition(java.lang.String definition) {
+	public void setDefinition(String definition) {
 		_ddmStructureLayout.setDefinition(definition);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_ddmStructureLayout.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
 		_ddmStructureLayout.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
+		_ddmStructureLayout.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
@@ -459,7 +434,7 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	* @param userName the user name of this ddm structure layout
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_ddmStructureLayout.setUserName(userName);
 	}
 
@@ -469,7 +444,7 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	* @param userUuid the user uuid of this ddm structure layout
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_ddmStructureLayout.setUserUuid(userUuid);
 	}
 
@@ -479,8 +454,33 @@ public class DDMStructureLayoutWrapper implements DDMStructureLayout,
 	* @param uuid the uuid of this ddm structure layout
 	*/
 	@Override
-	public void setUuid(java.lang.String uuid) {
+	public void setUuid(String uuid) {
 		_ddmStructureLayout.setUuid(uuid);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.CacheModel<DDMStructureLayout> toCacheModel() {
+		return _ddmStructureLayout.toCacheModel();
+	}
+
+	@Override
+	public DDMStructureLayout toEscapedModel() {
+		return new DDMStructureLayoutWrapper(_ddmStructureLayout.toEscapedModel());
+	}
+
+	@Override
+	public String toString() {
+		return _ddmStructureLayout.toString();
+	}
+
+	@Override
+	public DDMStructureLayout toUnescapedModel() {
+		return new DDMStructureLayoutWrapper(_ddmStructureLayout.toUnescapedModel());
+	}
+
+	@Override
+	public String toXmlString() {
+		return _ddmStructureLayout.toXmlString();
 	}
 
 	@Override

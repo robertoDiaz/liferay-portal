@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,14 +55,15 @@ public class KaleoNotificationLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoNotification addKaleoNotification(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId, java.lang.String kaleoNodeName,
+		String kaleoClassName, long kaleoClassPK,
+		long kaleoDefinitionVersionId, String kaleoNodeName,
 		com.liferay.portal.workflow.kaleo.definition.Notification notification,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addKaleoNotification(kaleoClassName, kaleoClassPK,
-			kaleoDefinitionId, kaleoNodeName, notification, serviceContext);
+			kaleoDefinitionVersionId, kaleoNodeName, notification,
+			serviceContext);
 	}
 
 	/**
@@ -79,9 +81,10 @@ public class KaleoNotificationLocalServiceUtil {
 		getService().deleteCompanyKaleoNotifications(companyId);
 	}
 
-	public static void deleteKaleoDefinitionKaleoNotifications(
-		long kaleoDefinitionId) {
-		getService().deleteKaleoDefinitionKaleoNotifications(kaleoDefinitionId);
+	public static void deleteKaleoDefinitionVersionKaleoNotifications(
+		long kaleoDefinitionVersionId) {
+		getService()
+			.deleteKaleoDefinitionVersionKaleoNotifications(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -238,13 +241,12 @@ public class KaleoNotificationLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoNotification> getKaleoNotifications(
-		java.lang.String kaleoClassName, long kaleoClassPK) {
+		String kaleoClassName, long kaleoClassPK) {
 		return getService().getKaleoNotifications(kaleoClassName, kaleoClassPK);
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoNotification> getKaleoNotifications(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		java.lang.String executionType) {
+		String kaleoClassName, long kaleoClassPK, String executionType) {
 		return getService()
 				   .getKaleoNotifications(kaleoClassName, kaleoClassPK,
 			executionType);
@@ -264,7 +266,7 @@ public class KaleoNotificationLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -289,6 +291,17 @@ public class KaleoNotificationLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoNotificationLocalService.class);
+	private static ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoNotificationLocalService.class);
+
+		ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService> serviceTracker =
+			new ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService>(bundle.getBundleContext(),
+				KaleoNotificationLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

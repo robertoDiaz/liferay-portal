@@ -20,13 +20,17 @@
 
 <liferay-portlet:renderURL portletConfiguration="<%= true %>" var="configurationRenderURL" />
 
-<aui:form action="<%= configurationActionURL %>" method="post" name="fm">
+<liferay-frontend:edit-form
+	action="<%= configurationActionURL %>"
+	method="post"
+	name="fm"
+>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
-	<div class="portlet-configuration-body-content">
-		<div class="container-fluid-1280">
-			<aui:fieldset>
+	<liferay-frontend:edit-form-body>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
 				<aui:select label="maximum-activities-to-load-at-once" name="preferences--max--" value="<%= socialActivitiesDisplayContext.getMax() %>">
 					<aui:option label="1" />
 					<aui:option label="2" />
@@ -46,20 +50,22 @@
 					<aui:option label="90" />
 					<aui:option label="100" />
 				</aui:select>
-			</aui:fieldset>
+			</liferay-frontend:fieldset>
 
 			<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
-				<liferay-ui:rss-settings
+				<liferay-rss:rss-settings
 					delta="<%= socialActivitiesDisplayContext.getRSSDelta() %>"
 					displayStyle="<%= socialActivitiesDisplayContext.getRSSDisplayStyle() %>"
 					enabled="<%= socialActivitiesDisplayContext.isRSSEnabled() %>"
 					feedType="<%= socialActivitiesDisplayContext.getRSSFeedType() %>"
 				/>
 			</c:if>
-		</div>
-	</div>
+		</liferay-frontend:fieldset-group>
+	</liferay-frontend:edit-form-body>
 
-	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
-	</aui:button-row>
-</aui:form>
+	<liferay-frontend:edit-form-footer>
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
+	</liferay-frontend:edit-form-footer>
+</liferay-frontend:edit-form>

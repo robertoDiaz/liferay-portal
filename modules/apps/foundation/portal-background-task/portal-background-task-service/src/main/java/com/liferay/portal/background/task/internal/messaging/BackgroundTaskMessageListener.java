@@ -14,6 +14,8 @@
 
 package com.liferay.portal.background.task.internal.messaging;
 
+import com.liferay.portal.background.task.internal.SerialBackgroundTaskExecutor;
+import com.liferay.portal.background.task.internal.ThreadLocalAwareBackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
@@ -25,10 +27,9 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistry;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocalManager;
 import com.liferay.portal.kernel.backgroundtask.ClassLoaderAwareBackgroundTaskExecutor;
-import com.liferay.portal.kernel.backgroundtask.SerialBackgroundTaskExecutor;
-import com.liferay.portal.kernel.backgroundtask.ThreadLocalAwareBackgroundTaskExecutor;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
+import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.StackTraceUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -52,12 +54,13 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 		BackgroundTaskManager backgroundTaskManager,
 		BackgroundTaskStatusRegistry backgroundTaskStatusRegistry,
 		BackgroundTaskThreadLocalManager backgroundTaskThreadLocalManager,
-		MessageBus messageBus) {
+		LockManager lockManager, MessageBus messageBus) {
 
 		_backgroundTaskExecutorRegistry = backgroundTaskExecutorRegistry;
 		_backgroundTaskManager = backgroundTaskManager;
 		_backgroundTaskStatusRegistry = backgroundTaskStatusRegistry;
 		_backgroundTaskThreadLocalManager = backgroundTaskThreadLocalManager;
+		_lockManager = lockManager;
 		_messageBus = messageBus;
 	}
 
@@ -167,8 +170,10 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 		finally {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Completing background task " + backgroundTaskId +
-						" with status: " + status);
+					StringBundler.concat(
+						"Completing background task ",
+						String.valueOf(backgroundTaskId), " with status: ",
+						String.valueOf(status)));
 			}
 
 			_backgroundTaskManager.amendBackgroundTask(
@@ -275,7 +280,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 
 		if (backgroundTaskExecutor.isSerial()) {
 			backgroundTaskExecutor = new SerialBackgroundTaskExecutor(
-				backgroundTaskExecutor);
+				backgroundTaskExecutor, _lockManager);
 		}
 
 		backgroundTaskExecutor = new ThreadLocalAwareBackgroundTaskExecutor(
@@ -293,6 +298,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 	private final BackgroundTaskStatusRegistry _backgroundTaskStatusRegistry;
 	private final BackgroundTaskThreadLocalManager
 		_backgroundTaskThreadLocalManager;
+	private final LockManager _lockManager;
 	private final MessageBus _messageBus;
 
 }

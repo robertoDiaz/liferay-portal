@@ -16,14 +16,6 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-long[] categorizableGroupIds = (long[])request.getAttribute("configuration.jsp-categorizableGroupIds");
-
-if (categorizableGroupIds == null) {
-	categorizableGroupIds = StringUtil.split(ParamUtil.getString(request, "categorizableGroupIds"), 0L);
-}
-%>
-
 <aui:fieldset label="displayed-assets-must-match-these-rules" markupView="lexicon">
 	<liferay-asset:asset-tags-error />
 
@@ -39,7 +31,9 @@ if (categorizableGroupIds == null) {
 		String name = dqre.getName();
 		%>
 
-		<liferay-util:buffer var="messageArgument">
+		<liferay-util:buffer
+			var="messageArgument"
+		>
 			<em>(<liferay-ui:message key='<%= dqre.isContains() ? "contains" : "does-not-contain" %>' /> - <liferay-ui:message key='<%= dqre.isAndOperator() ? "all" : "any" %>' /> - <liferay-ui:message key='<%= name.equals(("assetTags")) ? "tags" : "categories" %>' />)</em>
 		</liferay-util:buffer>
 
@@ -58,7 +52,7 @@ Map<String, Object> context = new HashMap<>();
 
 context.put("categorySelectorURL", assetPublisherDisplayContext.getCategorySelectorURL());
 context.put("id", "autofield");
-context.put("groupIds", StringUtil.merge(categorizableGroupIds));
+context.put("groupIds", StringUtil.merge(assetPublisherDisplayContext.getReferencedModelsGroupIds()));
 context.put("namespace", liferayPortletResponse.getNamespace());
 context.put("pathThemeImages", themeDisplay.getPathThemeImages());
 context.put("rules", assetPublisherDisplayContext.getAutoFieldRulesJSONArray());
@@ -69,5 +63,5 @@ context.put("vocabularyIds", assetPublisherDisplayContext.getVocabularyIds());
 <soy:template-renderer
 	context="<%= context %>"
 	module="asset-publisher-web/js/AutoField.es"
-	templateNamespace="AutoField.render"
+	templateNamespace="com.liferay.asset.publisher.web.AutoField.render"
 />

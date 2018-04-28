@@ -20,59 +20,26 @@
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "vocabularies"), null);
 %>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<portlet:renderURL var="mainURL" />
+<clay:navigation-bar
+	inverted="<%= true %>"
+	items="<%= assetCategoriesDisplayContext.getAssetVocabulariesNavigationItems() %>"
+/>
 
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item href="<%= mainURL.toString() %>" label="vocabularies" selected="<%= true %>" />
-	</aui:nav>
-
-	<c:if test="<%= assetCategoriesDisplayContext.isShowVocabulariesSearch() %>">
-		<liferay-portlet:renderURL varImpl="portletURL" />
-
-		<aui:nav-bar-search>
-			<aui:form action="<%= portletURL %>" name="searchFm">
-				<liferay-ui:input-search markupView="lexicon" />
-			</aui:form>
-		</aui:nav-bar-search>
-	</c:if>
-</aui:nav-bar>
-
-<liferay-frontend:management-bar
+<clay:management-toolbar
+	actionItems="<%= assetCategoriesDisplayContext.getVocabulariesActionItemsDropdownItems() %>"
+	clearResultsURL="<%= assetCategoriesDisplayContext.getVocabulariesClearResultsURL() %>"
+	componentId="assetVocabulariesManagementToolbar"
+	creationMenu="<%= assetCategoriesDisplayContext.isShowVocabulariesAddButton() ? assetCategoriesDisplayContext.getVocabulariesCreationMenu() : null %>"
 	disabled="<%= assetCategoriesDisplayContext.isDisabledVocabulariesManagementBar() %>"
-	includeCheckBox="<%= true %>"
+	filterItems="<%= assetCategoriesDisplayContext.getVocabulariesFilterItemsDropdownItems() %>"
+	searchActionURL="<%= assetCategoriesDisplayContext.getVocabulariesSearchActionURL() %>"
 	searchContainerId="assetVocabularies"
->
-	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-filters>
-			<liferay-frontend:management-bar-navigation
-				navigationKeys='<%= new String[] {"all"} %>'
-				portletURL="<%= PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse) %>"
-			/>
-
-			<liferay-frontend:management-bar-sort
-				orderByCol="<%= assetCategoriesDisplayContext.getOrderByCol() %>"
-				orderByType="<%= assetCategoriesDisplayContext.getOrderByType() %>"
-				orderColumns='<%= new String[] {"create-date"} %>'
-				portletURL="<%= PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse) %>"
-			/>
-		</liferay-frontend:management-bar-filters>
-
-		<liferay-portlet:actionURL name="changeDisplayStyle" varImpl="changeDisplayStyleURL">
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</liferay-portlet:actionURL>
-
-		<liferay-frontend:management-bar-display-buttons
-			displayViews='<%= new String[] {"icon", "descriptive", "list"} %>'
-			portletURL="<%= changeDisplayStyleURL %>"
-			selectedDisplayStyle="<%= assetCategoriesDisplayContext.getDisplayStyle() %>"
-		/>
-	</liferay-frontend:management-bar-buttons>
-
-	<liferay-frontend:management-bar-action-buttons>
-		<liferay-frontend:management-bar-button href="javascript:;" icon="trash" id="deleteSelectedVocabularies" label="delete" />
-	</liferay-frontend:management-bar-action-buttons>
-</liferay-frontend:management-bar>
+	searchFormName="searchFm"
+	sortingOrder="<%= assetCategoriesDisplayContext.getOrderByType() %>"
+	sortingURL="<%= assetCategoriesDisplayContext.getVocabulariesSortingURL() %>"
+	totalItems="<%= assetCategoriesDisplayContext.getVocabulariesTotalItems() %>"
+	viewTypes="<%= assetCategoriesDisplayContext.getVocabulariesViewTypeItems() %>"
+/>
 
 <portlet:actionURL name="deleteVocabulary" var="deleteVocabularyURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -215,27 +182,17 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "vocabul
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator displayStyle="<%= assetCategoriesDisplayContext.getDisplayStyle() %>" markupView="lexicon" />
+		<liferay-ui:search-iterator
+			displayStyle="<%= assetCategoriesDisplayContext.getDisplayStyle() %>"
+			markupView="lexicon"
+		/>
 	</liferay-ui:search-container>
 </aui:form>
 
-<c:if test="<%= assetCategoriesDisplayContext.isShowVocabulariesAddButton() %>">
-	<portlet:renderURL var="addVocabularyURL">
-		<portlet:param name="mvcPath" value="/edit_vocabulary.jsp" />
-	</portlet:renderURL>
-
-	<liferay-frontend:add-menu>
-		<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "add-vocabulary") %>' url="<%= addVocabularyURL.toString() %>" />
-	</liferay-frontend:add-menu>
-</c:if>
-
-<aui:script sandbox="<%= true %>">
-	$('#<portlet:namespace />deleteSelectedVocabularies').on(
-		'click',
-		function() {
-			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-				submitForm($(document.<portlet:namespace />fm));
-			}
+<aui:script>
+	window.<portlet:namespace />deleteSelectedVocabularies = function() {
+		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
+			submitForm(document.querySelector('#<portlet:namespace />fm'));
 		}
-	);
+	}
 </aui:script>

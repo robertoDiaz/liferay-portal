@@ -16,7 +16,8 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,9 +55,8 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static com.liferay.polls.model.PollsQuestion addQuestion(
-		long userId,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long userId, java.util.Map<java.util.Locale, String> titleMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
 		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
 		java.util.List<com.liferay.polls.model.PollsChoice> choices,
@@ -78,7 +78,7 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static void addQuestionResources(long questionId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		String[] groupPermissions, String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.addQuestionResources(questionId, groupPermissions, guestPermissions);
@@ -95,7 +95,7 @@ public class PollsQuestionLocalServiceUtil {
 
 	public static void addQuestionResources(
 		com.liferay.polls.model.PollsQuestion question,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		String[] groupPermissions, String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.addQuestionResources(question, groupPermissions, guestPermissions);
@@ -252,7 +252,7 @@ public class PollsQuestionLocalServiceUtil {
 	* @return the matching polls question, or <code>null</code> if a matching polls question could not be found
 	*/
 	public static com.liferay.polls.model.PollsQuestion fetchPollsQuestionByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService().fetchPollsQuestionByUuidAndGroupId(uuid, groupId);
 	}
 
@@ -274,7 +274,7 @@ public class PollsQuestionLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -306,7 +306,7 @@ public class PollsQuestionLocalServiceUtil {
 	* @throws PortalException if a matching polls question could not be found
 	*/
 	public static com.liferay.polls.model.PollsQuestion getPollsQuestionByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPollsQuestionByUuidAndGroupId(uuid, groupId);
 	}
@@ -335,7 +335,7 @@ public class PollsQuestionLocalServiceUtil {
 	* @return the matching polls questions, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.polls.model.PollsQuestion> getPollsQuestionsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService().getPollsQuestionsByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -350,7 +350,7 @@ public class PollsQuestionLocalServiceUtil {
 	* @return the range of matching polls questions, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.polls.model.PollsQuestion> getPollsQuestionsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.polls.model.PollsQuestion> orderByComparator) {
 		return getService()
 				   .getPollsQuestionsByUuidAndCompanyId(uuid, companyId, start,
@@ -387,8 +387,7 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.polls.model.PollsQuestion> search(
-		long companyId, long[] groupIds, java.lang.String keywords, int start,
-		int end,
+		long companyId, long[] groupIds, String keywords, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.polls.model.PollsQuestion> orderByComparator) {
 		return getService()
 				   .search(companyId, groupIds, keywords, start, end,
@@ -396,8 +395,8 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.polls.model.PollsQuestion> search(
-		long companyId, long[] groupIds, java.lang.String name,
-		java.lang.String description, boolean andOperator, int start, int end,
+		long companyId, long[] groupIds, String name, String description,
+		boolean andOperator, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.polls.model.PollsQuestion> orderByComparator) {
 		return getService()
 				   .search(companyId, groupIds, name, description, andOperator,
@@ -405,13 +404,12 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static int searchCount(long companyId, long[] groupIds,
-		java.lang.String keywords) {
+		String keywords) {
 		return getService().searchCount(companyId, groupIds, keywords);
 	}
 
 	public static int searchCount(long companyId, long[] groupIds,
-		java.lang.String title, java.lang.String description,
-		boolean andOperator) {
+		String title, String description, boolean andOperator) {
 		return getService()
 				   .searchCount(companyId, groupIds, title, description,
 			andOperator);
@@ -430,8 +428,8 @@ public class PollsQuestionLocalServiceUtil {
 
 	public static com.liferay.polls.model.PollsQuestion updateQuestion(
 		long userId, long questionId,
-		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Map<java.util.Locale, String> titleMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
 		int expirationDateHour, int expirationDateMinute, boolean neverExpire,
 		java.util.List<com.liferay.polls.model.PollsChoice> choices,
@@ -448,6 +446,17 @@ public class PollsQuestionLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(PollsQuestionLocalService.class);
+	private static ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PollsQuestionLocalService.class);
+
+		ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService> serviceTracker =
+			new ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService>(bundle.getBundleContext(),
+				PollsQuestionLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

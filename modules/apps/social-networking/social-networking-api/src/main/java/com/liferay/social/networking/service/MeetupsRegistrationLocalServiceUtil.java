@@ -16,7 +16,8 @@ package com.liferay.social.networking.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -248,7 +249,7 @@ public class MeetupsRegistrationLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -259,7 +260,7 @@ public class MeetupsRegistrationLocalServiceUtil {
 	}
 
 	public static com.liferay.social.networking.model.MeetupsRegistration updateMeetupsRegistration(
-		long userId, long meetupsEntryId, int status, java.lang.String comments)
+		long userId, long meetupsEntryId, int status, String comments)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateMeetupsRegistration(userId, meetupsEntryId, status,
@@ -281,6 +282,17 @@ public class MeetupsRegistrationLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(MeetupsRegistrationLocalService.class);
+	private static ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MeetupsRegistrationLocalService.class);
+
+		ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService> serviceTracker =
+			new ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService>(bundle.getBundleContext(),
+				MeetupsRegistrationLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

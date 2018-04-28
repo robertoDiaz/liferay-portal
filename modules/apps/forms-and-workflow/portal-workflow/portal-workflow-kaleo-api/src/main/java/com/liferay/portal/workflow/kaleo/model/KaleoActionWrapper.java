@@ -67,7 +67,7 @@ public class KaleoActionWrapper implements KaleoAction,
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("kaleoClassName", getKaleoClassName());
 		attributes.put("kaleoClassPK", getKaleoClassPK());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoNodeName", getKaleoNodeName());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
@@ -136,10 +136,11 @@ public class KaleoActionWrapper implements KaleoAction,
 			setKaleoClassPK(kaleoClassPK);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		String kaleoNodeName = (String)attributes.get("kaleoNodeName");
@@ -193,7 +194,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoActionWrapper((KaleoAction)_kaleoAction.clone());
 	}
 
@@ -228,7 +229,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the description of this kaleo action
 	*/
 	@Override
-	public java.lang.String getDescription() {
+	public String getDescription() {
 		return _kaleoAction.getDescription();
 	}
 
@@ -238,7 +239,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the execution type of this kaleo action
 	*/
 	@Override
-	public java.lang.String getExecutionType() {
+	public String getExecutionType() {
 		return _kaleoAction.getExecutionType();
 	}
 
@@ -273,7 +274,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the kaleo class name of this kaleo action
 	*/
 	@Override
-	public java.lang.String getKaleoClassName() {
+	public String getKaleoClassName() {
 		return _kaleoAction.getKaleoClassName();
 	}
 
@@ -288,13 +289,13 @@ public class KaleoActionWrapper implements KaleoAction,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo action.
+	* Returns the kaleo definition version ID of this kaleo action.
 	*
-	* @return the kaleo definition ID of this kaleo action
+	* @return the kaleo definition version ID of this kaleo action
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoAction.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoAction.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -303,7 +304,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the kaleo node name of this kaleo action
 	*/
 	@Override
-	public java.lang.String getKaleoNodeName() {
+	public String getKaleoNodeName() {
 		return _kaleoAction.getKaleoNodeName();
 	}
 
@@ -323,7 +324,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the name of this kaleo action
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _kaleoAction.getName();
 	}
 
@@ -358,7 +359,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the script of this kaleo action
 	*/
 	@Override
-	public java.lang.String getScript() {
+	public String getScript() {
 		return _kaleoAction.getScript();
 	}
 
@@ -368,7 +369,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the script language of this kaleo action
 	*/
 	@Override
-	public java.lang.String getScriptLanguage() {
+	public String getScriptLanguage() {
 		return _kaleoAction.getScriptLanguage();
 	}
 
@@ -378,7 +379,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the script required contexts of this kaleo action
 	*/
 	@Override
-	public java.lang.String getScriptRequiredContexts() {
+	public String getScriptRequiredContexts() {
 		return _kaleoAction.getScriptRequiredContexts();
 	}
 
@@ -398,7 +399,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the user name of this kaleo action
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoAction.getUserName();
 	}
 
@@ -408,7 +409,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @return the user uuid of this kaleo action
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoAction.getUserUuid();
 	}
 
@@ -468,7 +469,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param description the description of this kaleo action
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
+	public void setDescription(String description) {
 		_kaleoAction.setDescription(description);
 	}
 
@@ -478,7 +479,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param executionType the execution type of this kaleo action
 	*/
 	@Override
-	public void setExecutionType(java.lang.String executionType) {
+	public void setExecutionType(String executionType) {
 		_kaleoAction.setExecutionType(executionType);
 	}
 
@@ -524,7 +525,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param kaleoClassName the kaleo class name of this kaleo action
 	*/
 	@Override
-	public void setKaleoClassName(java.lang.String kaleoClassName) {
+	public void setKaleoClassName(String kaleoClassName) {
 		_kaleoAction.setKaleoClassName(kaleoClassName);
 	}
 
@@ -539,13 +540,13 @@ public class KaleoActionWrapper implements KaleoAction,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo action.
+	* Sets the kaleo definition version ID of this kaleo action.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo action
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo action
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoAction.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoAction.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -554,7 +555,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param kaleoNodeName the kaleo node name of this kaleo action
 	*/
 	@Override
-	public void setKaleoNodeName(java.lang.String kaleoNodeName) {
+	public void setKaleoNodeName(String kaleoNodeName) {
 		_kaleoAction.setKaleoNodeName(kaleoNodeName);
 	}
 
@@ -574,7 +575,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param name the name of this kaleo action
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_kaleoAction.setName(name);
 	}
 
@@ -614,7 +615,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param script the script of this kaleo action
 	*/
 	@Override
-	public void setScript(java.lang.String script) {
+	public void setScript(String script) {
 		_kaleoAction.setScript(script);
 	}
 
@@ -624,7 +625,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param scriptLanguage the script language of this kaleo action
 	*/
 	@Override
-	public void setScriptLanguage(java.lang.String scriptLanguage) {
+	public void setScriptLanguage(String scriptLanguage) {
 		_kaleoAction.setScriptLanguage(scriptLanguage);
 	}
 
@@ -634,8 +635,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param scriptRequiredContexts the script required contexts of this kaleo action
 	*/
 	@Override
-	public void setScriptRequiredContexts(
-		java.lang.String scriptRequiredContexts) {
+	public void setScriptRequiredContexts(String scriptRequiredContexts) {
 		_kaleoAction.setScriptRequiredContexts(scriptRequiredContexts);
 	}
 
@@ -655,7 +655,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param userName the user name of this kaleo action
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoAction.setUserName(userName);
 	}
 
@@ -665,7 +665,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	* @param userUuid the user uuid of this kaleo action
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoAction.setUserUuid(userUuid);
 	}
 
@@ -680,7 +680,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoAction.toString();
 	}
 
@@ -690,7 +690,7 @@ public class KaleoActionWrapper implements KaleoAction,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoAction.toXmlString();
 	}
 

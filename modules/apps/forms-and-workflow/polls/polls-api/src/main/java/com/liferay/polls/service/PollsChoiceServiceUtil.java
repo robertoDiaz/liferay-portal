@@ -16,7 +16,8 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -47,7 +48,7 @@ public class PollsChoiceServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -55,6 +56,16 @@ public class PollsChoiceServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PollsChoiceService, PollsChoiceService> _serviceTracker =
-		ServiceTrackerFactory.open(PollsChoiceService.class);
+	private static ServiceTracker<PollsChoiceService, PollsChoiceService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PollsChoiceService.class);
+
+		ServiceTracker<PollsChoiceService, PollsChoiceService> serviceTracker = new ServiceTracker<PollsChoiceService, PollsChoiceService>(bundle.getBundleContext(),
+				PollsChoiceService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -31,7 +31,11 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 @DDMForm(
 	rules = {
 		@DDMFormRule(
-			actions = {"setVisible('tooltip', false)"}, condition = "TRUE"
+			actions = {
+				"setDataType('predefinedValue', getValue('dataType'))",
+				"setVisible('tooltip', false)"
+			},
+			condition = "TRUE"
 		)
 	}
 )
@@ -107,7 +111,7 @@ public interface NumericDDMFormFieldTypeSettings
 	public LocalizedValue tooltip();
 
 	@DDMFormField(
-		dataType = "number", label = "%validation", type = "validation"
+		dataType = "numeric", label = "%validation", type = "validation"
 	)
 	@Override
 	public DDMFormFieldValidation validation();

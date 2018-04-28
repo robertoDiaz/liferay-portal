@@ -16,7 +16,8 @@ package com.liferay.portal.background.task.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,14 +43,13 @@ public class BackgroundTaskServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.background.task.service.impl.BackgroundTaskServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static int getBackgroundTasksCount(long groupId,
-		java.lang.String taskExecutorClassName, java.lang.String completed) {
+		String taskExecutorClassName, String completed) {
 		return getService()
 				   .getBackgroundTasksCount(groupId, taskExecutorClassName,
 			completed);
 	}
 
-	public static java.lang.String getBackgroundTaskStatusJSON(
-		long backgroundTaskId) {
+	public static String getBackgroundTaskStatusJSON(long backgroundTaskId) {
 		return getService().getBackgroundTaskStatusJSON(backgroundTaskId);
 	}
 
@@ -58,7 +58,7 @@ public class BackgroundTaskServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -66,6 +66,17 @@ public class BackgroundTaskServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<BackgroundTaskService, BackgroundTaskService> _serviceTracker =
-		ServiceTrackerFactory.open(BackgroundTaskService.class);
+	private static ServiceTracker<BackgroundTaskService, BackgroundTaskService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(BackgroundTaskService.class);
+
+		ServiceTracker<BackgroundTaskService, BackgroundTaskService> serviceTracker =
+			new ServiceTracker<BackgroundTaskService, BackgroundTaskService>(bundle.getBundleContext(),
+				BackgroundTaskService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

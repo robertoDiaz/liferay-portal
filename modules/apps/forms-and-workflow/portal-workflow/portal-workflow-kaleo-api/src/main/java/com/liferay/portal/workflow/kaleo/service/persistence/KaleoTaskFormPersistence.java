@@ -173,138 +173,141 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	public int countByCompanyId(long companyId);
 
 	/**
-	* Returns all the kaleo task forms where kaleoDefinitionId = &#63;.
+	* Returns all the kaleo task forms where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @return the matching kaleo task forms
 	*/
-	public java.util.List<KaleoTaskForm> findByKaleoDefinitionId(
-		long kaleoDefinitionId);
+	public java.util.List<KaleoTaskForm> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId);
 
 	/**
-	* Returns a range of all the kaleo task forms where kaleoDefinitionId = &#63;.
+	* Returns a range of all the kaleo task forms where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoTaskFormModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo task forms
 	* @param end the upper bound of the range of kaleo task forms (not inclusive)
 	* @return the range of matching kaleo task forms
 	*/
-	public java.util.List<KaleoTaskForm> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end);
+	public java.util.List<KaleoTaskForm> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end);
 
 	/**
-	* Returns an ordered range of all the kaleo task forms where kaleoDefinitionId = &#63;.
+	* Returns an ordered range of all the kaleo task forms where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoTaskFormModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo task forms
 	* @param end the upper bound of the range of kaleo task forms (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching kaleo task forms
 	*/
-	public java.util.List<KaleoTaskForm> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end,
+	public java.util.List<KaleoTaskForm> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator);
 
 	/**
-	* Returns an ordered range of all the kaleo task forms where kaleoDefinitionId = &#63;.
+	* Returns an ordered range of all the kaleo task forms where kaleoDefinitionVersionId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link KaleoTaskFormModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param start the lower bound of the range of kaleo task forms
 	* @param end the upper bound of the range of kaleo task forms (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching kaleo task forms
 	*/
-	public java.util.List<KaleoTaskForm> findByKaleoDefinitionId(
-		long kaleoDefinitionId, int start, int end,
+	public java.util.List<KaleoTaskForm> findByKaleoDefinitionVersionId(
+		long kaleoDefinitionVersionId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator,
 		boolean retrieveFromCache);
 
 	/**
-	* Returns the first kaleo task form in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the first kaleo task form in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching kaleo task form
 	* @throws NoSuchTaskFormException if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm findByKaleoDefinitionId_First(long kaleoDefinitionId,
+	public KaleoTaskForm findByKaleoDefinitionVersionId_First(
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator)
 		throws NoSuchTaskFormException;
 
 	/**
-	* Returns the first kaleo task form in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the first kaleo task form in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching kaleo task form, or <code>null</code> if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm fetchByKaleoDefinitionId_First(
-		long kaleoDefinitionId,
+	public KaleoTaskForm fetchByKaleoDefinitionVersionId_First(
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator);
 
 	/**
-	* Returns the last kaleo task form in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the last kaleo task form in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching kaleo task form
 	* @throws NoSuchTaskFormException if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm findByKaleoDefinitionId_Last(long kaleoDefinitionId,
+	public KaleoTaskForm findByKaleoDefinitionVersionId_Last(
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator)
 		throws NoSuchTaskFormException;
 
 	/**
-	* Returns the last kaleo task form in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the last kaleo task form in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching kaleo task form, or <code>null</code> if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm fetchByKaleoDefinitionId_Last(long kaleoDefinitionId,
+	public KaleoTaskForm fetchByKaleoDefinitionVersionId_Last(
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator);
 
 	/**
-	* Returns the kaleo task forms before and after the current kaleo task form in the ordered set where kaleoDefinitionId = &#63;.
+	* Returns the kaleo task forms before and after the current kaleo task form in the ordered set where kaleoDefinitionVersionId = &#63;.
 	*
 	* @param kaleoTaskFormId the primary key of the current kaleo task form
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next kaleo task form
 	* @throws NoSuchTaskFormException if a kaleo task form with the primary key could not be found
 	*/
-	public KaleoTaskForm[] findByKaleoDefinitionId_PrevAndNext(
-		long kaleoTaskFormId, long kaleoDefinitionId,
+	public KaleoTaskForm[] findByKaleoDefinitionVersionId_PrevAndNext(
+		long kaleoTaskFormId, long kaleoDefinitionVersionId,
 		com.liferay.portal.kernel.util.OrderByComparator<KaleoTaskForm> orderByComparator)
 		throws NoSuchTaskFormException;
 
 	/**
-	* Removes all the kaleo task forms where kaleoDefinitionId = &#63; from the database.
+	* Removes all the kaleo task forms where kaleoDefinitionVersionId = &#63; from the database.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	*/
-	public void removeByKaleoDefinitionId(long kaleoDefinitionId);
+	public void removeByKaleoDefinitionVersionId(long kaleoDefinitionVersionId);
 
 	/**
-	* Returns the number of kaleo task forms where kaleoDefinitionId = &#63;.
+	* Returns the number of kaleo task forms where kaleoDefinitionVersionId = &#63;.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID
+	* @param kaleoDefinitionVersionId the kaleo definition version ID
 	* @return the number of matching kaleo task forms
 	*/
-	public int countByKaleoDefinitionId(long kaleoDefinitionId);
+	public int countByKaleoDefinitionVersionId(long kaleoDefinitionVersionId);
 
 	/**
 	* Returns all the kaleo task forms where kaleoNodeId = &#63;.
@@ -578,8 +581,8 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	* @return the matching kaleo task form
 	* @throws NoSuchTaskFormException if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm findByFormUuid_KTI(long kaleoTaskId,
-		java.lang.String formUuid) throws NoSuchTaskFormException;
+	public KaleoTaskForm findByFormUuid_KTI(long kaleoTaskId, String formUuid)
+		throws NoSuchTaskFormException;
 
 	/**
 	* Returns the kaleo task form where kaleoTaskId = &#63; and formUuid = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
@@ -588,8 +591,7 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	* @param formUuid the form uuid
 	* @return the matching kaleo task form, or <code>null</code> if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm fetchByFormUuid_KTI(long kaleoTaskId,
-		java.lang.String formUuid);
+	public KaleoTaskForm fetchByFormUuid_KTI(long kaleoTaskId, String formUuid);
 
 	/**
 	* Returns the kaleo task form where kaleoTaskId = &#63; and formUuid = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
@@ -599,8 +601,8 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching kaleo task form, or <code>null</code> if a matching kaleo task form could not be found
 	*/
-	public KaleoTaskForm fetchByFormUuid_KTI(long kaleoTaskId,
-		java.lang.String formUuid, boolean retrieveFromCache);
+	public KaleoTaskForm fetchByFormUuid_KTI(long kaleoTaskId, String formUuid,
+		boolean retrieveFromCache);
 
 	/**
 	* Removes the kaleo task form where kaleoTaskId = &#63; and formUuid = &#63; from the database.
@@ -609,8 +611,8 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	* @param formUuid the form uuid
 	* @return the kaleo task form that was removed
 	*/
-	public KaleoTaskForm removeByFormUuid_KTI(long kaleoTaskId,
-		java.lang.String formUuid) throws NoSuchTaskFormException;
+	public KaleoTaskForm removeByFormUuid_KTI(long kaleoTaskId, String formUuid)
+		throws NoSuchTaskFormException;
 
 	/**
 	* Returns the number of kaleo task forms where kaleoTaskId = &#63; and formUuid = &#63;.
@@ -619,7 +621,7 @@ public interface KaleoTaskFormPersistence extends BasePersistence<KaleoTaskForm>
 	* @param formUuid the form uuid
 	* @return the number of matching kaleo task forms
 	*/
-	public int countByFormUuid_KTI(long kaleoTaskId, java.lang.String formUuid);
+	public int countByFormUuid_KTI(long kaleoTaskId, String formUuid);
 
 	/**
 	* Caches the kaleo task form in the entity cache if it is enabled.

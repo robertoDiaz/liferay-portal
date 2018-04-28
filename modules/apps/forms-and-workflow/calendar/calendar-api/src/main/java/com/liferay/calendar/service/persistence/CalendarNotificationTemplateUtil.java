@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarNotificationTemplate;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -121,8 +122,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param uuid the uuid
 	* @return the matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid(
-		java.lang.String uuid) {
+	public static List<CalendarNotificationTemplate> findByUuid(String uuid) {
 		return getPersistence().findByUuid(uuid);
 	}
 
@@ -138,8 +138,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param end the upper bound of the range of calendar notification templates (not inclusive)
 	* @return the range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid(
-		java.lang.String uuid, int start, int end) {
+	public static List<CalendarNotificationTemplate> findByUuid(String uuid,
+		int start, int end) {
 		return getPersistence().findByUuid(uuid, start, end);
 	}
 
@@ -156,8 +156,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid(
-		java.lang.String uuid, int start, int end,
+	public static List<CalendarNotificationTemplate> findByUuid(String uuid,
+		int start, int end,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
 	}
@@ -176,8 +176,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid(
-		java.lang.String uuid, int start, int end,
+	public static List<CalendarNotificationTemplate> findByUuid(String uuid,
+		int start, int end,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -193,8 +193,7 @@ public class CalendarNotificationTemplateUtil {
 	* @return the first matching calendar notification template
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate findByUuid_First(
-		java.lang.String uuid,
+	public static CalendarNotificationTemplate findByUuid_First(String uuid,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
@@ -207,8 +206,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate fetchByUuid_First(
-		java.lang.String uuid,
+	public static CalendarNotificationTemplate fetchByUuid_First(String uuid,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
 	}
@@ -221,8 +219,7 @@ public class CalendarNotificationTemplateUtil {
 	* @return the last matching calendar notification template
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate findByUuid_Last(
-		java.lang.String uuid,
+	public static CalendarNotificationTemplate findByUuid_Last(String uuid,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
@@ -235,8 +232,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate fetchByUuid_Last(
-		java.lang.String uuid,
+	public static CalendarNotificationTemplate fetchByUuid_Last(String uuid,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
 	}
@@ -251,7 +247,7 @@ public class CalendarNotificationTemplateUtil {
 	* @throws NoSuchNotificationTemplateException if a calendar notification template with the primary key could not be found
 	*/
 	public static CalendarNotificationTemplate[] findByUuid_PrevAndNext(
-		long calendarNotificationTemplateId, java.lang.String uuid,
+		long calendarNotificationTemplateId, String uuid,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
@@ -264,7 +260,7 @@ public class CalendarNotificationTemplateUtil {
 	*
 	* @param uuid the uuid
 	*/
-	public static void removeByUuid(java.lang.String uuid) {
+	public static void removeByUuid(String uuid) {
 		getPersistence().removeByUuid(uuid);
 	}
 
@@ -274,7 +270,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param uuid the uuid
 	* @return the number of matching calendar notification templates
 	*/
-	public static int countByUuid(java.lang.String uuid) {
+	public static int countByUuid(String uuid) {
 		return getPersistence().countByUuid(uuid);
 	}
 
@@ -286,8 +282,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the matching calendar notification template
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate findByUUID_G(
-		java.lang.String uuid, long groupId)
+	public static CalendarNotificationTemplate findByUUID_G(String uuid,
+		long groupId)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence().findByUUID_G(uuid, groupId);
 	}
@@ -299,8 +295,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param groupId the group ID
 	* @return the matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate fetchByUUID_G(
-		java.lang.String uuid, long groupId) {
+	public static CalendarNotificationTemplate fetchByUUID_G(String uuid,
+		long groupId) {
 		return getPersistence().fetchByUUID_G(uuid, groupId);
 	}
 
@@ -312,8 +308,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate fetchByUUID_G(
-		java.lang.String uuid, long groupId, boolean retrieveFromCache) {
+	public static CalendarNotificationTemplate fetchByUUID_G(String uuid,
+		long groupId, boolean retrieveFromCache) {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
 	}
 
@@ -324,8 +320,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param groupId the group ID
 	* @return the calendar notification template that was removed
 	*/
-	public static CalendarNotificationTemplate removeByUUID_G(
-		java.lang.String uuid, long groupId)
+	public static CalendarNotificationTemplate removeByUUID_G(String uuid,
+		long groupId)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
@@ -337,7 +333,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param groupId the group ID
 	* @return the number of matching calendar notification templates
 	*/
-	public static int countByUUID_G(java.lang.String uuid, long groupId) {
+	public static int countByUUID_G(String uuid, long groupId) {
 		return getPersistence().countByUUID_G(uuid, groupId);
 	}
 
@@ -348,8 +344,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param companyId the company ID
 	* @return the matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid_C(
-		java.lang.String uuid, long companyId) {
+	public static List<CalendarNotificationTemplate> findByUuid_C(String uuid,
+		long companyId) {
 		return getPersistence().findByUuid_C(uuid, companyId);
 	}
 
@@ -366,8 +362,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param end the upper bound of the range of calendar notification templates (not inclusive)
 	* @return the range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end) {
+	public static List<CalendarNotificationTemplate> findByUuid_C(String uuid,
+		long companyId, int start, int end) {
 		return getPersistence().findByUuid_C(uuid, companyId, start, end);
 	}
 
@@ -385,8 +381,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<CalendarNotificationTemplate> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence()
 				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
@@ -407,8 +403,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the ordered range of matching calendar notification templates
 	*/
-	public static List<CalendarNotificationTemplate> findByUuid_C(
-		java.lang.String uuid, long companyId, int start, int end,
+	public static List<CalendarNotificationTemplate> findByUuid_C(String uuid,
+		long companyId, int start, int end,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
@@ -425,8 +421,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the first matching calendar notification template
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate findByUuid_C_First(
-		java.lang.String uuid, long companyId,
+	public static CalendarNotificationTemplate findByUuid_C_First(String uuid,
+		long companyId,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
@@ -442,7 +438,7 @@ public class CalendarNotificationTemplateUtil {
 	* @return the first matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
 	public static CalendarNotificationTemplate fetchByUuid_C_First(
-		java.lang.String uuid, long companyId,
+		String uuid, long companyId,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_First(uuid, companyId, orderByComparator);
@@ -457,8 +453,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the last matching calendar notification template
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate findByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static CalendarNotificationTemplate findByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
@@ -473,8 +469,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
-	public static CalendarNotificationTemplate fetchByUuid_C_Last(
-		java.lang.String uuid, long companyId,
+	public static CalendarNotificationTemplate fetchByUuid_C_Last(String uuid,
+		long companyId,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator) {
 		return getPersistence()
 				   .fetchByUuid_C_Last(uuid, companyId, orderByComparator);
@@ -491,8 +487,7 @@ public class CalendarNotificationTemplateUtil {
 	* @throws NoSuchNotificationTemplateException if a calendar notification template with the primary key could not be found
 	*/
 	public static CalendarNotificationTemplate[] findByUuid_C_PrevAndNext(
-		long calendarNotificationTemplateId, java.lang.String uuid,
-		long companyId,
+		long calendarNotificationTemplateId, String uuid, long companyId,
 		OrderByComparator<CalendarNotificationTemplate> orderByComparator)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
@@ -506,7 +501,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param uuid the uuid
 	* @param companyId the company ID
 	*/
-	public static void removeByUuid_C(java.lang.String uuid, long companyId) {
+	public static void removeByUuid_C(String uuid, long companyId) {
 		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
@@ -517,7 +512,7 @@ public class CalendarNotificationTemplateUtil {
 	* @param companyId the company ID
 	* @return the number of matching calendar notification templates
 	*/
-	public static int countByUuid_C(java.lang.String uuid, long companyId) {
+	public static int countByUuid_C(String uuid, long companyId) {
 		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
@@ -699,8 +694,7 @@ public class CalendarNotificationTemplateUtil {
 	* @throws NoSuchNotificationTemplateException if a matching calendar notification template could not be found
 	*/
 	public static CalendarNotificationTemplate findByC_NT_NTT(long calendarId,
-		java.lang.String notificationType,
-		java.lang.String notificationTemplateType)
+		String notificationType, String notificationTemplateType)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
 				   .findByC_NT_NTT(calendarId, notificationType,
@@ -716,8 +710,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
 	public static CalendarNotificationTemplate fetchByC_NT_NTT(
-		long calendarId, java.lang.String notificationType,
-		java.lang.String notificationTemplateType) {
+		long calendarId, String notificationType,
+		String notificationTemplateType) {
 		return getPersistence()
 				   .fetchByC_NT_NTT(calendarId, notificationType,
 			notificationTemplateType);
@@ -733,8 +727,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the matching calendar notification template, or <code>null</code> if a matching calendar notification template could not be found
 	*/
 	public static CalendarNotificationTemplate fetchByC_NT_NTT(
-		long calendarId, java.lang.String notificationType,
-		java.lang.String notificationTemplateType, boolean retrieveFromCache) {
+		long calendarId, String notificationType,
+		String notificationTemplateType, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByC_NT_NTT(calendarId, notificationType,
 			notificationTemplateType, retrieveFromCache);
@@ -749,8 +743,8 @@ public class CalendarNotificationTemplateUtil {
 	* @return the calendar notification template that was removed
 	*/
 	public static CalendarNotificationTemplate removeByC_NT_NTT(
-		long calendarId, java.lang.String notificationType,
-		java.lang.String notificationTemplateType)
+		long calendarId, String notificationType,
+		String notificationTemplateType)
 		throws com.liferay.calendar.exception.NoSuchNotificationTemplateException {
 		return getPersistence()
 				   .removeByC_NT_NTT(calendarId, notificationType,
@@ -765,9 +759,8 @@ public class CalendarNotificationTemplateUtil {
 	* @param notificationTemplateType the notification template type
 	* @return the number of matching calendar notification templates
 	*/
-	public static int countByC_NT_NTT(long calendarId,
-		java.lang.String notificationType,
-		java.lang.String notificationTemplateType) {
+	public static int countByC_NT_NTT(long calendarId, String notificationType,
+		String notificationTemplateType) {
 		return getPersistence()
 				   .countByC_NT_NTT(calendarId, notificationType,
 			notificationTemplateType);
@@ -930,7 +923,7 @@ public class CalendarNotificationTemplateUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -938,6 +931,17 @@ public class CalendarNotificationTemplateUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<CalendarNotificationTemplatePersistence, CalendarNotificationTemplatePersistence> _serviceTracker =
-		ServiceTrackerFactory.open(CalendarNotificationTemplatePersistence.class);
+	private static ServiceTracker<CalendarNotificationTemplatePersistence, CalendarNotificationTemplatePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(CalendarNotificationTemplatePersistence.class);
+
+		ServiceTracker<CalendarNotificationTemplatePersistence, CalendarNotificationTemplatePersistence> serviceTracker =
+			new ServiceTracker<CalendarNotificationTemplatePersistence, CalendarNotificationTemplatePersistence>(bundle.getBundleContext(),
+				CalendarNotificationTemplatePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -57,7 +58,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 	public static com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance addKaleoTaskAssignmentInstance(
 		long groupId,
 		com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken kaleoTaskInstanceToken,
-		java.lang.String assigneeClassName, long assigneeClassPK,
+		String assigneeClassName, long assigneeClassPK,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -69,7 +70,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance> addTaskAssignmentInstances(
 		com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken kaleoTaskInstanceToken,
 		java.util.Collection<com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment> kaleoTaskAssignments,
-		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
+		java.util.Map<String, java.io.Serializable> workflowContext,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -79,7 +80,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance assignKaleoTaskAssignmentInstance(
 		com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken kaleoTaskInstanceToken,
-		java.lang.String assigneeClassName, long assigneeClassPK,
+		String assigneeClassName, long assigneeClassPK,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -112,10 +113,10 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 		getService().deleteCompanyKaleoTaskAssignmentInstances(companyId);
 	}
 
-	public static void deleteKaleoDefinitionKaleoTaskAssignmentInstances(
-		long kaleoDefintionId) {
+	public static void deleteKaleoDefinitionVersionKaleoTaskAssignmentInstances(
+		long kaleoDefinitionId) {
 		getService()
-			.deleteKaleoDefinitionKaleoTaskAssignmentInstances(kaleoDefintionId);
+			.deleteKaleoDefinitionVersionKaleoTaskAssignmentInstances(kaleoDefinitionId);
 	}
 
 	public static void deleteKaleoInstanceKaleoTaskAssignmentInstances(
@@ -320,7 +321,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -346,6 +347,17 @@ public class KaleoTaskAssignmentInstanceLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoTaskAssignmentInstanceLocalService, KaleoTaskAssignmentInstanceLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoTaskAssignmentInstanceLocalService.class);
+	private static ServiceTracker<KaleoTaskAssignmentInstanceLocalService, KaleoTaskAssignmentInstanceLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoTaskAssignmentInstanceLocalService.class);
+
+		ServiceTracker<KaleoTaskAssignmentInstanceLocalService, KaleoTaskAssignmentInstanceLocalService> serviceTracker =
+			new ServiceTracker<KaleoTaskAssignmentInstanceLocalService, KaleoTaskAssignmentInstanceLocalService>(bundle.getBundleContext(),
+				KaleoTaskAssignmentInstanceLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

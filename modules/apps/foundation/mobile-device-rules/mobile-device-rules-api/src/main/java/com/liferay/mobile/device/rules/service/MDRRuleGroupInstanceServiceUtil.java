@@ -16,7 +16,8 @@ package com.liferay.mobile.device.rules.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,8 +43,8 @@ public class MDRRuleGroupInstanceServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.mobile.device.rules.service.impl.MDRRuleGroupInstanceServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance addRuleGroupInstance(
-		long groupId, java.lang.String className, long classPK,
-		long ruleGroupId, int priority,
+		long groupId, String className, long classPK, long ruleGroupId,
+		int priority,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -52,8 +53,7 @@ public class MDRRuleGroupInstanceServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance addRuleGroupInstance(
-		long groupId, java.lang.String className, long classPK,
-		long ruleGroupId,
+		long groupId, String className, long classPK, long ruleGroupId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -71,20 +71,19 @@ public class MDRRuleGroupInstanceServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> getRuleGroupInstances(
-		java.lang.String className, long classPK, int start, int end,
+		String className, long classPK, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> orderByComparator) {
 		return getService()
 				   .getRuleGroupInstances(className, classPK, start, end,
 			orderByComparator);
 	}
 
-	public static int getRuleGroupInstancesCount(java.lang.String className,
-		long classPK) {
+	public static int getRuleGroupInstancesCount(String className, long classPK) {
 		return getService().getRuleGroupInstancesCount(className, classPK);
 	}
 
@@ -99,6 +98,17 @@ public class MDRRuleGroupInstanceServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MDRRuleGroupInstanceService, MDRRuleGroupInstanceService> _serviceTracker =
-		ServiceTrackerFactory.open(MDRRuleGroupInstanceService.class);
+	private static ServiceTracker<MDRRuleGroupInstanceService, MDRRuleGroupInstanceService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MDRRuleGroupInstanceService.class);
+
+		ServiceTracker<MDRRuleGroupInstanceService, MDRRuleGroupInstanceService> serviceTracker =
+			new ServiceTracker<MDRRuleGroupInstanceService, MDRRuleGroupInstanceService>(bundle.getBundleContext(),
+				MDRRuleGroupInstanceService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

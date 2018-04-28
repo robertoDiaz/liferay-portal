@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -172,7 +171,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("repositoryId", getRepositoryId());
 		attributes.put("mappedId", getMappedId());
-		attributes.put("manualCheckInRequired", getManualCheckInRequired());
+		attributes.put("manualCheckInRequired", isManualCheckInRequired());
 		attributes.put("lastPublishDate", getLastPublishDate());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -276,7 +275,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -368,7 +367,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -379,7 +378,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -442,7 +441,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 	@Override
 	public String getMappedId() {
 		if (_mappedId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _mappedId;
@@ -537,7 +536,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 		repositoryEntryImpl.setModifiedDate(getModifiedDate());
 		repositoryEntryImpl.setRepositoryId(getRepositoryId());
 		repositoryEntryImpl.setMappedId(getMappedId());
-		repositoryEntryImpl.setManualCheckInRequired(getManualCheckInRequired());
+		repositoryEntryImpl.setManualCheckInRequired(isManualCheckInRequired());
 		repositoryEntryImpl.setLastPublishDate(getLastPublishDate());
 
 		repositoryEntryImpl.resetOriginalValues();
@@ -680,7 +679,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 			repositoryEntryCacheModel.mappedId = null;
 		}
 
-		repositoryEntryCacheModel.manualCheckInRequired = getManualCheckInRequired();
+		repositoryEntryCacheModel.manualCheckInRequired = isManualCheckInRequired();
 
 		Date lastPublishDate = getLastPublishDate();
 
@@ -721,7 +720,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 		sb.append(", mappedId=");
 		sb.append(getMappedId());
 		sb.append(", manualCheckInRequired=");
-		sb.append(getManualCheckInRequired());
+		sb.append(isManualCheckInRequired());
 		sb.append(", lastPublishDate=");
 		sb.append(getLastPublishDate());
 		sb.append("}");
@@ -783,7 +782,7 @@ public class RepositoryEntryModelImpl extends BaseModelImpl<RepositoryEntry>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>manualCheckInRequired</column-name><column-value><![CDATA[");
-		sb.append(getManualCheckInRequired());
+		sb.append(isManualCheckInRequired());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lastPublishDate</column-name><column-value><![CDATA[");

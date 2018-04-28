@@ -60,6 +60,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("friendlyURLEntryId", getFriendlyURLEntryId());
 		attributes.put("groupId", getGroupId());
@@ -68,14 +69,19 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
-		attributes.put("urlTitle", getUrlTitle());
-		attributes.put("main", getMain());
+		attributes.put("defaultLanguageId", getDefaultLanguageId());
 
 		return attributes;
 	}
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -124,21 +130,15 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 			setClassPK(classPK);
 		}
 
-		String urlTitle = (String)attributes.get("urlTitle");
+		String defaultLanguageId = (String)attributes.get("defaultLanguageId");
 
-		if (urlTitle != null) {
-			setUrlTitle(urlTitle);
-		}
-
-		Boolean main = (Boolean)attributes.get("main");
-
-		if (main != null) {
-			setMain(main);
+		if (defaultLanguageId != null) {
+			setDefaultLanguageId(defaultLanguageId);
 		}
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new FriendlyURLEntryWrapper((FriendlyURLEntry)_friendlyURLEntry.clone());
 	}
 
@@ -147,13 +147,18 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		return _friendlyURLEntry.compareTo(friendlyURLEntry);
 	}
 
+	@Override
+	public String[] getAvailableLanguageIds() {
+		return _friendlyURLEntry.getAvailableLanguageIds();
+	}
+
 	/**
 	* Returns the fully qualified class name of this friendly url entry.
 	*
 	* @return the fully qualified class name of this friendly url entry
 	*/
 	@Override
-	public java.lang.String getClassName() {
+	public String getClassName() {
 		return _friendlyURLEntry.getClassName();
 	}
 
@@ -197,6 +202,16 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		return _friendlyURLEntry.getCreateDate();
 	}
 
+	/**
+	* Returns the default language ID of this friendly url entry.
+	*
+	* @return the default language ID of this friendly url entry
+	*/
+	@Override
+	public String getDefaultLanguageId() {
+		return _friendlyURLEntry.getDefaultLanguageId();
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _friendlyURLEntry.getExpandoBridge();
@@ -222,14 +237,9 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		return _friendlyURLEntry.getGroupId();
 	}
 
-	/**
-	* Returns the main of this friendly url entry.
-	*
-	* @return the main of this friendly url entry
-	*/
 	@Override
-	public boolean getMain() {
-		return _friendlyURLEntry.getMain();
+	public Map<String, String> getLanguageIdToUrlTitleMap() {
+		return _friendlyURLEntry.getLanguageIdToUrlTitleMap();
 	}
 
 	/**
@@ -240,6 +250,16 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	@Override
 	public Date getModifiedDate() {
 		return _friendlyURLEntry.getModifiedDate();
+	}
+
+	/**
+	* Returns the mvcc version of this friendly url entry.
+	*
+	* @return the mvcc version of this friendly url entry
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _friendlyURLEntry.getMvccVersion();
 	}
 
 	/**
@@ -257,19 +277,24 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		return _friendlyURLEntry.getPrimaryKeyObj();
 	}
 
-	/**
-	* Returns the url title of this friendly url entry.
-	*
-	* @return the url title of this friendly url entry
-	*/
 	@Override
-	public java.lang.String getUrlTitle() {
+	public String getUrlTitle() {
 		return _friendlyURLEntry.getUrlTitle();
 	}
 
 	@Override
-	public java.lang.String getUrlTitle(java.util.Locale locale) {
-		return _friendlyURLEntry.getUrlTitle(locale);
+	public String getUrlTitle(String languageId) {
+		return _friendlyURLEntry.getUrlTitle(languageId);
+	}
+
+	@Override
+	public String getUrlTitle(String languageId, boolean useDefault) {
+		return _friendlyURLEntry.getUrlTitle(languageId, useDefault);
+	}
+
+	@Override
+	public String getUrlTitleMapAsXML() {
+		return _friendlyURLEntry.getUrlTitleMapAsXML();
 	}
 
 	/**
@@ -278,7 +303,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	* @return the uuid of this friendly url entry
 	*/
 	@Override
-	public java.lang.String getUuid() {
+	public String getUuid() {
 		return _friendlyURLEntry.getUuid();
 	}
 
@@ -298,17 +323,8 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	@Override
-	public boolean isLocalized() {
-		return _friendlyURLEntry.isLocalized();
-	}
-
-	/**
-	* Returns <code>true</code> if this friendly url entry is main.
-	*
-	* @return <code>true</code> if this friendly url entry is main; <code>false</code> otherwise
-	*/
-	@Override
-	public boolean isMain() {
+	public boolean isMain()
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _friendlyURLEntry.isMain();
 	}
 
@@ -328,7 +344,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	@Override
-	public void setClassName(java.lang.String className) {
+	public void setClassName(String className) {
 		_friendlyURLEntry.setClassName(className);
 	}
 
@@ -372,6 +388,16 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 		_friendlyURLEntry.setCreateDate(createDate);
 	}
 
+	/**
+	* Sets the default language ID of this friendly url entry.
+	*
+	* @param defaultLanguageId the default language ID of this friendly url entry
+	*/
+	@Override
+	public void setDefaultLanguageId(String defaultLanguageId) {
+		_friendlyURLEntry.setDefaultLanguageId(defaultLanguageId);
+	}
+
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
@@ -409,16 +435,6 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets whether this friendly url entry is main.
-	*
-	* @param main the main of this friendly url entry
-	*/
-	@Override
-	public void setMain(boolean main) {
-		_friendlyURLEntry.setMain(main);
-	}
-
-	/**
 	* Sets the modified date of this friendly url entry.
 	*
 	* @param modifiedDate the modified date of this friendly url entry
@@ -426,6 +442,16 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_friendlyURLEntry.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	* Sets the mvcc version of this friendly url entry.
+	*
+	* @param mvccVersion the mvcc version of this friendly url entry
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_friendlyURLEntry.setMvccVersion(mvccVersion);
 	}
 
 	@Override
@@ -449,22 +475,12 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets the url title of this friendly url entry.
-	*
-	* @param urlTitle the url title of this friendly url entry
-	*/
-	@Override
-	public void setUrlTitle(java.lang.String urlTitle) {
-		_friendlyURLEntry.setUrlTitle(urlTitle);
-	}
-
-	/**
 	* Sets the uuid of this friendly url entry.
 	*
 	* @param uuid the uuid of this friendly url entry
 	*/
 	@Override
-	public void setUuid(java.lang.String uuid) {
+	public void setUuid(String uuid) {
 		_friendlyURLEntry.setUuid(uuid);
 	}
 
@@ -479,7 +495,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _friendlyURLEntry.toString();
 	}
 
@@ -489,7 +505,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _friendlyURLEntry.toXmlString();
 	}
 

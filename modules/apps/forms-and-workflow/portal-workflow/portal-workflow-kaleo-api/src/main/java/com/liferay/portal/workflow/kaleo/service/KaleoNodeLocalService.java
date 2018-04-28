@@ -71,7 +71,7 @@ public interface KaleoNodeLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public KaleoNode addKaleoNode(KaleoNode kaleoNode);
 
-	public KaleoNode addKaleoNode(long kaleoDefinitionId, Node node,
+	public KaleoNode addKaleoNode(long kaleoDefinitionVersionId, Node node,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -80,11 +80,13 @@ public interface KaleoNodeLocalService extends BaseLocalService,
 	* @param kaleoNodeId the primary key for the new kaleo node
 	* @return the new kaleo node
 	*/
+	@Transactional(enabled = false)
 	public KaleoNode createKaleoNode(long kaleoNodeId);
 
 	public void deleteCompanyKaleoNodes(long companyId);
 
-	public void deleteKaleoDefinitionKaleoNodes(long kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoNodes(
+		long kaleoDefinitionVersionId);
 
 	/**
 	* Deletes the kaleo node from the database. Also notifies the appropriate model listeners.
@@ -182,7 +184,8 @@ public interface KaleoNodeLocalService extends BaseLocalService,
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<KaleoNode> getKaleoDefinitionKaleoNodes(long kaleoDefinitionId);
+	public List<KaleoNode> getKaleoDefinitionVersionKaleoNodes(
+		long kaleoDefinitionVersionId);
 
 	/**
 	* Returns the kaleo node with the primary key.
@@ -221,7 +224,7 @@ public interface KaleoNodeLocalService extends BaseLocalService,
 	*
 	* @return the OSGi service identifier
 	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public String getOSGiServiceIdentifier();
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

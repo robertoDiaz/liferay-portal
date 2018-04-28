@@ -16,7 +16,8 @@ package com.liferay.trash.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,8 +43,7 @@ public class TrashVersionLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.trash.service.impl.TrashVersionLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.trash.model.TrashVersion addTrashVersion(
-		long trashEntryId, java.lang.String className, long classPK,
-		int status,
+		long trashEntryId, String className, long classPK, int status,
 		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties) {
 		return getService()
 				   .addTrashVersion(trashEntryId, className, classPK, status,
@@ -95,7 +95,7 @@ public class TrashVersionLocalServiceUtil {
 	}
 
 	public static com.liferay.trash.model.TrashVersion deleteTrashVersion(
-		java.lang.String className, long classPK) {
+		String className, long classPK) {
 		return getService().deleteTrashVersion(className, classPK);
 	}
 
@@ -198,12 +198,12 @@ public class TrashVersionLocalServiceUtil {
 	*/
 	@Deprecated
 	public static com.liferay.trash.model.TrashVersion fetchVersion(
-		long entryId, java.lang.String className, long classPK) {
+		long entryId, String className, long classPK) {
 		return getService().fetchVersion(entryId, className, classPK);
 	}
 
 	public static com.liferay.trash.model.TrashVersion fetchVersion(
-		java.lang.String className, long classPK) {
+		String className, long classPK) {
 		return getService().fetchVersion(className, classPK);
 	}
 
@@ -220,7 +220,7 @@ public class TrashVersionLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -274,7 +274,7 @@ public class TrashVersionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.trash.model.TrashVersion> getVersions(
-		long entryId, java.lang.String className) {
+		long entryId, String className) {
 		return getService().getVersions(entryId, className);
 	}
 
@@ -293,6 +293,17 @@ public class TrashVersionLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<TrashVersionLocalService, TrashVersionLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(TrashVersionLocalService.class);
+	private static ServiceTracker<TrashVersionLocalService, TrashVersionLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(TrashVersionLocalService.class);
+
+		ServiceTracker<TrashVersionLocalService, TrashVersionLocalService> serviceTracker =
+			new ServiceTracker<TrashVersionLocalService, TrashVersionLocalService>(bundle.getBundleContext(),
+				TrashVersionLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

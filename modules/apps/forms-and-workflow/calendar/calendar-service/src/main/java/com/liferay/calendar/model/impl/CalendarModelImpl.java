@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -169,9 +168,9 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		model.setDescription(soapModel.getDescription());
 		model.setTimeZoneId(soapModel.getTimeZoneId());
 		model.setColor(soapModel.getColor());
-		model.setDefaultCalendar(soapModel.getDefaultCalendar());
-		model.setEnableComments(soapModel.getEnableComments());
-		model.setEnableRatings(soapModel.getEnableRatings());
+		model.setDefaultCalendar(soapModel.isDefaultCalendar());
+		model.setEnableComments(soapModel.isEnableComments());
+		model.setEnableRatings(soapModel.isEnableRatings());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 
 		return model;
@@ -250,9 +249,9 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		attributes.put("description", getDescription());
 		attributes.put("timeZoneId", getTimeZoneId());
 		attributes.put("color", getColor());
-		attributes.put("defaultCalendar", getDefaultCalendar());
-		attributes.put("enableComments", getEnableComments());
-		attributes.put("enableRatings", getEnableRatings());
+		attributes.put("defaultCalendar", isDefaultCalendar());
+		attributes.put("enableComments", isEnableComments());
+		attributes.put("enableRatings", isEnableRatings());
 		attributes.put("lastPublishDate", getLastPublishDate());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -370,7 +369,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -466,7 +465,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -478,7 +477,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -545,7 +544,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -646,7 +645,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -749,7 +748,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 	@Override
 	public String getTimeZoneId() {
 		if (_timeZoneId == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _timeZoneId;
@@ -903,7 +902,7 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		String xml = getName();
 
 		if (xml == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
@@ -978,9 +977,9 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		calendarImpl.setDescription(getDescription());
 		calendarImpl.setTimeZoneId(getTimeZoneId());
 		calendarImpl.setColor(getColor());
-		calendarImpl.setDefaultCalendar(getDefaultCalendar());
-		calendarImpl.setEnableComments(getEnableComments());
-		calendarImpl.setEnableRatings(getEnableRatings());
+		calendarImpl.setDefaultCalendar(isDefaultCalendar());
+		calendarImpl.setEnableComments(isEnableComments());
+		calendarImpl.setEnableRatings(isEnableRatings());
 		calendarImpl.setLastPublishDate(getLastPublishDate());
 
 		calendarImpl.resetOriginalValues();
@@ -1139,11 +1138,11 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 
 		calendarCacheModel.color = getColor();
 
-		calendarCacheModel.defaultCalendar = getDefaultCalendar();
+		calendarCacheModel.defaultCalendar = isDefaultCalendar();
 
-		calendarCacheModel.enableComments = getEnableComments();
+		calendarCacheModel.enableComments = isEnableComments();
 
-		calendarCacheModel.enableRatings = getEnableRatings();
+		calendarCacheModel.enableRatings = isEnableRatings();
 
 		Date lastPublishDate = getLastPublishDate();
 
@@ -1188,11 +1187,11 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		sb.append(", color=");
 		sb.append(getColor());
 		sb.append(", defaultCalendar=");
-		sb.append(getDefaultCalendar());
+		sb.append(isDefaultCalendar());
 		sb.append(", enableComments=");
-		sb.append(getEnableComments());
+		sb.append(isEnableComments());
 		sb.append(", enableRatings=");
-		sb.append(getEnableRatings());
+		sb.append(isEnableRatings());
 		sb.append(", lastPublishDate=");
 		sb.append(getLastPublishDate());
 		sb.append("}");
@@ -1262,15 +1261,15 @@ public class CalendarModelImpl extends BaseModelImpl<Calendar>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>defaultCalendar</column-name><column-value><![CDATA[");
-		sb.append(getDefaultCalendar());
+		sb.append(isDefaultCalendar());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>enableComments</column-name><column-value><![CDATA[");
-		sb.append(getEnableComments());
+		sb.append(isEnableComments());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>enableRatings</column-name><column-value><![CDATA[");
-		sb.append(getEnableRatings());
+		sb.append(isEnableRatings());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>lastPublishDate</column-name><column-value><![CDATA[");

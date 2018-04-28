@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -286,8 +287,7 @@ public class DDMStructureVersionUtil {
 	* @return the matching ddm structure version
 	* @throws NoSuchStructureVersionException if a matching ddm structure version could not be found
 	*/
-	public static DDMStructureVersion findByS_V(long structureId,
-		java.lang.String version)
+	public static DDMStructureVersion findByS_V(long structureId, String version)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureVersionException {
 		return getPersistence().findByS_V(structureId, version);
 	}
@@ -300,7 +300,7 @@ public class DDMStructureVersionUtil {
 	* @return the matching ddm structure version, or <code>null</code> if a matching ddm structure version could not be found
 	*/
 	public static DDMStructureVersion fetchByS_V(long structureId,
-		java.lang.String version) {
+		String version) {
 		return getPersistence().fetchByS_V(structureId, version);
 	}
 
@@ -313,7 +313,7 @@ public class DDMStructureVersionUtil {
 	* @return the matching ddm structure version, or <code>null</code> if a matching ddm structure version could not be found
 	*/
 	public static DDMStructureVersion fetchByS_V(long structureId,
-		java.lang.String version, boolean retrieveFromCache) {
+		String version, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByS_V(structureId, version, retrieveFromCache);
 	}
@@ -326,7 +326,7 @@ public class DDMStructureVersionUtil {
 	* @return the ddm structure version that was removed
 	*/
 	public static DDMStructureVersion removeByS_V(long structureId,
-		java.lang.String version)
+		String version)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchStructureVersionException {
 		return getPersistence().removeByS_V(structureId, version);
 	}
@@ -338,7 +338,7 @@ public class DDMStructureVersionUtil {
 	* @param version the version
 	* @return the number of matching ddm structure versions
 	*/
-	public static int countByS_V(long structureId, java.lang.String version) {
+	public static int countByS_V(long structureId, String version) {
 		return getPersistence().countByS_V(structureId, version);
 	}
 
@@ -667,7 +667,7 @@ public class DDMStructureVersionUtil {
 		return getPersistence().countAll();
 	}
 
-	public static java.util.Set<java.lang.String> getBadColumnNames() {
+	public static java.util.Set<String> getBadColumnNames() {
 		return getPersistence().getBadColumnNames();
 	}
 
@@ -675,6 +675,17 @@ public class DDMStructureVersionUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDMStructureVersionPersistence, DDMStructureVersionPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(DDMStructureVersionPersistence.class);
+	private static ServiceTracker<DDMStructureVersionPersistence, DDMStructureVersionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDMStructureVersionPersistence.class);
+
+		ServiceTracker<DDMStructureVersionPersistence, DDMStructureVersionPersistence> serviceTracker =
+			new ServiceTracker<DDMStructureVersionPersistence, DDMStructureVersionPersistence>(bundle.getBundleContext(),
+				DDMStructureVersionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -16,7 +16,8 @@ package com.liferay.mobile.device.rules.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,8 +55,8 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance addRuleGroupInstance(
-		long groupId, java.lang.String className, long classPK,
-		long ruleGroupId, int priority,
+		long groupId, String className, long classPK, long ruleGroupId,
+		int priority,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -64,8 +65,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance addRuleGroupInstance(
-		long groupId, java.lang.String className, long classPK,
-		long ruleGroupId,
+		long groupId, String className, long classPK, long ruleGroupId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -225,7 +225,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	* @return the matching mdr rule group instance, or <code>null</code> if a matching mdr rule group instance could not be found
 	*/
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance fetchMDRRuleGroupInstanceByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService()
 				   .fetchMDRRuleGroupInstanceByUuidAndGroupId(uuid, groupId);
 	}
@@ -236,7 +236,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance fetchRuleGroupInstance(
-		java.lang.String className, long classPK, long ruleGroupId) {
+		String className, long classPK, long ruleGroupId) {
 		return getService()
 				   .fetchRuleGroupInstance(className, classPK, ruleGroupId);
 	}
@@ -276,7 +276,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	* @throws PortalException if a matching mdr rule group instance could not be found
 	*/
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance getMDRRuleGroupInstanceByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .getMDRRuleGroupInstanceByUuidAndGroupId(uuid, groupId);
@@ -306,7 +306,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	* @return the matching mdr rule group instances, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> getMDRRuleGroupInstancesByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService()
 				   .getMDRRuleGroupInstancesByUuidAndCompanyId(uuid, companyId);
 	}
@@ -322,7 +322,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	* @return the range of matching mdr rule group instances, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> getMDRRuleGroupInstancesByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> orderByComparator) {
 		return getService()
 				   .getMDRRuleGroupInstancesByUuidAndCompanyId(uuid, companyId,
@@ -343,7 +343,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -360,7 +360,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	}
 
 	public static com.liferay.mobile.device.rules.model.MDRRuleGroupInstance getRuleGroupInstance(
-		java.lang.String className, long classPK, long ruleGroupId)
+		String className, long classPK, long ruleGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRuleGroupInstance(className, classPK, ruleGroupId);
 	}
@@ -376,12 +376,12 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> getRuleGroupInstances(
-		java.lang.String className, long classPK) {
+		String className, long classPK) {
 		return getService().getRuleGroupInstances(className, classPK);
 	}
 
 	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> getRuleGroupInstances(
-		java.lang.String className, long classPK, int start, int end,
+		String className, long classPK, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.mobile.device.rules.model.MDRRuleGroupInstance> orderByComparator) {
 		return getService()
 				   .getRuleGroupInstances(className, classPK, start, end,
@@ -392,8 +392,7 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 		return getService().getRuleGroupInstancesCount(ruleGroupId);
 	}
 
-	public static int getRuleGroupInstancesCount(java.lang.String className,
-		long classPK) {
+	public static int getRuleGroupInstancesCount(String className, long classPK) {
 		return getService().getRuleGroupInstancesCount(className, classPK);
 	}
 
@@ -419,6 +418,17 @@ public class MDRRuleGroupInstanceLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MDRRuleGroupInstanceLocalService, MDRRuleGroupInstanceLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(MDRRuleGroupInstanceLocalService.class);
+	private static ServiceTracker<MDRRuleGroupInstanceLocalService, MDRRuleGroupInstanceLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MDRRuleGroupInstanceLocalService.class);
+
+		ServiceTracker<MDRRuleGroupInstanceLocalService, MDRRuleGroupInstanceLocalService> serviceTracker =
+			new ServiceTracker<MDRRuleGroupInstanceLocalService, MDRRuleGroupInstanceLocalService>(bundle.getBundleContext(),
+				MDRRuleGroupInstanceLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

@@ -14,7 +14,7 @@
 
 package com.liferay.asset.categories.navigation.web.internal.upgrade;
 
-import com.liferay.asset.categories.navigation.web.constants.AssetCategoriesNavigationPortletKeys;
+import com.liferay.asset.categories.navigation.constants.AssetCategoriesNavigationPortletKeys;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletId;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -30,12 +30,10 @@ public class AssetCategoriesNavigationWebUpgrade
 
 	@Override
 	public void register(Registry registry) {
-		registry.register(
-			"com.liferay.asset.categories.navigation.web", "0.0.0", "1.0.0",
-			new DummyUpgradeStep());
+		registry.register("0.0.0", "1.0.0", new DummyUpgradeStep());
 
 		registry.register(
-			"com.liferay.asset.categories.navigation.web", "0.0.1", "1.0.0",
+			"0.0.1", "1.0.0",
 			new BaseUpgradePortletId() {
 
 				@Override

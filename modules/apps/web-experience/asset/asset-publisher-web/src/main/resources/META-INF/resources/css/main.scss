@@ -26,7 +26,7 @@
 			}
 
 			&:before {
-				top: 35px;
+				top: 30px;
 			}
 
 			.lfr-autorow-controls {
@@ -118,6 +118,10 @@
 				}
 			}
 		}
+
+		.timeline-increment {
+			z-index: 0;
+		}
 	}
 
 	.addbutton-timeline-item {
@@ -140,6 +144,7 @@
 			border-radius: 100%;
 			color: #FFF;
 			margin-left: 3px;
+			margin-top: -55px;
 			padding: 0;
 		}
 	}

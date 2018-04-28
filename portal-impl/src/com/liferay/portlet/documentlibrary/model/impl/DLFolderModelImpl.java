@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -180,14 +179,14 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setRepositoryId(soapModel.getRepositoryId());
-		model.setMountPoint(soapModel.getMountPoint());
+		model.setMountPoint(soapModel.isMountPoint());
 		model.setParentFolderId(soapModel.getParentFolderId());
 		model.setTreePath(soapModel.getTreePath());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setLastPostDate(soapModel.getLastPostDate());
 		model.setDefaultFileEntryTypeId(soapModel.getDefaultFileEntryTypeId());
-		model.setHidden(soapModel.getHidden());
+		model.setHidden(soapModel.isHidden());
 		model.setRestrictionType(soapModel.getRestrictionType());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 		model.setStatus(soapModel.getStatus());
@@ -279,14 +278,14 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("repositoryId", getRepositoryId());
-		attributes.put("mountPoint", getMountPoint());
+		attributes.put("mountPoint", isMountPoint());
 		attributes.put("parentFolderId", getParentFolderId());
 		attributes.put("treePath", getTreePath());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
 		attributes.put("lastPostDate", getLastPostDate());
 		attributes.put("defaultFileEntryTypeId", getDefaultFileEntryTypeId());
-		attributes.put("hidden", getHidden());
+		attributes.put("hidden", isHidden());
 		attributes.put("restrictionType", getRestrictionType());
 		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
@@ -446,7 +445,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _uuid;
@@ -554,7 +553,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -566,7 +565,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _userName;
@@ -685,7 +684,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getTreePath() {
 		if (_treePath == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _treePath;
@@ -711,7 +710,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getName() {
 		if (_name == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _name;
@@ -737,7 +736,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getDescription() {
 		if (_description == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _description;
@@ -864,7 +863,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 			return user.getUuid();
 		}
 		catch (PortalException pe) {
-			return StringPool.BLANK;
+			return "";
 		}
 	}
 
@@ -876,7 +875,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	@Override
 	public String getStatusByUserName() {
 		if (_statusByUserName == null) {
-			return StringPool.BLANK;
+			return "";
 		}
 		else {
 			return _statusByUserName;
@@ -946,7 +945,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 
 		com.liferay.portal.kernel.trash.TrashHandler trashHandler = getTrashHandler();
 
-		if (!Validator.isNull(trashHandler.getContainerModelClassName(
+		if (Validator.isNotNull(trashHandler.getContainerModelClassName(
 						getPrimaryKey()))) {
 			ContainerModel containerModel = null;
 
@@ -1181,14 +1180,14 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		dlFolderImpl.setCreateDate(getCreateDate());
 		dlFolderImpl.setModifiedDate(getModifiedDate());
 		dlFolderImpl.setRepositoryId(getRepositoryId());
-		dlFolderImpl.setMountPoint(getMountPoint());
+		dlFolderImpl.setMountPoint(isMountPoint());
 		dlFolderImpl.setParentFolderId(getParentFolderId());
 		dlFolderImpl.setTreePath(getTreePath());
 		dlFolderImpl.setName(getName());
 		dlFolderImpl.setDescription(getDescription());
 		dlFolderImpl.setLastPostDate(getLastPostDate());
 		dlFolderImpl.setDefaultFileEntryTypeId(getDefaultFileEntryTypeId());
-		dlFolderImpl.setHidden(getHidden());
+		dlFolderImpl.setHidden(isHidden());
 		dlFolderImpl.setRestrictionType(getRestrictionType());
 		dlFolderImpl.setLastPublishDate(getLastPublishDate());
 		dlFolderImpl.setStatus(getStatus());
@@ -1360,7 +1359,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 
 		dlFolderCacheModel.repositoryId = getRepositoryId();
 
-		dlFolderCacheModel.mountPoint = getMountPoint();
+		dlFolderCacheModel.mountPoint = isMountPoint();
 
 		dlFolderCacheModel.parentFolderId = getParentFolderId();
 
@@ -1399,7 +1398,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 
 		dlFolderCacheModel.defaultFileEntryTypeId = getDefaultFileEntryTypeId();
 
-		dlFolderCacheModel.hidden = getHidden();
+		dlFolderCacheModel.hidden = isHidden();
 
 		dlFolderCacheModel.restrictionType = getRestrictionType();
 
@@ -1459,7 +1458,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		sb.append(", repositoryId=");
 		sb.append(getRepositoryId());
 		sb.append(", mountPoint=");
-		sb.append(getMountPoint());
+		sb.append(isMountPoint());
 		sb.append(", parentFolderId=");
 		sb.append(getParentFolderId());
 		sb.append(", treePath=");
@@ -1473,7 +1472,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		sb.append(", defaultFileEntryTypeId=");
 		sb.append(getDefaultFileEntryTypeId());
 		sb.append(", hidden=");
-		sb.append(getHidden());
+		sb.append(isHidden());
 		sb.append(", restrictionType=");
 		sb.append(getRestrictionType());
 		sb.append(", lastPublishDate=");
@@ -1537,7 +1536,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>mountPoint</column-name><column-value><![CDATA[");
-		sb.append(getMountPoint());
+		sb.append(isMountPoint());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>parentFolderId</column-name><column-value><![CDATA[");
@@ -1565,7 +1564,7 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>hidden</column-name><column-value><![CDATA[");
-		sb.append(getHidden());
+		sb.append(isHidden());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>restrictionType</column-name><column-value><![CDATA[");

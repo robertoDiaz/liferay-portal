@@ -67,7 +67,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("kaleoClassName", getKaleoClassName());
 		attributes.put("kaleoClassPK", getKaleoClassPK());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoNodeId", getKaleoNodeId());
 		attributes.put("assigneeClassName", getAssigneeClassName());
 		attributes.put("assigneeClassPK", getAssigneeClassPK());
@@ -137,10 +137,11 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 			setKaleoClassPK(kaleoClassPK);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		Long kaleoNodeId = (Long)attributes.get("kaleoNodeId");
@@ -189,7 +190,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoTaskAssignmentWrapper((KaleoTaskAssignment)_kaleoTaskAssignment.clone());
 	}
 
@@ -204,7 +205,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the assignee action ID of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getAssigneeActionId() {
+	public String getAssigneeActionId() {
 		return _kaleoTaskAssignment.getAssigneeActionId();
 	}
 
@@ -214,7 +215,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the assignee class name of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getAssigneeClassName() {
+	public String getAssigneeClassName() {
 		return _kaleoTaskAssignment.getAssigneeClassName();
 	}
 
@@ -234,7 +235,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the assignee script of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getAssigneeScript() {
+	public String getAssigneeScript() {
 		return _kaleoTaskAssignment.getAssigneeScript();
 	}
 
@@ -244,7 +245,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the assignee script language of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getAssigneeScriptLanguage() {
+	public String getAssigneeScriptLanguage() {
 		return _kaleoTaskAssignment.getAssigneeScriptLanguage();
 	}
 
@@ -254,7 +255,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the assignee script required contexts of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getAssigneeScriptRequiredContexts() {
+	public String getAssigneeScriptRequiredContexts() {
 		return _kaleoTaskAssignment.getAssigneeScriptRequiredContexts();
 	}
 
@@ -299,7 +300,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the kaleo class name of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getKaleoClassName() {
+	public String getKaleoClassName() {
 		return _kaleoTaskAssignment.getKaleoClassName();
 	}
 
@@ -314,13 +315,13 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo task assignment.
+	* Returns the kaleo definition version ID of this kaleo task assignment.
 	*
-	* @return the kaleo definition ID of this kaleo task assignment
+	* @return the kaleo definition version ID of this kaleo task assignment
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoTaskAssignment.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoTaskAssignment.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -384,7 +385,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the user name of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoTaskAssignment.getUserName();
 	}
 
@@ -394,7 +395,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @return the user uuid of this kaleo task assignment
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoTaskAssignment.getUserUuid();
 	}
 
@@ -429,7 +430,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param assigneeActionId the assignee action ID of this kaleo task assignment
 	*/
 	@Override
-	public void setAssigneeActionId(java.lang.String assigneeActionId) {
+	public void setAssigneeActionId(String assigneeActionId) {
 		_kaleoTaskAssignment.setAssigneeActionId(assigneeActionId);
 	}
 
@@ -439,7 +440,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param assigneeClassName the assignee class name of this kaleo task assignment
 	*/
 	@Override
-	public void setAssigneeClassName(java.lang.String assigneeClassName) {
+	public void setAssigneeClassName(String assigneeClassName) {
 		_kaleoTaskAssignment.setAssigneeClassName(assigneeClassName);
 	}
 
@@ -459,7 +460,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param assigneeScript the assignee script of this kaleo task assignment
 	*/
 	@Override
-	public void setAssigneeScript(java.lang.String assigneeScript) {
+	public void setAssigneeScript(String assigneeScript) {
 		_kaleoTaskAssignment.setAssigneeScript(assigneeScript);
 	}
 
@@ -469,8 +470,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param assigneeScriptLanguage the assignee script language of this kaleo task assignment
 	*/
 	@Override
-	public void setAssigneeScriptLanguage(
-		java.lang.String assigneeScriptLanguage) {
+	public void setAssigneeScriptLanguage(String assigneeScriptLanguage) {
 		_kaleoTaskAssignment.setAssigneeScriptLanguage(assigneeScriptLanguage);
 	}
 
@@ -481,7 +481,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	*/
 	@Override
 	public void setAssigneeScriptRequiredContexts(
-		java.lang.String assigneeScriptRequiredContexts) {
+		String assigneeScriptRequiredContexts) {
 		_kaleoTaskAssignment.setAssigneeScriptRequiredContexts(assigneeScriptRequiredContexts);
 	}
 
@@ -542,7 +542,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param kaleoClassName the kaleo class name of this kaleo task assignment
 	*/
 	@Override
-	public void setKaleoClassName(java.lang.String kaleoClassName) {
+	public void setKaleoClassName(String kaleoClassName) {
 		_kaleoTaskAssignment.setKaleoClassName(kaleoClassName);
 	}
 
@@ -557,13 +557,13 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo task assignment.
+	* Sets the kaleo definition version ID of this kaleo task assignment.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo task assignment
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo task assignment
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoTaskAssignment.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoTaskAssignment.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -632,7 +632,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param userName the user name of this kaleo task assignment
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoTaskAssignment.setUserName(userName);
 	}
 
@@ -642,7 +642,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	* @param userUuid the user uuid of this kaleo task assignment
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoTaskAssignment.setUserUuid(userUuid);
 	}
 
@@ -657,7 +657,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoTaskAssignment.toString();
 	}
 
@@ -667,7 +667,7 @@ public class KaleoTaskAssignmentWrapper implements KaleoTaskAssignment,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoTaskAssignment.toXmlString();
 	}
 

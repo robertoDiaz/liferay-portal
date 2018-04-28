@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,14 +55,14 @@ public class KaleoTimerLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoTimer addKaleoTimer(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId,
+		String kaleoClassName, long kaleoClassPK,
+		long kaleoDefinitionVersionId,
 		com.liferay.portal.workflow.kaleo.definition.Timer timer,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addKaleoTimer(kaleoClassName, kaleoClassPK,
-			kaleoDefinitionId, timer, serviceContext);
+			kaleoDefinitionVersionId, timer, serviceContext);
 	}
 
 	/**
@@ -229,12 +230,12 @@ public class KaleoTimerLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTimer> getKaleoTimers(
-		java.lang.String kaleoClassName, long kaleoClassPK) {
+		String kaleoClassName, long kaleoClassPK) {
 		return getService().getKaleoTimers(kaleoClassName, kaleoClassPK);
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTimer> getKaleoTimers(
-		java.lang.String kaleoClassName, long kaleoClassPK, boolean blocking) {
+		String kaleoClassName, long kaleoClassPK, boolean blocking) {
 		return getService()
 				   .getKaleoTimers(kaleoClassName, kaleoClassPK, blocking);
 	}
@@ -253,7 +254,7 @@ public class KaleoTimerLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -278,6 +279,17 @@ public class KaleoTimerLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoTimerLocalService, KaleoTimerLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoTimerLocalService.class);
+	private static ServiceTracker<KaleoTimerLocalService, KaleoTimerLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoTimerLocalService.class);
+
+		ServiceTracker<KaleoTimerLocalService, KaleoTimerLocalService> serviceTracker =
+			new ServiceTracker<KaleoTimerLocalService, KaleoTimerLocalService>(bundle.getBundleContext(),
+				KaleoTimerLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

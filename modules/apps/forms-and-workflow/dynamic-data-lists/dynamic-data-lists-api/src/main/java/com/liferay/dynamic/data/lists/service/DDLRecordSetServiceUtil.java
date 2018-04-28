@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -66,9 +67,9 @@ public class DDLRecordSetServiceUtil {
 	* @throws PortalException if a portal exception occurred
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet addRecordSet(
-		long groupId, long ddmStructureId, java.lang.String recordSetKey,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long groupId, long ddmStructureId, String recordSetKey,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows, int scope,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -107,7 +108,7 @@ public class DDLRecordSetServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -171,8 +172,8 @@ public class DDLRecordSetServiceUtil {
 	* @return the range of matching record sets ordered by the comparator
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> search(
-		long companyId, long groupId, java.lang.String keywords, int scope,
-		int start, int end,
+		long companyId, long groupId, String keywords, int scope, int start,
+		int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSet> orderByComparator) {
 		return getService()
 				   .search(companyId, groupId, keywords, scope, start, end,
@@ -217,9 +218,8 @@ public class DDLRecordSetServiceUtil {
 	* @return the range of matching record sets ordered by the comparator
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> search(
-		long companyId, long groupId, java.lang.String name,
-		java.lang.String description, int scope, boolean andOperator,
-		int start, int end,
+		long companyId, long groupId, String name, String description,
+		int scope, boolean andOperator, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSet> orderByComparator) {
 		return getService()
 				   .search(companyId, groupId, name, description, scope,
@@ -246,7 +246,7 @@ public class DDLRecordSetServiceUtil {
 	* @return the number of matching record sets
 	*/
 	public static int searchCount(long companyId, long groupId,
-		java.lang.String keywords, int scope) {
+		String keywords, int scope) {
 		return getService().searchCount(companyId, groupId, keywords, scope);
 	}
 
@@ -274,9 +274,8 @@ public class DDLRecordSetServiceUtil {
 	values.
 	* @return the number of matching record sets
 	*/
-	public static int searchCount(long companyId, long groupId,
-		java.lang.String name, java.lang.String description, int scope,
-		boolean andOperator) {
+	public static int searchCount(long companyId, long groupId, String name,
+		String description, int scope, boolean andOperator) {
 		return getService()
 				   .searchCount(companyId, groupId, name, description, scope,
 			andOperator);
@@ -338,8 +337,8 @@ public class DDLRecordSetServiceUtil {
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet updateRecordSet(
 		long recordSetId, long ddmStructureId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -366,9 +365,9 @@ public class DDLRecordSetServiceUtil {
 	* @throws PortalException if a portal exception occurred
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet updateRecordSet(
-		long groupId, long ddmStructureId, java.lang.String recordSetKey,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long groupId, long ddmStructureId, String recordSetKey,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -381,6 +380,16 @@ public class DDLRecordSetServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordSetService, DDLRecordSetService> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordSetService.class);
+	private static ServiceTracker<DDLRecordSetService, DDLRecordSetService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordSetService.class);
+
+		ServiceTracker<DDLRecordSetService, DDLRecordSetService> serviceTracker = new ServiceTracker<DDLRecordSetService, DDLRecordSetService>(bundle.getBundleContext(),
+				DDLRecordSetService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

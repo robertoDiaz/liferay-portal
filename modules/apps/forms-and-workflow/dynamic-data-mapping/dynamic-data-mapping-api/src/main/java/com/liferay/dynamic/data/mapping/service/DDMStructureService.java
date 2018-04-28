@@ -60,11 +60,42 @@ public interface DDMStructureService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMStructureServiceUtil} to access the ddm structure remote service. Add custom service methods to {@link com.liferay.dynamic.data.mapping.service.impl.DDMStructureServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public DDMStructure addStructure(long userId, long groupId,
+		long classNameId, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, DDMForm ddmForm,
+		DDMFormLayout ddmFormLayout, String storageType,
+		ServiceContext serviceContext) throws PortalException;
+
+	/**
+	* Adds a structure referencing a default parent structure, using the portal
+	* property <code>dynamic.data.lists.storage.type</code> storage type and
+	* default structure type.
+	*
+	* @param userId the primary key of the structure's creator/owner
+	* @param groupId the primary key of the group
+	* @param classNameId the primary key of the class name for the
+	structure's related model
+	* @param nameMap the structure's locales and localized names
+	* @param descriptionMap the structure's locales and localized
+	descriptions
+	* @param xsd the structure's XML schema definition
+	* @param serviceContext the service context to be applied. Can set the
+	UUID, creation date, modification date, guest permissions,
+	and group permissions for the structure.
+	* @return the structure
+	* @deprecated As of 2.1.0, replaced by {@link #addStructure(long, long,
+	long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
+	*/
+	@Deprecated
+	public DDMStructure addStructure(long userId, long groupId,
+		long classNameId, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, String xsd,
+		ServiceContext serviceContext) throws PortalException;
+
 	public DDMStructure addStructure(long groupId, long parentStructureId,
-		long classNameId, java.lang.String structureKey,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, DDMForm ddmForm,
-		DDMFormLayout ddmFormLayout, java.lang.String storageType, int type,
+		long classNameId, String structureKey, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, DDMForm ddmForm,
+		DDMFormLayout ddmFormLayout, String storageType, int type,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -95,20 +126,17 @@ public interface DDMStructureService extends BaseService {
 	long, String, Map, Map, DDMForm, DDMFormLayout, String, int,
 	ServiceContext)}
 	*/
-	@java.lang.Deprecated
+	@Deprecated
 	public DDMStructure addStructure(long groupId, long parentStructureId,
-		long classNameId, java.lang.String structureKey,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String xsd,
-		java.lang.String storageType, int type, ServiceContext serviceContext)
-		throws PortalException;
+		long classNameId, String structureKey, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, String xsd, String storageType,
+		int type, ServiceContext serviceContext) throws PortalException;
 
 	public DDMStructure addStructure(long userId, long groupId,
-		java.lang.String parentStructureKey, long classNameId,
-		java.lang.String structureKey, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, DDMForm ddmForm,
-		DDMFormLayout ddmFormLayout, java.lang.String storageType, int type,
-		ServiceContext serviceContext) throws PortalException;
+		String parentStructureKey, long classNameId, String structureKey,
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+		DDMForm ddmForm, DDMFormLayout ddmFormLayout, String storageType,
+		int type, ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Adds a structure referencing the parent structure by its structure key.
@@ -141,48 +169,12 @@ public interface DDMStructureService extends BaseService {
 	String, long, String, Map, Map, DDMForm, DDMFormLayout,
 	String, int, ServiceContext)}
 	*/
-	@java.lang.Deprecated
+	@Deprecated
 	public DDMStructure addStructure(long userId, long groupId,
-		java.lang.String parentStructureKey, long classNameId,
-		java.lang.String structureKey, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String xsd,
-		java.lang.String storageType, int type, ServiceContext serviceContext)
+		String parentStructureKey, long classNameId, String structureKey,
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+		String xsd, String storageType, int type, ServiceContext serviceContext)
 		throws PortalException;
-
-	public DDMStructure addStructure(long userId, long groupId,
-		long classNameId, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, DDMForm ddmForm,
-		DDMFormLayout ddmFormLayout, java.lang.String storageType,
-		ServiceContext serviceContext) throws PortalException;
-
-	/**
-	* Adds a structure referencing a default parent structure, using the portal
-	* property <code>dynamic.data.lists.storage.type</code> storage type and
-	* default structure type.
-	*
-	* @param userId the primary key of the structure's creator/owner
-	* @param groupId the primary key of the group
-	* @param classNameId the primary key of the class name for the
-	structure's related model
-	* @param nameMap the structure's locales and localized names
-	* @param descriptionMap the structure's locales and localized
-	descriptions
-	* @param xsd the structure's XML schema definition
-	* @param serviceContext the service context to be applied. Can set the
-	UUID, creation date, modification date, guest permissions,
-	and group permissions for the structure.
-	* @return the structure
-	* @deprecated As of 2.1.0, replaced by {@link #addStructure(long, long,
-	long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
-	*/
-	@java.lang.Deprecated
-	public DDMStructure addStructure(long userId, long groupId,
-		long classNameId, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, java.lang.String xsd,
-		ServiceContext serviceContext) throws PortalException;
-
-	public DDMStructure copyStructure(long structureId,
-		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Copies a structure, creating a new structure with all the values
@@ -199,9 +191,23 @@ public interface DDMStructureService extends BaseService {
 	* @return the new structure
 	*/
 	public DDMStructure copyStructure(long structureId,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap,
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
 		ServiceContext serviceContext) throws PortalException;
+
+	public DDMStructure copyStructure(long structureId,
+		ServiceContext serviceContext) throws PortalException;
+
+	/**
+	* Deletes the structure and its resources.
+	*
+	* <p>
+	* Before deleting the structure, the system verifies whether the structure
+	* is required by another entity. If it is needed, an exception is thrown.
+	* </p>
+	*
+	* @param structureId the primary key of the structure to be deleted
+	*/
+	public void deleteStructure(long structureId) throws PortalException;
 
 	/**
 	* Returns the structure matching the class name ID, structure key, and
@@ -216,11 +222,28 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchStructure(long groupId, long classNameId,
-		java.lang.String structureKey) throws PortalException;
+		String structureKey) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchStructure(long groupId, long classNameId,
-		java.lang.String structureKey, boolean includeAncestorStructures)
+		String structureKey, boolean includeAncestorStructures)
+		throws PortalException;
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public String getOSGiServiceIdentifier();
+
+	/**
+	* Returns the structure with the ID.
+	*
+	* @param structureId the primary key of the structure
+	* @return the structure with the ID
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructure getStructure(long structureId)
 		throws PortalException;
 
 	/**
@@ -235,7 +258,7 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure getStructure(long groupId, long classNameId,
-		java.lang.String structureKey) throws PortalException;
+		String structureKey) throws PortalException;
 
 	/**
 	* Returns the structure matching the class name ID, structure key, and
@@ -260,150 +283,8 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure getStructure(long groupId, long classNameId,
-		java.lang.String structureKey, boolean includeAncestorStructures)
+		String structureKey, boolean includeAncestorStructures)
 		throws PortalException;
-
-	/**
-	* Returns the structure with the ID.
-	*
-	* @param structureId the primary key of the structure
-	* @return the structure with the ID
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMStructure getStructure(long structureId)
-		throws PortalException;
-
-	public DDMStructure updateStructure(long groupId, long parentStructureId,
-		long classNameId, java.lang.String structureKey,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, DDMForm ddmForm,
-		DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	* Updates the structure matching the class name ID, structure key, and
-	* group, replacing its old parent structure, name map, description map, and
-	* XSD with new ones.
-	*
-	* @param groupId the primary key of the group
-	* @param parentStructureId the primary key of the new parent structure
-	* @param classNameId the primary key of the class name for the
-	structure's related model
-	* @param structureKey the unique string identifying the structure
-	* @param nameMap the structure's new locales and localized names
-	* @param descriptionMap the structure's new locales and localized
-	description
-	* @param definition the structure's new XML schema definition
-	* @param serviceContext the service context to be applied. Can set the
-	modification date.
-	* @return the updated structure
-	* @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
-	long, String, Map, Map, DDMForm, DDMFormLayout,
-	ServiceContext)}
-	*/
-	@java.lang.Deprecated
-	public DDMStructure updateStructure(long groupId, long parentStructureId,
-		long classNameId, java.lang.String structureKey,
-		Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap,
-		java.lang.String definition, ServiceContext serviceContext)
-		throws PortalException;
-
-	public DDMStructure updateStructure(long structureId,
-		long parentStructureId, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap, DDMForm ddmForm,
-		DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	* Updates the structure matching the structure ID, replacing the old parent
-	* structure ID, name map, description map, and XSD with the new values.
-	*
-	* @param structureId the primary key of the structure
-	* @param parentStructureId the new parent structure primary key
-	* @param nameMap the structure's new locales and localized names
-	* @param descriptionMap the structure's new locales and localized
-	description
-	* @param definition the new XML schema definition of the structure
-	* @param serviceContext the service context to be applied. Can set the
-	modification date.
-	* @return the updated structure
-	* @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
-	Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
-	*/
-	@java.lang.Deprecated
-	public DDMStructure updateStructure(long structureId,
-		long parentStructureId, Map<Locale, java.lang.String> nameMap,
-		Map<Locale, java.lang.String> descriptionMap,
-		java.lang.String definition, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	* Returns the number of structures matching the groups and class name IDs,
-	* and matching the keywords in the structure names and descriptions.
-	*
-	* @param companyId the primary key of the structure's company
-	* @param groupIds the primary keys of the groups
-	* @param classNameId the primary key of the class name of the model the
-	structure is related to
-	* @param keywords the keywords (space separated), which may occur in the
-	structure's name or description (optionally <code>null</code>)
-	* @param status the workflow's status.
-	* @return the number of matching structures
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds, long classNameId,
-		java.lang.String keywords, int status);
-
-	/**
-	* Returns the number of structures matching the groups and class name IDs,
-	* and matching the keywords in the structure names and descriptions.
-	*
-	* @param companyId the primary key of the structure's company
-	* @param groupIds the primary keys of the groups
-	* @param classNameId the primary key of the class name of the model the
-	structure is related to
-	* @param keywords the keywords (space separated), which may occur in the
-	structure's name or description (optionally <code>null</code>)
-	* @param type the structure's type. For more information, see {@link
-	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
-	* @param status the workflow's status.
-	* @return the number of matching structures
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds, long classNameId,
-		java.lang.String keywords, int type, int status);
-
-	/**
-	* Returns the number of structures matching the groups, class name IDs,
-	* name keyword, description keyword, storage type, and type
-	*
-	* @param companyId the primary key of the structure's company
-	* @param groupIds the primary keys of the groups
-	* @param classNameId the primary key of the class name of the model the
-	structure is related to
-	* @param name the name keywords
-	* @param description the description keywords
-	* @param storageType the structure's storage type. It can be "xml" or
-	"expando". For more information, see {@link
-	com.liferay.dynamic.data.mapping.storage.StorageType}.
-	* @param type the structure's type. For more information, see {@link
-	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
-	* @param andOperator whether every field must match its keywords, or just
-	one field
-	* @return the number of matching structures
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, long[] groupIds, long classNameId,
-		java.lang.String name, java.lang.String description,
-		java.lang.String storageType, int type, int status, boolean andOperator);
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public java.lang.String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructure> getStructures(long companyId, long[] groupIds,
@@ -413,6 +294,9 @@ public interface DDMStructureService extends BaseService {
 	public List<DDMStructure> getStructures(long companyId, long[] groupIds,
 		long classNameId, int status, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator);
+
+	public void revertStructure(long structureId, String version,
+		ServiceContext serviceContext) throws PortalException;
 
 	/**
 	* Returns an ordered range of all the structures matching the groups and
@@ -434,6 +318,8 @@ public interface DDMStructureService extends BaseService {
 	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
+	* @param type the structure's type. For more information, see {@link
+	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
 	* @param status the workflow's status.
 	* @param start the lower bound of the range of structures to return
 	* @param end the upper bound of the range of structures to return (not
@@ -444,7 +330,7 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructure> search(long companyId, long[] groupIds,
-		long classNameId, java.lang.String keywords, int status, int start,
+		long classNameId, String keywords, int type, int status, int start,
 		int end, OrderByComparator<DDMStructure> orderByComparator);
 
 	/**
@@ -467,8 +353,6 @@ public interface DDMStructureService extends BaseService {
 	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
-	* @param type the structure's type. For more information, see {@link
-	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
 	* @param status the workflow's status.
 	* @param start the lower bound of the range of structures to return
 	* @param end the upper bound of the range of structures to return (not
@@ -479,8 +363,8 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructure> search(long companyId, long[] groupIds,
-		long classNameId, java.lang.String keywords, int type, int status,
-		int start, int end, OrderByComparator<DDMStructure> orderByComparator);
+		long classNameId, String keywords, int status, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator);
 
 	/**
 	* Returns an ordered range of all the structures matching the groups, class
@@ -518,23 +402,128 @@ public interface DDMStructureService extends BaseService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructure> search(long companyId, long[] groupIds,
-		long classNameId, java.lang.String name, java.lang.String description,
-		java.lang.String storageType, int type, int status,
-		boolean andOperator, int start, int end,
+		long classNameId, String name, String description, String storageType,
+		int type, int status, boolean andOperator, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator);
 
 	/**
-	* Deletes the structure and its resources.
+	* Returns the number of structures matching the groups and class name IDs,
+	* and matching the keywords in the structure names and descriptions.
 	*
-	* <p>
-	* Before deleting the structure, the system verifies whether the structure
-	* is required by another entity. If it is needed, an exception is thrown.
-	* </p>
-	*
-	* @param structureId the primary key of the structure to be deleted
+	* @param companyId the primary key of the structure's company
+	* @param groupIds the primary keys of the groups
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
+	* @param keywords the keywords (space separated), which may occur in the
+	structure's name or description (optionally <code>null</code>)
+	* @param status the workflow's status.
+	* @return the number of matching structures
 	*/
-	public void deleteStructure(long structureId) throws PortalException;
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		String keywords, int status);
 
-	public void revertStructure(long structureId, java.lang.String version,
+	/**
+	* Returns the number of structures matching the groups and class name IDs,
+	* and matching the keywords in the structure names and descriptions.
+	*
+	* @param companyId the primary key of the structure's company
+	* @param groupIds the primary keys of the groups
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
+	* @param keywords the keywords (space separated), which may occur in the
+	structure's name or description (optionally <code>null</code>)
+	* @param type the structure's type. For more information, see {@link
+	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
+	* @param status the workflow's status.
+	* @return the number of matching structures
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		String keywords, int type, int status);
+
+	/**
+	* Returns the number of structures matching the groups, class name IDs,
+	* name keyword, description keyword, storage type, and type
+	*
+	* @param companyId the primary key of the structure's company
+	* @param groupIds the primary keys of the groups
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
+	* @param name the name keywords
+	* @param description the description keywords
+	* @param storageType the structure's storage type. It can be "xml" or
+	"expando". For more information, see {@link
+	com.liferay.dynamic.data.mapping.storage.StorageType}.
+	* @param type the structure's type. For more information, see {@link
+	com.liferay.dynamic.data.mapping.model.DDMStructureConstants}.
+	* @param andOperator whether every field must match its keywords, or just
+	one field
+	* @return the number of matching structures
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		String name, String description, String storageType, int type,
+		int status, boolean andOperator);
+
+	public DDMStructure updateStructure(long groupId, long parentStructureId,
+		long classNameId, String structureKey, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, DDMForm ddmForm,
+		DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	* Updates the structure matching the class name ID, structure key, and
+	* group, replacing its old parent structure, name map, description map, and
+	* XSD with new ones.
+	*
+	* @param groupId the primary key of the group
+	* @param parentStructureId the primary key of the new parent structure
+	* @param classNameId the primary key of the class name for the
+	structure's related model
+	* @param structureKey the unique string identifying the structure
+	* @param nameMap the structure's new locales and localized names
+	* @param descriptionMap the structure's new locales and localized
+	description
+	* @param definition the structure's new XML schema definition
+	* @param serviceContext the service context to be applied. Can set the
+	modification date.
+	* @return the updated structure
+	* @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
+	long, String, Map, Map, DDMForm, DDMFormLayout,
+	ServiceContext)}
+	*/
+	@Deprecated
+	public DDMStructure updateStructure(long groupId, long parentStructureId,
+		long classNameId, String structureKey, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, String definition,
+		ServiceContext serviceContext) throws PortalException;
+
+	public DDMStructure updateStructure(long structureId,
+		long parentStructureId, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, DDMForm ddmForm,
+		DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	* Updates the structure matching the structure ID, replacing the old parent
+	* structure ID, name map, description map, and XSD with the new values.
+	*
+	* @param structureId the primary key of the structure
+	* @param parentStructureId the new parent structure primary key
+	* @param nameMap the structure's new locales and localized names
+	* @param descriptionMap the structure's new locales and localized
+	description
+	* @param definition the new XML schema definition of the structure
+	* @param serviceContext the service context to be applied. Can set the
+	modification date.
+	* @return the updated structure
+	* @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
+	Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
+	*/
+	@Deprecated
+	public DDMStructure updateStructure(long structureId,
+		long parentStructureId, Map<Locale, String> nameMap,
+		Map<Locale, String> descriptionMap, String definition,
 		ServiceContext serviceContext) throws PortalException;
 }

@@ -48,7 +48,7 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance addKaleoTaskFormInstance(
-		long groupId, long kaleoTaskFormId, java.lang.String formValues,
+		long groupId, long kaleoTaskFormId, String formValues,
 		com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken kaleoTaskInstanceToken,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -79,9 +79,9 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteKaleoDefinitionKaleoTaskFormInstances(
-		long kaleoDefinitionId) {
-		_kaleoTaskFormInstanceLocalService.deleteKaleoDefinitionKaleoTaskFormInstances(kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoTaskFormInstances(
+		long kaleoDefinitionVersionId) {
+		_kaleoTaskFormInstanceLocalService.deleteKaleoDefinitionVersionKaleoTaskFormInstances(kaleoDefinitionVersionId);
 	}
 
 	@Override
@@ -294,7 +294,7 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _kaleoTaskFormInstanceLocalService.getOSGiServiceIdentifier();
 	}
 

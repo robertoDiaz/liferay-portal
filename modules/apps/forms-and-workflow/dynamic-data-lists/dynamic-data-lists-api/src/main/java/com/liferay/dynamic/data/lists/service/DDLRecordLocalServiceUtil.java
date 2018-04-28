@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -131,7 +132,7 @@ public class DDLRecordLocalServiceUtil {
 	@Deprecated
 	public static com.liferay.dynamic.data.lists.model.DDLRecord addRecord(
 		long userId, long groupId, long recordSetId, int displayIndex,
-		java.util.Map<java.lang.String, java.io.Serializable> fieldsMap,
+		java.util.Map<String, java.io.Serializable> fieldsMap,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -330,7 +331,7 @@ public class DDLRecordLocalServiceUtil {
 	* @return the matching ddl record, or <code>null</code> if a matching ddl record could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecord fetchDDLRecordByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService().fetchDDLRecordByUuidAndGroupId(uuid, groupId);
 	}
 
@@ -424,7 +425,7 @@ public class DDLRecordLocalServiceUtil {
 	* @throws PortalException if a matching ddl record could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecord getDDLRecordByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getDDLRecordByUuidAndGroupId(uuid, groupId);
 	}
@@ -453,7 +454,7 @@ public class DDLRecordLocalServiceUtil {
 	* @return the matching ddl records, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecord> getDDLRecordsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService().getDDLRecordsByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -468,7 +469,7 @@ public class DDLRecordLocalServiceUtil {
 	* @return the range of matching ddl records, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecord> getDDLRecordsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecord> orderByComparator) {
 		return getService()
 				   .getDDLRecordsByUuidAndCompanyId(uuid, companyId, start,
@@ -518,8 +519,8 @@ public class DDLRecordLocalServiceUtil {
 		return getService().getLatestRecordVersion(recordId);
 	}
 
-	public static java.lang.Long[] getMinAndMaxCompanyRecordIds(
-		long companyId, int status, int scope) {
+	public static Long[] getMinAndMaxCompanyRecordIds(long companyId,
+		int status, int scope) {
 		return getService()
 				   .getMinAndMaxCompanyRecordIds(companyId, status, scope);
 	}
@@ -537,7 +538,7 @@ public class DDLRecordLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -667,7 +668,7 @@ public class DDLRecordLocalServiceUtil {
 	*/
 	@Deprecated
 	public static com.liferay.dynamic.data.lists.model.DDLRecordVersion getRecordVersion(
-		long recordId, java.lang.String version)
+		long recordId, String version)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRecordVersion(recordId, version);
 	}
@@ -705,8 +706,7 @@ public class DDLRecordLocalServiceUtil {
 	the record modified date.
 	* @throws PortalException if a portal exception occurred
 	*/
-	public static void revertRecord(long userId, long recordId,
-		java.lang.String version,
+	public static void revertRecord(long userId, long recordId, String version,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().revertRecord(userId, recordId, version, serviceContext);
@@ -718,7 +718,7 @@ public class DDLRecordLocalServiceUtil {
 	*/
 	@Deprecated
 	public static void revertRecordVersion(long userId, long recordId,
-		java.lang.String version,
+		String version,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
@@ -769,8 +769,8 @@ public class DDLRecordLocalServiceUtil {
 	public static void updateAsset(long userId,
 		com.liferay.dynamic.data.lists.model.DDLRecord record,
 		com.liferay.dynamic.data.lists.model.DDLRecordVersion recordVersion,
-		long[] assetCategoryIds, java.lang.String[] assetTagNames,
-		java.util.Locale locale, java.lang.Double priority)
+		long[] assetCategoryIds, String[] assetTagNames,
+		java.util.Locale locale, Double priority)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.updateAsset(userId, record, recordVersion, assetCategoryIds,
@@ -867,7 +867,7 @@ public class DDLRecordLocalServiceUtil {
 	@Deprecated
 	public static com.liferay.dynamic.data.lists.model.DDLRecord updateRecord(
 		long userId, long recordId, int displayIndex,
-		java.util.Map<java.lang.String, java.io.Serializable> fieldsMap,
+		java.util.Map<String, java.io.Serializable> fieldsMap,
 		boolean mergeFields,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -900,6 +900,17 @@ public class DDLRecordLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordLocalService, DDLRecordLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordLocalService.class);
+	private static ServiceTracker<DDLRecordLocalService, DDLRecordLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordLocalService.class);
+
+		ServiceTracker<DDLRecordLocalService, DDLRecordLocalService> serviceTracker =
+			new ServiceTracker<DDLRecordLocalService, DDLRecordLocalService>(bundle.getBundleContext(),
+				DDLRecordLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

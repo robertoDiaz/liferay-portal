@@ -16,7 +16,8 @@ package com.liferay.microblogs.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -43,7 +44,7 @@ public class MicroblogsEntryLocalServiceUtil {
 	 */
 	public static com.liferay.microblogs.model.MicroblogsEntry addMicroblogsEntry(
 		long userId, long creatorClassNameId, long creatorClassPK,
-		java.lang.String content, int type, long parentMicroblogsEntryId,
+		String content, int type, long parentMicroblogsEntryId,
 		int socialRelationType,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -54,8 +55,8 @@ public class MicroblogsEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.microblogs.model.MicroblogsEntry addMicroblogsEntry(
-		long userId, java.lang.String content, int type,
-		long parentMicroblogsEntryId, int socialRelationType,
+		long userId, String content, int type, long parentMicroblogsEntryId,
+		int socialRelationType,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -308,7 +309,7 @@ public class MicroblogsEntryLocalServiceUtil {
 
 	public static java.util.List<com.liferay.microblogs.model.MicroblogsEntry> getMicroblogsEntries(
 		long companyId, long creatorClassNameId, long creatorClassPK,
-		java.lang.String assetTagName, boolean andOperator, int start, int end) {
+		String assetTagName, boolean andOperator, int start, int end) {
 		return getService()
 				   .getMicroblogsEntries(companyId, creatorClassNameId,
 			creatorClassPK, assetTagName, andOperator, start, end);
@@ -319,15 +320,15 @@ public class MicroblogsEntryLocalServiceUtil {
 	*/
 	@Deprecated
 	public static java.util.List<com.liferay.microblogs.model.MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, long creatorClassPK,
-		java.lang.String assetTagName, boolean andOperator, int start, int end) {
+		long creatorClassNameId, long creatorClassPK, String assetTagName,
+		boolean andOperator, int start, int end) {
 		return getService()
 				   .getMicroblogsEntries(creatorClassNameId, creatorClassPK,
 			assetTagName, andOperator, start, end);
 	}
 
 	public static java.util.List<com.liferay.microblogs.model.MicroblogsEntry> getMicroblogsEntries(
-		long companyId, long creatorClassNameId, java.lang.String assetTagName,
+		long companyId, long creatorClassNameId, String assetTagName,
 		int start, int end) {
 		return getService()
 				   .getMicroblogsEntries(companyId, creatorClassNameId,
@@ -339,8 +340,7 @@ public class MicroblogsEntryLocalServiceUtil {
 	*/
 	@Deprecated
 	public static java.util.List<com.liferay.microblogs.model.MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, java.lang.String assetTagName, int start,
-		int end) {
+		long creatorClassNameId, String assetTagName, int start, int end) {
 		return getService()
 				   .getMicroblogsEntries(creatorClassNameId, assetTagName,
 			start, end);
@@ -391,15 +391,15 @@ public class MicroblogsEntryLocalServiceUtil {
 	}
 
 	public static int getMicroblogsEntriesCount(long companyId,
-		long creatorClassNameId, long creatorClassPK,
-		java.lang.String assetTagName, boolean andOperator) {
+		long creatorClassNameId, long creatorClassPK, String assetTagName,
+		boolean andOperator) {
 		return getService()
 				   .getMicroblogsEntriesCount(companyId, creatorClassNameId,
 			creatorClassPK, assetTagName, andOperator);
 	}
 
 	public static int getMicroblogsEntriesCount(long companyId,
-		long creatorClassNameId, java.lang.String assetTagName) {
+		long creatorClassNameId, String assetTagName) {
 		return getService()
 				   .getMicroblogsEntriesCount(companyId, creatorClassNameId,
 			assetTagName);
@@ -410,7 +410,7 @@ public class MicroblogsEntryLocalServiceUtil {
 	*/
 	@Deprecated
 	public static int getMicroblogsEntriesCount(long creatorClassNameId,
-		long creatorClassPK, java.lang.String assetTagName, boolean andOperator) {
+		long creatorClassPK, String assetTagName, boolean andOperator) {
 		return getService()
 				   .getMicroblogsEntriesCount(creatorClassNameId,
 			creatorClassPK, assetTagName, andOperator);
@@ -421,7 +421,7 @@ public class MicroblogsEntryLocalServiceUtil {
 	*/
 	@Deprecated
 	public static int getMicroblogsEntriesCount(long creatorClassNameId,
-		java.lang.String assetTagName) {
+		String assetTagName) {
 		return getService()
 				   .getMicroblogsEntriesCount(creatorClassNameId, assetTagName);
 	}
@@ -444,7 +444,7 @@ public class MicroblogsEntryLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -496,15 +496,14 @@ public class MicroblogsEntryLocalServiceUtil {
 
 	public static void updateAsset(
 		com.liferay.microblogs.model.MicroblogsEntry microblogsEntry,
-		long[] assetCategoryIds, java.lang.String[] assetTagNames)
+		long[] assetCategoryIds, String[] assetTagNames)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.updateAsset(microblogsEntry, assetCategoryIds, assetTagNames);
 	}
 
 	public static com.liferay.microblogs.model.MicroblogsEntry updateMicroblogsEntry(
-		long microblogsEntryId, java.lang.String content,
-		int socialRelationType,
+		long microblogsEntryId, String content, int socialRelationType,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -527,6 +526,17 @@ public class MicroblogsEntryLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<MicroblogsEntryLocalService, MicroblogsEntryLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(MicroblogsEntryLocalService.class);
+	private static ServiceTracker<MicroblogsEntryLocalService, MicroblogsEntryLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MicroblogsEntryLocalService.class);
+
+		ServiceTracker<MicroblogsEntryLocalService, MicroblogsEntryLocalService> serviceTracker =
+			new ServiceTracker<MicroblogsEntryLocalService, MicroblogsEntryLocalService>(bundle.getBundleContext(),
+				MicroblogsEntryLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

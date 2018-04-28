@@ -16,7 +16,8 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -78,10 +79,9 @@ public class DDLRecordSetLocalServiceUtil {
 	* @throws PortalException if a portal exception occurred
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet addRecordSet(
-		long userId, long groupId, long ddmStructureId,
-		java.lang.String recordSetKey,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long userId, long groupId, long ddmStructureId, String recordSetKey,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows, int scope,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -117,7 +117,7 @@ public class DDLRecordSetLocalServiceUtil {
 	*/
 	public static void addRecordSetResources(
 		com.liferay.dynamic.data.lists.model.DDLRecordSet recordSet,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		String[] groupPermissions, String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.addRecordSetResources(recordSet, groupPermissions, guestPermissions);
@@ -202,8 +202,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @param recordSetKey the record set's mnemonic primary key
 	* @throws PortalException if a portal exception occurred
 	*/
-	public static void deleteRecordSet(long groupId,
-		java.lang.String recordSetKey)
+	public static void deleteRecordSet(long groupId, String recordSetKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteRecordSet(groupId, recordSetKey);
 	}
@@ -310,7 +309,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the matching ddl record set, or <code>null</code> if a matching ddl record set could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet fetchDDLRecordSetByUuidAndGroupId(
-		java.lang.String uuid, long groupId) {
+		String uuid, long groupId) {
 		return getService().fetchDDLRecordSetByUuidAndGroupId(uuid, groupId);
 	}
 
@@ -335,7 +334,7 @@ public class DDLRecordSetLocalServiceUtil {
 	<code>null</code> if a matching record set could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet fetchRecordSet(
-		long groupId, java.lang.String recordSetKey) {
+		long groupId, String recordSetKey) {
 		return getService().fetchRecordSet(groupId, recordSetKey);
 	}
 
@@ -365,7 +364,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @throws PortalException if a matching ddl record set could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet getDDLRecordSetByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getDDLRecordSetByUuidAndGroupId(uuid, groupId);
 	}
@@ -394,7 +393,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the matching ddl record sets, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> getDDLRecordSetsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) {
+		String uuid, long companyId) {
 		return getService().getDDLRecordSetsByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -409,7 +408,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the range of matching ddl record sets, or an empty list if no matches were found
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> getDDLRecordSetsByUuidAndCompanyId(
-		java.lang.String uuid, long companyId, int start, int end,
+		String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSet> orderByComparator) {
 		return getService()
 				   .getDDLRecordSetsByUuidAndCompanyId(uuid, companyId, start,
@@ -439,7 +438,7 @@ public class DDLRecordSetLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -471,13 +470,13 @@ public class DDLRecordSetLocalServiceUtil {
 	* @throws PortalException if the the matching record set could not be found
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet getRecordSet(
-		long groupId, java.lang.String recordSetKey)
+		long groupId, String recordSetKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRecordSet(groupId, recordSetKey);
 	}
 
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet getRecordSet(
-		java.lang.String uuid, long recordSetId)
+		String uuid, long recordSetId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRecordSet(uuid, recordSetId);
 	}
@@ -564,8 +563,8 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the range of matching record sets ordered by the comparator
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> search(
-		long companyId, long groupId, java.lang.String keywords, int scope,
-		int start, int end,
+		long companyId, long groupId, String keywords, int scope, int start,
+		int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSet> orderByComparator) {
 		return getService()
 				   .search(companyId, groupId, keywords, scope, start, end,
@@ -609,9 +608,8 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the range of matching record sets ordered by the comparator
 	*/
 	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSet> search(
-		long companyId, long groupId, java.lang.String name,
-		java.lang.String description, int scope, boolean andOperator,
-		int start, int end,
+		long companyId, long groupId, String name, String description,
+		int scope, boolean andOperator, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSet> orderByComparator) {
 		return getService()
 				   .search(companyId, groupId, name, description, scope,
@@ -637,7 +635,7 @@ public class DDLRecordSetLocalServiceUtil {
 	* @return the number of matching record sets
 	*/
 	public static int searchCount(long companyId, long groupId,
-		java.lang.String keywords, int scope) {
+		String keywords, int scope) {
 		return getService().searchCount(companyId, groupId, keywords, scope);
 	}
 
@@ -665,9 +663,8 @@ public class DDLRecordSetLocalServiceUtil {
 	values.
 	* @return the number of matching record sets
 	*/
-	public static int searchCount(long companyId, long groupId,
-		java.lang.String name, java.lang.String description, int scope,
-		boolean andOperator) {
+	public static int searchCount(long companyId, long groupId, String name,
+		String description, int scope, boolean andOperator) {
 		return getService()
 				   .searchCount(companyId, groupId, name, description, scope,
 			andOperator);
@@ -740,8 +737,8 @@ public class DDLRecordSetLocalServiceUtil {
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet updateRecordSet(
 		long recordSetId, long ddmStructureId,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -768,9 +765,9 @@ public class DDLRecordSetLocalServiceUtil {
 	* @throws PortalException if a portal exception occurred
 	*/
 	public static com.liferay.dynamic.data.lists.model.DDLRecordSet updateRecordSet(
-		long groupId, long ddmStructureId, java.lang.String recordSetKey,
-		java.util.Map<java.util.Locale, java.lang.String> nameMap,
-		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		long groupId, long ddmStructureId, String recordSetKey,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap,
 		int minDisplayRows,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -783,6 +780,17 @@ public class DDLRecordSetLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDLRecordSetLocalService, DDLRecordSetLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(DDLRecordSetLocalService.class);
+	private static ServiceTracker<DDLRecordSetLocalService, DDLRecordSetLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDLRecordSetLocalService.class);
+
+		ServiceTracker<DDLRecordSetLocalService, DDLRecordSetLocalService> serviceTracker =
+			new ServiceTracker<DDLRecordSetLocalService, DDLRecordSetLocalService>(bundle.getBundleContext(),
+				DDLRecordSetLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

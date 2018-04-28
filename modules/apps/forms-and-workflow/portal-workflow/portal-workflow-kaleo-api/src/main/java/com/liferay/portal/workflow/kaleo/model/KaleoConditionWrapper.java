@@ -65,7 +65,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoNodeId", getKaleoNodeId());
 		attributes.put("script", getScript());
 		attributes.put("scriptLanguage", getScriptLanguage());
@@ -118,10 +118,11 @@ public class KaleoConditionWrapper implements KaleoCondition,
 			setModifiedDate(modifiedDate);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		Long kaleoNodeId = (Long)attributes.get("kaleoNodeId");
@@ -151,7 +152,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoConditionWrapper((KaleoCondition)_kaleoCondition.clone());
 	}
 
@@ -206,13 +207,13 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo condition.
+	* Returns the kaleo definition version ID of this kaleo condition.
 	*
-	* @return the kaleo definition ID of this kaleo condition
+	* @return the kaleo definition version ID of this kaleo condition
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoCondition.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoCondition.getKaleoDefinitionVersionId();
 	}
 
 	/**
@@ -256,7 +257,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @return the script of this kaleo condition
 	*/
 	@Override
-	public java.lang.String getScript() {
+	public String getScript() {
 		return _kaleoCondition.getScript();
 	}
 
@@ -266,7 +267,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @return the script language of this kaleo condition
 	*/
 	@Override
-	public java.lang.String getScriptLanguage() {
+	public String getScriptLanguage() {
 		return _kaleoCondition.getScriptLanguage();
 	}
 
@@ -276,7 +277,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @return the script required contexts of this kaleo condition
 	*/
 	@Override
-	public java.lang.String getScriptRequiredContexts() {
+	public String getScriptRequiredContexts() {
 		return _kaleoCondition.getScriptRequiredContexts();
 	}
 
@@ -296,7 +297,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @return the user name of this kaleo condition
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoCondition.getUserName();
 	}
 
@@ -306,7 +307,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @return the user uuid of this kaleo condition
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoCondition.getUserUuid();
 	}
 
@@ -397,13 +398,13 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo condition.
+	* Sets the kaleo definition version ID of this kaleo condition.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo condition
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo condition
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoCondition.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoCondition.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -452,7 +453,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @param script the script of this kaleo condition
 	*/
 	@Override
-	public void setScript(java.lang.String script) {
+	public void setScript(String script) {
 		_kaleoCondition.setScript(script);
 	}
 
@@ -462,7 +463,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @param scriptLanguage the script language of this kaleo condition
 	*/
 	@Override
-	public void setScriptLanguage(java.lang.String scriptLanguage) {
+	public void setScriptLanguage(String scriptLanguage) {
 		_kaleoCondition.setScriptLanguage(scriptLanguage);
 	}
 
@@ -472,8 +473,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @param scriptRequiredContexts the script required contexts of this kaleo condition
 	*/
 	@Override
-	public void setScriptRequiredContexts(
-		java.lang.String scriptRequiredContexts) {
+	public void setScriptRequiredContexts(String scriptRequiredContexts) {
 		_kaleoCondition.setScriptRequiredContexts(scriptRequiredContexts);
 	}
 
@@ -493,7 +493,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @param userName the user name of this kaleo condition
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoCondition.setUserName(userName);
 	}
 
@@ -503,7 +503,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	* @param userUuid the user uuid of this kaleo condition
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoCondition.setUserUuid(userUuid);
 	}
 
@@ -518,7 +518,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoCondition.toString();
 	}
 
@@ -528,7 +528,7 @@ public class KaleoConditionWrapper implements KaleoCondition,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoCondition.toXmlString();
 	}
 

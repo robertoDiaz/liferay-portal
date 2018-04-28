@@ -41,27 +41,21 @@ public class DDMTemplateVersionServiceWrapper
 		return _ddmTemplateVersionService.getLatestTemplateVersion(templateId);
 	}
 
-	@Override
-	public com.liferay.dynamic.data.mapping.model.DDMTemplateVersion getTemplateVersion(
-		long templateVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmTemplateVersionService.getTemplateVersion(templateVersionId);
-	}
-
-	@Override
-	public int getTemplateVersionsCount(long templateId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmTemplateVersionService.getTemplateVersionsCount(templateId);
-	}
-
 	/**
 	* Returns the OSGi service identifier.
 	*
 	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _ddmTemplateVersionService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public com.liferay.dynamic.data.mapping.model.DDMTemplateVersion getTemplateVersion(
+		long templateVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmTemplateVersionService.getTemplateVersion(templateVersionId);
 	}
 
 	@Override
@@ -71,6 +65,12 @@ public class DDMTemplateVersionServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmTemplateVersionService.getTemplateVersions(templateId,
 			start, end, orderByComparator);
+	}
+
+	@Override
+	public int getTemplateVersionsCount(long templateId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmTemplateVersionService.getTemplateVersionsCount(templateId);
 	}
 
 	@Override

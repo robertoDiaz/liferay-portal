@@ -65,7 +65,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoInstanceId", getKaleoInstanceId());
 		attributes.put("parentKaleoInstanceTokenId",
 			getParentKaleoInstanceTokenId());
@@ -73,7 +73,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 		attributes.put("currentKaleoNodeName", getCurrentKaleoNodeName());
 		attributes.put("className", getClassName());
 		attributes.put("classPK", getClassPK());
-		attributes.put("completed", getCompleted());
+		attributes.put("completed", isCompleted());
 		attributes.put("completionDate", getCompletionDate());
 
 		return attributes;
@@ -123,10 +123,11 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 			setModifiedDate(modifiedDate);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		Long kaleoInstanceId = (Long)attributes.get("kaleoInstanceId");
@@ -181,7 +182,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoInstanceTokenWrapper((KaleoInstanceToken)_kaleoInstanceToken.clone());
 	}
 
@@ -201,7 +202,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @return the class name of this kaleo instance token
 	*/
 	@Override
-	public java.lang.String getClassName() {
+	public String getClassName() {
 		return _kaleoInstanceToken.getClassName();
 	}
 
@@ -277,7 +278,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @return the current kaleo node name of this kaleo instance token
 	*/
 	@Override
-	public java.lang.String getCurrentKaleoNodeName() {
+	public String getCurrentKaleoNodeName() {
 		return _kaleoInstanceToken.getCurrentKaleoNodeName();
 	}
 
@@ -302,13 +303,13 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo instance token.
+	* Returns the kaleo definition version ID of this kaleo instance token.
 	*
-	* @return the kaleo definition ID of this kaleo instance token
+	* @return the kaleo definition version ID of this kaleo instance token
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoInstanceToken.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoInstanceToken.getKaleoDefinitionVersionId();
 	}
 
 	@Override
@@ -394,7 +395,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @return the user name of this kaleo instance token
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoInstanceToken.getUserName();
 	}
 
@@ -404,7 +405,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @return the user uuid of this kaleo instance token
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoInstanceToken.getUserUuid();
 	}
 
@@ -459,7 +460,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @param className the class name of this kaleo instance token
 	*/
 	@Override
-	public void setClassName(java.lang.String className) {
+	public void setClassName(String className) {
 		_kaleoInstanceToken.setClassName(className);
 	}
 
@@ -535,7 +536,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @param currentKaleoNodeName the current kaleo node name of this kaleo instance token
 	*/
 	@Override
-	public void setCurrentKaleoNodeName(java.lang.String currentKaleoNodeName) {
+	public void setCurrentKaleoNodeName(String currentKaleoNodeName) {
 		_kaleoInstanceToken.setCurrentKaleoNodeName(currentKaleoNodeName);
 	}
 
@@ -566,13 +567,13 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo instance token.
+	* Sets the kaleo definition version ID of this kaleo instance token.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo instance token
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo instance token
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoInstanceToken.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoInstanceToken.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -651,7 +652,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @param userName the user name of this kaleo instance token
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoInstanceToken.setUserName(userName);
 	}
 
@@ -661,7 +662,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	* @param userUuid the user uuid of this kaleo instance token
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoInstanceToken.setUserUuid(userUuid);
 	}
 
@@ -676,7 +677,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoInstanceToken.toString();
 	}
 
@@ -686,7 +687,7 @@ public class KaleoInstanceTokenWrapper implements KaleoInstanceToken,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoInstanceToken.toXmlString();
 	}
 

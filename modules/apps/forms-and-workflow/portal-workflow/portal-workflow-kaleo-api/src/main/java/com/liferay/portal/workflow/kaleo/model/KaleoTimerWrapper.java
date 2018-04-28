@@ -66,9 +66,9 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("kaleoClassName", getKaleoClassName());
 		attributes.put("kaleoClassPK", getKaleoClassPK());
-		attributes.put("kaleoDefinitionId", getKaleoDefinitionId());
+		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("name", getName());
-		attributes.put("blocking", getBlocking());
+		attributes.put("blocking", isBlocking());
 		attributes.put("description", getDescription());
 		attributes.put("duration", getDuration());
 		attributes.put("scale", getScale());
@@ -134,10 +134,11 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 			setKaleoClassPK(kaleoClassPK);
 		}
 
-		Long kaleoDefinitionId = (Long)attributes.get("kaleoDefinitionId");
+		Long kaleoDefinitionVersionId = (Long)attributes.get(
+				"kaleoDefinitionVersionId");
 
-		if (kaleoDefinitionId != null) {
-			setKaleoDefinitionId(kaleoDefinitionId);
+		if (kaleoDefinitionVersionId != null) {
+			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		}
 
 		String name = (String)attributes.get("name");
@@ -184,7 +185,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new KaleoTimerWrapper((KaleoTimer)_kaleoTimer.clone());
 	}
 
@@ -229,7 +230,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the description of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getDescription() {
+	public String getDescription() {
 		return _kaleoTimer.getDescription();
 	}
 
@@ -264,7 +265,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the kaleo class name of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getKaleoClassName() {
+	public String getKaleoClassName() {
 		return _kaleoTimer.getKaleoClassName();
 	}
 
@@ -279,13 +280,13 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	}
 
 	/**
-	* Returns the kaleo definition ID of this kaleo timer.
+	* Returns the kaleo definition version ID of this kaleo timer.
 	*
-	* @return the kaleo definition ID of this kaleo timer
+	* @return the kaleo definition version ID of this kaleo timer
 	*/
 	@Override
-	public long getKaleoDefinitionId() {
-		return _kaleoTimer.getKaleoDefinitionId();
+	public long getKaleoDefinitionVersionId() {
+		return _kaleoTimer.getKaleoDefinitionVersionId();
 	}
 
 	@Override
@@ -319,7 +320,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the name of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _kaleoTimer.getName();
 	}
 
@@ -354,7 +355,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the recurrence scale of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getRecurrenceScale() {
+	public String getRecurrenceScale() {
 		return _kaleoTimer.getRecurrenceScale();
 	}
 
@@ -364,7 +365,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the scale of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getScale() {
+	public String getScale() {
 		return _kaleoTimer.getScale();
 	}
 
@@ -384,7 +385,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the user name of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _kaleoTimer.getUserName();
 	}
 
@@ -394,7 +395,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @return the user uuid of this kaleo timer
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _kaleoTimer.getUserUuid();
 	}
 
@@ -479,7 +480,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param description the description of this kaleo timer
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
+	public void setDescription(String description) {
 		_kaleoTimer.setDescription(description);
 	}
 
@@ -525,7 +526,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param kaleoClassName the kaleo class name of this kaleo timer
 	*/
 	@Override
-	public void setKaleoClassName(java.lang.String kaleoClassName) {
+	public void setKaleoClassName(String kaleoClassName) {
 		_kaleoTimer.setKaleoClassName(kaleoClassName);
 	}
 
@@ -540,13 +541,13 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	}
 
 	/**
-	* Sets the kaleo definition ID of this kaleo timer.
+	* Sets the kaleo definition version ID of this kaleo timer.
 	*
-	* @param kaleoDefinitionId the kaleo definition ID of this kaleo timer
+	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo timer
 	*/
 	@Override
-	public void setKaleoDefinitionId(long kaleoDefinitionId) {
-		_kaleoTimer.setKaleoDefinitionId(kaleoDefinitionId);
+	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
+		_kaleoTimer.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -575,7 +576,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param name the name of this kaleo timer
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_kaleoTimer.setName(name);
 	}
 
@@ -615,7 +616,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param recurrenceScale the recurrence scale of this kaleo timer
 	*/
 	@Override
-	public void setRecurrenceScale(java.lang.String recurrenceScale) {
+	public void setRecurrenceScale(String recurrenceScale) {
 		_kaleoTimer.setRecurrenceScale(recurrenceScale);
 	}
 
@@ -625,7 +626,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param scale the scale of this kaleo timer
 	*/
 	@Override
-	public void setScale(java.lang.String scale) {
+	public void setScale(String scale) {
 		_kaleoTimer.setScale(scale);
 	}
 
@@ -645,7 +646,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param userName the user name of this kaleo timer
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_kaleoTimer.setUserName(userName);
 	}
 
@@ -655,7 +656,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	* @param userUuid the user uuid of this kaleo timer
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_kaleoTimer.setUserUuid(userUuid);
 	}
 
@@ -670,7 +671,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _kaleoTimer.toString();
 	}
 
@@ -680,7 +681,7 @@ public class KaleoTimerWrapper implements KaleoTimer, ModelWrapper<KaleoTimer> {
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _kaleoTimer.toXmlString();
 	}
 

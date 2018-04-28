@@ -27,15 +27,15 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
-import com.liferay.exportimport.portlet.preferences.processor.capability.ReferencedStagedModelImporterCapability;
+import com.liferay.journal.constants.JournalConstants;
+import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
-import com.liferay.journal.content.web.constants.JournalContentPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.journal.service.JournalContentSearchLocalService;
-import com.liferay.journal.service.permission.JournalPermission;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -47,7 +47,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -65,9 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = {
-		"javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT
-	},
+	property = "javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT,
 	service = ExportImportPortletPreferencesProcessor.class
 )
 public class JournalContentExportImportPortletPreferencesProcessor
@@ -85,8 +83,7 @@ public class JournalContentExportImportPortletPreferencesProcessor
 	public List<Capability> getImportCapabilities() {
 		return ListUtil.toList(
 			new Capability[] {
-				_journalContentMetadataExporterImporterCapability,
-				_referencedStagedModelImporterCapability
+				_journalContentMetadataExporterImporterCapability, _capability
 			});
 	}
 
@@ -100,11 +97,15 @@ public class JournalContentExportImportPortletPreferencesProcessor
 
 		try {
 			portletDataContext.addPortletPermissions(
-				JournalPermission.RESOURCE_NAME);
+				JournalConstants.RESOURCE_NAME);
 		}
 		catch (PortalException pe) {
-			throw new PortletDataException(
-				"Unable to export portlet permissions", pe);
+			PortletDataException pde = new PortletDataException(pe);
+
+			pde.setPortletId(JournalContentPortletKeys.JOURNAL_CONTENT);
+			pde.setType(PortletDataException.EXPORT_PORTLET_PERMISSIONS);
+
+			throw pde;
 		}
 
 		String articleId = portletPreferences.getValue("articleId", null);
@@ -157,7 +158,7 @@ public class JournalContentExportImportPortletPreferencesProcessor
 				articleGroupId, articleId);
 
 		if (journalArticleResource != null) {
-			int[] statuses = new int[] {
+			int[] statuses = {
 				WorkflowConstants.STATUS_APPROVED,
 				WorkflowConstants.STATUS_EXPIRED,
 				WorkflowConstants.STATUS_SCHEDULED
@@ -170,8 +171,9 @@ public class JournalContentExportImportPortletPreferencesProcessor
 		if (article == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Portlet " + portletId +
-						" refers to an invalid article ID " + articleId);
+					StringBundler.concat(
+						"Portlet ", portletId,
+						" refers to an invalid article ID ", articleId));
 			}
 
 			portletDataContext.setScopeGroupId(previousScopeGroupId);
@@ -229,8 +231,12 @@ public class JournalContentExportImportPortletPreferencesProcessor
 					PortletDataContext.REFERENCE_TYPE_STRONG);
 			}
 			catch (PortalException | ReadOnlyException e) {
-				throw new PortletDataException(
-					"Unable to export referenced article template", e);
+				PortletDataException pde = new PortletDataException(e);
+
+				pde.setPortletId(JournalContentPortletKeys.JOURNAL_CONTENT);
+				pde.setType(PortletDataException.EXPORT_REFERENCED_TEMPLATE);
+
+				throw pde;
 			}
 		}
 
@@ -247,15 +253,18 @@ public class JournalContentExportImportPortletPreferencesProcessor
 
 		try {
 			portletDataContext.importPortletPermissions(
-				JournalPermission.RESOURCE_NAME);
+				JournalConstants.RESOURCE_NAME);
 		}
 		catch (PortalException pe) {
-			throw new PortletDataException(
-				"Unable to import portlet permissions", pe);
+			PortletDataException pde = new PortletDataException(pe);
+
+			pde.setPortletId(JournalContentPortletKeys.JOURNAL_CONTENT);
+			pde.setType(PortletDataException.IMPORT_PORTLET_PERMISSIONS);
+
+			throw pde;
 		}
 
 		long previousScopeGroupId = portletDataContext.getScopeGroupId();
-		String previousScopeType = portletDataContext.getScopeType();
 
 		Map<Long, Long> groupIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -342,17 +351,24 @@ public class JournalContentExportImportPortletPreferencesProcessor
 			}
 		}
 		catch (PortalException pe) {
-			throw new PortletDataException(
-				"Unable to update journal content search data during import",
-				pe);
+			PortletDataException pde = new PortletDataException(pe);
+
+			pde.setPortletId(JournalContentPortletKeys.JOURNAL_CONTENT);
+			pde.setType(
+				PortletDataException.UPDATE_JOURNAL_CONTENT_SEARCH_DATA);
+
+			throw pde;
 		}
 		catch (ReadOnlyException roe) {
-			throw new PortletDataException(
-				"Unable to update portlet preferences during import", roe);
+			PortletDataException pde = new PortletDataException(roe);
+
+			pde.setPortletId(JournalContentPortletKeys.JOURNAL_CONTENT);
+			pde.setType(PortletDataException.UPDATE_PORTLET_PREFERENCES);
+
+			throw pde;
 		}
 
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
-		portletDataContext.setScopeType(previousScopeType);
 
 		return portletPreferences;
 	}
@@ -362,6 +378,9 @@ public class JournalContentExportImportPortletPreferencesProcessor
 
 	@Reference(unbind = "-")
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference(target = "(name=ReferencedStagedModelImporter)")
+	private Capability _capability;
 
 	@Reference(unbind = "-")
 	private DDMTemplateLocalService _ddmTemplateLocalService;
@@ -388,9 +407,5 @@ public class JournalContentExportImportPortletPreferencesProcessor
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(unbind = "-")
-	private ReferencedStagedModelImporterCapability
-		_referencedStagedModelImporterCapability;
 
 }

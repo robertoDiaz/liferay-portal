@@ -1,12 +1,8 @@
 AUI.add(
 	'liferay-ddm-form-renderer-util',
 	function(A) {
-		var AObject = A.Object;
-
-		var Lang = A.Lang;
-
 		var VALIDATIONS = {
-			number: [
+			numeric: [
 				{
 					label: Liferay.Language.get('is-greater-than-or-equal-to'),
 					name: 'gteq',

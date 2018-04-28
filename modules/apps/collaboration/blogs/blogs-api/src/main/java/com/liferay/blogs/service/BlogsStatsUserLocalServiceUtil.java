@@ -16,7 +16,8 @@ package com.liferay.blogs.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -300,7 +301,7 @@ public class BlogsStatsUserLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -351,6 +352,17 @@ public class BlogsStatsUserLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<BlogsStatsUserLocalService, BlogsStatsUserLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(BlogsStatsUserLocalService.class);
+	private static ServiceTracker<BlogsStatsUserLocalService, BlogsStatsUserLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(BlogsStatsUserLocalService.class);
+
+		ServiceTracker<BlogsStatsUserLocalService, BlogsStatsUserLocalService> serviceTracker =
+			new ServiceTracker<BlogsStatsUserLocalService, BlogsStatsUserLocalService>(bundle.getBundleContext(),
+				BlogsStatsUserLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

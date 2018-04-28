@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,14 +55,14 @@ public class KaleoActionLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.workflow.kaleo.model.KaleoAction addKaleoAction(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId, java.lang.String kaleoNodeName,
+		String kaleoClassName, long kaleoClassPK,
+		long kaleoDefinitionVersionId, String kaleoNodeName,
 		com.liferay.portal.workflow.kaleo.definition.Action action,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addKaleoAction(kaleoClassName, kaleoClassPK,
-			kaleoDefinitionId, kaleoNodeName, action, serviceContext);
+			kaleoDefinitionVersionId, kaleoNodeName, action, serviceContext);
 	}
 
 	/**
@@ -103,8 +104,10 @@ public class KaleoActionLocalServiceUtil {
 		return getService().deleteKaleoAction(kaleoActionId);
 	}
 
-	public static void deleteKaleoDefinitionKaleoActions(long kaleoDefinitionId) {
-		getService().deleteKaleoDefinitionKaleoActions(kaleoDefinitionId);
+	public static void deleteKaleoDefinitionVersionKaleoActions(
+		long kaleoDefinitionVersionId) {
+		getService()
+			.deleteKaleoDefinitionVersionKaleoActions(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -237,13 +240,12 @@ public class KaleoActionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoAction> getKaleoActions(
-		java.lang.String kaleoClassName, long kaleoClassPK) {
+		String kaleoClassName, long kaleoClassPK) {
 		return getService().getKaleoActions(kaleoClassName, kaleoClassPK);
 	}
 
 	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoAction> getKaleoActions(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		java.lang.String executionType) {
+		String kaleoClassName, long kaleoClassPK, String executionType) {
 		return getService()
 				   .getKaleoActions(kaleoClassName, kaleoClassPK, executionType);
 	}
@@ -262,7 +264,7 @@ public class KaleoActionLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -287,6 +289,17 @@ public class KaleoActionLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoActionLocalService, KaleoActionLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(KaleoActionLocalService.class);
+	private static ServiceTracker<KaleoActionLocalService, KaleoActionLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KaleoActionLocalService.class);
+
+		ServiceTracker<KaleoActionLocalService, KaleoActionLocalService> serviceTracker =
+			new ServiceTracker<KaleoActionLocalService, KaleoActionLocalService>(bundle.getBundleContext(),
+				KaleoActionLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

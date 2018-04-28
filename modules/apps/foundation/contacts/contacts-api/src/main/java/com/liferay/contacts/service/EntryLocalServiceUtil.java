@@ -16,7 +16,8 @@ package com.liferay.contacts.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,8 +55,7 @@ public class EntryLocalServiceUtil {
 	}
 
 	public static com.liferay.contacts.model.Entry addEntry(long userId,
-		java.lang.String fullName, java.lang.String emailAddress,
-		java.lang.String comments)
+		String fullName, String emailAddress, String comments)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().addEntry(userId, fullName, emailAddress, comments);
 	}
@@ -243,7 +243,7 @@ public class EntryLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -254,24 +254,23 @@ public class EntryLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.contacts.model.Entry> search(
-		long userId, java.lang.String keywords, int start, int end) {
+		long userId, String keywords, int start, int end) {
 		return getService().search(userId, keywords, start, end);
 	}
 
-	public static int searchCount(long userId, java.lang.String keywords) {
+	public static int searchCount(long userId, String keywords) {
 		return getService().searchCount(userId, keywords);
 	}
 
 	public static java.util.List<com.liferay.portal.kernel.model.BaseModel<?>> searchUsersAndContacts(
-		long companyId, long userId, java.lang.String keywords, int start,
-		int end) {
+		long companyId, long userId, String keywords, int start, int end) {
 		return getService()
 				   .searchUsersAndContacts(companyId, userId, keywords, start,
 			end);
 	}
 
 	public static int searchUsersAndContactsCount(long companyId, long userId,
-		java.lang.String keywords) {
+		String keywords) {
 		return getService()
 				   .searchUsersAndContactsCount(companyId, userId, keywords);
 	}
@@ -288,8 +287,7 @@ public class EntryLocalServiceUtil {
 	}
 
 	public static com.liferay.contacts.model.Entry updateEntry(long entryId,
-		java.lang.String fullName, java.lang.String emailAddress,
-		java.lang.String comments)
+		String fullName, String emailAddress, String comments)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateEntry(entryId, fullName, emailAddress, comments);
@@ -299,6 +297,16 @@ public class EntryLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<EntryLocalService, EntryLocalService> _serviceTracker =
-		ServiceTrackerFactory.open(EntryLocalService.class);
+	private static ServiceTracker<EntryLocalService, EntryLocalService> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(EntryLocalService.class);
+
+		ServiceTracker<EntryLocalService, EntryLocalService> serviceTracker = new ServiceTracker<EntryLocalService, EntryLocalService>(bundle.getBundleContext(),
+				EntryLocalService.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }

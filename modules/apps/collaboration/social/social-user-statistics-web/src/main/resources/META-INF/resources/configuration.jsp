@@ -19,50 +19,75 @@
 <%
 socialUserStatisticsPortletInstanceConfiguration = ConfigurationProviderUtil.getConfiguration(SocialUserStatisticsPortletInstanceConfiguration.class, new PortletInstanceSettingsLocator(themeDisplay.getLayout(), portletDisplay.getPortletResource()));
 
-int displayActivityCounterNameCount = socialUserStatisticsPortletInstanceConfiguration.displayActivityCounterName().length;
+String[] displayActivityCounterNames = socialUserStatisticsPortletInstanceConfiguration.displayActivityCounterName();
 
-if (displayActivityCounterNameCount == 0) {
-	displayActivityCounterNameCount = 1;
+int displayActivityCounterNameIndexCount = displayActivityCounterNames.length;
+
+if (displayActivityCounterNameIndexCount == 0) {
+	displayActivityCounterNameIndexCount = 1;
 }
+
+String[] displayActivityCounterNameIndexes = new String[displayActivityCounterNameIndexCount];
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
 
 <liferay-portlet:renderURL portletConfiguration="<%= true %>" var="configurationRenderURL" />
 
-<aui:form action="<%= configurationActionURL %>" method="post" name="fm">
+<liferay-frontend:edit-form
+	action="<%= configurationActionURL %>"
+	method="post"
+	name="fm"
+>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
-	<div class="portlet-configuration-body-content">
-		<div class="container-fluid-1280">
-			<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="userStatisticsRankingsPanel" persistState="<%= true %>" title="ranking">
+	<liferay-frontend:edit-form-body>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id="userStatisticsRankingsPanel"
+				label="ranking"
+			>
 				<aui:input label="rank-by-contribution" name="preferences--rankByContribution--" type="checkbox" value="<%= socialUserStatisticsPortletInstanceConfiguration.rankByContribution() %>" />
 
 				<aui:input label="rank-by-participation" name="preferences--rankByParticipation--" type="checkbox" value="<%= socialUserStatisticsPortletInstanceConfiguration.rankByParticipation() %>" />
-			</liferay-ui:panel>
+			</liferay-frontend:fieldset>
 
-			<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="userStatisticsSettingsPanel" persistState="<%= true %>" title="settings">
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id="userStatisticsSettingsPanel"
+				label="settings"
+			>
 				<aui:input label="show-header-text" name="preferences--showHeaderText--" type="checkbox" value="<%= socialUserStatisticsPortletInstanceConfiguration.showHeaderText() %>" />
 
 				<aui:input label="show-totals" name="preferences--showTotals--" type="checkbox" value="<%= socialUserStatisticsPortletInstanceConfiguration.showTotals() %>" />
-			</liferay-ui:panel>
+			</liferay-frontend:fieldset>
 
-			<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="userStatisticsDisplayActivityCounterNamesPanel" persistState="<%= true %>" title="counters">
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id="userStatisticsDisplayActivityCounterNamesPanel"
+				label="counters"
+			>
 				<div id="<portlet:namespace />displayActivityCounterNames">
 					<aui:input label="display-additional-activity-counters" name="preferences--displayAdditionalActivityCounters--" type="checkbox" value="<%= socialUserStatisticsPortletInstanceConfiguration.displayAdditionalActivityCounters() %>" />
 
-					<aui:fieldset label="">
+					<liferay-frontend:fieldset
+						label=""
+					>
 
 						<%
-						for (int displayActivityCounterNameIndex = 0; displayActivityCounterNameIndex < displayActivityCounterNameCount; displayActivityCounterNameIndex++) {
+						for (int i = 0; i < displayActivityCounterNameIndexCount; i++) {
+							String index = String.valueOf(i);
+
+							displayActivityCounterNameIndexes[i] = index;
 						%>
 
 							<div class="lfr-form-row">
 								<div class="row-fields">
 									<liferay-util:include page="/add_activity_counter.jsp" servletContext="<%= application %>">
 										<liferay-util:param name="portletResource" value="<%= portletName %>" />
-										<liferay-util:param name="index" value="<%= String.valueOf(displayActivityCounterNameIndex) %>" />
+										<liferay-util:param name="index" value="<%= index %>" />
 									</liferay-util:include>
 								</div>
 							</div>
@@ -71,23 +96,29 @@ if (displayActivityCounterNameCount == 0) {
 						}
 						%>
 
-					</aui:fieldset>
+					</liferay-frontend:fieldset>
 				</div>
+
+				<aui:input name="displayActivityCounterNameIndexes" type="hidden" value="<%= StringUtil.merge(displayActivityCounterNameIndexes) %>" />
 
 				<aui:script use="liferay-auto-fields">
 					var autoFields = new Liferay.AutoFields(
 						{
 							contentBox: '#<portlet:namespace />displayActivityCounterNames > fieldset',
+							fieldIndexes: '<portlet:namespace/>displayActivityCounterNameIndexes',
 							namespace: '<portlet:namespace />',
-							url: '<liferay-portlet:renderURL portletName="<%= SocialUserStatisticsPortletKeys.SOCIAL_USER_STATISTICS %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><liferay-portlet:param name="mvcPath" value="/add_activity_counter.jsp" /><liferay-portlet:param name="index" value="<%= String.valueOf(displayActivityCounterNameCount) %>" /><liferay-portlet:param name="portletResource" value="<%= portletName %>" /></liferay-portlet:renderURL>'
+							url: '<liferay-portlet:renderURL portletName="<%= SocialUserStatisticsPortletKeys.SOCIAL_USER_STATISTICS %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><liferay-portlet:param name="mvcPath" value="/add_activity_counter.jsp" /><liferay-portlet:param name="portletResource" value="<%= portletName %>" /></liferay-portlet:renderURL>',
+							urlNamespace: '<%= "_" + SocialUserStatisticsPortletKeys.SOCIAL_USER_STATISTICS + "_" %>'
 						}
 					).render();
 				</aui:script>
-			</liferay-ui:panel>
-		</div>
-	</div>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
+	</liferay-frontend:edit-form-body>
 
-	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
-	</aui:button-row>
-</aui:form>
+	<liferay-frontend:edit-form-footer>
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
+	</liferay-frontend:edit-form-footer>
+</liferay-frontend:edit-form>

@@ -18,11 +18,10 @@ import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.mail.kernel.model.Account;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.petra.log4j.Log4JUtil;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.convert.ConvertException;
 import com.liferay.portal.convert.ConvertProcess;
-import com.liferay.portal.instances.service.PortalInstancesLocalService;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.SingleVMPool;
@@ -34,17 +33,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.messaging.DestinationNames;
-import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.messaging.MessageListener;
-import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.scripting.Scripting;
 import com.liferay.portal.kernel.scripting.ScriptingException;
 import com.liferay.portal.kernel.scripting.ScriptingHelperUtil;
-import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.membershippolicy.OrganizationMembershipPolicy;
 import com.liferay.portal.kernel.security.membershippolicy.OrganizationMembershipPolicyFactory;
@@ -60,20 +54,17 @@ import com.liferay.portal.kernel.servlet.DirectServletRegistry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.ThreadUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.kernel.xuggler.XugglerInstallException;
 import com.liferay.portal.kernel.xuggler.XugglerUtil;
 import com.liferay.portal.util.MaintenanceUtil;
@@ -83,13 +74,8 @@ import com.liferay.portlet.ActionResponseImpl;
 import com.liferay.portlet.admin.util.CleanUpPermissionsUtil;
 import com.liferay.portlet.admin.util.CleanUpPortletPreferencesUtil;
 
-import java.io.Serializable;
-
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -187,12 +173,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 					xie);
 			}
 		}
-		else if (cmd.equals("reindex")) {
-			reindex(actionRequest);
-		}
-		else if (cmd.equals("reindexDictionaries")) {
-			reindexDictionaries(actionRequest);
-		}
 		else if (cmd.equals("runScript")) {
 			runScript(actionRequest, actionResponse);
 		}
@@ -204,9 +184,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		}
 		else if (cmd.equals("updateExternalServices")) {
 			updateExternalServices(actionRequest, portletPreferences);
-		}
-		else if (cmd.equals("updateFileUploads")) {
-			updateFileUploads(actionRequest, portletPreferences);
 		}
 		else if (cmd.equals("updateLogLevels")) {
 			updateLogLevels(actionRequest);
@@ -314,7 +291,9 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected void gc() throws Exception {
-		Runtime.getRuntime().gc();
+		Runtime runtime = Runtime.getRuntime();
+
+		runtime.gc();
 	}
 
 	protected String getFileExtensions(
@@ -332,95 +311,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		String jarName = ParamUtil.getString(actionRequest, "jarName");
 
 		XugglerUtil.installNativeLibraries(jarName);
-	}
-
-	protected void reindex(final ActionRequest actionRequest) throws Exception {
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Map<String, Serializable> taskContextMap = new HashMap<>();
-
-		String className = ParamUtil.getString(actionRequest, "className");
-
-		if (!ParamUtil.getBoolean(actionRequest, "blocking")) {
-			_indexWriterHelper.reindex(
-				themeDisplay.getUserId(), "reindex",
-				_portalInstancesLocalService.getCompanyIds(), className,
-				taskContextMap);
-
-			return;
-		}
-
-		final String jobName = "reindex-".concat(_portalUUID.generate());
-
-		final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-		MessageListener messageListener = new MessageListener() {
-
-			@Override
-			public void receive(Message message)
-				throws MessageListenerException {
-
-				int status = message.getInteger("status");
-
-				if ((status != BackgroundTaskConstants.STATUS_CANCELLED) &&
-					(status != BackgroundTaskConstants.STATUS_FAILED) &&
-					(status != BackgroundTaskConstants.STATUS_SUCCESSFUL)) {
-
-					return;
-				}
-
-				if (!jobName.equals(message.getString("name"))) {
-					return;
-				}
-
-				PortletSession portletSession =
-					actionRequest.getPortletSession();
-
-				long lastAccessedTime = portletSession.getLastAccessedTime();
-				int maxInactiveInterval =
-					portletSession.getMaxInactiveInterval();
-
-				int extendedMaxInactiveIntervalTime =
-					(int)(System.currentTimeMillis() - lastAccessedTime +
-						maxInactiveInterval);
-
-				portletSession.setMaxInactiveInterval(
-					extendedMaxInactiveIntervalTime);
-
-				countDownLatch.countDown();
-			}
-
-		};
-
-		_messageBus.registerMessageListener(
-			DestinationNames.BACKGROUND_TASK_STATUS, messageListener);
-
-		try {
-			_indexWriterHelper.reindex(
-				themeDisplay.getUserId(), jobName,
-				_portalInstancesLocalService.getCompanyIds(), className,
-				taskContextMap);
-
-			countDownLatch.await(
-				ParamUtil.getLong(actionRequest, "timeout", Time.HOUR),
-				TimeUnit.MILLISECONDS);
-		}
-		finally {
-			_messageBus.unregisterMessageListener(
-				DestinationNames.BACKGROUND_TASK_STATUS, messageListener);
-		}
-	}
-
-	protected void reindexDictionaries(ActionRequest actionRequest)
-		throws Exception {
-
-		long[] companyIds = _portalInstancesLocalService.getCompanyIds();
-
-		for (long companyId : companyIds) {
-			_indexWriterHelper.indexQuerySuggestionDictionaries(companyId);
-			_indexWriterHelper.indexSpellCheckerDictionaries(companyId);
-		}
 	}
 
 	protected void runScript(
@@ -526,8 +416,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			String name = enu.nextElement();
 
 			if (name.startsWith("imageMagickLimit")) {
-				String key = StringUtil.toLowerCase(
-					name.substring(16, name.length()));
+				String key = StringUtil.toLowerCase(name.substring(16));
 				String value = ParamUtil.getString(actionRequest, name);
 
 				portletPreferences.setValue(
@@ -539,37 +428,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 
 		GhostscriptUtil.reset();
 		ImageMagickUtil.reset();
-	}
-
-	protected void updateFileUploads(
-			ActionRequest actionRequest, PortletPreferences portletPreferences)
-		throws Exception {
-
-		long dlFileEntryPreviewableProcessorMaxSize = ParamUtil.getLong(
-			actionRequest, "dlFileEntryPreviewableProcessorMaxSize");
-		long dlFileEntryThumbnailMaxHeight = ParamUtil.getLong(
-			actionRequest, "dlFileEntryThumbnailMaxHeight");
-		long dlFileEntryThumbnailMaxWidth = ParamUtil.getLong(
-			actionRequest, "dlFileEntryThumbnailMaxWidth");
-		String dlFileExtensions = getFileExtensions(
-			actionRequest, "dlFileExtensions");
-		long dlFileMaxSize = ParamUtil.getLong(actionRequest, "dlFileMaxSize");
-
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_ENTRY_PREVIEWABLE_PROCESSOR_MAX_SIZE,
-			String.valueOf(dlFileEntryPreviewableProcessorMaxSize));
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT,
-			String.valueOf(dlFileEntryThumbnailMaxHeight));
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH,
-			String.valueOf(dlFileEntryThumbnailMaxWidth));
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_EXTENSIONS, dlFileExtensions);
-		portletPreferences.setValue(
-			PropsKeys.DL_FILE_MAX_SIZE, String.valueOf(dlFileMaxSize));
-
-		portletPreferences.store();
 	}
 
 	protected void updateLogLevels(ActionRequest actionRequest)
@@ -691,19 +549,10 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		EditServerMVCActionCommand.class);
 
 	@Reference
-	private BackgroundTaskManager _backgroundTaskManager;
-
-	@Reference
 	private DirectServletRegistry _directServletRegistry;
 
 	@Reference
-	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
 	private MailService _mailService;
-
-	@Reference
-	private MessageBus _messageBus;
 
 	@Reference
 	private MultiVMPool _multiVMPool;
@@ -711,12 +560,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private OrganizationMembershipPolicyFactory
 		_organizationMembershipPolicyFactory;
-
-	@Reference
-	private PortalInstancesLocalService _portalInstancesLocalService;
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 	@Reference
 	private RoleMembershipPolicyFactory _roleMembershipPolicyFactory;

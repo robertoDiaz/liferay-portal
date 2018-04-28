@@ -14,12 +14,17 @@
 
 package com.liferay.portlet;
 
+import com.liferay.petra.encryptor.Encryptor;
+import com.liferay.petra.encryptor.EncryptorException;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
+import com.liferay.portal.kernel.model.PortletURLListener;
 import com.liferay.portal.kernel.model.PublicRenderParameter;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
@@ -34,30 +39,23 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.util.Encryptor;
-import com.liferay.util.EncryptorException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import java.security.Key;
@@ -71,17 +69,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSecurityException;
 import javax.portlet.PortletURL;
+import javax.portlet.PortletURLGenerationListener;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceURL;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Brian Wing Shun Chan
@@ -98,30 +99,6 @@ public class PortletURLImpl
 		this(request, portlet, null, layout, lifecycle);
 	}
 
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #PortletURLImpl(HttpServletRequest, Portlet, Layout, String)}
-	 */
-	@Deprecated
-	public PortletURLImpl(
-		HttpServletRequest request, String portletId, Layout layout,
-		String lifecycle) {
-
-		this(request, portletId, null, layout, lifecycle);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #PortletURLImpl(HttpServletRequest, String, Layout, String)}
-	 */
-	@Deprecated
-	public PortletURLImpl(
-		HttpServletRequest request, String portletId, long plid,
-		String lifecycle) {
-
-		this(request, portletId, null, plid, lifecycle);
-	}
-
 	public PortletURLImpl(
 		PortletRequest portletRequest, Portlet portlet, Layout layout,
 		String lifecycle) {
@@ -129,34 +106,6 @@ public class PortletURLImpl
 		this(
 			PortalUtil.getHttpServletRequest(portletRequest), portlet,
 			portletRequest, layout, lifecycle);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #PortletURLImpl(PortletRequest, Portlet, Layout, String)}
-	 */
-	@Deprecated
-	public PortletURLImpl(
-		PortletRequest portletRequest, String portletId, Layout layout,
-		String lifecycle) {
-
-		this(
-			PortalUtil.getHttpServletRequest(portletRequest), portletId,
-			portletRequest, layout, lifecycle);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #PortletURLImpl(PortletRequest, String, Layout, String)}
-	 */
-	@Deprecated
-	public PortletURLImpl(
-		PortletRequest portletRequest, String portletId, long plid,
-		String lifecycle) {
-
-		this(
-			PortalUtil.getHttpServletRequest(portletRequest), portletId,
-			portletRequest, plid, lifecycle);
 	}
 
 	@Override
@@ -300,20 +249,6 @@ public class PortletURLImpl
 		return _removedParameterNames;
 	}
 
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #visitReservedParameters(BiConsumer)}
-	 */
-	@Deprecated
-	@Override
-	public Map<String, String> getReservedParameterMap() {
-		LinkedHashMap<String, String> linkedHashMap = new LinkedHashMap<>();
-
-		visitReservedParameters(linkedHashMap::put);
-
-		return Collections.unmodifiableMap(linkedHashMap);
-	}
-
 	@Override
 	public String getResourceID() {
 		return _resourceID;
@@ -411,8 +346,10 @@ public class PortletURLImpl
 			!mappedCacheability.equals(PORTLET)) {
 
 			throw new IllegalArgumentException(
-				"Cacheability " + cacheability + " is not FULL, " + FULL +
-					", PAGE, " + PAGE + ", or PORTLET, " + PORTLET);
+				StringBundler.concat(
+					"Cacheability ", cacheability, " is not FULL, ",
+					String.valueOf(FULL), ", PAGE, ", PAGE, ", or PORTLET, ",
+					String.valueOf(PORTLET)));
 		}
 
 		if (_portletRequest instanceof ResourceRequest) {
@@ -712,7 +649,9 @@ public class PortletURLImpl
 			biConsumer.accept("p_p_lifecycle", "2");
 		}
 
-		if (_windowStateString != null) {
+		if ((_windowStateString != null) &&
+			!_cacheability.equals(ResourceURL.FULL)) {
+
 			biConsumer.accept("p_p_state", _windowStateString);
 		}
 
@@ -720,7 +659,9 @@ public class PortletURLImpl
 			biConsumer.accept("p_p_state_rcv", "1");
 		}
 
-		if (_portletModeString != null) {
+		if ((_portletModeString != null) &&
+			!_cacheability.equals(ResourceURL.FULL)) {
+
 			biConsumer.accept("p_p_mode", _portletModeString);
 		}
 
@@ -747,21 +688,6 @@ public class PortletURLImpl
 		}
 
 		writer.write(toString);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #PortletURLImpl(PortletRequest, String, PortletRequest,
-	 *             Layout, String)}
-	 */
-	@Deprecated
-	protected PortletURLImpl(
-		HttpServletRequest request, String portletId,
-		PortletRequest portletRequest, long plid, String lifecycle) {
-
-		this(request, portletId, portletRequest, null, lifecycle);
-
-		_plid = plid;
 	}
 
 	protected void addPortalAuthToken(StringBundler sb, Key key) {
@@ -858,16 +784,9 @@ public class PortletURLImpl
 			});
 
 		if (_doAsUserId > 0) {
-			try {
-				Company company = PortalUtil.getCompany(_request);
-
-				sb.append("doAsUserId=");
-				sb.append(processValue(company.getKeyObj(), _doAsUserId));
-				sb.append(StringPool.AMPERSAND);
-			}
-			catch (Exception e) {
-				_log.error("Unable to get company", e);
-			}
+			sb.append("doAsUserId=");
+			sb.append(processValue(key, _doAsUserId));
+			sb.append(StringPool.AMPERSAND);
 		}
 		else {
 			String doAsUserId = themeDisplay.getDoAsUserId();
@@ -936,25 +855,23 @@ public class PortletURLImpl
 				sb.append(StringPool.AMPERSAND);
 			}
 
-			String removeValue = processValue(key, "1");
-
 			for (String removedPublicParameter :
 					_removePublicRenderParameters) {
 
 				sb.append(URLCodec.encodeURL(removedPublicParameter));
 				sb.append(StringPool.EQUAL);
-				sb.append(removeValue);
 				sb.append(StringPool.AMPERSAND);
 			}
 		}
 
 		Map<String, String[]> renderParams = _params;
 
-		if (_copyCurrentRenderParameters) {
+		if (_copyCurrentRenderParameters &&
+			!(_lifecycle.equals(PortletRequest.RESOURCE_PHASE) &&
+			 _cacheability.equals(ResourceURL.FULL))) {
+
 			renderParams = _mergeWithRenderParameters(renderParams);
 		}
-
-		int previousSbIndex = sb.index();
 
 		for (Map.Entry<String, String[]> entry : renderParams.entrySet()) {
 			String name = entry.getKey();
@@ -964,11 +881,13 @@ public class PortletURLImpl
 				continue;
 			}
 
-			String publicRenderParameterName = getPublicRenderParameterName(
-				name);
+			if (!_lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
+				String publicRenderParameterName = getPublicRenderParameterName(
+					name);
 
-			if (Validator.isNotNull(publicRenderParameterName)) {
-				name = publicRenderParameterName;
+				if (Validator.isNotNull(publicRenderParameterName)) {
+					name = publicRenderParameterName;
+				}
 			}
 
 			for (String value : values) {
@@ -980,109 +899,24 @@ public class PortletURLImpl
 			}
 		}
 
-		if (sb.index() > previousSbIndex) {
-			sb.setIndex(sb.index() - 1);
-		}
-
 		if (_encrypt) {
-			sb.append(StringPool.AMPERSAND);
 			sb.append(WebKeys.ENCRYPT);
 			sb.append("=1");
 		}
-
-		if (PropsValues.PORTLET_URL_ANCHOR_ENABLE) {
-			if (_anchor && (_windowStateString != null) &&
-				!_windowStateString.equals(WindowState.MAXIMIZED.toString()) &&
-				!_windowStateString.equals(
-					LiferayWindowState.EXCLUSIVE.toString()) &&
-				!_windowStateString.equals(
-					LiferayWindowState.POP_UP.toString())) {
-
-				String lastString = sb.stringAt(sb.index() - 1);
-
-				char lastChar = lastString.charAt(lastString.length() - 1);
-
-				if ((lastChar != CharPool.AMPERSAND) &&
-					(lastChar != CharPool.QUESTION)) {
-
-					sb.append(StringPool.AMPERSAND);
-				}
-
-				sb.append("#p_");
-				sb.append(URLCodec.encodeURL(_portlet.getPortletId()));
-			}
-		}
-
-		String lastString = sb.stringAt(sb.index() - 1);
-
-		char lastChar = lastString.charAt(lastString.length() - 1);
-
-		if ((lastChar == CharPool.AMPERSAND) ||
-			(lastChar == CharPool.QUESTION)) {
-
-			sb.setStringAt(
-				lastString.substring(0, lastString.length() - 1),
-				sb.index() - 1);
+		else {
+			sb.setIndex(sb.index() - 1);
 		}
 
 		String result = sb.toString();
 
 		if (!CookieKeys.hasSessionId(_request)) {
-			result = PortalUtil.getURLWithSessionId(
-				result, _request.getSession().getId());
+			HttpSession session = _request.getSession();
+
+			result = PortalUtil.getURLWithSessionId(result, session.getId());
 		}
 
-		if (_escapeXml) {
-			result = HtmlUtil.escape(result);
-		}
-
-		if (result.length() > Http.URL_MAXIMUM_LENGTH) {
-			result = HttpUtil.shortenURL(result, 2);
-		}
-
-		return result;
-	}
-
-	protected String generateWSRPToString() {
-		StringBundler sb = new StringBundler("wsrp_rewrite?");
-
-		sb.append("wsrp-urlType");
-		sb.append(StringPool.EQUAL);
-
-		if (_lifecycle.equals(PortletRequest.ACTION_PHASE)) {
-			sb.append(URLCodec.encodeURL("blockingAction"));
-		}
-		else if (_lifecycle.equals(PortletRequest.RENDER_PHASE)) {
-			sb.append(URLCodec.encodeURL("render"));
-		}
-		else if (_lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
-			sb.append(URLCodec.encodeURL("resource"));
-		}
-
-		sb.append(StringPool.AMPERSAND);
-
-		if (_windowStateString != null) {
-			sb.append("wsrp-windowState=");
-			sb.append(URLCodec.encodeURL("wsrp:" + _windowStateString));
-			sb.append(StringPool.AMPERSAND);
-		}
-
-		if (_portletModeString != null) {
-			sb.append("wsrp-mode=");
-			sb.append(URLCodec.encodeURL("wsrp:" + _portletModeString));
-			sb.append(StringPool.AMPERSAND);
-		}
-
-		if (_resourceID != null) {
-			sb.append("wsrp-resourceID=");
-			sb.append(URLCodec.encodeURL(_resourceID));
-			sb.append(StringPool.AMPERSAND);
-		}
-
-		if (_lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
-			sb.append("wsrp-resourceCacheability=");
-			sb.append(URLCodec.encodeURL(_cacheability));
-			sb.append(StringPool.AMPERSAND);
+		if (!_escapeXml) {
+			result = HttpUtil.shortenURL(result);
 		}
 
 		if (PropsValues.PORTLET_URL_ANCHOR_ENABLE) {
@@ -1093,74 +927,23 @@ public class PortletURLImpl
 				!_windowStateString.equals(
 					LiferayWindowState.POP_UP.toString())) {
 
-				sb.append("wsrp-fragmentID=#p_");
+				sb.setIndex(0);
+
+				sb.append(result);
+				sb.append("#p_");
 				sb.append(URLCodec.encodeURL(_portlet.getPortletId()));
-				sb.append(StringPool.AMPERSAND);
+
+				result = sb.toString();
 			}
 		}
 
-		Map<String, String[]> renderParams = _params;
+		if (_escapeXml) {
+			result = HtmlUtil.escape(result);
 
-		if (_copyCurrentRenderParameters) {
-			renderParams = _mergeWithRenderParameters(renderParams);
+			result = HttpUtil.shortenURL(result);
 		}
 
-		StringBundler parameterSB = new StringBundler();
-
-		int previousSbIndex = sb.index();
-
-		for (Map.Entry<String, String[]> entry : renderParams.entrySet()) {
-			String name = entry.getKey();
-			String[] values = entry.getValue();
-
-			if (isParameterIncludedInPath(name)) {
-				continue;
-			}
-
-			String publicRenderParameterName = getPublicRenderParameterName(
-				name);
-
-			if (Validator.isNotNull(publicRenderParameterName)) {
-				name = publicRenderParameterName;
-			}
-
-			for (String value : values) {
-				_appendNamespaceAndEncode(parameterSB, name);
-
-				parameterSB.append(StringPool.EQUAL);
-				parameterSB.append(URLCodec.encodeURL(value));
-				parameterSB.append(StringPool.AMPERSAND);
-			}
-		}
-
-		if (sb.index() > previousSbIndex) {
-			sb.setIndex(sb.index() - 1);
-		}
-
-		sb.append("wsrp-navigationalState");
-		sb.append(StringPool.EQUAL);
-
-		byte[] parameterBytes = null;
-
-		try {
-			String parameterString = parameterSB.toString();
-
-			parameterBytes = parameterString.getBytes(StringPool.UTF8);
-		}
-		catch (UnsupportedEncodingException uee) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(uee, uee);
-			}
-		}
-
-		String navigationalState = Base64.toURLSafe(
-			Base64.encode(parameterBytes));
-
-		sb.append(navigationalState);
-
-		sb.append("/wsrp_rewrite");
-
-		return sb.toString();
+		return result;
 	}
 
 	protected String getPublicRenderParameterName(String name) {
@@ -1190,31 +973,6 @@ public class PortletURLImpl
 		else {
 			return false;
 		}
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
-	 */
-	@Deprecated
-	protected void mergeRenderParameters() {
-		_params = _mergeWithRenderParameters(_params);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
-	 */
-	@Deprecated
-	protected String prependNamespace(String name) {
-		String namespace = getNamespace();
-
-		if (!name.startsWith(PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE) &&
-			!name.startsWith(namespace) &&
-			!PortalUtil.isReservedParameter(name)) {
-
-			return namespace.concat(name);
-		}
-
-		return name;
 	}
 
 	protected String processValue(Key key, int value) {
@@ -1261,7 +1019,10 @@ public class PortletURLImpl
 		_params = new LinkedHashMap<>();
 		_removePublicRenderParameters = new LinkedHashSet<>();
 		_secure = PortalUtil.isSecure(request);
-		_wsrp = ParamUtil.getBoolean(request, "wsrp");
+
+		if (lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
+			_copyCurrentRenderParameters = true;
+		}
 
 		if (!portlet.isUndeployedPortlet()) {
 			Set<String> autopropagatedParameters =
@@ -1318,6 +1079,32 @@ public class PortletURLImpl
 		}
 
 		sb.append(URLCodec.encodeURL(name));
+	}
+
+	private void _callPortletURLGenerationListener() {
+		PortletApp portletApp = _portlet.getPortletApp();
+
+		for (PortletURLListener portletURLListener :
+				portletApp.getPortletURLListeners()) {
+
+			try {
+				PortletURLGenerationListener portletURLGenerationListener =
+					PortletURLListenerFactory.create(portletURLListener);
+
+				if (_lifecycle.equals(PortletRequest.ACTION_PHASE)) {
+					portletURLGenerationListener.filterActionURL(this);
+				}
+				else if (_lifecycle.equals(PortletRequest.RENDER_PHASE)) {
+					portletURLGenerationListener.filterRenderURL(this);
+				}
+				else if (_lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
+					portletURLGenerationListener.filterResourceURL(this);
+				}
+			}
+			catch (PortletException pe) {
+				_log.error(pe, pe);
+			}
+		}
 	}
 
 	private Key _getKey() {
@@ -1422,15 +1209,12 @@ public class PortletURLImpl
 	private String _toString;
 	private boolean _windowStateRestoreCurrentView;
 	private String _windowStateString;
-	private final boolean _wsrp;
 
 	private class ToStringPrivilegedAction implements PrivilegedAction<String> {
 
 		@Override
 		public String run() {
-			if (_wsrp) {
-				return generateWSRPToString();
-			}
+			_callPortletURLGenerationListener();
 
 			return generateToString();
 		}

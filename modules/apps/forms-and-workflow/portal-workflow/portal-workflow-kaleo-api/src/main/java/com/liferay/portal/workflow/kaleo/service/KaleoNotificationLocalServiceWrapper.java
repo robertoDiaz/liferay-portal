@@ -48,14 +48,14 @@ public class KaleoNotificationLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoNotification addKaleoNotification(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		long kaleoDefinitionId, java.lang.String kaleoNodeName,
+		String kaleoClassName, long kaleoClassPK,
+		long kaleoDefinitionVersionId, String kaleoNodeName,
 		com.liferay.portal.workflow.kaleo.definition.Notification notification,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kaleoNotificationLocalService.addKaleoNotification(kaleoClassName,
-			kaleoClassPK, kaleoDefinitionId, kaleoNodeName, notification,
-			serviceContext);
+			kaleoClassPK, kaleoDefinitionVersionId, kaleoNodeName,
+			notification, serviceContext);
 	}
 
 	/**
@@ -76,8 +76,9 @@ public class KaleoNotificationLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteKaleoDefinitionKaleoNotifications(long kaleoDefinitionId) {
-		_kaleoNotificationLocalService.deleteKaleoDefinitionKaleoNotifications(kaleoDefinitionId);
+	public void deleteKaleoDefinitionVersionKaleoNotifications(
+		long kaleoDefinitionVersionId) {
+		_kaleoNotificationLocalService.deleteKaleoDefinitionVersionKaleoNotifications(kaleoDefinitionVersionId);
 	}
 
 	/**
@@ -251,15 +252,14 @@ public class KaleoNotificationLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoNotification> getKaleoNotifications(
-		java.lang.String kaleoClassName, long kaleoClassPK) {
+		String kaleoClassName, long kaleoClassPK) {
 		return _kaleoNotificationLocalService.getKaleoNotifications(kaleoClassName,
 			kaleoClassPK);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoNotification> getKaleoNotifications(
-		java.lang.String kaleoClassName, long kaleoClassPK,
-		java.lang.String executionType) {
+		String kaleoClassName, long kaleoClassPK, String executionType) {
 		return _kaleoNotificationLocalService.getKaleoNotifications(kaleoClassName,
 			kaleoClassPK, executionType);
 	}
@@ -280,7 +280,7 @@ public class KaleoNotificationLocalServiceWrapper
 	* @return the OSGi service identifier
 	*/
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _kaleoNotificationLocalService.getOSGiServiceIdentifier();
 	}
 

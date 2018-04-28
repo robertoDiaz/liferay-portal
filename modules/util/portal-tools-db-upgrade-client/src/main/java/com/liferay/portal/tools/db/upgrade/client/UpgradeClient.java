@@ -14,7 +14,7 @@
 
 package com.liferay.portal.tools.db.upgrade.client;
 
-import com.liferay.portal.tools.db.upgrade.client.util.GogoTelnetClient;
+import com.liferay.gogo.shell.client.GogoShellClient;
 import com.liferay.portal.tools.db.upgrade.client.util.Properties;
 import com.liferay.portal.tools.db.upgrade.client.util.TeePrintStream;
 
@@ -81,7 +81,13 @@ public class UpgradeClient {
 			else {
 				jvmOpts =
 					"-Dfile.encoding=UTF8 -Duser.country=US " +
-						"-Duser.language=en -Duser.timezone=GMT -Xmx2048m ";
+						"-Duser.language=en -Duser.timezone=GMT -Xmx2048m";
+			}
+
+			if (commandLine.hasOption("debug")) {
+				jvmOpts = jvmOpts.concat(
+					" -agentlib:jdwp=transport=dt_socket,address=8001,server=" +
+						"y,suspend=y");
 			}
 
 			File logFile = null;
@@ -217,8 +223,8 @@ public class UpgradeClient {
 			ioe.printStackTrace();
 		}
 
-		try (GogoTelnetClient gogoTelnetClient = new GogoTelnetClient()) {
-			if (_shell || !_isFinished(gogoTelnetClient)) {
+		try (GogoShellClient gogoShellClient = new GogoShellClient()) {
+			if (_shell || !_isFinished(gogoShellClient)) {
 				System.out.println("You are connected to Gogo shell.");
 
 				_printHelp();
@@ -232,7 +238,7 @@ public class UpgradeClient {
 						break;
 					}
 					else {
-						System.out.println(gogoTelnetClient.send(line));
+						System.out.println(gogoShellClient.send(line));
 					}
 				}
 			}
@@ -263,6 +269,8 @@ public class UpgradeClient {
 	private static Options _getOptions() {
 		Options options = new Options();
 
+		options.addOption(
+			new Option("d", "debug", false, "Debug the upgrade jvm."));
 		options.addOption(
 			new Option("h", "help", false, "Print this message."));
 		options.addOption(
@@ -339,14 +347,14 @@ public class UpgradeClient {
 		return sb.toString();
 	}
 
-	private boolean _isFinished(GogoTelnetClient gogoTelnetClient)
+	private boolean _isFinished(GogoShellClient gogoShellClient)
 		throws IOException {
 
 		System.out.print("Checking to see if all upgrades have completed...");
 
-		String upgradeCheck = gogoTelnetClient.send("upgrade:check");
+		String upgradeCheck = gogoShellClient.send("upgrade:check");
 
-		String upgradeSteps = gogoTelnetClient.send(
+		String upgradeSteps = gogoShellClient.send(
 			"upgrade:list | grep Registered | grep step");
 
 		if (!upgradeCheck.equals("upgrade:check") ||
@@ -486,15 +494,22 @@ public class UpgradeClient {
 				_appServer.getServerDetectorServerId());
 		}
 		else {
+			String dirName = _appServerProperties.getProperty("dir");
+
+			File dir = new File(dirName);
+
+			if (!dir.isAbsolute()) {
+				dir = new File(_jarDir, dirName);
+			}
+
+			dirName = dir.getCanonicalPath();
+
+			_appServerProperties.setProperty("dir", dirName);
+
 			_appServer = new AppServer(
-				_appServerProperties.getProperty("dir"),
-				_appServerProperties.getProperty("extra.lib.dirs"),
+				dirName, _appServerProperties.getProperty("extra.lib.dirs"),
 				_appServerProperties.getProperty("global.lib.dir"),
 				_appServerProperties.getProperty("portal.dir"), value);
-
-			File dir = _appServer.getDir();
-
-			_appServerProperties.setProperty("dir", dir.getCanonicalPath());
 		}
 	}
 
@@ -617,6 +632,8 @@ public class UpgradeClient {
 	private void _verifyPortalUpgradeExtProperties() throws IOException {
 		String value = _portalUpgradeExtProperties.getProperty("liferay.home");
 
+		File baseDir = new File(".");
+
 		if ((value == null) || value.isEmpty()) {
 			File defaultLiferayHomeDir = new File(_jarDir, "../../");
 
@@ -630,8 +647,15 @@ public class UpgradeClient {
 				value = defaultLiferayHomeDir.getCanonicalPath();
 			}
 		}
+		else {
+			baseDir = _jarDir;
+		}
 
 		File liferayHome = new File(value);
+
+		if (!liferayHome.isAbsolute()) {
+			liferayHome = new File(baseDir, value);
+		}
 
 		_portalUpgradeExtProperties.setProperty(
 			"liferay.home", liferayHome.getCanonicalPath());

@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.type.select.internal;
 
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormFieldEvaluationResult;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldOptionsFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -28,10 +29,10 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 				ddmFormField.getProperty("dataSourceType"), "manual"));
 		parameters.put(
 			"multiple",
-			ddmFormField.isMultiple() ? "multiple" : StringPool.BLANK);
+			getMultiple(ddmFormField, ddmFormFieldRenderingContext));
 
 		DDMFormFieldOptions ddmFormFieldOptions =
 			ddmFormFieldOptionsFactory.create(
@@ -78,7 +79,8 @@ public class SelectDDMFormFieldTemplateContextContributor
 		parameters.put(
 			"options",
 			getOptions(
-				ddmFormFieldOptions, ddmFormFieldRenderingContext.getLocale()));
+				ddmFormFieldOptions, ddmFormFieldRenderingContext.getLocale(),
+				ddmFormFieldRenderingContext));
 
 		Map<String, String> stringsMap = new HashMap<>();
 
@@ -89,6 +91,9 @@ public class SelectDDMFormFieldTemplateContextContributor
 			"chooseAnOption",
 			LanguageUtil.get(resourceBundle, "choose-an-option"));
 		stringsMap.put(
+			"chooseOptions",
+			LanguageUtil.get(resourceBundle, "choose-options"));
+		stringsMap.put(
 			"dynamicallyLoadedData",
 			LanguageUtil.get(resourceBundle, "dynamically-loaded-data"));
 		stringsMap.put(
@@ -96,6 +101,13 @@ public class SelectDDMFormFieldTemplateContextContributor
 		stringsMap.put("search", LanguageUtil.get(resourceBundle, "search"));
 
 		parameters.put("strings", stringsMap);
+
+		List<String> predefinedValue = getValue(
+			getPredefinedValue(ddmFormField, ddmFormFieldRenderingContext));
+
+		if (predefinedValue != null) {
+			parameters.put("predefinedValue", predefinedValue);
+		}
 
 		parameters.put(
 			"value",
@@ -106,8 +118,29 @@ public class SelectDDMFormFieldTemplateContextContributor
 		return parameters;
 	}
 
+	protected boolean getMultiple(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
+			(DDMFormFieldEvaluationResult)ddmFormFieldRenderingContext.
+				getProperty("ddmFormFieldEvaluationResult");
+
+		if (ddmFormFieldEvaluationResult != null) {
+			Boolean multiple = ddmFormFieldEvaluationResult.getProperty(
+				"multiple");
+
+			if (multiple != null) {
+				return multiple;
+			}
+		}
+
+		return ddmFormField.isMultiple();
+	}
+
 	protected List<Object> getOptions(
-		DDMFormFieldOptions ddmFormFieldOptions, Locale locale) {
+		DDMFormFieldOptions ddmFormFieldOptions, Locale locale,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		List<Object> options = new ArrayList<>();
 
@@ -117,7 +150,13 @@ public class SelectDDMFormFieldTemplateContextContributor
 			LocalizedValue optionLabel = ddmFormFieldOptions.getOptionLabels(
 				optionValue);
 
-			optionMap.put("label", optionLabel.getString(locale));
+			String optionLabelString = optionLabel.getString(locale);
+
+			if (ddmFormFieldRenderingContext.isViewMode()) {
+				optionLabelString = HtmlUtil.extractText(optionLabelString);
+			}
+
+			optionMap.put("label", optionLabelString);
 
 			optionMap.put("value", optionValue);
 
@@ -125,6 +164,22 @@ public class SelectDDMFormFieldTemplateContextContributor
 		}
 
 		return options;
+	}
+
+	protected String getPredefinedValue(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		LocalizedValue predefinedValue = ddmFormField.getPredefinedValue();
+
+		if (predefinedValue == null) {
+			return null;
+		}
+
+		String predefinedValueString = predefinedValue.getString(
+			ddmFormFieldRenderingContext.getLocale());
+
+		return predefinedValueString;
 	}
 
 	protected ResourceBundle getResourceBundle(Locale locale) {

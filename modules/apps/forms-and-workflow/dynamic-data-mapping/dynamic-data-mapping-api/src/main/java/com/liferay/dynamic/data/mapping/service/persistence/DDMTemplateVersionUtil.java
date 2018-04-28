@@ -18,11 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 
-import com.liferay.osgi.util.ServiceTrackerFactory;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -283,8 +284,7 @@ public class DDMTemplateVersionUtil {
 	* @return the matching ddm template version
 	* @throws NoSuchTemplateVersionException if a matching ddm template version could not be found
 	*/
-	public static DDMTemplateVersion findByT_V(long templateId,
-		java.lang.String version)
+	public static DDMTemplateVersion findByT_V(long templateId, String version)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchTemplateVersionException {
 		return getPersistence().findByT_V(templateId, version);
 	}
@@ -296,8 +296,7 @@ public class DDMTemplateVersionUtil {
 	* @param version the version
 	* @return the matching ddm template version, or <code>null</code> if a matching ddm template version could not be found
 	*/
-	public static DDMTemplateVersion fetchByT_V(long templateId,
-		java.lang.String version) {
+	public static DDMTemplateVersion fetchByT_V(long templateId, String version) {
 		return getPersistence().fetchByT_V(templateId, version);
 	}
 
@@ -310,7 +309,7 @@ public class DDMTemplateVersionUtil {
 	* @return the matching ddm template version, or <code>null</code> if a matching ddm template version could not be found
 	*/
 	public static DDMTemplateVersion fetchByT_V(long templateId,
-		java.lang.String version, boolean retrieveFromCache) {
+		String version, boolean retrieveFromCache) {
 		return getPersistence()
 				   .fetchByT_V(templateId, version, retrieveFromCache);
 	}
@@ -322,8 +321,7 @@ public class DDMTemplateVersionUtil {
 	* @param version the version
 	* @return the ddm template version that was removed
 	*/
-	public static DDMTemplateVersion removeByT_V(long templateId,
-		java.lang.String version)
+	public static DDMTemplateVersion removeByT_V(long templateId, String version)
 		throws com.liferay.dynamic.data.mapping.exception.NoSuchTemplateVersionException {
 		return getPersistence().removeByT_V(templateId, version);
 	}
@@ -335,7 +333,7 @@ public class DDMTemplateVersionUtil {
 	* @param version the version
 	* @return the number of matching ddm template versions
 	*/
-	public static int countByT_V(long templateId, java.lang.String version) {
+	public static int countByT_V(long templateId, String version) {
 		return getPersistence().countByT_V(templateId, version);
 	}
 
@@ -666,6 +664,17 @@ public class DDMTemplateVersionUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<DDMTemplateVersionPersistence, DDMTemplateVersionPersistence> _serviceTracker =
-		ServiceTrackerFactory.open(DDMTemplateVersionPersistence.class);
+	private static ServiceTracker<DDMTemplateVersionPersistence, DDMTemplateVersionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DDMTemplateVersionPersistence.class);
+
+		ServiceTracker<DDMTemplateVersionPersistence, DDMTemplateVersionPersistence> serviceTracker =
+			new ServiceTracker<DDMTemplateVersionPersistence, DDMTemplateVersionPersistence>(bundle.getBundleContext(),
+				DDMTemplateVersionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 }
