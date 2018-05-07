@@ -383,7 +383,7 @@ public class JournalDisplayContext {
 
 							String label = "folder";
 
-							if (getFolder() == null) {
+							if (getFolder() != null) {
 								label = "subfolder";
 							}
 
@@ -1463,6 +1463,7 @@ public class JournalDisplayContext {
 		Group group = themeDisplay.getScopeGroup();
 
 		if (group.isStaged() && !group.isStagingGroup() &&
+			!group.isStagedRemotely() &&
 			group.isStagedPortlet(JournalPortletKeys.JOURNAL)) {
 
 			return false;

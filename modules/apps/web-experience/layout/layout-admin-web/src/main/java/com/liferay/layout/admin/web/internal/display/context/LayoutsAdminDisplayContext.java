@@ -495,6 +495,19 @@ public class LayoutsAdminDisplayContext {
 			_themeDisplay.getRequest());
 	}
 
+	public String getPortletResource() {
+		String portletResource = ParamUtil.getString(
+			_request, "portletResource");
+
+		if (Validator.isNull(portletResource)) {
+			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+			portletResource = portletDisplay.getPortletName();
+		}
+
+		return portletResource;
+	}
+
 	public PortletURL getPortletURL() {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
@@ -851,7 +864,7 @@ public class LayoutsAdminDisplayContext {
 
 		OrphanPortletsDisplayContext orphanPortletsDisplayContext =
 			new OrphanPortletsDisplayContext(
-				_liferayPortletRequest, _liferayPortletResponse);
+				_request, _liferayPortletRequest, _liferayPortletResponse);
 
 		if (ListUtil.isEmpty(
 				orphanPortletsDisplayContext.getOrphanPortlets(layout))) {
