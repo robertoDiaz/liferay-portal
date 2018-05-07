@@ -186,7 +186,7 @@ public class UADApplicationSummaryHelper {
 		baseURL.setParameter("orderByCol", getOrderByCol(renderRequest));
 		baseURL.setParameter("orderByType", getOrderByType(renderRequest));
 
-		User user = _portal.getSelectedUser(renderRequest);
+		User user = _selectedUserHelper.getSelectedUser(renderRequest);
 
 		long userId = user.getUserId();
 
@@ -235,7 +235,7 @@ public class UADApplicationSummaryHelper {
 		return new DropdownItemList() {
 			{
 				for (String navigation :
-						new String[] {"all", "in-progress", "done"}) {
+						new String[] {"all", "pending", "done"}) {
 
 					add(
 						dropdownItem -> {
@@ -296,7 +296,7 @@ public class UADApplicationSummaryHelper {
 	public Predicate<UADApplicationSummaryDisplay> getPredicate(
 		String navigation) {
 
-		if (navigation.equals("in-progress")) {
+		if (navigation.equals("pending")) {
 			return display -> display.getCount() > 0;
 		}
 		else if (navigation.equals("done")) {
@@ -309,12 +309,8 @@ public class UADApplicationSummaryHelper {
 	public int getReviewableUADEntitiesCount(
 		Stream<UADDisplay> uadDisplayStream, long userId) {
 
-		return uadDisplayStream.map(
-			uadDisplay -> uadDisplay.getKey()
-		).map(
-			key -> _uadRegistry.getUADAggregator(key)
-		).mapToInt(
-			uadAggregator -> (int)uadAggregator.count(userId)
+		return uadDisplayStream.mapToInt(
+			uadDisplay -> (int)uadDisplay.count(userId)
 		).sum();
 	}
 
@@ -403,6 +399,9 @@ public class UADApplicationSummaryHelper {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private SelectedUserHelper _selectedUserHelper;
 
 	@Reference
 	private UADRegistry _uadRegistry;
