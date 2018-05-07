@@ -17,6 +17,9 @@ package com.liferay.user.associated.data.display;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 
+import java.io.Serializable;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,18 +28,33 @@ import java.util.Map;
  */
 public interface UADDisplay<T> {
 
+	public long count(long userId);
+
+	public T get(Serializable primaryKey) throws Exception;
+
 	public String getApplicationName();
+
+	public default String[] getColumnFieldNames() {
+		return getDisplayFieldNames();
+	}
 
 	public String[] getDisplayFieldNames();
 
-	public String getEditURL(
+	public default String getEditURL(
 			T t, LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
-		throws Exception;
+		throws Exception {
+
+		return null;
+	}
+
+	public Map<String, Object> getFieldValues(T t, String[] fieldNames);
 
 	public String getKey();
 
-	public Map<String, Object> getNonanonymizableFieldValues(T t);
+	public Serializable getPrimaryKey(T t);
+
+	public List<T> getRange(long userId, int start, int end);
 
 	public String getTypeName(Locale locale);
 
