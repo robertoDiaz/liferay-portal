@@ -16,13 +16,10 @@ package com.liferay.asset.publisher.portlet.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
-import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolderConstants;
-import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.ExpiredModelException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -58,11 +55,10 @@ import org.junit.runner.RunWith;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
- * Tests whether the friendly URL resolves for existent, nonexistent or expired
- * web content articles in the Asset Publisher.
+ * Tests whether the friendly URL resolves for existent and nonexistent web
+ * content articles in the Asset Publisher.
  *
  * @author Eduardo Garcia
- * @author Roberto Díaz
  */
 @RunWith(Arquillian.class)
 public class DisplayPageFriendlyURLResolverTest {
@@ -133,74 +129,17 @@ public class DisplayPageFriendlyURLResolverTest {
 			getRequestContext());
 
 		Assert.assertNotNull(actualURL);
-	}
 
-	@Test(expected = NoSuchLayoutException.class)
-	public void testJournalArticleFriendlyURLWithNonExistentArticle()
-		throws Exception {
+		try {
+			PortalUtil.getActualURL(
+				_group.getGroupId(), false, Portal.PATH_MAIN,
+				"/-/nonexistent-test-journal-article",
+				new HashMap<String, String[]>(), getRequestContext());
 
-		PortalUtil.getActualURL(
-			_group.getGroupId(), false, Portal.PATH_MAIN,
-			"/-/nonexistent-test-journal-article",
-			new HashMap<String, String[]>(), getRequestContext());
-	}
-
-	@Test(expected = ExpiredModelException.class)
-	public void testJournalArticleFriendlyURLWithExpiredArticle() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
-
-		LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), _group.getGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, "Home", StringPool.BLANK,
-			StringPool.BLANK, LayoutConstants.TYPE_PORTLET, false,
-			StringPool.BLANK, serviceContext);
-
-		Layout layout = LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), _group.getGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			"Test " + RandomTestUtil.nextInt(), StringPool.BLANK,
-			StringPool.BLANK, LayoutConstants.TYPE_PORTLET, false,
-			StringPool.BLANK, serviceContext);
-
-		LayoutTypePortlet layoutTypePortlet =
-			(LayoutTypePortlet)layout.getLayoutType();
-
-		String portletId = layoutTypePortlet.addPortletId(
-			TestPropsValues.getUserId(),
-			AssetPublisherPortletKeys.ASSET_PUBLISHER, "column-1", 0);
-
-		layoutTypePortlet.setTypeSettingsProperty(
-			LayoutTypePortletConstants.DEFAULT_ASSET_PUBLISHER_PORTLET_ID,
-			portletId);
-
-		layout = LayoutLocalServiceUtil.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			layout.getTypeSettings());
-
-		Map<Locale, String> titleMap = new HashMap<>();
-
-		titleMap.put(LocaleUtil.US, "Test Journal Article");
-
-		Map<Locale, String> contentMap = new HashMap<>();
-
-		contentMap.put(LocaleUtil.US, "This test content is in English.");
-
-		JournalArticle article = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			JournalArticleConstants.CLASSNAME_ID_DEFAULT, titleMap, titleMap,
-			contentMap, layout.getUuid(), LocaleUtil.US, null, false, false,
-			serviceContext);
-
-		JournalArticleLocalServiceUtil.expireArticle(
-			article.getUserId(), article.getGroupId(), article.getArticleId(),
-			article.getUrlTitle(), serviceContext);
-
-		PortalUtil.getActualURL(
-			_group.getGroupId(), false, Portal.PATH_MAIN,
-			"/-/test-journal-article", new HashMap<String, String[]>(),
-			getRequestContext());
+			Assert.fail();
+		}
+		catch (NoSuchLayoutException nsle) {
+		}
 	}
 
 	protected Map<String, Object> getRequestContext() {
