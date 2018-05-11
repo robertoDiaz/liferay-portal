@@ -19,7 +19,7 @@
 				<execute macro="PortalInstances#tearDownCP" />
 			</then>
 			<else>
-				<!--There is no need for a SocialActivity#tearDownCP, as the User Statistics will not be reset and Jenkins does not run teardowns.-->
+				<!-- There is no need for a SocialActivity#tearDownCP, as the User Statistics will not be reset and Jenkins does not run teardowns. -->
 
 				<execute macro="User#firstLoginPG" />
 
@@ -355,7 +355,7 @@
 
 		<execute macro="Page#gotoSALocalizedCP">
 			<var name="adminLocalized" value="システム管理" />
-			<var name="portletCategoryName" value="編集" />
+			<var name="portletCategoryName" value="設定" />
 			<var name="portletName" value="ソーシャルアクティビティ" />
 		</execute>
 
