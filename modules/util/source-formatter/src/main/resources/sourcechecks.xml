@@ -13,6 +13,9 @@
 		<check name="BNDRangeCheck" />
 		<check name="BNDSchemaVersionCheck" />
 		<check name="BNDStylingCheck" />
+		<check name="BNDSuiteCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="BNDWhitespaceCheck" />
 
 		<!-- Module checks -->
@@ -126,6 +129,7 @@
 		<check name="JavaServiceImplCheck" />
 		<check name="JavaSignatureStylingCheck" />
 		<check name="JavaStaticBlockCheck" />
+		<check name="JavaStaticImportsCheck" />
 		<check name="JavaStopWatchCheck" />
 		<check name="JavaStylingCheck" />
 		<check name="JavaSystemExceptionCheck" />
@@ -347,6 +351,7 @@
 		<check name="XMLPoshiFileCheck" />
 		<check name="XMLProjectElementCheck" />
 		<check name="XMLResourceActionsFileCheck" />
+		<check name="XMLServiceEntityNameCheck" />
 		<check name="XMLServiceFileCheck" />
 		<check name="XMLSolrSchemaFileCheck" />
 		<check name="XMLSuppressionsFileCheck" />
