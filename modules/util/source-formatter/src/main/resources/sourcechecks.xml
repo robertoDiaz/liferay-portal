@@ -13,6 +13,9 @@
 		<check name="BNDRangeCheck" />
 		<check name="BNDSchemaVersionCheck" />
 		<check name="BNDStylingCheck" />
+		<check name="BNDSuiteCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="BNDWhitespaceCheck" />
 
 		<!-- Module checks -->
@@ -55,6 +58,7 @@
 		<check name="FTLLiferayVariableOrderCheck" />
 		<check name="FTLStringRelationalOperatorCheck" />
 		<check name="FTLStylingCheck" />
+		<check name="FTLTagAttributesCheck" />
 		<check name="FTLTagCheck" />
 		<check name="FTLWhitespaceCheck" />
 	</source-processor>
@@ -126,6 +130,7 @@
 		<check name="JavaServiceImplCheck" />
 		<check name="JavaSignatureStylingCheck" />
 		<check name="JavaStaticBlockCheck" />
+		<check name="JavaStaticImportsCheck" />
 		<check name="JavaStopWatchCheck" />
 		<check name="JavaStylingCheck" />
 		<check name="JavaSystemExceptionCheck" />
@@ -326,6 +331,7 @@
 		<check name="TLDElementOrderCheck" />
 		<check name="TLDTypeCheck" />
 		<check name="WhitespaceCheck" />
+		<check name="XMLIndentationCheck" />
 	</source-processor>
 	<source-processor name="TSSourceProcessor">
 		<check name="WhitespaceCheck" />
@@ -347,6 +353,7 @@
 		<check name="XMLPoshiFileCheck" />
 		<check name="XMLProjectElementCheck" />
 		<check name="XMLResourceActionsFileCheck" />
+		<check name="XMLServiceEntityNameCheck" />
 		<check name="XMLServiceFileCheck" />
 		<check name="XMLSolrSchemaFileCheck" />
 		<check name="XMLSuppressionsFileCheck" />

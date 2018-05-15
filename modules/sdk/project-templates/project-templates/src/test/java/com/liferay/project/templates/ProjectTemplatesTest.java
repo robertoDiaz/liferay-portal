@@ -488,6 +488,32 @@ public class ProjectTemplatesTest {
 		_buildProjects(gradleProjectDir, mavenProjectDir);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildTemplateLiferayVersionInvalid62() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "6.2");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildTemplateLiferayVersionInvalid70test()
+		throws Exception {
+
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.0test");
+	}
+
+	@Test
+	public void testBuildTemplateLiferayVersionValid70() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.0");
+	}
+
+	@Test
+	public void testBuildTemplateLiferayVersionValid712() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.1.2");
+	}
+
 	@Test
 	public void testBuildTemplateMVCPortlet() throws Exception {
 		_testBuildTemplatePortlet(
@@ -2204,22 +2230,23 @@ public class ProjectTemplatesTest {
 
 		GradleRunner gradleRunner = GradleRunner.create();
 
+		List<String> arguments = new ArrayList<>(taskPaths.length + 3);
+
+		arguments.add("--stacktrace");
+
 		String httpProxyHost = mavenExecutor.getHttpProxyHost();
 		int httpProxyPort = mavenExecutor.getHttpProxyPort();
 
 		if (Validator.isNotNull(httpProxyHost) && (httpProxyPort > 0)) {
-			String[] arguments = new String[taskPaths.length + 2];
-
-			arguments[0] = "-Dhttp.proxyHost=" + httpProxyHost;
-			arguments[1] = "-Dhttp.proxyPort=" + httpProxyPort;
-
-			System.arraycopy(taskPaths, 0, arguments, 2, taskPaths.length);
-
-			gradleRunner.withArguments(arguments);
+			arguments.add("-Dhttp.proxyHost=" + httpProxyHost);
+			arguments.add("-Dhttp.proxyPort=" + httpProxyPort);
 		}
-		else {
-			gradleRunner.withArguments(taskPaths);
+
+		for (String taskPath : taskPaths) {
+			arguments.add(taskPath);
 		}
+
+		gradleRunner.withArguments(arguments);
 
 		gradleRunner.withGradleDistribution(_gradleDistribution);
 		gradleRunner.withProjectDir(projectDir);
@@ -2331,6 +2358,7 @@ public class ProjectTemplatesTest {
 		List<File> archetypesDirs = Arrays.asList(archetypesDir);
 
 		projectTemplatesArgs.setArchetypesDirs(archetypesDirs);
+
 		projectTemplatesArgs.setAuthor(author);
 		projectTemplatesArgs.setClassName(className);
 		projectTemplatesArgs.setContributorType(contributorType);
