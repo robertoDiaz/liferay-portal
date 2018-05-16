@@ -53,9 +53,8 @@ public class LoginPostAction implements LifecycleAction {
 	}
 
 	@Reference(
-		target =
-			"(javax.portlet.name=" + InviteMembersPortletKeys.INVITE_MEMBERS +
-				")",
+		target = "(javax.portlet.name=" + InviteMembersPortletKeys.INVITE_MEMBERS +
+			")",
 		unbind = "-"
 	)
 	private CreateAccountActionProcess _createAccountActionProcess;

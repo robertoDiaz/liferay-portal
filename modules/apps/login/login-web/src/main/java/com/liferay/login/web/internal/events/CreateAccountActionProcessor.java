@@ -73,7 +73,7 @@ public class CreateAccountActionProcessor {
 		CreateAccountActionProcessor.class);
 
 	private static
-		ServiceTrackerList<CreateAccountActionProcess, CreateAccountActionProcess>
-			_serviceTrackerList;
+		ServiceTrackerList<CreateAccountActionProcess,
+			CreateAccountActionProcess> _serviceTrackerList;
 
 }
