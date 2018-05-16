@@ -15,9 +15,13 @@
 package com.liferay.invitation.invite.members.internal.events;
 
 import com.liferay.invitation.invite.members.constants.InviteMembersPortletKeys;
+import com.liferay.invitation.invite.members.exception.MemberRequestAlreadyUsedException;
+import com.liferay.invitation.invite.members.exception.MemberRequestInvalidUserException;
 import com.liferay.invitation.invite.members.service.MemberRequestLocalService;
 import com.liferay.login.events.CreateAccountActionProcess;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
@@ -70,9 +74,21 @@ public class InviteMembersCreateAccountActionProcess
 			}
 		}
 
-		_memberRequestLocalService.updateMemberRequest(
-			memberRequestKey, user.getUserId());
+		try {
+			_memberRequestLocalService.updateMemberRequest(
+				memberRequestKey, user.getUserId());
+		}
+		catch (MemberRequestAlreadyUsedException |
+			   MemberRequestInvalidUserException e) {
+
+			if (_log.isWarnEnabled()) {
+				_log.warn("The membership request is already processed.");
+			}
+		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		InviteMembersCreateAccountActionProcess.class);
 
 	@Reference
 	private Http _http;
