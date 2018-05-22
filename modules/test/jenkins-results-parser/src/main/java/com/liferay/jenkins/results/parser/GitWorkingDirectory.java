@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -764,6 +765,40 @@ public class GitWorkingDirectory {
 			getRepositoryName(), "/tree/", branchName, "/", relativePath);
 	}
 
+	public File getJavaFileFromFullClassName(String fullClassName) {
+		if (_javaDirPaths == null) {
+			List<File> javaFiles = JenkinsResultsParserUtil.findFiles(
+				getWorkingDirectory(), ".*\\.java");
+
+			_javaDirPaths = new HashSet<>();
+
+			for (File javaFile : javaFiles) {
+				File parentFile = javaFile.getParentFile();
+
+				_javaDirPaths.add(parentFile.getPath());
+			}
+		}
+
+		String classFileName =
+			fullClassName.replaceAll(".*\\.([^\\.]+)", "$1") + ".java";
+		String classPackageName = fullClassName.substring(
+			0, fullClassName.lastIndexOf("."));
+
+		String classPackagePath = classPackageName.replaceAll("\\.", "/");
+
+		for (String javaDirPath : _javaDirPaths) {
+			if (javaDirPath.contains(classPackagePath)) {
+				File classFile = new File(javaDirPath, classFileName);
+
+				if (classFile.exists()) {
+					return classFile;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public List<File> getModifiedFilesList() {
 		return getModifiedFilesList(null);
 	}
@@ -1412,7 +1447,8 @@ public class GitWorkingDirectory {
 	}
 
 	protected File getRealGitDirectory(File gitFile) {
-		String gitFileContent;
+		String gitFileContent = null;
+
 		try {
 			gitFileContent = JenkinsResultsParserUtil.read(gitFile);
 		}
@@ -1618,7 +1654,7 @@ public class GitWorkingDirectory {
 		List<String> shortNames = new ArrayList<>(fullNameList.size());
 
 		for (String fullName : fullNameList) {
-			shortNames.add(fullName.substring(fullName.lastIndexOf("/") + 1));
+			shortNames.add(fullName.substring("refs/heads/".length()));
 		}
 
 		return shortNames;
@@ -1777,6 +1813,7 @@ public class GitWorkingDirectory {
 			"git.working.directory.public.only.repository.names");
 
 	private File _gitDirectory;
+	private Set<String> _javaDirPaths;
 	private final String _repositoryName;
 	private final String _repositoryUsername;
 	private final String _upstreamBranchName;

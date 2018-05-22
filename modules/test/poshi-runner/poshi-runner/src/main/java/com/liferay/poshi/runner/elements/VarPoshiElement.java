@@ -19,6 +19,9 @@ import com.liferay.poshi.runner.util.Validator;
 
 import java.io.IOException;
 
+import java.util.List;
+
+import org.dom4j.Attribute;
 import org.dom4j.CDATA;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -42,7 +45,7 @@ public class VarPoshiElement extends PoshiElement {
 		PoshiElement parentPoshiElement, String readableSyntax) {
 
 		if (_isElementType(readableSyntax)) {
-			return new VarPoshiElement(readableSyntax);
+			return new VarPoshiElement(parentPoshiElement, readableSyntax);
 		}
 
 		return null;
@@ -54,9 +57,9 @@ public class VarPoshiElement extends PoshiElement {
 				if (node instanceof CDATA) {
 					StringBuilder sb = new StringBuilder();
 
-					sb.append("escapeText(\"");
+					sb.append("\'\'\'");
 					sb.append(node.getText());
-					sb.append("\")");
+					sb.append("\'\'\'");
 
 					return sb.toString();
 				}
@@ -68,19 +71,27 @@ public class VarPoshiElement extends PoshiElement {
 
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
+		if (readableSyntax.startsWith("static")) {
+			addAttribute("static", "true");
+
+			readableSyntax = readableSyntax.replaceFirst("static", "");
+
+			readableSyntax = readableSyntax.trim();
+		}
+
 		String name = getNameFromAssignment(readableSyntax);
 
 		addAttribute("name", name);
 
-		String quotedValue = getValueFromAssignment(readableSyntax);
+		String value = getValueFromAssignment(readableSyntax);
 
-		String value = getQuotedContent(quotedValue);
-
-		if (quotedValue.startsWith("escapeText(")) {
-			addCDATA(value);
+		if (value.startsWith("\'\'\'")) {
+			addCDATA(getReadableEscapedContent(value));
 
 			return;
 		}
+
+		value = getQuotedContent(value);
 
 		if (value.contains("Util.") || value.startsWith("selenium.")) {
 			if (value.startsWith("selenium.")) {
@@ -106,11 +117,15 @@ public class VarPoshiElement extends PoshiElement {
 
 		sb.append("\n\t");
 
+		String staticAttribute = attributeValue("static");
+
+		if (staticAttribute != null) {
+			sb.append("static ");
+		}
+
 		PoshiElement parentElement = (PoshiElement)getParent();
 
-		String parentElementName = parentElement.getName();
-
-		if (!parentElementName.equals("execute")) {
+		if (!(parentElement instanceof ExecutePoshiElement)) {
 			sb.append(getName());
 			sb.append(" ");
 		}
@@ -145,7 +160,7 @@ public class VarPoshiElement extends PoshiElement {
 
 		sb.append(value);
 
-		if (!parentElementName.equals("execute")) {
+		if (!(parentElement instanceof ExecutePoshiElement)) {
 			sb.append(";");
 		}
 
@@ -159,8 +174,14 @@ public class VarPoshiElement extends PoshiElement {
 		this(_ELEMENT_NAME, element);
 	}
 
-	protected VarPoshiElement(String readableSyntax) {
-		this(_ELEMENT_NAME, readableSyntax);
+	protected VarPoshiElement(List<Attribute> attributes, List<Node> nodes) {
+		this(_ELEMENT_NAME, attributes, nodes);
+	}
+
+	protected VarPoshiElement(
+		PoshiElement parentPoshiElement, String readableSyntax) {
+
+		this(_ELEMENT_NAME, parentPoshiElement, readableSyntax);
 	}
 
 	protected VarPoshiElement(String name, Element element) {
@@ -171,8 +192,16 @@ public class VarPoshiElement extends PoshiElement {
 		}
 	}
 
-	protected VarPoshiElement(String name, String readableSyntax) {
-		super(name, readableSyntax);
+	protected VarPoshiElement(
+		String elementName, List<Attribute> attributes, List<Node> nodes) {
+
+		super(elementName, attributes, nodes);
+	}
+
+	protected VarPoshiElement(
+		String name, PoshiElement parentPoshiElement, String readableSyntax) {
+
+		super(name, parentPoshiElement, readableSyntax);
 	}
 
 	@Override
@@ -223,7 +252,9 @@ public class VarPoshiElement extends PoshiElement {
 			return false;
 		}
 
-		if (!readableSyntax.startsWith("var ")) {
+		if (!readableSyntax.startsWith("static var") &&
+			!readableSyntax.startsWith("var ")) {
+
 			return false;
 		}
 

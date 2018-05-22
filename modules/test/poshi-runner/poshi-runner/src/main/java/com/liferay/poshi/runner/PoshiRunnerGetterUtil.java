@@ -261,6 +261,9 @@ public class PoshiRunnerGetterUtil {
 
 				parameter = GetterUtil.getInteger((String)parameter);
 			}
+			else if (className.endsWith("StringUtil")) {
+				parameter = String.valueOf(parameter);
+			}
 
 			parameters[i] = parameter;
 		}
@@ -350,7 +353,7 @@ public class PoshiRunnerGetterUtil {
 		String filePath = url.getFile();
 
 		if (!fileContent.contains("<definition") &&
-			filePath.endsWith(".testcase")) {
+			(filePath.endsWith(".macro") || filePath.endsWith(".testcase"))) {
 
 			PoshiNode<?, ?> poshiNode = PoshiNodeFactory.newPoshiNodeFromFile(
 				filePath);
@@ -430,6 +433,7 @@ public class PoshiRunnerGetterUtil {
 			}
 
 			sb.append(line);
+			sb.append("\n");
 
 			lineNumber++;
 		}
