@@ -20,6 +20,7 @@ import com.google.common.collect.Multimap;
 
 import com.liferay.poshi.runner.pql.PQLEntity;
 import com.liferay.poshi.runner.pql.PQLEntityFactory;
+import com.liferay.poshi.runner.prose.PoshiProseMatcher;
 import com.liferay.poshi.runner.selenium.LiferaySelenium;
 import com.liferay.poshi.runner.util.FileUtil;
 import com.liferay.poshi.runner.util.MathUtil;
@@ -70,6 +71,12 @@ import org.dom4j.io.SAXReader;
  */
 public class PoshiRunnerContext {
 
+	public static final String[] POSHI_SUPPORT_FILE_INCLUDES =
+		{"**/*.action", "**/*.function", "**/*.macro", "**/*.path"};
+
+	public static final String[] POSHI_TEST_FILE_INCLUDES =
+		{"**/*.prose", "**/*.testcase"};
+
 	public static void clear() {
 		_commandElements.clear();
 		_commandReturns.clear();
@@ -89,6 +96,10 @@ public class PoshiRunnerContext {
 		String fileName, String namespace) {
 
 		return _filePaths.get(namespace + "." + fileName);
+	}
+
+	public static List<String> getFilePathKeys() {
+		return new ArrayList<>(_filePaths.keySet());
 	}
 
 	public static List<String> getFilePaths() {
@@ -282,6 +293,13 @@ public class PoshiRunnerContext {
 		_readPoshiFiles();
 		_readSeleniumFiles();
 		_readTestToggleFiles();
+	}
+
+	public static void readFiles(String[] includes, String... baseDirNames)
+		throws Exception {
+
+		_readPoshiFiles(includes, baseDirNames);
+		_readSeleniumFiles();
 	}
 
 	public static void setTestCaseNamespacedClassCommandName(
@@ -755,26 +773,25 @@ public class PoshiRunnerContext {
 	}
 
 	private static void _readPoshiFiles() throws Exception {
-		String[] poshiFileNames = {
-			"**/*.action", "**/*.function", "**/*.macro", "**/*.path",
-			"**/*.testcase"
-		};
-
-		_readPoshiFilesFromClassPath(poshiFileNames, "testFunctional");
-
 		if (Validator.isNotNull(PropsValues.TEST_INCLUDE_DIR_NAMES)) {
 			_readPoshiFiles(
-				new String[] {
-					"**/*.action", "**/*.function", "**/*.macro", "**/*.path"
-				},
+				POSHI_SUPPORT_FILE_INCLUDES,
 				PropsValues.TEST_INCLUDE_DIR_NAMES);
 		}
 
-		if (Validator.isNotNull(PropsValues.TEST_SUBREPO_DIRS)) {
-			_readPoshiFiles(poshiFileNames, PropsValues.TEST_SUBREPO_DIRS);
-		}
+		for (String[] poshiFileIncludes : new String[][] {
+				POSHI_SUPPORT_FILE_INCLUDES, POSHI_TEST_FILE_INCLUDES
+			}) {
 
-		_readPoshiFiles(poshiFileNames, _TEST_BASE_DIR_NAME);
+			_readPoshiFilesFromClassPath(poshiFileIncludes, "testFunctional");
+
+			if (Validator.isNotNull(PropsValues.TEST_SUBREPO_DIRS)) {
+				_readPoshiFiles(
+					poshiFileIncludes, PropsValues.TEST_SUBREPO_DIRS);
+			}
+
+			_readPoshiFiles(poshiFileIncludes, _TEST_BASE_DIR_NAME);
+		}
 
 		_initComponentCommandNamesMap();
 
@@ -1108,6 +1125,16 @@ public class PoshiRunnerContext {
 					classType + "#" + namespacedClassCommandName,
 					_getCommandReturns(commandElement));
 
+				String prose = commandElement.attributeValue("prose");
+
+				if (classType.equals("macro") && (prose != null) &&
+					!prose.isEmpty()) {
+
+					PoshiProseMatcher.storePoshiProseMatcher(
+						commandElement.attributeValue("prose"),
+						namespacedClassCommandName);
+				}
+
 				if (classType.equals("test-case")) {
 					Properties properties = _getClassCommandNameProperties(
 						rootElement, commandElement);
@@ -1281,7 +1308,7 @@ public class PoshiRunnerContext {
 	private static final Map<String, String> _pathLocators = new HashMap<>();
 	private static final Pattern _poshiResourceJarNamePattern = Pattern.compile(
 		"jar:.*\\/(?<namespace>\\w+)\\-(?<branchName>\\w+" +
-			"(\\-\\w+)*)\\-(?<sha>\\w+)\\.jar.*");
+			"([\\-\\.]\\w+)*)\\-(?<timestamp>\\d+)\\-(?<sha>\\w+)\\.jar.*");
 	private static final Map<String, Element> _rootElements = new HashMap<>();
 	private static final Map<String, Integer> _seleniumParameterCounts =
 		new HashMap<>();

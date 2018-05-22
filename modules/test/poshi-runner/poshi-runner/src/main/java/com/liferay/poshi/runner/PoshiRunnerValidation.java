@@ -200,7 +200,8 @@ public class PoshiRunnerValidation {
 		Element element, String filePath) {
 
 		List<String> possibleAttributeNames = Arrays.asList(
-			"line-number", "name", "returns", "summary", "summary-ignore");
+			"line-number", "name", "prose", "returns", "summary",
+			"summary-ignore");
 
 		validatePossibleAttributeNames(
 			element, possibleAttributeNames, filePath);
@@ -665,6 +666,7 @@ public class PoshiRunnerValidation {
 		String className =
 			PoshiRunnerGetterUtil.getClassNameFromNamespacedClassCommandName(
 				function);
+
 		String namespace = PoshiRunnerContext.getNamespaceFromFilePath(
 			filePath);
 
@@ -1758,7 +1760,7 @@ public class PoshiRunnerValidation {
 	private static void _throwExceptions() throws Exception {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(Integer.toString(_exceptions.size()));
+		sb.append(String.valueOf(_exceptions.size()));
 		sb.append(" errors in POSHI\n\n\n");
 
 		for (Exception exception : _exceptions) {
