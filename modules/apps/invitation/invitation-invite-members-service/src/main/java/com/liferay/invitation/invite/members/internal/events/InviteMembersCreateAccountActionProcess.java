@@ -15,14 +15,15 @@
 package com.liferay.invitation.invite.members.internal.events;
 
 import com.liferay.invitation.invite.members.constants.InviteMembersPortletKeys;
-import com.liferay.invitation.invite.members.exception.MemberRequestAlreadyUsedException;
-import com.liferay.invitation.invite.members.exception.MemberRequestInvalidUserException;
+import com.liferay.invitation.invite.members.model.MemberRequest;
 import com.liferay.invitation.invite.members.service.MemberRequestLocalService;
+import com.liferay.invitation.invite.members.service.persistence.MemberRequestUtil;
 import com.liferay.login.events.CreateAccountActionProcess;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -74,17 +75,17 @@ public class InviteMembersCreateAccountActionProcess
 			}
 		}
 
-		try {
-			_memberRequestLocalService.updateMemberRequest(
-				memberRequestKey, user.getUserId());
-		}
-		catch (MemberRequestAlreadyUsedException |
-			   MemberRequestInvalidUserException e) {
+		MemberRequest memberRequest = MemberRequestUtil.findByKey(
+			memberRequestKey);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn("The membership request is already processed.");
-			}
+		if (memberRequest.getReceiverUserId() !=
+				UserConstants.USER_ID_DEFAULT) {
+
+			return;
 		}
+
+		_memberRequestLocalService.updateMemberRequest(
+			memberRequestKey, user.getUserId());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
