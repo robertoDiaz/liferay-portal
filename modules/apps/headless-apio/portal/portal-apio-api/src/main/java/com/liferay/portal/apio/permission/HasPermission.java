@@ -23,7 +23,7 @@ import java.util.function.BiFunction;
 
 /**
  * Instances of this class contains the information necessary to calculate
- * permissions for the models exposed in Liferay Portal APIO APIs.
+ * permissions for the models exposed in Liferay Portal Apio APIs.
  *
  * <p>
  * The different methods that this interface exposes are intended to be used
@@ -72,7 +72,7 @@ public interface HasPermission {
 	 * @review
 	 */
 	public Boolean forAddingRootJournalArticle(
-		Credentials credentials, Long groupId);
+		Credentials credentials, long groupId);
 
 	/**
 	 * Returns {@code true} if the current {@code User} can add an {@code User}.

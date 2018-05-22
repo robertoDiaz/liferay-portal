@@ -180,10 +180,12 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	*
 	* @param layout the layout
 	* @return the layout that was removed
+	* @throws PortalException
 	*/
 	@Override
 	public com.liferay.portal.kernel.model.Layout deleteLayout(
-		com.liferay.portal.kernel.model.Layout layout) {
+		com.liferay.portal.kernel.model.Layout layout)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutLocalService.deleteLayout(layout);
 	}
 
@@ -1190,7 +1192,9 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	* Returns all the layouts whose friendly URLs are <code>null</code>
 	*
 	* @return all the layouts whose friendly URLs are <code>null</code>
+	* @deprecated As of 7.0.0, with no direct replacement
 	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Layout> getNullFriendlyURLLayouts() {
 		return _layoutLocalService.getNullFriendlyURLLayouts();
