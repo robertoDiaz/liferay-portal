@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/publish_entity_menu_item/init.jsp" %>
+<%@ include file="/publish_model_menu_item/init.jsp" %>
 
 <c:if test="<%= GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(), ActionKeys.EXPORT_IMPORT_PORTLET_INFO) && showMenuItem %>">
 
@@ -24,7 +24,6 @@
 	portletURL.setParameter(ActionRequest.ACTION_NAME, "exportImportChangeset");
 	portletURL.setParameter("mvcRenderCommandName", "exportImportChangeset");
 	portletURL.setParameter("cmd", Constants.PUBLISH);
-	portletURL.setParameter("backURL", currentURL);
 	portletURL.setParameter("changesetUuid", changesetUuid);
 	portletURL.setParameter("portletId", portletDisplay.getId());
 	%>

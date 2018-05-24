@@ -137,8 +137,8 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMNavigator#gotoDocumentCP">
@@ -416,8 +416,8 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMNavigator#gotoFolder">
@@ -661,8 +661,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -681,8 +681,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMDocument#viewDocumentToolbarCmdAsGuestPG">
@@ -698,8 +698,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMDocument#enableActionsMenuOnPortlet" />
@@ -932,8 +932,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1053,8 +1053,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1184,6 +1184,7 @@
 
 		<execute macro="DMFolder#viewCP">
 			<var name="dmFolderName" value="Unit 1 - Moon Rock Chemistry" />
+			<var name="specificNameFolder" value="true" />
 		</execute>
 
 		<execute macro="DMFolder#addSubfolderCP">
@@ -1192,6 +1193,7 @@
 
 		<execute macro="DMFolder#viewCP">
 			<var name="dmFolderName" value="The Properties of Moon Rocks" />
+			<var name="specificNameFolder" value="true" />
 		</execute>
 
 		<execute macro="DMFolder#addSubfolderCP">
@@ -1218,10 +1220,12 @@
 
 		<execute macro="DMFolder#viewCP">
 			<var name="dmFolderName" value="Unit 1 - Moon Rock Chemistry" />
+			<var name="specificNameFolder" value="true" />
 		</execute>
 
 		<execute macro="DMFolder#viewCP">
 			<var name="dmFolderName" value="The Properties of Moon Rocks" />
+			<var name="specificNameFolder" value="true" />
 		</execute>
 
 		<execute macro="DMFolder#removePermissions">
@@ -1627,8 +1631,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="User#logoutPG" />
@@ -1811,6 +1815,7 @@
 
 		<execute macro="DMFolder#viewCP">
 			<var name="dmFolderName" value="DM SubFolder Name" />
+			<var name="specificNameFolder" value="true" />
 		</execute>
 
 		<execute macro="DMDocument#addCP">
@@ -1840,8 +1845,8 @@
 			<var name="pageName" value="Documents and Media Page - Global" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2011,8 +2016,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2261,8 +2266,8 @@
 			<var name="siteName" value="Organization Name" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMNavigator#gotoFolder">
@@ -2306,8 +2311,8 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2408,6 +2413,7 @@
 			<var name="dmDocumentTitle" value="DM Document2 Title" />
 		</execute>
 
-		<execute function="AssertChecked" locator1="DocumentsAndMedia#TOOLBAR_SELECT_ALL_CHECKBOX" />
+		<execute function="AssertElementPresent" locator1="Checkbox#LEXICON_SELECT_ALL_CHECKED" />
+		<execute function="AssertElementPresent" locator1="Checkbox#LEXICON_DESELECT_ALL_BUTTON" />
 	</command>
 </definition>
