@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -60,6 +61,7 @@ import com.liferay.portlet.asset.model.impl.AssetCategoryModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -818,13 +820,6 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 					result = assetCategory;
 
 					cacheResult(assetCategory);
-
-					if ((assetCategory.getUuid() == null) ||
-							!assetCategory.getUuid().equals(uuid) ||
-							(assetCategory.getGroupId() != groupId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-							finderArgs, assetCategory);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -9366,14 +9361,6 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 					result = assetCategory;
 
 					cacheResult(assetCategory);
-
-					if ((assetCategory.getParentCategoryId() != parentCategoryId) ||
-							(assetCategory.getName() == null) ||
-							!assetCategory.getName().equals(name) ||
-							(assetCategory.getVocabularyId() != vocabularyId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_P_N_V,
-							finderArgs, assetCategory);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -10893,8 +10880,6 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 	@Override
 	protected AssetCategory removeImpl(AssetCategory assetCategory) {
-		assetCategory = toUnwrappedModel(assetCategory);
-
 		assetCategoryToAssetEntryTableMapper.deleteLeftPrimaryKeyTableMappings(assetCategory.getPrimaryKey());
 
 		Session session = null;
@@ -10939,9 +10924,23 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 	@Override
 	public AssetCategory updateImpl(AssetCategory assetCategory) {
-		assetCategory = toUnwrappedModel(assetCategory);
-
 		boolean isNew = assetCategory.isNew();
+
+		if (!(assetCategory instanceof AssetCategoryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(assetCategory.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(assetCategory);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in assetCategory proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom AssetCategory implementation " +
+				assetCategory.getClass());
+		}
 
 		AssetCategoryModelImpl assetCategoryModelImpl = (AssetCategoryModelImpl)assetCategory;
 
@@ -11353,36 +11352,6 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 		assetCategory.resetOriginalValues();
 
 		return assetCategory;
-	}
-
-	protected AssetCategory toUnwrappedModel(AssetCategory assetCategory) {
-		if (assetCategory instanceof AssetCategoryImpl) {
-			return assetCategory;
-		}
-
-		AssetCategoryImpl assetCategoryImpl = new AssetCategoryImpl();
-
-		assetCategoryImpl.setNew(assetCategory.isNew());
-		assetCategoryImpl.setPrimaryKey(assetCategory.getPrimaryKey());
-
-		assetCategoryImpl.setUuid(assetCategory.getUuid());
-		assetCategoryImpl.setCategoryId(assetCategory.getCategoryId());
-		assetCategoryImpl.setGroupId(assetCategory.getGroupId());
-		assetCategoryImpl.setCompanyId(assetCategory.getCompanyId());
-		assetCategoryImpl.setUserId(assetCategory.getUserId());
-		assetCategoryImpl.setUserName(assetCategory.getUserName());
-		assetCategoryImpl.setCreateDate(assetCategory.getCreateDate());
-		assetCategoryImpl.setModifiedDate(assetCategory.getModifiedDate());
-		assetCategoryImpl.setParentCategoryId(assetCategory.getParentCategoryId());
-		assetCategoryImpl.setLeftCategoryId(assetCategory.getLeftCategoryId());
-		assetCategoryImpl.setRightCategoryId(assetCategory.getRightCategoryId());
-		assetCategoryImpl.setName(assetCategory.getName());
-		assetCategoryImpl.setTitle(assetCategory.getTitle());
-		assetCategoryImpl.setDescription(assetCategory.getDescription());
-		assetCategoryImpl.setVocabularyId(assetCategory.getVocabularyId());
-		assetCategoryImpl.setLastPublishDate(assetCategory.getLastPublishDate());
-
-		return assetCategoryImpl;
 	}
 
 	/**

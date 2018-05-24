@@ -87,8 +87,8 @@
 			<var name="siteName" value="Remote Site" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="DMDocument#viewPG">
@@ -213,7 +213,7 @@
 	</command>
 
 	<command name="AddDMDocumentWCArticleStagingLocalLive" priority="5">
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="false" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="Navigator#gotoSitePage">
@@ -373,7 +373,7 @@
 	</command>
 
 	<command name="AssertNoEditLink" priority="5">
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="false" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="ProductMenu#gotoSite">
@@ -553,8 +553,8 @@
 
 		<execute macro="DMDocument#enableActionsMenuOnPortlet" />
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="Navigator#openSiteURL">
