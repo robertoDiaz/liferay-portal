@@ -1,0 +1,20 @@
+.popup-alert-notice {
+	.notice-date {
+		margin: 0 10px;
+	}
+
+	.current-user-language {
+		border: solid transparent;
+		border-width: 0 1px;
+		display: inline;
+		margin: 0 10px;
+		padding: 0 15px;
+	}
+}
+
+.alert-notifications.alert-notifications-fixed {
+	bottom: 4.75rem;
+	left: 1.25rem;
+	right: initial;
+	top: initial;
+}

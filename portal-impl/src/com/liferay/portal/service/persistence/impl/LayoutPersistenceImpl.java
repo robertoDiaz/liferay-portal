@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +52,7 @@ import com.liferay.portal.model.impl.LayoutModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -797,14 +799,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.getUuid() == null) ||
-							!layout.getUuid().equals(uuid) ||
-							(layout.getGroupId() != groupId) ||
-							(layout.isPrivateLayout() != privateLayout)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G_P,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2989,11 +2983,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.getIconImageId() != iconImageId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_ICONIMAGEID,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -6864,12 +6853,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.isPrivateLayout() != privateLayout) ||
-							(layout.getIconImageId() != iconImageId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_P_I,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -7106,13 +7089,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.getGroupId() != groupId) ||
-							(layout.isPrivateLayout() != privateLayout) ||
-							(layout.getLayoutId() != layoutId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_L,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -9970,14 +9946,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.getGroupId() != groupId) ||
-							(layout.isPrivateLayout() != privateLayout) ||
-							(layout.getFriendlyURL() == null) ||
-							!layout.getFriendlyURL().equals(friendlyURL)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_F,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -10268,15 +10236,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					result = layout;
 
 					cacheResult(layout);
-
-					if ((layout.getGroupId() != groupId) ||
-							(layout.isPrivateLayout() != privateLayout) ||
-							(layout.getSourcePrototypeLayoutUuid() == null) ||
-							!layout.getSourcePrototypeLayoutUuid()
-									   .equals(sourcePrototypeLayoutUuid)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_SPLU,
-							finderArgs, layout);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -11830,8 +11789,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 	@Override
 	protected Layout removeImpl(Layout layout) {
-		layout = toUnwrappedModel(layout);
-
 		Session session = null;
 
 		try {
@@ -11862,9 +11819,23 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 	@Override
 	public Layout updateImpl(Layout layout) {
-		layout = toUnwrappedModel(layout);
-
 		boolean isNew = layout.isNew();
+
+		if (!(layout instanceof LayoutModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(layout.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(layout);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in layout proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Layout implementation " +
+				layout.getClass());
+		}
 
 		LayoutModelImpl layoutModelImpl = (LayoutModelImpl)layout;
 
@@ -12243,50 +12214,6 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		layout.resetOriginalValues();
 
 		return layout;
-	}
-
-	protected Layout toUnwrappedModel(Layout layout) {
-		if (layout instanceof LayoutImpl) {
-			return layout;
-		}
-
-		LayoutImpl layoutImpl = new LayoutImpl();
-
-		layoutImpl.setNew(layout.isNew());
-		layoutImpl.setPrimaryKey(layout.getPrimaryKey());
-
-		layoutImpl.setMvccVersion(layout.getMvccVersion());
-		layoutImpl.setUuid(layout.getUuid());
-		layoutImpl.setPlid(layout.getPlid());
-		layoutImpl.setGroupId(layout.getGroupId());
-		layoutImpl.setCompanyId(layout.getCompanyId());
-		layoutImpl.setUserId(layout.getUserId());
-		layoutImpl.setUserName(layout.getUserName());
-		layoutImpl.setCreateDate(layout.getCreateDate());
-		layoutImpl.setModifiedDate(layout.getModifiedDate());
-		layoutImpl.setPrivateLayout(layout.isPrivateLayout());
-		layoutImpl.setLayoutId(layout.getLayoutId());
-		layoutImpl.setParentLayoutId(layout.getParentLayoutId());
-		layoutImpl.setName(layout.getName());
-		layoutImpl.setTitle(layout.getTitle());
-		layoutImpl.setDescription(layout.getDescription());
-		layoutImpl.setKeywords(layout.getKeywords());
-		layoutImpl.setRobots(layout.getRobots());
-		layoutImpl.setType(layout.getType());
-		layoutImpl.setTypeSettings(layout.getTypeSettings());
-		layoutImpl.setHidden(layout.isHidden());
-		layoutImpl.setFriendlyURL(layout.getFriendlyURL());
-		layoutImpl.setIconImageId(layout.getIconImageId());
-		layoutImpl.setThemeId(layout.getThemeId());
-		layoutImpl.setColorSchemeId(layout.getColorSchemeId());
-		layoutImpl.setCss(layout.getCss());
-		layoutImpl.setPriority(layout.getPriority());
-		layoutImpl.setLayoutPrototypeUuid(layout.getLayoutPrototypeUuid());
-		layoutImpl.setLayoutPrototypeLinkEnabled(layout.isLayoutPrototypeLinkEnabled());
-		layoutImpl.setSourcePrototypeLayoutUuid(layout.getSourcePrototypeLayoutUuid());
-		layoutImpl.setLastPublishDate(layout.getLastPublishDate());
-
-		return layoutImpl;
 	}
 
 	/**
