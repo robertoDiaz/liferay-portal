@@ -14,6 +14,7 @@
 
 package com.liferay.portlet;
 
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -49,7 +50,10 @@ public abstract class MimeResponseImpl
 
 	@Override
 	public CacheControl getCacheControl() {
-		return new CacheControlImpl(null, 0, false, false, this);
+		Portlet portlet = getPortlet();
+
+		return new CacheControlImpl(
+			null, portlet.getExpCache(), false, false, this);
 	}
 
 	@Override
@@ -90,7 +94,8 @@ public abstract class MimeResponseImpl
 	public PrintWriter getWriter() throws IllegalStateException, IOException {
 		if (_calledGetPortletOutputStream) {
 			throw new IllegalStateException(
-				"Cannot obtain Writer because OutputStream is already in use");
+				"Unable to obtain Writer because OutputStream is already in " +
+					"use");
 		}
 
 		if (_contentType == null) {
@@ -123,7 +128,7 @@ public abstract class MimeResponseImpl
 	public void reset() {
 		if (_calledFlushBuffer) {
 			throw new IllegalStateException(
-				"Cannot reset a buffer that has been flushed");
+				"Unable to reset a buffer that has been flushed");
 		}
 	}
 
@@ -131,7 +136,7 @@ public abstract class MimeResponseImpl
 	public void resetBuffer() {
 		if (_calledFlushBuffer) {
 			throw new IllegalStateException(
-				"Cannot reset a buffer that has been flushed");
+				"Unable to reset a buffer that has been flushed");
 		}
 
 		response.resetBuffer();

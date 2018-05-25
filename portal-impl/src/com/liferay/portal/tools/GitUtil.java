@@ -107,8 +107,6 @@ public class GitUtil {
 
 		String baseDirName = ArgumentsUtil.getString(
 			arguments, "git.base.dir", "./");
-		String markerFileName = ArgumentsUtil.getString(
-			arguments, "git.marker.file", null);
 		String type = ArgumentsUtil.getString(
 			arguments, "git.type", "current-branch");
 
@@ -131,6 +129,9 @@ public class GitUtil {
 			else {
 				throw new IllegalArgumentException();
 			}
+
+			String markerFileName = ArgumentsUtil.getString(
+				arguments, "git.marker.file", null);
 
 			if (Validator.isNotNull(markerFileName)) {
 				fileNames = getDirNames(baseDirName, fileNames, markerFileName);
@@ -300,7 +301,7 @@ public class GitUtil {
 
 			if (errorMessage.contains("Cannot run program")) {
 				throw new GitException(
-					"Add Git to your PATH system variable first.");
+					"Add Git to your PATH system variable first");
 			}
 
 			throw ioe;
@@ -322,7 +323,7 @@ public class GitUtil {
 		}
 
 		throw new GitException(
-			"Unable to retrieve files because .git directory is missing.");
+			"Unable to retrieve files because .git directory is missing");
 	}
 
 	protected static String getLatestAuthorCommitId() throws Exception {
