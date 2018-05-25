@@ -100,6 +100,10 @@ renderResponse.setTitle(LanguageUtil.get(request, "import-pages"));
 		<%= uploadProgressId %>.startProgress();
 		<%= importProgressId %>.startProgress();
 
-		submitForm(document.<portlet:namespace />fm);
+		var form = document.getElementById('<portlet:namespace />fm');
+
+		if (form) {
+			submitForm(form);
+		}
 	}
 </aui:script>

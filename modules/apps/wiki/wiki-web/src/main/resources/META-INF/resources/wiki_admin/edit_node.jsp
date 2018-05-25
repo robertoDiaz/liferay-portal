@@ -68,9 +68,17 @@ renderResponse.setTitle((node == null) ? LanguageUtil.get(request, "new-wiki-nod
 
 <aui:script>
 	function <portlet:namespace />saveNode() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (node == null) ? Constants.ADD : Constants.UPDATE %>';
+		var form = document.getElementById('<portlet:namespace />fm');
 
-		submitForm(document.<portlet:namespace />fm);
+		if (form) {
+			var cmd = form.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+
+			if (cmd) {
+				cmd.setAttribute('value', '<%= (node == null) ? Constants.ADD : Constants.UPDATE %>');
+			}
+
+			submitForm(form);
+		}
 	}
 </aui:script>
 

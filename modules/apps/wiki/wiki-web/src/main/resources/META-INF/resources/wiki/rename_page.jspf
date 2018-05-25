@@ -45,8 +45,16 @@
 
 <aui:script>
 	function <portlet:namespace />renamePage() {
-		document.<portlet:namespace />renameFm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.RENAME %>';
+		var renameFm = document.getElementById('<portlet:namespace />renameFm');
 
-		submitForm(document.<portlet:namespace />renameFm);
+		if (renameFm) {
+			var cmd = renameFm.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+
+			if (cmd) {
+				cmd.setAttribute('value', '<%= Constants.RENAME %>');
+			}
+
+			submitForm(renameFm);
+		}
 	}
 </aui:script>
