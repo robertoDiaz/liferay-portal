@@ -134,13 +134,27 @@
 
 <aui:script>
 	function <portlet:namespace />saveConfiguration() {
-		var Util = Liferay.Util;
 
-		var form = AUI.$(document.<portlet:namespace />fm);
+		var form = document.getElementById('<portlet:namespace />fm');
 
-		form.fm('visibleNodes').val(Util.listSelect(form.fm('currentVisibleNodes')));
-		form.fm('hiddenNodes').val(Util.listSelect(form.fm('availableVisibleNodes')));
+		if (form) {
+			var Util = Liferay.Util;
 
-		submitForm(form);
+			var currentVisibleNodes = form.querySelector('#<portlet:namespace />currentVisibleNodes');
+			var visibleNodes = form.querySelector('#<portlet:namespace />preferences--visibleNodes--');
+
+			if (currentVisibleNodes && visibleNodes) {
+				visibleNodes.setAttribute('value', Util.listSelect(currentVisibleNodes));
+			}
+
+			var availableVisibleNodes = form.querySelector('#<portlet:namespace />availableVisibleNodes');
+			var hiddenNodes = form.querySelector('#<portlet:namespace />preferences--hiddenNodes--');
+
+			if (availableVisibleNodes && hiddenNodes) {
+				hiddenNodes.setAttribute('value', Util.listSelect(availableVisibleNodes));
+			}
+
+			submitForm(form);
+		}
 	}
 </aui:script>

@@ -267,24 +267,24 @@ for (int i = 0; i < pages.size(); i++) {
 <c:if test='<%= navigation.equals("history") %>'>
 	<aui:script>
 		function <portlet:namespace />initRowsChecked() {
-			var $ = AUI.$;
+			var rowIds = document.querySelectorAll('input[name=<portlet:namespace />rowIds]');
 
-			var rowIds = $('input[name=<portlet:namespace />rowIds]');
-
-			rowIds.slice(2).prop('checked', false);
+			for (var i = 2; i < rowIds.length; i++) {
+				rowIds[i].checked = false;
+			}
 		}
 
 		function <portlet:namespace />updateRowsChecked(element) {
-			var rowsChecked = AUI.$('input[name=<portlet:namespace />rowIds]:checked');
+			var rowsChecked = document.querySelectorAll('input[name=<portlet:namespace />rowIds]:checked');
 
 			if (rowsChecked.length > 2) {
 				var index = 2;
 
-				if (rowsChecked.eq(2).is(element)) {
+				if (rowsChecked[2] == element) {
 					index = 1;
 				}
 
-				rowsChecked.eq(index).prop('checked', false);
+				rowsChecked[index].checked  = false;
 			}
 		}
 	</aui:script>
@@ -296,47 +296,55 @@ for (int i = 0; i < pages.size(); i++) {
 			WikiPage latestWikiPage = (WikiPage)pages.get(1);
 			%>
 
-			$('#<portlet:namespace />compare').on(
-				'click',
-				function(event) {
-					<portlet:renderURL var="compareVersionURL">
-						<portlet:param name="mvcRenderCommandName" value="/wiki/compare_versions" />
-						<portlet:param name="backURL" value="<%= currentURL %>" />
-						<portlet:param name="tabs3" value="versions" />
-						<portlet:param name="nodeId" value="<%= String.valueOf(node.getNodeId()) %>" />
-						<portlet:param name="title" value="<%= wikiPage.getTitle() %>" />
-						<portlet:param name="type" value="html" />
-					</portlet:renderURL>
+			var compare = document.getElementById('<portlet:namespace />compare');
 
-					var uri = '<%= compareVersionURL %>';
+			if (compare) {
+				compare.addEventListener(
+					'click',
+					function(event) {
+						<portlet:renderURL var="compareVersionURL">
+							<portlet:param name="mvcRenderCommandName" value="/wiki/compare_versions" />
+							<portlet:param name="backURL" value="<%= currentURL %>" />
+							<portlet:param name="tabs3" value="versions" />
+							<portlet:param name="nodeId" value="<%= String.valueOf(node.getNodeId()) %>" />
+							<portlet:param name="title" value="<%= wikiPage.getTitle() %>" />
+							<portlet:param name="type" value="html" />
+						</portlet:renderURL>
 
-					var rowIds = $('input[name=<portlet:namespace />rowIds]:checked');
+						var uri = '<%= compareVersionURL %>';
 
-					var rowIdsSize = rowIds.length;
+						var rowIds = document.querySelectorAll('input[name=<portlet:namespace />rowIds]:checked');
 
-					if (rowIdsSize === 0 || rowIdsSize === 2) {
-						if (rowIdsSize === 0) {
-							uri = Liferay.Util.addParams('<portlet:namespace />sourceVersion=<%= latestWikiPage.getVersion() %>', uri);
-							uri = Liferay.Util.addParams('<portlet:namespace />targetVersion=<%= wikiPage.getVersion() %>', uri);
+						var rowIdsSize = rowIds.length;
+
+						if (rowIdsSize === 0 || rowIdsSize === 2) {
+							if (rowIdsSize === 0) {
+								uri = Liferay.Util.addParams('<portlet:namespace />sourceVersion=<%= latestWikiPage.getVersion() %>', uri);
+								uri = Liferay.Util.addParams('<portlet:namespace />targetVersion=<%= wikiPage.getVersion() %>', uri);
+							}
+							else if (rowIdsSize === 2) {
+								uri = Liferay.Util.addParams('<portlet:namespace />sourceVersion=' + rowIds[1].value, uri);
+								uri = Liferay.Util.addParams('<portlet:namespace />targetVersion=' + rowIds[0].value, uri);
+							}
+
+							location.href = uri;
 						}
-						else if (rowIdsSize === 2) {
-							uri = Liferay.Util.addParams('<portlet:namespace />sourceVersion=' + rowIds.eq(1).val(), uri);
-							uri = Liferay.Util.addParams('<portlet:namespace />targetVersion=' + rowIds.eq(0).val(), uri);
-						}
-
-						location.href = uri;
 					}
-				}
-			);
+				);
+			}
 		</c:if>
 
 		<portlet:namespace />initRowsChecked();
 
-		$('input[name=<portlet:namespace />rowIds]').on(
-			'click',
-			function(event) {
-				<portlet:namespace />updateRowsChecked(event.currentTarget);
-			}
-		);
+		var rowIds = document.querySelector('input[name=<portlet:namespace />rowIds]');
+
+		if (rowIds) {
+			rowIds.addEventListener(
+				'click',
+				function(event) {
+					<portlet:namespace />updateRowsChecked(event.target);
+				}
+			);
+		}
 	</aui:script>
 </c:if>

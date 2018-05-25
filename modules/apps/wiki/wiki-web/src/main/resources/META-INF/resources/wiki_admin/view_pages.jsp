@@ -285,12 +285,19 @@ WikiPagesManagementToolbarDisplayContext wikiPagesManagementToolbarDisplayContex
 <aui:script>
 	var deletePages = function() {
 		if (<%= trashHelper.isTrashEnabled(scopeGroupId) %> || confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />')) {
-			var form = AUI.$(document.<portlet:namespace />fm);
+			var form = document.getElementById('<portlet:namespace />fm');
 
-			form.attr('method', 'post');
-			form.fm('<%= Constants.CMD %>').val('<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>');
+			if (form) {
+				form.setAttribute('method', 'post');
 
-			submitForm(form, '<portlet:actionURL name="/wiki/edit_page" />');
+				var cmd = form.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+
+				if (cmd) {
+					cmd.setAttribute('value', '<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>');
+				}
+
+				submitForm(form, '<portlet:actionURL name="/wiki/edit_page" />');
+			}
 		}
 	};
 

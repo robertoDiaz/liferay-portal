@@ -93,18 +93,31 @@ boolean nodeInGroup = false;
 							</aui:select>
 						</div>
 
-						<aui:script sandbox="<%= true %>">
-							var nodeIdSelect = $('#<portlet:namespace />nodeId');
-							var pageSelectorContainer = $('#<portlet:namespace />pageSelectorContainer');
+						<aui:script require="metal-dom/src/dom" sandbox="<%= true %>">
+							let dom = metalDomSrcDom.default;
 
-							var nodeIdValue = nodeIdSelect.val();
+							var nodeId = document.getElementById('<portlet:namespace />nodeId');
+							var pageSelectorContainer = document.getElementById('<portlet:namespace />pageSelectorContainer');
 
-							nodeIdSelect.on(
-								'change',
-								function() {
-									pageSelectorContainer.toggleClass('hide', nodeIdSelect.val() !== nodeIdValue);
-								}
-							);
+							if (nodeId && pageSelectorContainer) {
+								var nodeIdValue = nodeId.value;
+
+								nodeId.addEventListener(
+									'change',
+									function() {
+										if (nodeId.value !== nodeIdValue) {
+											dom.addClasses(pageSelectorContainer, 'hide');
+
+											dom.removeClasses(pageSelectorContainer, 'show');
+										}
+										else {
+											dom.addClasses(pageSelectorContainer, 'show');
+
+											dom.removeClasses(pageSelectorContainer, 'hide');
+										}
+									}
+								);
+							}
 						</aui:script>
 					</c:when>
 					<c:otherwise>

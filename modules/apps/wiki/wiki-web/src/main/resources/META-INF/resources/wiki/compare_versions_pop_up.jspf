@@ -14,12 +14,13 @@
  */
 --%>
 
-<aui:script sandbox="<%= true %>">
-	$('body').on(
+<aui:script require="metal-dom/src/all/dom as dom" sandbox="<%= true %>">
+	var compareToLinkHandler = dom.delegate(
+		document,
 		'click',
 		'.compare-to-link a',
 		function(event) {
-			var currentTarget = $(event.currentTarget);
+			var target = event.target;
 
 			Liferay.Util.selectEntity(
 				{
@@ -29,9 +30,9 @@
 						modal: true
 					},
 					eventName: '<portlet:namespace />selectVersionFm',
-					id: '<portlet:namespace />compareVersions' + currentTarget.attr('id'),
+					id: '<portlet:namespace />compareVersions' + target.getAttribute('id'),
 					title: '<liferay-ui:message key="compare-versions" />',
-					uri: currentTarget.data('uri')
+					uri: target.getAttribute('data-uri')
 				},
 				function(event) {
 					<portlet:renderURL var="compareVersionURL">
@@ -52,4 +53,12 @@
 			);
 		}
 	);
+
+	function removeListener() {
+		compareToLinkHandler.removeListener();
+
+		Liferay.detach('destroyPortlet', removeListener);
+	}
+
+	Liferay.on('destroyPortlet', removeListener);
 </aui:script>

@@ -434,17 +434,28 @@ if (portletTitleBasedNavigation) {
 					</div>
 				</liferay-ddm:template-renderer>
 
-				<aui:script sandbox="<%= true %>">
-					var toc = $('#p_p_id<portlet:namespace /> .toc');
+				<aui:script require="metal-dom/src/dom" sandbox="<%= true %>">
+					let dom = metalDomSrcDom.default;
 
-					var index = toc.find('.toc-index');
+					var portlet = document.getElementById('p_p_id<portlet:namespace />');
 
-					toc.find('a.toc-trigger').on(
-						'click',
-						function(event) {
-							index.toggleClass('hide');
+					if (portlet) {
+						var toc = portlet.querySelector('.toc');
+
+						if (toc) {
+							var index = toc.querySelector('.toc-index');
+							var trigger = toc.querySelector('a.toc-trigger');
+
+							if (trigger && index) {
+								trigger.addEventListener(
+									'click',
+									function(event) {
+										dom.toggleClasses(index, 'hide');
+									}
+								);
+							}
 						}
-					);
+					}
 				</aui:script>
 
 				<%
