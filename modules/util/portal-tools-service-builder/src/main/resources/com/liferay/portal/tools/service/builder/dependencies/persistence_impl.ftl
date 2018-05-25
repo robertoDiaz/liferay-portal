@@ -965,23 +965,61 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 			query.append(_SQL_SELECT_${entity.alias?upper_case}_WHERE_PKS_IN);
 
-			<#if stringUtil.equals(entity.PKClassName, "String")>
-				for (int i = 0; i < uncachedPrimaryKeys.size(); i++) {
-					query.append("?");
+			int databaseInClauseMaxLength = GetterUtil.getInteger(com.liferay.portal.util.PropsUtil.get("database.in.clause.max.length"));
 
-					query.append(",");
+			if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+				List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+				int curStart = 0;
+				int curEnd = 0;
+
+				while (curEnd < uncachedPrimaryKeys.size()){
+					if (curStart == 0) {
+						curEnd = curEnd + databaseInClauseMaxLength;
+					}
+					else {
+						query.append(WHERE_OR);
+						query.append("${entity.PKDBName}");
+						query.append(WHERE_IN);
+						query.append("(");
+
+						curEnd = curEnd + databaseInClauseMaxLength;
+
+						if (curEnd > uncachedPrimaryKeys.size()) {
+							curEnd = uncachedPrimaryKeys.size();
+						}
+					}
+
+					List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart, curEnd);
+
+					<#if stringUtil.equals(entity.PKClassName, "String")>
+						for (int i = 0; i < curUncachedPrimaryKeysList.size(); i++) {
+							query.append("?");
+
+							query.append(",");
+						}
+					<#else>
+						query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+					</#if>
+
+					query.append(")");
 				}
-			<#else>
-				for (Serializable primaryKey : uncachedPrimaryKeys) {
-					query.append((${entity.PKClassName})primaryKey);
+			}
+			else {
+				<#if stringUtil.equals(entity.PKClassName, "String")>
+					for (int i = 0; i < uncachedPrimaryKeys.size(); i++) {
+						query.append("?");
 
-					query.append(",");
-				}
-			</#if>
+						query.append(",");
+					}
+				<#else>
+					query.append(StringUtil.merge(uncachedPrimaryKeys));
+				</#if>
 
-			query.setIndex(query.index() - 1);
+				query.setIndex(query.index() - 1);
 
-			query.append(")");
+				query.append(")");
+			}
 
 			String sql = query.toString();
 
