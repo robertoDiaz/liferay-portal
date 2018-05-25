@@ -119,14 +119,30 @@ childPages.remove(wikiPage);
 
 <aui:script>
 	function <portlet:namespace />changeParent() {
-		document.<portlet:namespace />changeParentFm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.CHANGE_PARENT %>';
+		var changeParentFm = document.getElementById('<portlet:namespace />changeParentFm');
 
-		submitForm(document.<portlet:namespace />changeParentFm);
+		if (changeParentFm) {
+			var cmd = changeParentFm.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+
+			if (cmd) {
+				cmd.setAttribute('value', '<%= Constants.CHANGE_PARENT %>');
+			}
+
+			submitForm(changeParentFm);
+		}
 	}
 
 	function <portlet:namespace />publishPage() {
-		document.<portlet:namespace />changeParentFm.<portlet:namespace />workflowAction.value = '<%= WorkflowConstants.ACTION_PUBLISH %>';
+		var changeParentFm = document.getElementById('<portlet:namespace />changeParentFm');
 
-		<portlet:namespace />changeParent();
+		if (changeParentFm) {
+			var workflowAction = changeParentFm.querySelector('#<portlet:namespace />workflowAction');
+
+			if (workflowAction) {
+				workflowAction.setAttribute('value', '<%= WorkflowConstants.ACTION_PUBLISH %>');
+
+				<portlet:namespace />changeParent();
+			}
+		}
 	}
 </aui:script>
