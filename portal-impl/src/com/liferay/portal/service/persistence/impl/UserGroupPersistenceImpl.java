@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,6 +58,7 @@ import com.liferay.portal.model.impl.UserGroupModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -3963,13 +3965,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 					result = userGroup;
 
 					cacheResult(userGroup);
-
-					if ((userGroup.getCompanyId() != companyId) ||
-							(userGroup.getName() == null) ||
-							!userGroup.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_N,
-							finderArgs, userGroup);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -4296,8 +4291,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 	@Override
 	protected UserGroup removeImpl(UserGroup userGroup) {
-		userGroup = toUnwrappedModel(userGroup);
-
 		userGroupToGroupTableMapper.deleteLeftPrimaryKeyTableMappings(userGroup.getPrimaryKey());
 
 		userGroupToTeamTableMapper.deleteLeftPrimaryKeyTableMappings(userGroup.getPrimaryKey());
@@ -4334,9 +4327,23 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 	@Override
 	public UserGroup updateImpl(UserGroup userGroup) {
-		userGroup = toUnwrappedModel(userGroup);
-
 		boolean isNew = userGroup.isNew();
+
+		if (!(userGroup instanceof UserGroupModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userGroup.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userGroup);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userGroup proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserGroup implementation " +
+				userGroup.getClass());
+		}
 
 		UserGroupModelImpl userGroupModelImpl = (UserGroupModelImpl)userGroup;
 
@@ -4518,32 +4525,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		userGroup.resetOriginalValues();
 
 		return userGroup;
-	}
-
-	protected UserGroup toUnwrappedModel(UserGroup userGroup) {
-		if (userGroup instanceof UserGroupImpl) {
-			return userGroup;
-		}
-
-		UserGroupImpl userGroupImpl = new UserGroupImpl();
-
-		userGroupImpl.setNew(userGroup.isNew());
-		userGroupImpl.setPrimaryKey(userGroup.getPrimaryKey());
-
-		userGroupImpl.setMvccVersion(userGroup.getMvccVersion());
-		userGroupImpl.setUuid(userGroup.getUuid());
-		userGroupImpl.setUserGroupId(userGroup.getUserGroupId());
-		userGroupImpl.setCompanyId(userGroup.getCompanyId());
-		userGroupImpl.setUserId(userGroup.getUserId());
-		userGroupImpl.setUserName(userGroup.getUserName());
-		userGroupImpl.setCreateDate(userGroup.getCreateDate());
-		userGroupImpl.setModifiedDate(userGroup.getModifiedDate());
-		userGroupImpl.setParentUserGroupId(userGroup.getParentUserGroupId());
-		userGroupImpl.setName(userGroup.getName());
-		userGroupImpl.setDescription(userGroup.getDescription());
-		userGroupImpl.setAddedByLDAPImport(userGroup.isAddedByLDAPImport());
-
-		return userGroupImpl;
 	}
 
 	/**

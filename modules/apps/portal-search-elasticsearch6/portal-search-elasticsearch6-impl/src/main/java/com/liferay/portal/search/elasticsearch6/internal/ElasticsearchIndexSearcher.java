@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexSearcher;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.search.Stats;
 import com.liferay.portal.kernel.search.StatsResults;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
+import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
@@ -187,7 +189,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				_log.info(
 					StringBundler.concat(
 						"Searching ", query.toString(), " took ",
-						String.valueOf(stopWatch.getTime()), " ms"));
+						stopWatch.getTime(), " ms"));
 			}
 		}
 	}
@@ -221,7 +223,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				_log.info(
 					StringBundler.concat(
 						"Searching ", query.toString(), " took ",
-						String.valueOf(stopWatch.getTime()), " ms"));
+						stopWatch.getTime(), " ms"));
 			}
 		}
 	}
@@ -552,7 +554,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			_log.info(
 				StringBundler.concat(
 					"The search engine processed ", searchRequestBuilderString,
-					" in ", String.valueOf(searchResponse.getTook())));
+					" in ", searchResponse.getTook()));
 		}
 
 		return searchResponse;
@@ -578,6 +580,24 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			searchContext, query, start, end, false);
 
 		return processResponse(searchResponse, searchContext, query);
+	}
+
+	protected String getAggregationName(Facet facet) {
+		FacetConfiguration facetConfiguration = facet.getFacetConfiguration();
+
+		JSONObject data = facetConfiguration.getData();
+
+		return data.getString("aggregationName", facet.getFieldName());
+	}
+
+	protected FacetCollector getFacetCollector(
+		Facet facet, Map<String, Aggregation> aggregationsMap) {
+
+		FacetCollectorFactory facetCollectorFactory =
+			new FacetCollectorFactory();
+
+		return facetCollectorFactory.getFacetCollector(
+			aggregationsMap.get(getAggregationName(facet)));
 	}
 
 	protected String[] getSelectedIndexNames(
@@ -688,18 +708,10 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		Map<String, Facet> facetsMap = searchContext.getFacets();
 
 		for (Facet facet : facetsMap.values()) {
-			if (facet.isStatic()) {
-				continue;
+			if (!facet.isStatic()) {
+				facet.setFacetCollector(
+					getFacetCollector(facet, aggregationsMap));
 			}
-
-			FacetCollectorFactory facetCollectorFactory =
-				new FacetCollectorFactory();
-
-			FacetCollector facetCollector =
-				facetCollectorFactory.getFacetCollector(
-					aggregationsMap.get(facet.getFieldName()));
-
-			facet.setFacetCollector(facetCollector);
 		}
 	}
 

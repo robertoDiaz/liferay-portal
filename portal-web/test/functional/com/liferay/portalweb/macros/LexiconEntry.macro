@@ -31,7 +31,7 @@
 				</if>
 			</then>
 			<else>
-				<execute macro="Alert#waitForSuccessMessageHide" />
+				<execute macro="Alert#viewSuccessMessage" />
 			</else>
 		</if>
 	</command>
@@ -43,7 +43,7 @@
 	<command name="gotoAddMenuItem">
 		<execute macro="LexiconEntry#gotoAdd" />
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="${menuItem}">
+		<execute function="AssertClick" locator1="MenuItem#MENU_ITEM" value1="${menuItem}">
 			<var name="key_menuItem" value="${menuItem}" />
 		</execute>
 	</command>
@@ -142,6 +142,12 @@
 	<command name="selectEntry">
 		<execute function="Check" locator1="ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX">
 			<var name="key_rowEntry" value="${rowEntry}" />
+		</execute>
+	</command>
+
+	<command name="viewActiveDisplayStyle">
+		<execute function="AssertElementPresent" locator1="Icon#CURRENT_DISPLAY_STYLE_ACTIVE">
+			<var name="key_displayStyle" value="${displayStyle}" />
 		</execute>
 	</command>
 

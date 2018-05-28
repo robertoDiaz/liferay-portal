@@ -23,6 +23,7 @@ import com.liferay.project.templates.internal.util.Validator;
 import com.liferay.project.templates.util.DirectoryComparator;
 import com.liferay.project.templates.util.FileTestUtil;
 import com.liferay.project.templates.util.StringTestUtil;
+import com.liferay.project.templates.util.XMLTestUtil;
 
 import difflib.Delta;
 import difflib.DiffUtils;
@@ -60,6 +61,9 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import net.diibadaaba.zipdiff.DifferenceCalculator;
 import net.diibadaaba.zipdiff.Differences;
 
@@ -78,6 +82,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author Lawrence Lee
@@ -486,6 +493,32 @@ public class ProjectTemplatesTest {
 			"src/main/resources/.gitkeep", gradleProjectDir, mavenProjectDir);
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildTemplateLiferayVersionInvalid62() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "6.2");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildTemplateLiferayVersionInvalid70test()
+		throws Exception {
+
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.0test");
+	}
+
+	@Test
+	public void testBuildTemplateLiferayVersionValid70() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.0");
+	}
+
+	@Test
+	public void testBuildTemplateLiferayVersionValid712() throws Exception {
+		_buildTemplateWithGradle(
+			"mvc-portlet", "test", "--liferayVersion", "7.1.2");
 	}
 
 	@Test
@@ -1095,6 +1128,35 @@ public class ProjectTemplatesTest {
 	}
 
 	@Test
+	public void testBuildTemplateSocialBookmark() throws Exception {
+		File gradleProjectDir = _buildTemplateWithGradle(
+			"social-bookmark", "foo", "--package-name", "com.liferay.test",
+			"--liferayVersion", "7.1");
+
+		_testExists(gradleProjectDir, "bnd.bnd");
+
+		_testExists(gradleProjectDir, "build.gradle");
+
+		_testContains(
+			gradleProjectDir,
+			"src/main/java/com/liferay/test/social/bookmark" +
+				"/FooSocialBookmark.java",
+			"public class FooSocialBookmark implements SocialBookmark");
+		_testContains(
+			gradleProjectDir, "src/main/resources/META-INF/resources/page.jsp",
+			"<clay:link");
+		_testContains(
+			gradleProjectDir, "src/main/resources/content/Language.properties",
+			"foo=Foo");
+
+		File mavenProjectDir = _buildTemplateWithMaven(
+			"social-bookmark", "foo", "com.test", "-DclassName=Foo",
+			"-Dpackage=com.liferay.test", "-DliferayVersion=7.1");
+
+		_buildProjects(gradleProjectDir, mavenProjectDir);
+	}
+
+	@Test
 	public void testBuildTemplateSoyPortlet() throws Exception {
 		Assume.assumeFalse(Validator.isNotNull(System.getenv("JENKINS_HOME")));
 
@@ -1130,7 +1192,9 @@ public class ProjectTemplatesTest {
 
 		_testContains(
 			gradleProjectDir, "build.gradle",
-			"apply plugin: \"com.liferay.plugin\"");
+			"apply plugin: \"com.liferay.plugin\"",
+			"compileOnly group: \"javax.portlet\", name: \"portlet-api\", " +
+				"version: \"2.0\"");
 		_testContains(
 			gradleProjectDir,
 			"src/main/java/com/liferay/test/constants/FooPortletKeys.java",
@@ -1150,6 +1214,13 @@ public class ProjectTemplatesTest {
 			"-Dpackage=com.liferay.test");
 
 		_testExists(mavenProjectDir, "gulpfile.js");
+
+		File pomXmlFile = new File(mavenProjectDir, "pom.xml");
+
+		Path pomXmlPath = pomXmlFile.toPath();
+
+		_testPomXmlContainsDependency(
+			pomXmlPath, "javax.portlet", "portlet-api", "2.0");
 
 		File mavenPackageJsonFile = new File(mavenProjectDir, "package.json");
 
@@ -1208,7 +1279,9 @@ public class ProjectTemplatesTest {
 
 		_testContains(
 			gradleProjectDir, "build.gradle",
-			"apply plugin: \"com.liferay.plugin\"");
+			"apply plugin: \"com.liferay.plugin\"",
+			"compileOnly group: \"javax.portlet\", name: \"portlet-api\", " +
+				"version: \"3.0.0\"");
 		_testContains(
 			gradleProjectDir,
 			"src/main/java/com/liferay/test/constants/FooPortletKeys.java",
@@ -1230,6 +1303,13 @@ public class ProjectTemplatesTest {
 			"-Dpackage=com.liferay.test", "-DliferayVersion=7.1");
 
 		_testExists(mavenProjectDir, "gulpfile.js");
+
+		File pomXmlFile = new File(mavenProjectDir, "pom.xml");
+
+		Path pomXmlPath = pomXmlFile.toPath();
+
+		_testPomXmlContainsDependency(
+			pomXmlPath, "javax.portlet", "portlet-api", "3.0.0");
 
 		File mavenPackageJsonFile = new File(mavenProjectDir, "package.json");
 
@@ -2119,14 +2199,22 @@ public class ProjectTemplatesTest {
 		completeArgs.add("-DartifactId=" + name);
 		completeArgs.add("-Dversion=1.0.0");
 
+		boolean liferayVersionSet = false;
 		boolean projectTypeSet = false;
 
 		for (String arg : args) {
 			completeArgs.add(arg);
 
-			if (arg.startsWith("-DprojectType=")) {
+			if (arg.startsWith("-DliferayVersion=")) {
+				liferayVersionSet = true;
+			}
+			else if (arg.startsWith("-DprojectType=")) {
 				projectTypeSet = true;
 			}
+		}
+
+		if (!liferayVersionSet) {
+			completeArgs.add("-DliferayVersion=7.0");
 		}
 
 		if (!projectTypeSet) {
@@ -2204,22 +2292,23 @@ public class ProjectTemplatesTest {
 
 		GradleRunner gradleRunner = GradleRunner.create();
 
+		List<String> arguments = new ArrayList<>(taskPaths.length + 3);
+
+		arguments.add("--stacktrace");
+
 		String httpProxyHost = mavenExecutor.getHttpProxyHost();
 		int httpProxyPort = mavenExecutor.getHttpProxyPort();
 
 		if (Validator.isNotNull(httpProxyHost) && (httpProxyPort > 0)) {
-			String[] arguments = new String[taskPaths.length + 2];
-
-			arguments[0] = "-Dhttp.proxyHost=" + httpProxyHost;
-			arguments[1] = "-Dhttp.proxyPort=" + httpProxyPort;
-
-			System.arraycopy(taskPaths, 0, arguments, 2, taskPaths.length);
-
-			gradleRunner.withArguments(arguments);
+			arguments.add("-Dhttp.proxyHost=" + httpProxyHost);
+			arguments.add("-Dhttp.proxyPort=" + httpProxyPort);
 		}
-		else {
-			gradleRunner.withArguments(taskPaths);
+
+		for (String taskPath : taskPaths) {
+			arguments.add(taskPath);
 		}
+
+		gradleRunner.withArguments(arguments);
 
 		gradleRunner.withGradleDistribution(_gradleDistribution);
 		gradleRunner.withProjectDir(projectDir);
@@ -2331,6 +2420,7 @@ public class ProjectTemplatesTest {
 		List<File> archetypesDirs = Arrays.asList(archetypesDir);
 
 		projectTemplatesArgs.setArchetypesDirs(archetypesDirs);
+
 		projectTemplatesArgs.setAuthor(author);
 		projectTemplatesArgs.setClassName(className);
 		projectTemplatesArgs.setContributorType(contributorType);
@@ -3123,6 +3213,65 @@ public class ProjectTemplatesTest {
 		_executeGradle(workspaceDir, ":modules:" + name + ":build");
 
 		_testExists(workspaceProjectDir, jarFilePath);
+	}
+
+	private void _testPomXmlContainsDependency(
+			Path pomXmlPath, String groupId, String artifactId, String version)
+		throws Exception {
+
+		DocumentBuilderFactory documentBuilderFactory =
+			DocumentBuilderFactory.newInstance();
+
+		DocumentBuilder documentBuilder =
+			documentBuilderFactory.newDocumentBuilder();
+
+		Assert.assertTrue("Missing " + pomXmlPath, Files.exists(pomXmlPath));
+
+		Document document = documentBuilder.parse(pomXmlPath.toFile());
+
+		Element projectElement = document.getDocumentElement();
+
+		Element dependenciesElement = XMLTestUtil.getChildElement(
+			projectElement, "dependencies");
+
+		List<Element> dependencyElements;
+
+		if (dependenciesElement != null) {
+			dependencyElements = XMLTestUtil.getChildElements(
+				dependenciesElement);
+		}
+		else {
+			dependencyElements = Collections.emptyList();
+		}
+
+		boolean foundDependency = false;
+
+		for (Element dependencyElement : dependencyElements) {
+			String dependencyElementString = XMLTestUtil.toString(
+				dependencyElement);
+
+			String artifactIdString = String.format(
+				"<artifactId>%s</artifactId>", artifactId);
+			String groupIdString = String.format(
+				"<groupId>%s</groupId>", groupId);
+			String versionString = String.format(
+				"<version>%s</version>", version);
+
+			if (dependencyElementString.contains(artifactIdString) &&
+				dependencyElementString.contains(groupIdString) &&
+				dependencyElementString.contains(versionString)) {
+
+				foundDependency = true;
+
+				break;
+			}
+		}
+
+		String missingDependencyString = String.format(
+			"Missing dependency %s:%s:%s in %s", groupId, artifactId, version,
+			pomXmlPath);
+
+		Assert.assertTrue(missingDependencyString, foundDependency);
 	}
 
 	private static final String _BUNDLES_DIFF_IGNORES = StringTestUtil.merge(
