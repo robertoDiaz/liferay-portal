@@ -33,7 +33,10 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.ReleasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -43,7 +46,9 @@ import com.liferay.portal.model.impl.ReleaseModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -215,13 +220,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 					result = release;
 
 					cacheResult(release);
-
-					if ((release.getServletContextName() == null) ||
-							!release.getServletContextName()
-										.equals(servletContextName)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
-							finderArgs, release);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -536,8 +534,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 
 	@Override
 	protected Release removeImpl(Release release) {
-		release = toUnwrappedModel(release);
-
 		Session session = null;
 
 		try {
@@ -568,9 +564,23 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 
 	@Override
 	public Release updateImpl(Release release) {
-		release = toUnwrappedModel(release);
-
 		boolean isNew = release.isNew();
+
+		if (!(release instanceof ReleaseModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(release.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(release);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in release proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Release implementation " +
+				release.getClass());
+		}
 
 		ReleaseModelImpl releaseModelImpl = (ReleaseModelImpl)release;
 
@@ -638,31 +648,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		release.resetOriginalValues();
 
 		return release;
-	}
-
-	protected Release toUnwrappedModel(Release release) {
-		if (release instanceof ReleaseImpl) {
-			return release;
-		}
-
-		ReleaseImpl releaseImpl = new ReleaseImpl();
-
-		releaseImpl.setNew(release.isNew());
-		releaseImpl.setPrimaryKey(release.getPrimaryKey());
-
-		releaseImpl.setMvccVersion(release.getMvccVersion());
-		releaseImpl.setReleaseId(release.getReleaseId());
-		releaseImpl.setCreateDate(release.getCreateDate());
-		releaseImpl.setModifiedDate(release.getModifiedDate());
-		releaseImpl.setServletContextName(release.getServletContextName());
-		releaseImpl.setSchemaVersion(release.getSchemaVersion());
-		releaseImpl.setBuildNumber(release.getBuildNumber());
-		releaseImpl.setBuildDate(release.getBuildDate());
-		releaseImpl.setVerified(release.isVerified());
-		releaseImpl.setState(release.getState());
-		releaseImpl.setTestString(release.getTestString());
-
-		return releaseImpl;
 	}
 
 	/**
@@ -812,15 +797,46 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 
 		query.append(_SQL_SELECT_RELEASE_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("releaseId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

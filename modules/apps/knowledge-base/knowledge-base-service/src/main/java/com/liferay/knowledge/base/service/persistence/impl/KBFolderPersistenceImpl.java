@@ -38,7 +38,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -49,7 +52,9 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -774,13 +779,6 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 					result = kbFolder;
 
 					cacheResult(kbFolder);
-
-					if ((kbFolder.getUuid() == null) ||
-							!kbFolder.getUuid().equals(uuid) ||
-							(kbFolder.getGroupId() != groupId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-							finderArgs, kbFolder);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2561,14 +2559,6 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 					result = kbFolder;
 
 					cacheResult(kbFolder);
-
-					if ((kbFolder.getGroupId() != groupId) ||
-							(kbFolder.getParentKBFolderId() != parentKBFolderId) ||
-							(kbFolder.getName() == null) ||
-							!kbFolder.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_N,
-							finderArgs, kbFolder);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2853,14 +2843,6 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 					result = kbFolder;
 
 					cacheResult(kbFolder);
-
-					if ((kbFolder.getGroupId() != groupId) ||
-							(kbFolder.getParentKBFolderId() != parentKBFolderId) ||
-							(kbFolder.getUrlTitle() == null) ||
-							!kbFolder.getUrlTitle().equals(urlTitle)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_P_UT,
-							finderArgs, kbFolder);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3272,8 +3254,6 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 	@Override
 	protected KBFolder removeImpl(KBFolder kbFolder) {
-		kbFolder = toUnwrappedModel(kbFolder);
-
 		Session session = null;
 
 		try {
@@ -3304,9 +3284,23 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 	@Override
 	public KBFolder updateImpl(KBFolder kbFolder) {
-		kbFolder = toUnwrappedModel(kbFolder);
-
 		boolean isNew = kbFolder.isNew();
+
+		if (!(kbFolder instanceof KBFolderModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(kbFolder.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(kbFolder);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in kbFolder proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom KBFolder implementation " +
+				kbFolder.getClass());
+		}
 
 		KBFolderModelImpl kbFolderModelImpl = (KBFolderModelImpl)kbFolder;
 
@@ -3465,33 +3459,6 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 		return kbFolder;
 	}
 
-	protected KBFolder toUnwrappedModel(KBFolder kbFolder) {
-		if (kbFolder instanceof KBFolderImpl) {
-			return kbFolder;
-		}
-
-		KBFolderImpl kbFolderImpl = new KBFolderImpl();
-
-		kbFolderImpl.setNew(kbFolder.isNew());
-		kbFolderImpl.setPrimaryKey(kbFolder.getPrimaryKey());
-
-		kbFolderImpl.setUuid(kbFolder.getUuid());
-		kbFolderImpl.setKbFolderId(kbFolder.getKbFolderId());
-		kbFolderImpl.setGroupId(kbFolder.getGroupId());
-		kbFolderImpl.setCompanyId(kbFolder.getCompanyId());
-		kbFolderImpl.setUserId(kbFolder.getUserId());
-		kbFolderImpl.setUserName(kbFolder.getUserName());
-		kbFolderImpl.setCreateDate(kbFolder.getCreateDate());
-		kbFolderImpl.setModifiedDate(kbFolder.getModifiedDate());
-		kbFolderImpl.setParentKBFolderId(kbFolder.getParentKBFolderId());
-		kbFolderImpl.setName(kbFolder.getName());
-		kbFolderImpl.setUrlTitle(kbFolder.getUrlTitle());
-		kbFolderImpl.setDescription(kbFolder.getDescription());
-		kbFolderImpl.setLastPublishDate(kbFolder.getLastPublishDate());
-
-		return kbFolderImpl;
-	}
-
 	/**
 	 * Returns the kb folder with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -3639,15 +3606,46 @@ public class KBFolderPersistenceImpl extends BasePersistenceImpl<KBFolder>
 
 		query.append(_SQL_SELECT_KBFOLDER_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("kbFolderId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

@@ -31,7 +31,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PortalPreferences;
 import com.liferay.portal.kernel.service.persistence.PortalPreferencesPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.PortalPreferencesImpl;
@@ -39,6 +42,9 @@ import com.liferay.portal.model.impl.PortalPreferencesModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -219,12 +225,6 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 					result = portalPreferences;
 
 					cacheResult(portalPreferences);
-
-					if ((portalPreferences.getOwnerId() != ownerId) ||
-							(portalPreferences.getOwnerType() != ownerType)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_O_O,
-							finderArgs, portalPreferences);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -520,8 +520,6 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 
 	@Override
 	protected PortalPreferences removeImpl(PortalPreferences portalPreferences) {
-		portalPreferences = toUnwrappedModel(portalPreferences);
-
 		Session session = null;
 
 		try {
@@ -552,9 +550,23 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 
 	@Override
 	public PortalPreferences updateImpl(PortalPreferences portalPreferences) {
-		portalPreferences = toUnwrappedModel(portalPreferences);
-
 		boolean isNew = portalPreferences.isNew();
+
+		if (!(portalPreferences instanceof PortalPreferencesModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(portalPreferences.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(portalPreferences);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in portalPreferences proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom PortalPreferences implementation " +
+				portalPreferences.getClass());
+		}
 
 		PortalPreferencesModelImpl portalPreferencesModelImpl = (PortalPreferencesModelImpl)portalPreferences;
 
@@ -601,26 +613,6 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 		portalPreferences.resetOriginalValues();
 
 		return portalPreferences;
-	}
-
-	protected PortalPreferences toUnwrappedModel(
-		PortalPreferences portalPreferences) {
-		if (portalPreferences instanceof PortalPreferencesImpl) {
-			return portalPreferences;
-		}
-
-		PortalPreferencesImpl portalPreferencesImpl = new PortalPreferencesImpl();
-
-		portalPreferencesImpl.setNew(portalPreferences.isNew());
-		portalPreferencesImpl.setPrimaryKey(portalPreferences.getPrimaryKey());
-
-		portalPreferencesImpl.setMvccVersion(portalPreferences.getMvccVersion());
-		portalPreferencesImpl.setPortalPreferencesId(portalPreferences.getPortalPreferencesId());
-		portalPreferencesImpl.setOwnerId(portalPreferences.getOwnerId());
-		portalPreferencesImpl.setOwnerType(portalPreferences.getOwnerType());
-		portalPreferencesImpl.setPreferences(portalPreferences.getPreferences());
-
-		return portalPreferencesImpl;
 	}
 
 	/**
@@ -771,15 +763,46 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 
 		query.append(_SQL_SELECT_PORTALPREFERENCES_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("portalPreferencesId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

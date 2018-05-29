@@ -39,9 +39,13 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
@@ -51,7 +55,9 @@ import com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -783,13 +789,6 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 					result = dlFileShortcut;
 
 					cacheResult(dlFileShortcut);
-
-					if ((dlFileShortcut.getUuid() == null) ||
-							!dlFileShortcut.getUuid().equals(uuid) ||
-							(dlFileShortcut.getGroupId() != groupId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-							finderArgs, dlFileShortcut);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -6215,8 +6214,6 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 
 	@Override
 	protected DLFileShortcut removeImpl(DLFileShortcut dlFileShortcut) {
-		dlFileShortcut = toUnwrappedModel(dlFileShortcut);
-
 		Session session = null;
 
 		try {
@@ -6247,9 +6244,23 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 
 	@Override
 	public DLFileShortcut updateImpl(DLFileShortcut dlFileShortcut) {
-		dlFileShortcut = toUnwrappedModel(dlFileShortcut);
-
 		boolean isNew = dlFileShortcut.isNew();
+
+		if (!(dlFileShortcut instanceof DLFileShortcutModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(dlFileShortcut.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(dlFileShortcut);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in dlFileShortcut proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom DLFileShortcut implementation " +
+				dlFileShortcut.getClass());
+		}
 
 		DLFileShortcutModelImpl dlFileShortcutModelImpl = (DLFileShortcutModelImpl)dlFileShortcut;
 
@@ -6529,38 +6540,6 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 		return dlFileShortcut;
 	}
 
-	protected DLFileShortcut toUnwrappedModel(DLFileShortcut dlFileShortcut) {
-		if (dlFileShortcut instanceof DLFileShortcutImpl) {
-			return dlFileShortcut;
-		}
-
-		DLFileShortcutImpl dlFileShortcutImpl = new DLFileShortcutImpl();
-
-		dlFileShortcutImpl.setNew(dlFileShortcut.isNew());
-		dlFileShortcutImpl.setPrimaryKey(dlFileShortcut.getPrimaryKey());
-
-		dlFileShortcutImpl.setUuid(dlFileShortcut.getUuid());
-		dlFileShortcutImpl.setFileShortcutId(dlFileShortcut.getFileShortcutId());
-		dlFileShortcutImpl.setGroupId(dlFileShortcut.getGroupId());
-		dlFileShortcutImpl.setCompanyId(dlFileShortcut.getCompanyId());
-		dlFileShortcutImpl.setUserId(dlFileShortcut.getUserId());
-		dlFileShortcutImpl.setUserName(dlFileShortcut.getUserName());
-		dlFileShortcutImpl.setCreateDate(dlFileShortcut.getCreateDate());
-		dlFileShortcutImpl.setModifiedDate(dlFileShortcut.getModifiedDate());
-		dlFileShortcutImpl.setRepositoryId(dlFileShortcut.getRepositoryId());
-		dlFileShortcutImpl.setFolderId(dlFileShortcut.getFolderId());
-		dlFileShortcutImpl.setToFileEntryId(dlFileShortcut.getToFileEntryId());
-		dlFileShortcutImpl.setTreePath(dlFileShortcut.getTreePath());
-		dlFileShortcutImpl.setActive(dlFileShortcut.isActive());
-		dlFileShortcutImpl.setLastPublishDate(dlFileShortcut.getLastPublishDate());
-		dlFileShortcutImpl.setStatus(dlFileShortcut.getStatus());
-		dlFileShortcutImpl.setStatusByUserId(dlFileShortcut.getStatusByUserId());
-		dlFileShortcutImpl.setStatusByUserName(dlFileShortcut.getStatusByUserName());
-		dlFileShortcutImpl.setStatusDate(dlFileShortcut.getStatusDate());
-
-		return dlFileShortcutImpl;
-	}
-
 	/**
 	 * Returns the document library file shortcut with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -6709,15 +6688,46 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 
 		query.append(_SQL_SELECT_DLFILESHORTCUT_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("fileShortcutId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

@@ -31,9 +31,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import com.liferay.portlet.social.model.impl.SocialActivitySetImpl;
 import com.liferay.portlet.social.model.impl.SocialActivitySetModelImpl;
@@ -45,7 +49,9 @@ import com.liferay.social.kernel.service.persistence.SocialActivitySetPersistenc
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3710,8 +3716,6 @@ public class SocialActivitySetPersistenceImpl extends BasePersistenceImpl<Social
 
 	@Override
 	protected SocialActivitySet removeImpl(SocialActivitySet socialActivitySet) {
-		socialActivitySet = toUnwrappedModel(socialActivitySet);
-
 		Session session = null;
 
 		try {
@@ -3742,9 +3746,23 @@ public class SocialActivitySetPersistenceImpl extends BasePersistenceImpl<Social
 
 	@Override
 	public SocialActivitySet updateImpl(SocialActivitySet socialActivitySet) {
-		socialActivitySet = toUnwrappedModel(socialActivitySet);
-
 		boolean isNew = socialActivitySet.isNew();
+
+		if (!(socialActivitySet instanceof SocialActivitySetModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(socialActivitySet.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(socialActivitySet);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in socialActivitySet proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SocialActivitySet implementation " +
+				socialActivitySet.getClass());
+		}
 
 		SocialActivitySetModelImpl socialActivitySetModelImpl = (SocialActivitySetModelImpl)socialActivitySet;
 
@@ -3976,32 +3994,6 @@ public class SocialActivitySetPersistenceImpl extends BasePersistenceImpl<Social
 		return socialActivitySet;
 	}
 
-	protected SocialActivitySet toUnwrappedModel(
-		SocialActivitySet socialActivitySet) {
-		if (socialActivitySet instanceof SocialActivitySetImpl) {
-			return socialActivitySet;
-		}
-
-		SocialActivitySetImpl socialActivitySetImpl = new SocialActivitySetImpl();
-
-		socialActivitySetImpl.setNew(socialActivitySet.isNew());
-		socialActivitySetImpl.setPrimaryKey(socialActivitySet.getPrimaryKey());
-
-		socialActivitySetImpl.setActivitySetId(socialActivitySet.getActivitySetId());
-		socialActivitySetImpl.setGroupId(socialActivitySet.getGroupId());
-		socialActivitySetImpl.setCompanyId(socialActivitySet.getCompanyId());
-		socialActivitySetImpl.setUserId(socialActivitySet.getUserId());
-		socialActivitySetImpl.setCreateDate(socialActivitySet.getCreateDate());
-		socialActivitySetImpl.setModifiedDate(socialActivitySet.getModifiedDate());
-		socialActivitySetImpl.setClassNameId(socialActivitySet.getClassNameId());
-		socialActivitySetImpl.setClassPK(socialActivitySet.getClassPK());
-		socialActivitySetImpl.setType(socialActivitySet.getType());
-		socialActivitySetImpl.setExtraData(socialActivitySet.getExtraData());
-		socialActivitySetImpl.setActivityCount(socialActivitySet.getActivityCount());
-
-		return socialActivitySetImpl;
-	}
-
 	/**
 	 * Returns the social activity set with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -4150,15 +4142,46 @@ public class SocialActivitySetPersistenceImpl extends BasePersistenceImpl<Social
 
 		query.append(_SQL_SELECT_SOCIALACTIVITYSET_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("activitySetId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

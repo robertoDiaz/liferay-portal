@@ -34,13 +34,20 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.OrgLaborPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.OrgLaborImpl;
 import com.liferay.portal.model.impl.OrgLaborModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -746,8 +753,6 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 
 	@Override
 	protected OrgLabor removeImpl(OrgLabor orgLabor) {
-		orgLabor = toUnwrappedModel(orgLabor);
-
 		Session session = null;
 
 		try {
@@ -778,9 +783,23 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 
 	@Override
 	public OrgLabor updateImpl(OrgLabor orgLabor) {
-		orgLabor = toUnwrappedModel(orgLabor);
-
 		boolean isNew = orgLabor.isNew();
+
+		if (!(orgLabor instanceof OrgLaborModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(orgLabor.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(orgLabor);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in orgLabor proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OrgLabor implementation " +
+				orgLabor.getClass());
+		}
 
 		OrgLaborModelImpl orgLaborModelImpl = (OrgLaborModelImpl)orgLabor;
 
@@ -850,39 +869,6 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 		orgLabor.resetOriginalValues();
 
 		return orgLabor;
-	}
-
-	protected OrgLabor toUnwrappedModel(OrgLabor orgLabor) {
-		if (orgLabor instanceof OrgLaborImpl) {
-			return orgLabor;
-		}
-
-		OrgLaborImpl orgLaborImpl = new OrgLaborImpl();
-
-		orgLaborImpl.setNew(orgLabor.isNew());
-		orgLaborImpl.setPrimaryKey(orgLabor.getPrimaryKey());
-
-		orgLaborImpl.setMvccVersion(orgLabor.getMvccVersion());
-		orgLaborImpl.setOrgLaborId(orgLabor.getOrgLaborId());
-		orgLaborImpl.setCompanyId(orgLabor.getCompanyId());
-		orgLaborImpl.setOrganizationId(orgLabor.getOrganizationId());
-		orgLaborImpl.setTypeId(orgLabor.getTypeId());
-		orgLaborImpl.setSunOpen(orgLabor.getSunOpen());
-		orgLaborImpl.setSunClose(orgLabor.getSunClose());
-		orgLaborImpl.setMonOpen(orgLabor.getMonOpen());
-		orgLaborImpl.setMonClose(orgLabor.getMonClose());
-		orgLaborImpl.setTueOpen(orgLabor.getTueOpen());
-		orgLaborImpl.setTueClose(orgLabor.getTueClose());
-		orgLaborImpl.setWedOpen(orgLabor.getWedOpen());
-		orgLaborImpl.setWedClose(orgLabor.getWedClose());
-		orgLaborImpl.setThuOpen(orgLabor.getThuOpen());
-		orgLaborImpl.setThuClose(orgLabor.getThuClose());
-		orgLaborImpl.setFriOpen(orgLabor.getFriOpen());
-		orgLaborImpl.setFriClose(orgLabor.getFriClose());
-		orgLaborImpl.setSatOpen(orgLabor.getSatOpen());
-		orgLaborImpl.setSatClose(orgLabor.getSatClose());
-
-		return orgLaborImpl;
 	}
 
 	/**
@@ -1032,15 +1018,46 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 
 		query.append(_SQL_SELECT_ORGLABOR_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("orgLaborId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

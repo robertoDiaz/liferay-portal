@@ -38,9 +38,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.LayoutPrototypePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.LayoutPrototypeImpl;
@@ -49,7 +53,9 @@ import com.liferay.portal.model.impl.LayoutPrototypeModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -4030,8 +4036,6 @@ public class LayoutPrototypePersistenceImpl extends BasePersistenceImpl<LayoutPr
 
 	@Override
 	protected LayoutPrototype removeImpl(LayoutPrototype layoutPrototype) {
-		layoutPrototype = toUnwrappedModel(layoutPrototype);
-
 		Session session = null;
 
 		try {
@@ -4062,9 +4066,23 @@ public class LayoutPrototypePersistenceImpl extends BasePersistenceImpl<LayoutPr
 
 	@Override
 	public LayoutPrototype updateImpl(LayoutPrototype layoutPrototype) {
-		layoutPrototype = toUnwrappedModel(layoutPrototype);
-
 		boolean isNew = layoutPrototype.isNew();
+
+		if (!(layoutPrototype instanceof LayoutPrototypeModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(layoutPrototype.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(layoutPrototype);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in layoutPrototype proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom LayoutPrototype implementation " +
+				layoutPrototype.getClass());
+		}
 
 		LayoutPrototypeModelImpl layoutPrototypeModelImpl = (LayoutPrototypeModelImpl)layoutPrototype;
 
@@ -4247,32 +4265,6 @@ public class LayoutPrototypePersistenceImpl extends BasePersistenceImpl<LayoutPr
 		return layoutPrototype;
 	}
 
-	protected LayoutPrototype toUnwrappedModel(LayoutPrototype layoutPrototype) {
-		if (layoutPrototype instanceof LayoutPrototypeImpl) {
-			return layoutPrototype;
-		}
-
-		LayoutPrototypeImpl layoutPrototypeImpl = new LayoutPrototypeImpl();
-
-		layoutPrototypeImpl.setNew(layoutPrototype.isNew());
-		layoutPrototypeImpl.setPrimaryKey(layoutPrototype.getPrimaryKey());
-
-		layoutPrototypeImpl.setMvccVersion(layoutPrototype.getMvccVersion());
-		layoutPrototypeImpl.setUuid(layoutPrototype.getUuid());
-		layoutPrototypeImpl.setLayoutPrototypeId(layoutPrototype.getLayoutPrototypeId());
-		layoutPrototypeImpl.setCompanyId(layoutPrototype.getCompanyId());
-		layoutPrototypeImpl.setUserId(layoutPrototype.getUserId());
-		layoutPrototypeImpl.setUserName(layoutPrototype.getUserName());
-		layoutPrototypeImpl.setCreateDate(layoutPrototype.getCreateDate());
-		layoutPrototypeImpl.setModifiedDate(layoutPrototype.getModifiedDate());
-		layoutPrototypeImpl.setName(layoutPrototype.getName());
-		layoutPrototypeImpl.setDescription(layoutPrototype.getDescription());
-		layoutPrototypeImpl.setSettings(layoutPrototype.getSettings());
-		layoutPrototypeImpl.setActive(layoutPrototype.isActive());
-
-		return layoutPrototypeImpl;
-	}
-
 	/**
 	 * Returns the layout prototype with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -4421,15 +4413,46 @@ public class LayoutPrototypePersistenceImpl extends BasePersistenceImpl<LayoutPr
 
 		query.append(_SQL_SELECT_LAYOUTPROTOTYPE_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("layoutPrototypeId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

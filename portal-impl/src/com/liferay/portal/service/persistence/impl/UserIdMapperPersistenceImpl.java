@@ -34,16 +34,22 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.UserIdMapperPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.UserIdMapperImpl;
 import com.liferay.portal.model.impl.UserIdMapperModelImpl;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -726,13 +732,6 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 					result = userIdMapper;
 
 					cacheResult(userIdMapper);
-
-					if ((userIdMapper.getUserId() != userId) ||
-							(userIdMapper.getType() == null) ||
-							!userIdMapper.getType().equals(type)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_T,
-							finderArgs, userIdMapper);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -995,15 +994,6 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 					result = userIdMapper;
 
 					cacheResult(userIdMapper);
-
-					if ((userIdMapper.getType() == null) ||
-							!userIdMapper.getType().equals(type) ||
-							(userIdMapper.getExternalUserId() == null) ||
-							!userIdMapper.getExternalUserId()
-											 .equals(externalUserId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_T_E,
-							finderArgs, userIdMapper);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1381,8 +1371,6 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 
 	@Override
 	protected UserIdMapper removeImpl(UserIdMapper userIdMapper) {
-		userIdMapper = toUnwrappedModel(userIdMapper);
-
 		Session session = null;
 
 		try {
@@ -1413,9 +1401,23 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 
 	@Override
 	public UserIdMapper updateImpl(UserIdMapper userIdMapper) {
-		userIdMapper = toUnwrappedModel(userIdMapper);
-
 		boolean isNew = userIdMapper.isNew();
+
+		if (!(userIdMapper instanceof UserIdMapperModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userIdMapper.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userIdMapper);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userIdMapper proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserIdMapper implementation " +
+				userIdMapper.getClass());
+		}
 
 		UserIdMapperModelImpl userIdMapperModelImpl = (UserIdMapperModelImpl)userIdMapper;
 
@@ -1487,27 +1489,6 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 		userIdMapper.resetOriginalValues();
 
 		return userIdMapper;
-	}
-
-	protected UserIdMapper toUnwrappedModel(UserIdMapper userIdMapper) {
-		if (userIdMapper instanceof UserIdMapperImpl) {
-			return userIdMapper;
-		}
-
-		UserIdMapperImpl userIdMapperImpl = new UserIdMapperImpl();
-
-		userIdMapperImpl.setNew(userIdMapper.isNew());
-		userIdMapperImpl.setPrimaryKey(userIdMapper.getPrimaryKey());
-
-		userIdMapperImpl.setMvccVersion(userIdMapper.getMvccVersion());
-		userIdMapperImpl.setUserIdMapperId(userIdMapper.getUserIdMapperId());
-		userIdMapperImpl.setCompanyId(userIdMapper.getCompanyId());
-		userIdMapperImpl.setUserId(userIdMapper.getUserId());
-		userIdMapperImpl.setType(userIdMapper.getType());
-		userIdMapperImpl.setDescription(userIdMapper.getDescription());
-		userIdMapperImpl.setExternalUserId(userIdMapper.getExternalUserId());
-
-		return userIdMapperImpl;
 	}
 
 	/**
@@ -1658,15 +1639,46 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 
 		query.append(_SQL_SELECT_USERIDMAPPER_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("userIdMapperId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

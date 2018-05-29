@@ -35,14 +35,21 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import com.liferay.portlet.announcements.model.impl.AnnouncementsFlagImpl;
 import com.liferay.portlet.announcements.model.impl.AnnouncementsFlagModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -739,13 +746,6 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 					result = announcementsFlag;
 
 					cacheResult(announcementsFlag);
-
-					if ((announcementsFlag.getUserId() != userId) ||
-							(announcementsFlag.getEntryId() != entryId) ||
-							(announcementsFlag.getValue() != value)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_E_V,
-							finderArgs, announcementsFlag);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1053,8 +1053,6 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 
 	@Override
 	protected AnnouncementsFlag removeImpl(AnnouncementsFlag announcementsFlag) {
-		announcementsFlag = toUnwrappedModel(announcementsFlag);
-
 		Session session = null;
 
 		try {
@@ -1085,9 +1083,23 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 
 	@Override
 	public AnnouncementsFlag updateImpl(AnnouncementsFlag announcementsFlag) {
-		announcementsFlag = toUnwrappedModel(announcementsFlag);
-
 		boolean isNew = announcementsFlag.isNew();
+
+		if (!(announcementsFlag instanceof AnnouncementsFlagModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(announcementsFlag.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(announcementsFlag);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in announcementsFlag proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom AnnouncementsFlag implementation " +
+				announcementsFlag.getClass());
+		}
 
 		AnnouncementsFlagModelImpl announcementsFlagModelImpl = (AnnouncementsFlagModelImpl)announcementsFlag;
 
@@ -1159,27 +1171,6 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 		announcementsFlag.resetOriginalValues();
 
 		return announcementsFlag;
-	}
-
-	protected AnnouncementsFlag toUnwrappedModel(
-		AnnouncementsFlag announcementsFlag) {
-		if (announcementsFlag instanceof AnnouncementsFlagImpl) {
-			return announcementsFlag;
-		}
-
-		AnnouncementsFlagImpl announcementsFlagImpl = new AnnouncementsFlagImpl();
-
-		announcementsFlagImpl.setNew(announcementsFlag.isNew());
-		announcementsFlagImpl.setPrimaryKey(announcementsFlag.getPrimaryKey());
-
-		announcementsFlagImpl.setFlagId(announcementsFlag.getFlagId());
-		announcementsFlagImpl.setCompanyId(announcementsFlag.getCompanyId());
-		announcementsFlagImpl.setUserId(announcementsFlag.getUserId());
-		announcementsFlagImpl.setCreateDate(announcementsFlag.getCreateDate());
-		announcementsFlagImpl.setEntryId(announcementsFlag.getEntryId());
-		announcementsFlagImpl.setValue(announcementsFlag.getValue());
-
-		return announcementsFlagImpl;
 	}
 
 	/**
@@ -1330,15 +1321,46 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 
 		query.append(_SQL_SELECT_ANNOUNCEMENTSFLAG_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("flagId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

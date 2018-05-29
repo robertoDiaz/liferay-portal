@@ -39,12 +39,18 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -948,18 +954,6 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 					result = oAuthToken;
 
 					cacheResult(oAuthToken);
-
-					if ((oAuthToken.getUserId() != userId) ||
-							(oAuthToken.getGadgetKey() == null) ||
-							!oAuthToken.getGadgetKey().equals(gadgetKey) ||
-							(oAuthToken.getServiceName() == null) ||
-							!oAuthToken.getServiceName().equals(serviceName) ||
-							(oAuthToken.getModuleId() != moduleId) ||
-							(oAuthToken.getTokenName() == null) ||
-							!oAuthToken.getTokenName().equals(tokenName)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_G_S_M_T,
-							finderArgs, oAuthToken);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1338,8 +1332,6 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 
 	@Override
 	protected OAuthToken removeImpl(OAuthToken oAuthToken) {
-		oAuthToken = toUnwrappedModel(oAuthToken);
-
 		Session session = null;
 
 		try {
@@ -1370,9 +1362,23 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 
 	@Override
 	public OAuthToken updateImpl(OAuthToken oAuthToken) {
-		oAuthToken = toUnwrappedModel(oAuthToken);
-
 		boolean isNew = oAuthToken.isNew();
+
+		if (!(oAuthToken instanceof OAuthTokenModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuthToken.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuthToken);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuthToken proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuthToken implementation " +
+				oAuthToken.getClass());
+		}
 
 		OAuthTokenModelImpl oAuthTokenModelImpl = (OAuthTokenModelImpl)oAuthToken;
 
@@ -1472,34 +1478,6 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 		oAuthToken.resetOriginalValues();
 
 		return oAuthToken;
-	}
-
-	protected OAuthToken toUnwrappedModel(OAuthToken oAuthToken) {
-		if (oAuthToken instanceof OAuthTokenImpl) {
-			return oAuthToken;
-		}
-
-		OAuthTokenImpl oAuthTokenImpl = new OAuthTokenImpl();
-
-		oAuthTokenImpl.setNew(oAuthToken.isNew());
-		oAuthTokenImpl.setPrimaryKey(oAuthToken.getPrimaryKey());
-
-		oAuthTokenImpl.setOAuthTokenId(oAuthToken.getOAuthTokenId());
-		oAuthTokenImpl.setCompanyId(oAuthToken.getCompanyId());
-		oAuthTokenImpl.setUserId(oAuthToken.getUserId());
-		oAuthTokenImpl.setUserName(oAuthToken.getUserName());
-		oAuthTokenImpl.setCreateDate(oAuthToken.getCreateDate());
-		oAuthTokenImpl.setModifiedDate(oAuthToken.getModifiedDate());
-		oAuthTokenImpl.setGadgetKey(oAuthToken.getGadgetKey());
-		oAuthTokenImpl.setServiceName(oAuthToken.getServiceName());
-		oAuthTokenImpl.setModuleId(oAuthToken.getModuleId());
-		oAuthTokenImpl.setAccessToken(oAuthToken.getAccessToken());
-		oAuthTokenImpl.setTokenName(oAuthToken.getTokenName());
-		oAuthTokenImpl.setTokenSecret(oAuthToken.getTokenSecret());
-		oAuthTokenImpl.setSessionHandle(oAuthToken.getSessionHandle());
-		oAuthTokenImpl.setExpiration(oAuthToken.getExpiration());
-
-		return oAuthTokenImpl;
 	}
 
 	/**
@@ -1650,15 +1628,46 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 
 		query.append(_SQL_SELECT_OAUTHTOKEN_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("oAuthTokenId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.string.CharPool;
@@ -69,6 +71,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+import javax.portlet.MimeResponse;
+import javax.portlet.MutableRenderParameters;
+import javax.portlet.MutableResourceParameters;
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
@@ -80,6 +85,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceURL;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
+import javax.portlet.annotations.PortletSerializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -88,24 +94,51 @@ import javax.servlet.http.HttpSession;
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
  * @author Connor McKay
+ * @author Neil Griffin
  */
+@ProviderType
 public class PortletURLImpl
 	implements LiferayPortletURL, PortletURL, ResourceURL, Serializable {
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #PortletURLImpl(
+	 * 		   HttpServletRequest, Portlet, Layout, String,
+	 * 		   MimeResponse.Copy)}
+	 */
+	@Deprecated
 	public PortletURLImpl(
 		HttpServletRequest request, Portlet portlet, Layout layout,
 		String lifecycle) {
 
-		this(request, portlet, null, layout, lifecycle);
+		this(request, portlet, null, layout, lifecycle, null);
 	}
 
+	public PortletURLImpl(
+		HttpServletRequest request, Portlet portlet, Layout layout,
+		String lifecycle, MimeResponse.Copy copy) {
+
+		this(request, portlet, null, layout, lifecycle, copy);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #PortletURLImpl(
+	 * 		   PortletRequest, Portlet, Layout, String, MimeResponse.Copy)}
+	 */
+	@Deprecated
 	public PortletURLImpl(
 		PortletRequest portletRequest, Portlet portlet, Layout layout,
 		String lifecycle) {
 
+		this(portletRequest, portlet, layout, lifecycle, null);
+	}
+
+	public PortletURLImpl(
+		PortletRequest portletRequest, Portlet portlet, Layout layout,
+		String lifecycle, MimeResponse.Copy copy) {
+
 		this(
 			PortalUtil.getHttpServletRequest(portletRequest), portlet,
-			portletRequest, layout, lifecycle);
+			portletRequest, layout, lifecycle, copy);
 	}
 
 	@Override
@@ -122,6 +155,18 @@ public class PortletURLImpl
 		if (key == null) {
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@Override
+	public Appendable append(Appendable appendable) throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Appendable append(Appendable appendable, boolean escapeXml)
+		throws IOException {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -250,8 +295,18 @@ public class PortletURLImpl
 	}
 
 	@Override
+	public MutableRenderParameters getRenderParameters() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public String getResourceID() {
 		return _resourceID;
+	}
+
+	@Override
+	public MutableResourceParameters getResourceParameters() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -330,6 +385,11 @@ public class PortletURLImpl
 		_anchor = anchor;
 
 		clearCache();
+	}
+
+	@Override
+	public void setBeanParameter(PortletSerializable portletSerializable) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -433,6 +493,11 @@ public class PortletURLImpl
 	}
 
 	@Override
+	public void setParameter(String name, String... values) {
+		setParameter(name, values, PropsValues.PORTLET_URL_APPEND_PARAMETERS);
+	}
+
+	@Override
 	public void setParameter(String name, String value, boolean append) {
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -445,11 +510,6 @@ public class PortletURLImpl
 		}
 
 		setParameter(name, new String[] {value}, append);
-	}
-
-	@Override
-	public void setParameter(String name, String[] values) {
-		setParameter(name, values, PropsValues.PORTLET_URL_APPEND_PARAMETERS);
 	}
 
 	@Override
@@ -494,12 +554,14 @@ public class PortletURLImpl
 			for (Map.Entry<String, String[]> entry : params.entrySet()) {
 				try {
 					String key = entry.getKey();
-					String[] value = entry.getValue();
 
 					if (key == null) {
 						throw new IllegalArgumentException();
 					}
-					else if (value == null) {
+
+					String[] value = entry.getValue();
+
+					if (value == null) {
 						throw new IllegalArgumentException();
 					}
 
@@ -875,7 +937,6 @@ public class PortletURLImpl
 
 		for (Map.Entry<String, String[]> entry : renderParams.entrySet()) {
 			String name = entry.getKey();
-			String[] values = entry.getValue();
 
 			if (isParameterIncludedInPath(name)) {
 				continue;
@@ -890,7 +951,7 @@ public class PortletURLImpl
 				}
 			}
 
-			for (String value : values) {
+			for (String value : entry.getValue()) {
 				_appendNamespaceAndEncode(sb, name);
 
 				sb.append(StringPool.EQUAL);
@@ -1004,7 +1065,8 @@ public class PortletURLImpl
 
 	private PortletURLImpl(
 		HttpServletRequest request, Portlet portlet,
-		PortletRequest portletRequest, Layout layout, String lifecycle) {
+		PortletRequest portletRequest, Layout layout, String lifecycle,
+		MimeResponse.Copy copy) {
 
 		if (portlet == null) {
 			throw new NullPointerException("Portlet is null");
@@ -1015,6 +1077,7 @@ public class PortletURLImpl
 		_portletRequest = portletRequest;
 		_layout = layout;
 		_lifecycle = lifecycle;
+		_copy = copy; // TODO
 		_parametersIncludedInPath = Collections.emptySet();
 		_params = new LinkedHashMap<>();
 		_removePublicRenderParameters = new LinkedHashSet<>();
@@ -1061,7 +1124,7 @@ public class PortletURLImpl
 			request,
 			PortletLocalServiceUtil.getPortletById(
 				PortalUtil.getCompanyId(request), portletId),
-			portletRequest, layout, lifecycle);
+			portletRequest, layout, lifecycle, null);
 	}
 
 	private void _appendNamespaceAndEncode(StringBundler sb, String name) {
@@ -1182,6 +1245,7 @@ public class PortletURLImpl
 
 	private boolean _anchor = true;
 	private String _cacheability = ResourceURL.PAGE;
+	private MimeResponse.Copy _copy;
 	private boolean _copyCurrentRenderParameters;
 	private long _doAsGroupId;
 	private long _doAsUserId;

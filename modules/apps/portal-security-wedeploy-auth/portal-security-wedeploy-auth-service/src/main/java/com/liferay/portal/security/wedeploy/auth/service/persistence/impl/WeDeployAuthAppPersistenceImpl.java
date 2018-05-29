@@ -30,7 +30,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.wedeploy.auth.exception.NoSuchAppException;
@@ -42,6 +45,9 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -252,14 +258,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 					result = weDeployAuthApp;
 
 					cacheResult(weDeployAuthApp);
-
-					if ((weDeployAuthApp.getRedirectURI() == null) ||
-							!weDeployAuthApp.getRedirectURI().equals(redirectURI) ||
-							(weDeployAuthApp.getClientId() == null) ||
-							!weDeployAuthApp.getClientId().equals(clientId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_RU_CI,
-							finderArgs, weDeployAuthApp);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -550,15 +548,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 					result = weDeployAuthApp;
 
 					cacheResult(weDeployAuthApp);
-
-					if ((weDeployAuthApp.getClientId() == null) ||
-							!weDeployAuthApp.getClientId().equals(clientId) ||
-							(weDeployAuthApp.getClientSecret() == null) ||
-							!weDeployAuthApp.getClientSecret()
-												.equals(clientSecret)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_CI_CS,
-							finderArgs, weDeployAuthApp);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -922,8 +911,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 	@Override
 	protected WeDeployAuthApp removeImpl(WeDeployAuthApp weDeployAuthApp) {
-		weDeployAuthApp = toUnwrappedModel(weDeployAuthApp);
-
 		Session session = null;
 
 		try {
@@ -954,9 +941,23 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 	@Override
 	public WeDeployAuthApp updateImpl(WeDeployAuthApp weDeployAuthApp) {
-		weDeployAuthApp = toUnwrappedModel(weDeployAuthApp);
-
 		boolean isNew = weDeployAuthApp.isNew();
+
+		if (!(weDeployAuthApp instanceof WeDeployAuthAppModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(weDeployAuthApp.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(weDeployAuthApp);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in weDeployAuthApp proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom WeDeployAuthApp implementation " +
+				weDeployAuthApp.getClass());
+		}
 
 		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl = (WeDeployAuthAppModelImpl)weDeployAuthApp;
 
@@ -1026,30 +1027,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		weDeployAuthApp.resetOriginalValues();
 
 		return weDeployAuthApp;
-	}
-
-	protected WeDeployAuthApp toUnwrappedModel(WeDeployAuthApp weDeployAuthApp) {
-		if (weDeployAuthApp instanceof WeDeployAuthAppImpl) {
-			return weDeployAuthApp;
-		}
-
-		WeDeployAuthAppImpl weDeployAuthAppImpl = new WeDeployAuthAppImpl();
-
-		weDeployAuthAppImpl.setNew(weDeployAuthApp.isNew());
-		weDeployAuthAppImpl.setPrimaryKey(weDeployAuthApp.getPrimaryKey());
-
-		weDeployAuthAppImpl.setWeDeployAuthAppId(weDeployAuthApp.getWeDeployAuthAppId());
-		weDeployAuthAppImpl.setCompanyId(weDeployAuthApp.getCompanyId());
-		weDeployAuthAppImpl.setUserId(weDeployAuthApp.getUserId());
-		weDeployAuthAppImpl.setUserName(weDeployAuthApp.getUserName());
-		weDeployAuthAppImpl.setCreateDate(weDeployAuthApp.getCreateDate());
-		weDeployAuthAppImpl.setModifiedDate(weDeployAuthApp.getModifiedDate());
-		weDeployAuthAppImpl.setName(weDeployAuthApp.getName());
-		weDeployAuthAppImpl.setRedirectURI(weDeployAuthApp.getRedirectURI());
-		weDeployAuthAppImpl.setClientId(weDeployAuthApp.getClientId());
-		weDeployAuthAppImpl.setClientSecret(weDeployAuthApp.getClientSecret());
-
-		return weDeployAuthAppImpl;
 	}
 
 	/**
@@ -1200,15 +1177,46 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 		query.append(_SQL_SELECT_WEDEPLOYAUTHAPP_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("weDeployAuthAppId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

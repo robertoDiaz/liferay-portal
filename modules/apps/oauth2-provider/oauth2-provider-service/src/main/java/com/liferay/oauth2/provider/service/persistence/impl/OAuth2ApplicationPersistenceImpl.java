@@ -38,7 +38,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,7 +50,9 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1108,13 +1113,6 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 					result = oAuth2Application;
 
 					cacheResult(oAuth2Application);
-
-					if ((oAuth2Application.getCompanyId() != companyId) ||
-							(oAuth2Application.getClientId() == null) ||
-							!oAuth2Application.getClientId().equals(clientId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_C,
-							finderArgs, oAuth2Application);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1448,8 +1446,6 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 	@Override
 	protected OAuth2Application removeImpl(OAuth2Application oAuth2Application) {
-		oAuth2Application = toUnwrappedModel(oAuth2Application);
-
 		Session session = null;
 
 		try {
@@ -1480,9 +1476,23 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 	@Override
 	public OAuth2Application updateImpl(OAuth2Application oAuth2Application) {
-		oAuth2Application = toUnwrappedModel(oAuth2Application);
-
 		boolean isNew = oAuth2Application.isNew();
+
+		if (!(oAuth2Application instanceof OAuth2ApplicationModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuth2Application.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuth2Application);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuth2Application proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuth2Application implementation " +
+				oAuth2Application.getClass());
+		}
 
 		OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl = (OAuth2ApplicationModelImpl)oAuth2Application;
 
@@ -1580,39 +1590,6 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		oAuth2Application.resetOriginalValues();
 
 		return oAuth2Application;
-	}
-
-	protected OAuth2Application toUnwrappedModel(
-		OAuth2Application oAuth2Application) {
-		if (oAuth2Application instanceof OAuth2ApplicationImpl) {
-			return oAuth2Application;
-		}
-
-		OAuth2ApplicationImpl oAuth2ApplicationImpl = new OAuth2ApplicationImpl();
-
-		oAuth2ApplicationImpl.setNew(oAuth2Application.isNew());
-		oAuth2ApplicationImpl.setPrimaryKey(oAuth2Application.getPrimaryKey());
-
-		oAuth2ApplicationImpl.setOAuth2ApplicationId(oAuth2Application.getOAuth2ApplicationId());
-		oAuth2ApplicationImpl.setCompanyId(oAuth2Application.getCompanyId());
-		oAuth2ApplicationImpl.setUserId(oAuth2Application.getUserId());
-		oAuth2ApplicationImpl.setUserName(oAuth2Application.getUserName());
-		oAuth2ApplicationImpl.setCreateDate(oAuth2Application.getCreateDate());
-		oAuth2ApplicationImpl.setModifiedDate(oAuth2Application.getModifiedDate());
-		oAuth2ApplicationImpl.setOAuth2ApplicationScopeAliasesId(oAuth2Application.getOAuth2ApplicationScopeAliasesId());
-		oAuth2ApplicationImpl.setAllowedGrantTypes(oAuth2Application.getAllowedGrantTypes());
-		oAuth2ApplicationImpl.setClientId(oAuth2Application.getClientId());
-		oAuth2ApplicationImpl.setClientProfile(oAuth2Application.getClientProfile());
-		oAuth2ApplicationImpl.setClientSecret(oAuth2Application.getClientSecret());
-		oAuth2ApplicationImpl.setDescription(oAuth2Application.getDescription());
-		oAuth2ApplicationImpl.setFeatures(oAuth2Application.getFeatures());
-		oAuth2ApplicationImpl.setHomePageURL(oAuth2Application.getHomePageURL());
-		oAuth2ApplicationImpl.setIconFileEntryId(oAuth2Application.getIconFileEntryId());
-		oAuth2ApplicationImpl.setName(oAuth2Application.getName());
-		oAuth2ApplicationImpl.setPrivacyPolicyURL(oAuth2Application.getPrivacyPolicyURL());
-		oAuth2ApplicationImpl.setRedirectURIs(oAuth2Application.getRedirectURIs());
-
-		return oAuth2ApplicationImpl;
 	}
 
 	/**
@@ -1763,15 +1740,46 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 		query.append(_SQL_SELECT_OAUTH2APPLICATION_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("oAuth2ApplicationId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

@@ -282,7 +282,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	@Override
 	public T remove(T model) {
-		if (model instanceof ModelWrapper) {
+		while (model instanceof ModelWrapper) {
 			ModelWrapper<T> modelWrapper = (ModelWrapper<T>)model;
 
 			model = modelWrapper.getWrappedModel();
@@ -330,7 +330,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	@Override
 	public T update(T model) {
-		if (model instanceof ModelWrapper) {
+		while (model instanceof ModelWrapper) {
 			ModelWrapper<T> modelWrapper = (ModelWrapper<T>)model;
 
 			model = modelWrapper.getWrappedModel();
@@ -527,6 +527,8 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	protected static final String WHERE_GREATER_THAN = " >= ? ";
 
 	protected static final String WHERE_GREATER_THAN_HAS_NEXT = " >= ? AND ";
+
+	protected static final String WHERE_IN = " IN ";
 
 	protected static final String WHERE_LESSER_THAN = " <= ? ";
 

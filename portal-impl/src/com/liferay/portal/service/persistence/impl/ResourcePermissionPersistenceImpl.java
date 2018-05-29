@@ -35,13 +35,18 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ResourcePermissionImpl;
 import com.liferay.portal.model.impl.ResourcePermissionModelImpl;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1208,11 +1213,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (scopes.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(scopes));
+				if (scopes.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < scopes.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > scopes.length) {
+								curEnd = scopes.length;
+							}
+						}
+
+						int[] copyOfRangeClassNames = Arrays.copyOfRange(scopes,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+
+					query.append(StringUtil.merge(scopes));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -1364,11 +1403,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (scopes.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(scopes));
+				if (scopes.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < scopes.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > scopes.length) {
+								curEnd = scopes.length;
+							}
+						}
+
+						int[] copyOfRangeClassNames = Arrays.copyOfRange(scopes,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_SCOPE_SCOPE_7);
+
+					query.append(StringUtil.merge(scopes));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -4730,11 +4803,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (roleIds.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(roleIds));
+				if (roleIds.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < roleIds.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > roleIds.length) {
+								curEnd = roleIds.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(roleIds,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+
+					query.append(StringUtil.merge(roleIds));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -4985,17 +5092,6 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 					result = resourcePermission;
 
 					cacheResult(resourcePermission);
-
-					if ((resourcePermission.getCompanyId() != companyId) ||
-							(resourcePermission.getName() == null) ||
-							!resourcePermission.getName().equals(name) ||
-							(resourcePermission.getScope() != scope) ||
-							(resourcePermission.getPrimKey() == null) ||
-							!resourcePermission.getPrimKey().equals(primKey) ||
-							(resourcePermission.getRoleId() != roleId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_N_S_P_R,
-							finderArgs, resourcePermission);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -5208,11 +5304,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (roleIds.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(roleIds));
+				if (roleIds.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < roleIds.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > roleIds.length) {
+								curEnd = roleIds.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(roleIds,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_N_S_P_R_ROLEID_7);
+
+					query.append(StringUtil.merge(roleIds));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -6103,11 +6233,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (roleIds.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(roleIds));
+				if (roleIds.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < roleIds.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > roleIds.length) {
+								curEnd = roleIds.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(roleIds,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+
+					query.append(StringUtil.merge(roleIds));
+
+					query.append(")");
+				}
 
 				query.append(")");
 
@@ -6355,11 +6519,45 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 			if (roleIds.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(roleIds));
+				if (roleIds.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < roleIds.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > roleIds.length) {
+								curEnd = roleIds.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(roleIds,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_N_S_P_R_V_ROLEID_7);
+
+					query.append(StringUtil.merge(roleIds));
+
+					query.append(")");
+				}
 
 				query.append(")");
 
@@ -6638,8 +6836,6 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 	@Override
 	protected ResourcePermission removeImpl(
 		ResourcePermission resourcePermission) {
-		resourcePermission = toUnwrappedModel(resourcePermission);
-
 		Session session = null;
 
 		try {
@@ -6670,9 +6866,23 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 
 	@Override
 	public ResourcePermission updateImpl(ResourcePermission resourcePermission) {
-		resourcePermission = toUnwrappedModel(resourcePermission);
-
 		boolean isNew = resourcePermission.isNew();
+
+		if (!(resourcePermission instanceof ResourcePermissionModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(resourcePermission.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(resourcePermission);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in resourcePermission proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom ResourcePermission implementation " +
+				resourcePermission.getClass());
+		}
 
 		ResourcePermissionModelImpl resourcePermissionModelImpl = (ResourcePermissionModelImpl)resourcePermission;
 
@@ -6975,32 +7185,6 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 		return resourcePermission;
 	}
 
-	protected ResourcePermission toUnwrappedModel(
-		ResourcePermission resourcePermission) {
-		if (resourcePermission instanceof ResourcePermissionImpl) {
-			return resourcePermission;
-		}
-
-		ResourcePermissionImpl resourcePermissionImpl = new ResourcePermissionImpl();
-
-		resourcePermissionImpl.setNew(resourcePermission.isNew());
-		resourcePermissionImpl.setPrimaryKey(resourcePermission.getPrimaryKey());
-
-		resourcePermissionImpl.setMvccVersion(resourcePermission.getMvccVersion());
-		resourcePermissionImpl.setResourcePermissionId(resourcePermission.getResourcePermissionId());
-		resourcePermissionImpl.setCompanyId(resourcePermission.getCompanyId());
-		resourcePermissionImpl.setName(resourcePermission.getName());
-		resourcePermissionImpl.setScope(resourcePermission.getScope());
-		resourcePermissionImpl.setPrimKey(resourcePermission.getPrimKey());
-		resourcePermissionImpl.setPrimKeyId(resourcePermission.getPrimKeyId());
-		resourcePermissionImpl.setRoleId(resourcePermission.getRoleId());
-		resourcePermissionImpl.setOwnerId(resourcePermission.getOwnerId());
-		resourcePermissionImpl.setActionIds(resourcePermission.getActionIds());
-		resourcePermissionImpl.setViewActionId(resourcePermission.isViewActionId());
-
-		return resourcePermissionImpl;
-	}
-
 	/**
 	 * Returns the resource permission with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -7149,15 +7333,46 @@ public class ResourcePermissionPersistenceImpl extends BasePersistenceImpl<Resou
 
 		query.append(_SQL_SELECT_RESOURCEPERMISSION_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("resourcePermissionId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

@@ -31,16 +31,22 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.service.persistence.CountryPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.CountryImpl;
 import com.liferay.portal.model.impl.CountryModelImpl;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -208,12 +214,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 					result = country;
 
 					cacheResult(country);
-
-					if ((country.getName() == null) ||
-							!country.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_NAME,
-							finderArgs, country);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -439,12 +439,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 					result = country;
 
 					cacheResult(country);
-
-					if ((country.getA2() == null) ||
-							!country.getA2().equals(a2)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_A2,
-							finderArgs, country);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -670,12 +664,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 					result = country;
 
 					cacheResult(country);
-
-					if ((country.getA3() == null) ||
-							!country.getA3().equals(a3)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_A3,
-							finderArgs, country);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1529,8 +1517,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 	@Override
 	protected Country removeImpl(Country country) {
-		country = toUnwrappedModel(country);
-
 		Session session = null;
 
 		try {
@@ -1561,9 +1547,23 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 	@Override
 	public Country updateImpl(Country country) {
-		country = toUnwrappedModel(country);
-
 		boolean isNew = country.isNew();
+
+		if (!(country instanceof CountryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(country.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(country);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in country proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Country implementation " +
+				country.getClass());
+		}
 
 		CountryModelImpl countryModelImpl = (CountryModelImpl)country;
 
@@ -1634,29 +1634,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		country.resetOriginalValues();
 
 		return country;
-	}
-
-	protected Country toUnwrappedModel(Country country) {
-		if (country instanceof CountryImpl) {
-			return country;
-		}
-
-		CountryImpl countryImpl = new CountryImpl();
-
-		countryImpl.setNew(country.isNew());
-		countryImpl.setPrimaryKey(country.getPrimaryKey());
-
-		countryImpl.setMvccVersion(country.getMvccVersion());
-		countryImpl.setCountryId(country.getCountryId());
-		countryImpl.setName(country.getName());
-		countryImpl.setA2(country.getA2());
-		countryImpl.setA3(country.getA3());
-		countryImpl.setNumber(country.getNumber());
-		countryImpl.setIdd(country.getIdd());
-		countryImpl.setZipRequired(country.isZipRequired());
-		countryImpl.setActive(country.isActive());
-
-		return countryImpl;
 	}
 
 	/**
@@ -1806,15 +1783,46 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 		query.append(_SQL_SELECT_COUNTRY_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("countryId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

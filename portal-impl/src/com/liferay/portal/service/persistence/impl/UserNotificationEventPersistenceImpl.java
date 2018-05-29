@@ -34,9 +34,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.UserNotificationEventPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.UserNotificationEventImpl;
@@ -45,7 +49,9 @@ import com.liferay.portal.model.impl.UserNotificationEventModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8475,8 +8481,6 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 	@Override
 	protected UserNotificationEvent removeImpl(
 		UserNotificationEvent userNotificationEvent) {
-		userNotificationEvent = toUnwrappedModel(userNotificationEvent);
-
 		Session session = null;
 
 		try {
@@ -8508,9 +8512,23 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 	@Override
 	public UserNotificationEvent updateImpl(
 		UserNotificationEvent userNotificationEvent) {
-		userNotificationEvent = toUnwrappedModel(userNotificationEvent);
-
 		boolean isNew = userNotificationEvent.isNew();
+
+		if (!(userNotificationEvent instanceof UserNotificationEventModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userNotificationEvent.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userNotificationEvent);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userNotificationEvent proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserNotificationEvent implementation " +
+				userNotificationEvent.getClass());
+		}
 
 		UserNotificationEventModelImpl userNotificationEventModelImpl = (UserNotificationEventModelImpl)userNotificationEvent;
 
@@ -8995,34 +9013,6 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 		return userNotificationEvent;
 	}
 
-	protected UserNotificationEvent toUnwrappedModel(
-		UserNotificationEvent userNotificationEvent) {
-		if (userNotificationEvent instanceof UserNotificationEventImpl) {
-			return userNotificationEvent;
-		}
-
-		UserNotificationEventImpl userNotificationEventImpl = new UserNotificationEventImpl();
-
-		userNotificationEventImpl.setNew(userNotificationEvent.isNew());
-		userNotificationEventImpl.setPrimaryKey(userNotificationEvent.getPrimaryKey());
-
-		userNotificationEventImpl.setMvccVersion(userNotificationEvent.getMvccVersion());
-		userNotificationEventImpl.setUuid(userNotificationEvent.getUuid());
-		userNotificationEventImpl.setUserNotificationEventId(userNotificationEvent.getUserNotificationEventId());
-		userNotificationEventImpl.setCompanyId(userNotificationEvent.getCompanyId());
-		userNotificationEventImpl.setUserId(userNotificationEvent.getUserId());
-		userNotificationEventImpl.setType(userNotificationEvent.getType());
-		userNotificationEventImpl.setTimestamp(userNotificationEvent.getTimestamp());
-		userNotificationEventImpl.setDeliveryType(userNotificationEvent.getDeliveryType());
-		userNotificationEventImpl.setDeliverBy(userNotificationEvent.getDeliverBy());
-		userNotificationEventImpl.setDelivered(userNotificationEvent.isDelivered());
-		userNotificationEventImpl.setPayload(userNotificationEvent.getPayload());
-		userNotificationEventImpl.setActionRequired(userNotificationEvent.isActionRequired());
-		userNotificationEventImpl.setArchived(userNotificationEvent.isArchived());
-
-		return userNotificationEventImpl;
-	}
-
 	/**
 	 * Returns the user notification event with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -9171,15 +9161,46 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 		query.append(_SQL_SELECT_USERNOTIFICATIONEVENT_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("userNotificationEventId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

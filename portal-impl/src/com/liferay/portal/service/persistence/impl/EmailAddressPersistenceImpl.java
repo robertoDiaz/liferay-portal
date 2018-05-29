@@ -36,9 +36,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.EmailAddressPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.EmailAddressImpl;
@@ -47,7 +51,9 @@ import com.liferay.portal.model.impl.EmailAddressModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -4163,8 +4169,6 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 	@Override
 	protected EmailAddress removeImpl(EmailAddress emailAddress) {
-		emailAddress = toUnwrappedModel(emailAddress);
-
 		Session session = null;
 
 		try {
@@ -4195,9 +4199,23 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 	@Override
 	public EmailAddress updateImpl(EmailAddress emailAddress) {
-		emailAddress = toUnwrappedModel(emailAddress);
-
 		boolean isNew = emailAddress.isNew();
+
+		if (!(emailAddress instanceof EmailAddressModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(emailAddress.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(emailAddress);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in emailAddress proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom EmailAddress implementation " +
+				emailAddress.getClass());
+		}
 
 		EmailAddressModelImpl emailAddressModelImpl = (EmailAddressModelImpl)emailAddress;
 
@@ -4471,33 +4489,6 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 		return emailAddress;
 	}
 
-	protected EmailAddress toUnwrappedModel(EmailAddress emailAddress) {
-		if (emailAddress instanceof EmailAddressImpl) {
-			return emailAddress;
-		}
-
-		EmailAddressImpl emailAddressImpl = new EmailAddressImpl();
-
-		emailAddressImpl.setNew(emailAddress.isNew());
-		emailAddressImpl.setPrimaryKey(emailAddress.getPrimaryKey());
-
-		emailAddressImpl.setMvccVersion(emailAddress.getMvccVersion());
-		emailAddressImpl.setUuid(emailAddress.getUuid());
-		emailAddressImpl.setEmailAddressId(emailAddress.getEmailAddressId());
-		emailAddressImpl.setCompanyId(emailAddress.getCompanyId());
-		emailAddressImpl.setUserId(emailAddress.getUserId());
-		emailAddressImpl.setUserName(emailAddress.getUserName());
-		emailAddressImpl.setCreateDate(emailAddress.getCreateDate());
-		emailAddressImpl.setModifiedDate(emailAddress.getModifiedDate());
-		emailAddressImpl.setClassNameId(emailAddress.getClassNameId());
-		emailAddressImpl.setClassPK(emailAddress.getClassPK());
-		emailAddressImpl.setAddress(emailAddress.getAddress());
-		emailAddressImpl.setTypeId(emailAddress.getTypeId());
-		emailAddressImpl.setPrimary(emailAddress.isPrimary());
-
-		return emailAddressImpl;
-	}
-
 	/**
 	 * Returns the email address with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -4646,15 +4637,46 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 		query.append(_SQL_SELECT_EMAILADDRESS_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("emailAddressId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

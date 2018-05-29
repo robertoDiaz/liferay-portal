@@ -34,13 +34,20 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.UserNotificationDeliveryPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.UserNotificationDeliveryImpl;
 import com.liferay.portal.model.impl.UserNotificationDeliveryModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -787,17 +794,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 					result = userNotificationDelivery;
 
 					cacheResult(userNotificationDelivery);
-
-					if ((userNotificationDelivery.getUserId() != userId) ||
-							(userNotificationDelivery.getPortletId() == null) ||
-							!userNotificationDelivery.getPortletId()
-														 .equals(portletId) ||
-							(userNotificationDelivery.getClassNameId() != classNameId) ||
-							(userNotificationDelivery.getNotificationType() != notificationType) ||
-							(userNotificationDelivery.getDeliveryType() != deliveryType)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
-							finderArgs, userNotificationDelivery);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1156,8 +1152,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	protected UserNotificationDelivery removeImpl(
 		UserNotificationDelivery userNotificationDelivery) {
-		userNotificationDelivery = toUnwrappedModel(userNotificationDelivery);
-
 		Session session = null;
 
 		try {
@@ -1189,9 +1183,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery updateImpl(
 		UserNotificationDelivery userNotificationDelivery) {
-		userNotificationDelivery = toUnwrappedModel(userNotificationDelivery);
-
 		boolean isNew = userNotificationDelivery.isNew();
+
+		if (!(userNotificationDelivery instanceof UserNotificationDeliveryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userNotificationDelivery.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userNotificationDelivery);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userNotificationDelivery proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserNotificationDelivery implementation " +
+				userNotificationDelivery.getClass());
+		}
 
 		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl = (UserNotificationDeliveryModelImpl)userNotificationDelivery;
 
@@ -1268,30 +1276,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		userNotificationDelivery.resetOriginalValues();
 
 		return userNotificationDelivery;
-	}
-
-	protected UserNotificationDelivery toUnwrappedModel(
-		UserNotificationDelivery userNotificationDelivery) {
-		if (userNotificationDelivery instanceof UserNotificationDeliveryImpl) {
-			return userNotificationDelivery;
-		}
-
-		UserNotificationDeliveryImpl userNotificationDeliveryImpl = new UserNotificationDeliveryImpl();
-
-		userNotificationDeliveryImpl.setNew(userNotificationDelivery.isNew());
-		userNotificationDeliveryImpl.setPrimaryKey(userNotificationDelivery.getPrimaryKey());
-
-		userNotificationDeliveryImpl.setMvccVersion(userNotificationDelivery.getMvccVersion());
-		userNotificationDeliveryImpl.setUserNotificationDeliveryId(userNotificationDelivery.getUserNotificationDeliveryId());
-		userNotificationDeliveryImpl.setCompanyId(userNotificationDelivery.getCompanyId());
-		userNotificationDeliveryImpl.setUserId(userNotificationDelivery.getUserId());
-		userNotificationDeliveryImpl.setPortletId(userNotificationDelivery.getPortletId());
-		userNotificationDeliveryImpl.setClassNameId(userNotificationDelivery.getClassNameId());
-		userNotificationDeliveryImpl.setNotificationType(userNotificationDelivery.getNotificationType());
-		userNotificationDeliveryImpl.setDeliveryType(userNotificationDelivery.getDeliveryType());
-		userNotificationDeliveryImpl.setDeliver(userNotificationDelivery.isDeliver());
-
-		return userNotificationDeliveryImpl;
 	}
 
 	/**
@@ -1445,15 +1429,46 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 
 		query.append(_SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("userNotificationDeliveryId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

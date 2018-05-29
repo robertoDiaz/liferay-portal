@@ -35,16 +35,22 @@ import com.liferay.portal.kernel.service.persistence.AccountPersistence;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.AccountImpl;
 import com.liferay.portal.model.impl.AccountModelImpl;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -257,8 +263,6 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 
 	@Override
 	protected Account removeImpl(Account account) {
-		account = toUnwrappedModel(account);
-
 		Session session = null;
 
 		try {
@@ -289,9 +293,23 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 
 	@Override
 	public Account updateImpl(Account account) {
-		account = toUnwrappedModel(account);
-
 		boolean isNew = account.isNew();
+
+		if (!(account instanceof AccountModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(account.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(account);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in account proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Account implementation " +
+				account.getClass());
+		}
 
 		AccountModelImpl accountModelImpl = (AccountModelImpl)account;
 
@@ -352,37 +370,6 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 		account.resetOriginalValues();
 
 		return account;
-	}
-
-	protected Account toUnwrappedModel(Account account) {
-		if (account instanceof AccountImpl) {
-			return account;
-		}
-
-		AccountImpl accountImpl = new AccountImpl();
-
-		accountImpl.setNew(account.isNew());
-		accountImpl.setPrimaryKey(account.getPrimaryKey());
-
-		accountImpl.setMvccVersion(account.getMvccVersion());
-		accountImpl.setAccountId(account.getAccountId());
-		accountImpl.setCompanyId(account.getCompanyId());
-		accountImpl.setUserId(account.getUserId());
-		accountImpl.setUserName(account.getUserName());
-		accountImpl.setCreateDate(account.getCreateDate());
-		accountImpl.setModifiedDate(account.getModifiedDate());
-		accountImpl.setParentAccountId(account.getParentAccountId());
-		accountImpl.setName(account.getName());
-		accountImpl.setLegalName(account.getLegalName());
-		accountImpl.setLegalId(account.getLegalId());
-		accountImpl.setLegalType(account.getLegalType());
-		accountImpl.setSicCode(account.getSicCode());
-		accountImpl.setTickerSymbol(account.getTickerSymbol());
-		accountImpl.setIndustry(account.getIndustry());
-		accountImpl.setType(account.getType());
-		accountImpl.setSize(account.getSize());
-
-		return accountImpl;
 	}
 
 	/**
@@ -532,15 +519,46 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 
 		query.append(_SQL_SELECT_ACCOUNT_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("accountId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

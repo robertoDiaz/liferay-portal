@@ -30,7 +30,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,7 +50,9 @@ import com.liferay.sync.service.persistence.SyncDevicePersistence;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -2470,8 +2475,6 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 	@Override
 	protected SyncDevice removeImpl(SyncDevice syncDevice) {
-		syncDevice = toUnwrappedModel(syncDevice);
-
 		Session session = null;
 
 		try {
@@ -2502,9 +2505,23 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 	@Override
 	public SyncDevice updateImpl(SyncDevice syncDevice) {
-		syncDevice = toUnwrappedModel(syncDevice);
-
 		boolean isNew = syncDevice.isNew();
+
+		if (!(syncDevice instanceof SyncDeviceModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(syncDevice.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(syncDevice);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in syncDevice proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SyncDevice implementation " +
+				syncDevice.getClass());
+		}
 
 		SyncDeviceModelImpl syncDeviceModelImpl = (SyncDeviceModelImpl)syncDevice;
 
@@ -2655,32 +2672,6 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		return syncDevice;
 	}
 
-	protected SyncDevice toUnwrappedModel(SyncDevice syncDevice) {
-		if (syncDevice instanceof SyncDeviceImpl) {
-			return syncDevice;
-		}
-
-		SyncDeviceImpl syncDeviceImpl = new SyncDeviceImpl();
-
-		syncDeviceImpl.setNew(syncDevice.isNew());
-		syncDeviceImpl.setPrimaryKey(syncDevice.getPrimaryKey());
-
-		syncDeviceImpl.setUuid(syncDevice.getUuid());
-		syncDeviceImpl.setSyncDeviceId(syncDevice.getSyncDeviceId());
-		syncDeviceImpl.setCompanyId(syncDevice.getCompanyId());
-		syncDeviceImpl.setUserId(syncDevice.getUserId());
-		syncDeviceImpl.setUserName(syncDevice.getUserName());
-		syncDeviceImpl.setCreateDate(syncDevice.getCreateDate());
-		syncDeviceImpl.setModifiedDate(syncDevice.getModifiedDate());
-		syncDeviceImpl.setType(syncDevice.getType());
-		syncDeviceImpl.setBuildNumber(syncDevice.getBuildNumber());
-		syncDeviceImpl.setFeatureSet(syncDevice.getFeatureSet());
-		syncDeviceImpl.setHostname(syncDevice.getHostname());
-		syncDeviceImpl.setStatus(syncDevice.getStatus());
-
-		return syncDeviceImpl;
-	}
-
 	/**
 	 * Returns the sync device with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -2829,15 +2820,46 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 		query.append(_SQL_SELECT_SYNCDEVICE_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("syncDeviceId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

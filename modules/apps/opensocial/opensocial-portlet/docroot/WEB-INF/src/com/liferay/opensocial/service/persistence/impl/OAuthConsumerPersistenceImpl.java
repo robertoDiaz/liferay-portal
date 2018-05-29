@@ -39,12 +39,18 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -806,14 +812,6 @@ public class OAuthConsumerPersistenceImpl extends BasePersistenceImpl<OAuthConsu
 					result = oAuthConsumer;
 
 					cacheResult(oAuthConsumer);
-
-					if ((oAuthConsumer.getGadgetKey() == null) ||
-							!oAuthConsumer.getGadgetKey().equals(gadgetKey) ||
-							(oAuthConsumer.getServiceName() == null) ||
-							!oAuthConsumer.getServiceName().equals(serviceName)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_S,
-							finderArgs, oAuthConsumer);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1139,8 +1137,6 @@ public class OAuthConsumerPersistenceImpl extends BasePersistenceImpl<OAuthConsu
 
 	@Override
 	protected OAuthConsumer removeImpl(OAuthConsumer oAuthConsumer) {
-		oAuthConsumer = toUnwrappedModel(oAuthConsumer);
-
 		Session session = null;
 
 		try {
@@ -1171,9 +1167,23 @@ public class OAuthConsumerPersistenceImpl extends BasePersistenceImpl<OAuthConsu
 
 	@Override
 	public OAuthConsumer updateImpl(OAuthConsumer oAuthConsumer) {
-		oAuthConsumer = toUnwrappedModel(oAuthConsumer);
-
 		boolean isNew = oAuthConsumer.isNew();
+
+		if (!(oAuthConsumer instanceof OAuthConsumerModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuthConsumer.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuthConsumer);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuthConsumer proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuthConsumer implementation " +
+				oAuthConsumer.getClass());
+		}
 
 		OAuthConsumerModelImpl oAuthConsumerModelImpl = (OAuthConsumerModelImpl)oAuthConsumer;
 
@@ -1268,29 +1278,6 @@ public class OAuthConsumerPersistenceImpl extends BasePersistenceImpl<OAuthConsu
 		oAuthConsumer.resetOriginalValues();
 
 		return oAuthConsumer;
-	}
-
-	protected OAuthConsumer toUnwrappedModel(OAuthConsumer oAuthConsumer) {
-		if (oAuthConsumer instanceof OAuthConsumerImpl) {
-			return oAuthConsumer;
-		}
-
-		OAuthConsumerImpl oAuthConsumerImpl = new OAuthConsumerImpl();
-
-		oAuthConsumerImpl.setNew(oAuthConsumer.isNew());
-		oAuthConsumerImpl.setPrimaryKey(oAuthConsumer.getPrimaryKey());
-
-		oAuthConsumerImpl.setOAuthConsumerId(oAuthConsumer.getOAuthConsumerId());
-		oAuthConsumerImpl.setCompanyId(oAuthConsumer.getCompanyId());
-		oAuthConsumerImpl.setCreateDate(oAuthConsumer.getCreateDate());
-		oAuthConsumerImpl.setModifiedDate(oAuthConsumer.getModifiedDate());
-		oAuthConsumerImpl.setGadgetKey(oAuthConsumer.getGadgetKey());
-		oAuthConsumerImpl.setServiceName(oAuthConsumer.getServiceName());
-		oAuthConsumerImpl.setConsumerKey(oAuthConsumer.getConsumerKey());
-		oAuthConsumerImpl.setConsumerSecret(oAuthConsumer.getConsumerSecret());
-		oAuthConsumerImpl.setKeyType(oAuthConsumer.getKeyType());
-
-		return oAuthConsumerImpl;
 	}
 
 	/**
@@ -1441,15 +1428,46 @@ public class OAuthConsumerPersistenceImpl extends BasePersistenceImpl<OAuthConsu
 
 		query.append(_SQL_SELECT_OAUTHCONSUMER_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("oAuthConsumerId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

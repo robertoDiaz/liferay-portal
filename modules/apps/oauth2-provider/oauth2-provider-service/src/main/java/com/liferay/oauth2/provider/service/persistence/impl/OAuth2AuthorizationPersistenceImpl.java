@@ -39,8 +39,11 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -49,7 +52,9 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1270,13 +1275,6 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 					result = oAuth2Authorization;
 
 					cacheResult(oAuth2Authorization);
-
-					if ((oAuth2Authorization.getAccessTokenContent() == null) ||
-							!oAuth2Authorization.getAccessTokenContent()
-													.equals(accessTokenContent)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_ACCESSTOKENCONTENT,
-							finderArgs, oAuth2Authorization);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1524,13 +1522,6 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 					result = oAuth2Authorization;
 
 					cacheResult(oAuth2Authorization);
-
-					if ((oAuth2Authorization.getRefreshTokenContent() == null) ||
-							!oAuth2Authorization.getRefreshTokenContent()
-													.equals(refreshTokenContent)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_REFRESHTOKENCONTENT,
-							finderArgs, oAuth2Authorization);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1898,8 +1889,6 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 	@Override
 	protected OAuth2Authorization removeImpl(
 		OAuth2Authorization oAuth2Authorization) {
-		oAuth2Authorization = toUnwrappedModel(oAuth2Authorization);
-
 		oAuth2AuthorizationToOAuth2ScopeGrantTableMapper.deleteLeftPrimaryKeyTableMappings(oAuth2Authorization.getPrimaryKey());
 
 		Session session = null;
@@ -1933,9 +1922,23 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 	@Override
 	public OAuth2Authorization updateImpl(
 		OAuth2Authorization oAuth2Authorization) {
-		oAuth2Authorization = toUnwrappedModel(oAuth2Authorization);
-
 		boolean isNew = oAuth2Authorization.isNew();
+
+		if (!(oAuth2Authorization instanceof OAuth2AuthorizationModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuth2Authorization.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuth2Authorization);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuth2Authorization proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuth2Authorization implementation " +
+				oAuth2Authorization.getClass());
+		}
 
 		OAuth2AuthorizationModelImpl oAuth2AuthorizationModelImpl = (OAuth2AuthorizationModelImpl)oAuth2Authorization;
 
@@ -2039,35 +2042,6 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 		oAuth2Authorization.resetOriginalValues();
 
 		return oAuth2Authorization;
-	}
-
-	protected OAuth2Authorization toUnwrappedModel(
-		OAuth2Authorization oAuth2Authorization) {
-		if (oAuth2Authorization instanceof OAuth2AuthorizationImpl) {
-			return oAuth2Authorization;
-		}
-
-		OAuth2AuthorizationImpl oAuth2AuthorizationImpl = new OAuth2AuthorizationImpl();
-
-		oAuth2AuthorizationImpl.setNew(oAuth2Authorization.isNew());
-		oAuth2AuthorizationImpl.setPrimaryKey(oAuth2Authorization.getPrimaryKey());
-
-		oAuth2AuthorizationImpl.setOAuth2AuthorizationId(oAuth2Authorization.getOAuth2AuthorizationId());
-		oAuth2AuthorizationImpl.setCompanyId(oAuth2Authorization.getCompanyId());
-		oAuth2AuthorizationImpl.setUserId(oAuth2Authorization.getUserId());
-		oAuth2AuthorizationImpl.setUserName(oAuth2Authorization.getUserName());
-		oAuth2AuthorizationImpl.setCreateDate(oAuth2Authorization.getCreateDate());
-		oAuth2AuthorizationImpl.setOAuth2ApplicationId(oAuth2Authorization.getOAuth2ApplicationId());
-		oAuth2AuthorizationImpl.setOAuth2ApplicationScopeAliasesId(oAuth2Authorization.getOAuth2ApplicationScopeAliasesId());
-		oAuth2AuthorizationImpl.setAccessTokenContent(oAuth2Authorization.getAccessTokenContent());
-		oAuth2AuthorizationImpl.setAccessTokenCreateDate(oAuth2Authorization.getAccessTokenCreateDate());
-		oAuth2AuthorizationImpl.setAccessTokenExpirationDate(oAuth2Authorization.getAccessTokenExpirationDate());
-		oAuth2AuthorizationImpl.setRemoteIPInfo(oAuth2Authorization.getRemoteIPInfo());
-		oAuth2AuthorizationImpl.setRefreshTokenContent(oAuth2Authorization.getRefreshTokenContent());
-		oAuth2AuthorizationImpl.setRefreshTokenCreateDate(oAuth2Authorization.getRefreshTokenCreateDate());
-		oAuth2AuthorizationImpl.setRefreshTokenExpirationDate(oAuth2Authorization.getRefreshTokenExpirationDate());
-
-		return oAuth2AuthorizationImpl;
 	}
 
 	/**
@@ -2218,15 +2192,46 @@ public class OAuth2AuthorizationPersistenceImpl extends BasePersistenceImpl<OAut
 
 		query.append(_SQL_SELECT_OAUTH2AUTHORIZATION_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("oAuth2AuthorizationId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

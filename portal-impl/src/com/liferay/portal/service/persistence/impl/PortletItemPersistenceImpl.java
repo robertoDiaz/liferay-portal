@@ -36,7 +36,10 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.PortletItemPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.PortletItemImpl;
@@ -44,6 +47,9 @@ import com.liferay.portal.model.impl.PortletItemModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1455,16 +1461,6 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 					result = portletItem;
 
 					cacheResult(portletItem);
-
-					if ((portletItem.getGroupId() != groupId) ||
-							(portletItem.getName() == null) ||
-							!portletItem.getName().equals(name) ||
-							(portletItem.getPortletId() == null) ||
-							!portletItem.getPortletId().equals(portletId) ||
-							(portletItem.getClassNameId() != classNameId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_N_P_C,
-							finderArgs, portletItem);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1813,8 +1809,6 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 
 	@Override
 	protected PortletItem removeImpl(PortletItem portletItem) {
-		portletItem = toUnwrappedModel(portletItem);
-
 		Session session = null;
 
 		try {
@@ -1845,9 +1839,23 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 
 	@Override
 	public PortletItem updateImpl(PortletItem portletItem) {
-		portletItem = toUnwrappedModel(portletItem);
-
 		boolean isNew = portletItem.isNew();
+
+		if (!(portletItem instanceof PortletItemModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(portletItem.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(portletItem);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in portletItem proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom PortletItem implementation " +
+				portletItem.getClass());
+		}
 
 		PortletItemModelImpl portletItemModelImpl = (PortletItemModelImpl)portletItem;
 
@@ -1981,31 +1989,6 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 		portletItem.resetOriginalValues();
 
 		return portletItem;
-	}
-
-	protected PortletItem toUnwrappedModel(PortletItem portletItem) {
-		if (portletItem instanceof PortletItemImpl) {
-			return portletItem;
-		}
-
-		PortletItemImpl portletItemImpl = new PortletItemImpl();
-
-		portletItemImpl.setNew(portletItem.isNew());
-		portletItemImpl.setPrimaryKey(portletItem.getPrimaryKey());
-
-		portletItemImpl.setMvccVersion(portletItem.getMvccVersion());
-		portletItemImpl.setPortletItemId(portletItem.getPortletItemId());
-		portletItemImpl.setGroupId(portletItem.getGroupId());
-		portletItemImpl.setCompanyId(portletItem.getCompanyId());
-		portletItemImpl.setUserId(portletItem.getUserId());
-		portletItemImpl.setUserName(portletItem.getUserName());
-		portletItemImpl.setCreateDate(portletItem.getCreateDate());
-		portletItemImpl.setModifiedDate(portletItem.getModifiedDate());
-		portletItemImpl.setName(portletItem.getName());
-		portletItemImpl.setPortletId(portletItem.getPortletId());
-		portletItemImpl.setClassNameId(portletItem.getClassNameId());
-
-		return portletItemImpl;
 	}
 
 	/**
@@ -2156,15 +2139,46 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 
 		query.append(_SQL_SELECT_PORTLETITEM_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("portletItemId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

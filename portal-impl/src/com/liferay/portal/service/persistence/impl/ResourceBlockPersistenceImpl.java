@@ -34,13 +34,20 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.ResourceBlockPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ResourceBlockImpl;
 import com.liferay.portal.model.impl.ResourceBlockModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1494,17 +1501,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 					result = resourceBlock;
 
 					cacheResult(resourceBlock);
-
-					if ((resourceBlock.getCompanyId() != companyId) ||
-							(resourceBlock.getGroupId() != groupId) ||
-							(resourceBlock.getName() == null) ||
-							!resourceBlock.getName().equals(name) ||
-							(resourceBlock.getPermissionsHash() == null) ||
-							!resourceBlock.getPermissionsHash()
-											  .equals(permissionsHash)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_G_N_P,
-							finderArgs, resourceBlock);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1857,8 +1853,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 	@Override
 	protected ResourceBlock removeImpl(ResourceBlock resourceBlock) {
-		resourceBlock = toUnwrappedModel(resourceBlock);
-
 		Session session = null;
 
 		try {
@@ -1889,9 +1883,23 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 	@Override
 	public ResourceBlock updateImpl(ResourceBlock resourceBlock) {
-		resourceBlock = toUnwrappedModel(resourceBlock);
-
 		boolean isNew = resourceBlock.isNew();
+
+		if (!(resourceBlock instanceof ResourceBlockModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(resourceBlock.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(resourceBlock);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in resourceBlock proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom ResourceBlock implementation " +
+				resourceBlock.getClass());
+		}
 
 		ResourceBlockModelImpl resourceBlockModelImpl = (ResourceBlockModelImpl)resourceBlock;
 
@@ -2003,27 +2011,6 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 		resourceBlock.resetOriginalValues();
 
 		return resourceBlock;
-	}
-
-	protected ResourceBlock toUnwrappedModel(ResourceBlock resourceBlock) {
-		if (resourceBlock instanceof ResourceBlockImpl) {
-			return resourceBlock;
-		}
-
-		ResourceBlockImpl resourceBlockImpl = new ResourceBlockImpl();
-
-		resourceBlockImpl.setNew(resourceBlock.isNew());
-		resourceBlockImpl.setPrimaryKey(resourceBlock.getPrimaryKey());
-
-		resourceBlockImpl.setMvccVersion(resourceBlock.getMvccVersion());
-		resourceBlockImpl.setResourceBlockId(resourceBlock.getResourceBlockId());
-		resourceBlockImpl.setCompanyId(resourceBlock.getCompanyId());
-		resourceBlockImpl.setGroupId(resourceBlock.getGroupId());
-		resourceBlockImpl.setName(resourceBlock.getName());
-		resourceBlockImpl.setPermissionsHash(resourceBlock.getPermissionsHash());
-		resourceBlockImpl.setReferenceCount(resourceBlock.getReferenceCount());
-
-		return resourceBlockImpl;
 	}
 
 	/**
@@ -2174,15 +2161,46 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 		query.append(_SQL_SELECT_RESOURCEBLOCK_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("resourceBlockId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

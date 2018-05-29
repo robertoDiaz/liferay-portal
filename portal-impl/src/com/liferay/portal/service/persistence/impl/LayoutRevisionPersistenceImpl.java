@@ -36,7 +36,10 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.LayoutRevisionImpl;
@@ -44,6 +47,9 @@ import com.liferay.portal.model.impl.LayoutRevisionModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -5165,13 +5171,6 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 					result = layoutRevision;
 
 					cacheResult(layoutRevision);
-
-					if ((layoutRevision.getLayoutSetBranchId() != layoutSetBranchId) ||
-							(layoutRevision.isHead() != head) ||
-							(layoutRevision.getPlid() != plid)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_L_H_P,
-							finderArgs, layoutRevision);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -6636,14 +6635,6 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 					result = layoutRevision;
 
 					cacheResult(layoutRevision);
-
-					if ((layoutRevision.getLayoutSetBranchId() != layoutSetBranchId) ||
-							(layoutRevision.getLayoutBranchId() != layoutBranchId) ||
-							(layoutRevision.isHead() != head) ||
-							(layoutRevision.getPlid() != plid)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_L_L_H_P,
-							finderArgs, layoutRevision);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -7006,8 +6997,6 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 	@Override
 	protected LayoutRevision removeImpl(LayoutRevision layoutRevision) {
-		layoutRevision = toUnwrappedModel(layoutRevision);
-
 		Session session = null;
 
 		try {
@@ -7038,9 +7027,23 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 	@Override
 	public LayoutRevision updateImpl(LayoutRevision layoutRevision) {
-		layoutRevision = toUnwrappedModel(layoutRevision);
-
 		boolean isNew = layoutRevision.isNew();
+
+		if (!(layoutRevision instanceof LayoutRevisionModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(layoutRevision.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(layoutRevision);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in layoutRevision proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom LayoutRevision implementation " +
+				layoutRevision.getClass());
+		}
 
 		LayoutRevisionModelImpl layoutRevisionModelImpl = (LayoutRevisionModelImpl)layoutRevision;
 
@@ -7421,49 +7424,6 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 		return layoutRevision;
 	}
 
-	protected LayoutRevision toUnwrappedModel(LayoutRevision layoutRevision) {
-		if (layoutRevision instanceof LayoutRevisionImpl) {
-			return layoutRevision;
-		}
-
-		LayoutRevisionImpl layoutRevisionImpl = new LayoutRevisionImpl();
-
-		layoutRevisionImpl.setNew(layoutRevision.isNew());
-		layoutRevisionImpl.setPrimaryKey(layoutRevision.getPrimaryKey());
-
-		layoutRevisionImpl.setMvccVersion(layoutRevision.getMvccVersion());
-		layoutRevisionImpl.setLayoutRevisionId(layoutRevision.getLayoutRevisionId());
-		layoutRevisionImpl.setGroupId(layoutRevision.getGroupId());
-		layoutRevisionImpl.setCompanyId(layoutRevision.getCompanyId());
-		layoutRevisionImpl.setUserId(layoutRevision.getUserId());
-		layoutRevisionImpl.setUserName(layoutRevision.getUserName());
-		layoutRevisionImpl.setCreateDate(layoutRevision.getCreateDate());
-		layoutRevisionImpl.setModifiedDate(layoutRevision.getModifiedDate());
-		layoutRevisionImpl.setLayoutSetBranchId(layoutRevision.getLayoutSetBranchId());
-		layoutRevisionImpl.setLayoutBranchId(layoutRevision.getLayoutBranchId());
-		layoutRevisionImpl.setParentLayoutRevisionId(layoutRevision.getParentLayoutRevisionId());
-		layoutRevisionImpl.setHead(layoutRevision.isHead());
-		layoutRevisionImpl.setMajor(layoutRevision.isMajor());
-		layoutRevisionImpl.setPlid(layoutRevision.getPlid());
-		layoutRevisionImpl.setPrivateLayout(layoutRevision.isPrivateLayout());
-		layoutRevisionImpl.setName(layoutRevision.getName());
-		layoutRevisionImpl.setTitle(layoutRevision.getTitle());
-		layoutRevisionImpl.setDescription(layoutRevision.getDescription());
-		layoutRevisionImpl.setKeywords(layoutRevision.getKeywords());
-		layoutRevisionImpl.setRobots(layoutRevision.getRobots());
-		layoutRevisionImpl.setTypeSettings(layoutRevision.getTypeSettings());
-		layoutRevisionImpl.setIconImageId(layoutRevision.getIconImageId());
-		layoutRevisionImpl.setThemeId(layoutRevision.getThemeId());
-		layoutRevisionImpl.setColorSchemeId(layoutRevision.getColorSchemeId());
-		layoutRevisionImpl.setCss(layoutRevision.getCss());
-		layoutRevisionImpl.setStatus(layoutRevision.getStatus());
-		layoutRevisionImpl.setStatusByUserId(layoutRevision.getStatusByUserId());
-		layoutRevisionImpl.setStatusByUserName(layoutRevision.getStatusByUserName());
-		layoutRevisionImpl.setStatusDate(layoutRevision.getStatusDate());
-
-		return layoutRevisionImpl;
-	}
-
 	/**
 	 * Returns the layout revision with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -7612,15 +7572,46 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 		query.append(_SQL_SELECT_LAYOUTREVISION_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("layoutRevisionId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

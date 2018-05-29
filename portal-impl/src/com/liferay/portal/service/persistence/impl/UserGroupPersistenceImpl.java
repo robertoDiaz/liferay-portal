@@ -44,8 +44,11 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,7 +60,9 @@ import com.liferay.portal.model.impl.UserGroupModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -3963,13 +3968,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 					result = userGroup;
 
 					cacheResult(userGroup);
-
-					if ((userGroup.getCompanyId() != companyId) ||
-							(userGroup.getName() == null) ||
-							!userGroup.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_N,
-							finderArgs, userGroup);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -4296,8 +4294,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 	@Override
 	protected UserGroup removeImpl(UserGroup userGroup) {
-		userGroup = toUnwrappedModel(userGroup);
-
 		userGroupToGroupTableMapper.deleteLeftPrimaryKeyTableMappings(userGroup.getPrimaryKey());
 
 		userGroupToTeamTableMapper.deleteLeftPrimaryKeyTableMappings(userGroup.getPrimaryKey());
@@ -4334,9 +4330,23 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 	@Override
 	public UserGroup updateImpl(UserGroup userGroup) {
-		userGroup = toUnwrappedModel(userGroup);
-
 		boolean isNew = userGroup.isNew();
+
+		if (!(userGroup instanceof UserGroupModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userGroup.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userGroup);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userGroup proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserGroup implementation " +
+				userGroup.getClass());
+		}
 
 		UserGroupModelImpl userGroupModelImpl = (UserGroupModelImpl)userGroup;
 
@@ -4520,32 +4530,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		return userGroup;
 	}
 
-	protected UserGroup toUnwrappedModel(UserGroup userGroup) {
-		if (userGroup instanceof UserGroupImpl) {
-			return userGroup;
-		}
-
-		UserGroupImpl userGroupImpl = new UserGroupImpl();
-
-		userGroupImpl.setNew(userGroup.isNew());
-		userGroupImpl.setPrimaryKey(userGroup.getPrimaryKey());
-
-		userGroupImpl.setMvccVersion(userGroup.getMvccVersion());
-		userGroupImpl.setUuid(userGroup.getUuid());
-		userGroupImpl.setUserGroupId(userGroup.getUserGroupId());
-		userGroupImpl.setCompanyId(userGroup.getCompanyId());
-		userGroupImpl.setUserId(userGroup.getUserId());
-		userGroupImpl.setUserName(userGroup.getUserName());
-		userGroupImpl.setCreateDate(userGroup.getCreateDate());
-		userGroupImpl.setModifiedDate(userGroup.getModifiedDate());
-		userGroupImpl.setParentUserGroupId(userGroup.getParentUserGroupId());
-		userGroupImpl.setName(userGroup.getName());
-		userGroupImpl.setDescription(userGroup.getDescription());
-		userGroupImpl.setAddedByLDAPImport(userGroup.isAddedByLDAPImport());
-
-		return userGroupImpl;
-	}
-
 	/**
 	 * Returns the user group with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -4694,15 +4678,46 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 		query.append(_SQL_SELECT_USERGROUP_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("userGroupId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

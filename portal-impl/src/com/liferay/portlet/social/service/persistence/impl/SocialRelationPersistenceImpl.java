@@ -31,9 +31,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
@@ -47,7 +51,9 @@ import com.liferay.social.kernel.service.persistence.SocialRelationPersistence;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5564,13 +5570,6 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 					result = socialRelation;
 
 					cacheResult(socialRelation);
-
-					if ((socialRelation.getUserId1() != userId1) ||
-							(socialRelation.getUserId2() != userId2) ||
-							(socialRelation.getType() != type)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U1_U2_T,
-							finderArgs, socialRelation);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -5900,8 +5899,6 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 
 	@Override
 	protected SocialRelation removeImpl(SocialRelation socialRelation) {
-		socialRelation = toUnwrappedModel(socialRelation);
-
 		Session session = null;
 
 		try {
@@ -5932,9 +5929,23 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 
 	@Override
 	public SocialRelation updateImpl(SocialRelation socialRelation) {
-		socialRelation = toUnwrappedModel(socialRelation);
-
 		boolean isNew = socialRelation.isNew();
+
+		if (!(socialRelation instanceof SocialRelationModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(socialRelation.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(socialRelation);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in socialRelation proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SocialRelation implementation " +
+				socialRelation.getClass());
+		}
 
 		SocialRelationModelImpl socialRelationModelImpl = (SocialRelationModelImpl)socialRelation;
 
@@ -6256,27 +6267,6 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 		return socialRelation;
 	}
 
-	protected SocialRelation toUnwrappedModel(SocialRelation socialRelation) {
-		if (socialRelation instanceof SocialRelationImpl) {
-			return socialRelation;
-		}
-
-		SocialRelationImpl socialRelationImpl = new SocialRelationImpl();
-
-		socialRelationImpl.setNew(socialRelation.isNew());
-		socialRelationImpl.setPrimaryKey(socialRelation.getPrimaryKey());
-
-		socialRelationImpl.setUuid(socialRelation.getUuid());
-		socialRelationImpl.setRelationId(socialRelation.getRelationId());
-		socialRelationImpl.setCompanyId(socialRelation.getCompanyId());
-		socialRelationImpl.setCreateDate(socialRelation.getCreateDate());
-		socialRelationImpl.setUserId1(socialRelation.getUserId1());
-		socialRelationImpl.setUserId2(socialRelation.getUserId2());
-		socialRelationImpl.setType(socialRelation.getType());
-
-		return socialRelationImpl;
-	}
-
 	/**
 	 * Returns the social relation with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -6425,15 +6415,46 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 
 		query.append(_SQL_SELECT_SOCIALRELATION_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("relationId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

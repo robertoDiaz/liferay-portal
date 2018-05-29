@@ -31,9 +31,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import com.liferay.portlet.social.model.impl.SocialActivityCounterImpl;
 import com.liferay.portlet.social.model.impl.SocialActivityCounterModelImpl;
@@ -45,7 +49,9 @@ import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersis
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1984,17 +1990,6 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 					result = socialActivityCounter;
 
 					cacheResult(socialActivityCounter);
-
-					if ((socialActivityCounter.getGroupId() != groupId) ||
-							(socialActivityCounter.getClassNameId() != classNameId) ||
-							(socialActivityCounter.getClassPK() != classPK) ||
-							(socialActivityCounter.getName() == null) ||
-							!socialActivityCounter.getName().equals(name) ||
-							(socialActivityCounter.getOwnerType() != ownerType) ||
-							(socialActivityCounter.getStartPeriod() != startPeriod)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_C_C_N_O_S,
-							finderArgs, socialActivityCounter);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2341,17 +2336,6 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 					result = socialActivityCounter;
 
 					cacheResult(socialActivityCounter);
-
-					if ((socialActivityCounter.getGroupId() != groupId) ||
-							(socialActivityCounter.getClassNameId() != classNameId) ||
-							(socialActivityCounter.getClassPK() != classPK) ||
-							(socialActivityCounter.getName() == null) ||
-							!socialActivityCounter.getName().equals(name) ||
-							(socialActivityCounter.getOwnerType() != ownerType) ||
-							(socialActivityCounter.getEndPeriod() != endPeriod)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_C_C_N_O_E,
-							finderArgs, socialActivityCounter);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2790,8 +2774,6 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	@Override
 	protected SocialActivityCounter removeImpl(
 		SocialActivityCounter socialActivityCounter) {
-		socialActivityCounter = toUnwrappedModel(socialActivityCounter);
-
 		Session session = null;
 
 		try {
@@ -2823,9 +2805,23 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	@Override
 	public SocialActivityCounter updateImpl(
 		SocialActivityCounter socialActivityCounter) {
-		socialActivityCounter = toUnwrappedModel(socialActivityCounter);
-
 		boolean isNew = socialActivityCounter.isNew();
+
+		if (!(socialActivityCounter instanceof SocialActivityCounterModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(socialActivityCounter.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(socialActivityCounter);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in socialActivityCounter proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SocialActivityCounter implementation " +
+				socialActivityCounter.getClass());
+		}
 
 		SocialActivityCounterModelImpl socialActivityCounterModelImpl = (SocialActivityCounterModelImpl)socialActivityCounter;
 
@@ -2965,34 +2961,6 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		socialActivityCounter.resetOriginalValues();
 
 		return socialActivityCounter;
-	}
-
-	protected SocialActivityCounter toUnwrappedModel(
-		SocialActivityCounter socialActivityCounter) {
-		if (socialActivityCounter instanceof SocialActivityCounterImpl) {
-			return socialActivityCounter;
-		}
-
-		SocialActivityCounterImpl socialActivityCounterImpl = new SocialActivityCounterImpl();
-
-		socialActivityCounterImpl.setNew(socialActivityCounter.isNew());
-		socialActivityCounterImpl.setPrimaryKey(socialActivityCounter.getPrimaryKey());
-
-		socialActivityCounterImpl.setActivityCounterId(socialActivityCounter.getActivityCounterId());
-		socialActivityCounterImpl.setGroupId(socialActivityCounter.getGroupId());
-		socialActivityCounterImpl.setCompanyId(socialActivityCounter.getCompanyId());
-		socialActivityCounterImpl.setClassNameId(socialActivityCounter.getClassNameId());
-		socialActivityCounterImpl.setClassPK(socialActivityCounter.getClassPK());
-		socialActivityCounterImpl.setName(socialActivityCounter.getName());
-		socialActivityCounterImpl.setOwnerType(socialActivityCounter.getOwnerType());
-		socialActivityCounterImpl.setCurrentValue(socialActivityCounter.getCurrentValue());
-		socialActivityCounterImpl.setTotalValue(socialActivityCounter.getTotalValue());
-		socialActivityCounterImpl.setGraceValue(socialActivityCounter.getGraceValue());
-		socialActivityCounterImpl.setStartPeriod(socialActivityCounter.getStartPeriod());
-		socialActivityCounterImpl.setEndPeriod(socialActivityCounter.getEndPeriod());
-		socialActivityCounterImpl.setActive(socialActivityCounter.isActive());
-
-		return socialActivityCounterImpl;
 	}
 
 	/**
@@ -3143,15 +3111,46 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 		query.append(_SQL_SELECT_SOCIALACTIVITYCOUNTER_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("activityCounterId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

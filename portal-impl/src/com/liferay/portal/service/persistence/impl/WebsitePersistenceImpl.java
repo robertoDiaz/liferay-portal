@@ -36,9 +36,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.WebsitePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.WebsiteImpl;
@@ -47,7 +51,9 @@ import com.liferay.portal.model.impl.WebsiteModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -4144,8 +4150,6 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 	@Override
 	protected Website removeImpl(Website website) {
-		website = toUnwrappedModel(website);
-
 		Session session = null;
 
 		try {
@@ -4176,9 +4180,23 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 	@Override
 	public Website updateImpl(Website website) {
-		website = toUnwrappedModel(website);
-
 		boolean isNew = website.isNew();
+
+		if (!(website instanceof WebsiteModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(website.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(website);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in website proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Website implementation " +
+				website.getClass());
+		}
 
 		WebsiteModelImpl websiteModelImpl = (WebsiteModelImpl)website;
 
@@ -4447,34 +4465,6 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return website;
 	}
 
-	protected Website toUnwrappedModel(Website website) {
-		if (website instanceof WebsiteImpl) {
-			return website;
-		}
-
-		WebsiteImpl websiteImpl = new WebsiteImpl();
-
-		websiteImpl.setNew(website.isNew());
-		websiteImpl.setPrimaryKey(website.getPrimaryKey());
-
-		websiteImpl.setMvccVersion(website.getMvccVersion());
-		websiteImpl.setUuid(website.getUuid());
-		websiteImpl.setWebsiteId(website.getWebsiteId());
-		websiteImpl.setCompanyId(website.getCompanyId());
-		websiteImpl.setUserId(website.getUserId());
-		websiteImpl.setUserName(website.getUserName());
-		websiteImpl.setCreateDate(website.getCreateDate());
-		websiteImpl.setModifiedDate(website.getModifiedDate());
-		websiteImpl.setClassNameId(website.getClassNameId());
-		websiteImpl.setClassPK(website.getClassPK());
-		websiteImpl.setUrl(website.getUrl());
-		websiteImpl.setTypeId(website.getTypeId());
-		websiteImpl.setPrimary(website.isPrimary());
-		websiteImpl.setLastPublishDate(website.getLastPublishDate());
-
-		return websiteImpl;
-	}
-
 	/**
 	 * Returns the website with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -4622,15 +4612,46 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		query.append(_SQL_SELECT_WEBSITE_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("websiteId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

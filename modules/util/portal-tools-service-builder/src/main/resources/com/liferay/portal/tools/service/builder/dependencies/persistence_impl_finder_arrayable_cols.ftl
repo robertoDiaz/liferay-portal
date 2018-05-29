@@ -20,11 +20,44 @@
 					}
 				}
 			<#else>
-				query.append(_FINDER_COLUMN_${entityFinder.name?upper_case}_${entityColumn.name?upper_case}_7${finderFieldSuffix});
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(${entityColumn.names}));
+				if (${entityColumn.names}.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < ${entityColumn.names}.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > ${entityColumn.names}.length) {
+								curEnd = ${entityColumn.names}.length;
+							}
+						}
+
+						${entityColumn.type}[] copyOfRangeClassNames = Arrays.copyOfRange(${entityColumn.names}, curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_${entityFinder.name?upper_case}_${entityColumn.name?upper_case}_7${finderFieldSuffix});
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_${entityFinder.name?upper_case}_${entityColumn.name?upper_case}_7${finderFieldSuffix});
+
+					query.append(StringUtil.merge(${entityColumn.names}));
+
+					query.append(")");
+				}
 			</#if>
 
 			query.append(")");

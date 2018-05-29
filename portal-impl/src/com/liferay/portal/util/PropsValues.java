@@ -446,6 +446,8 @@ public class PropsValues {
 
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL = PropsUtil.get(PropsKeys.CUSTOM_SQL_FUNCTION_ISNULL);
 
+	public static final int DATABASE_IN_CLAUSE_MAX_LENGTH = GetterUtil.getInteger(PropsUtil.get(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH));
+
 	public static final boolean DATABASE_INDEXES_UPDATE_ON_STARTUP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.DATABASE_INDEXES_UPDATE_ON_STARTUP));
 
 	public static final String DATABASE_MYSQL_ENGINE = PropsUtil.get(PropsKeys.DATABASE_MYSQL_ENGINE);

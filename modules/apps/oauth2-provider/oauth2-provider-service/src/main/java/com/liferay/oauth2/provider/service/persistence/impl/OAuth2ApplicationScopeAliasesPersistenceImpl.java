@@ -34,7 +34,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -43,7 +46,9 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1287,14 +1292,6 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 					result = oAuth2ApplicationScopeAliases;
 
 					cacheResult(oAuth2ApplicationScopeAliases);
-
-					if ((oAuth2ApplicationScopeAliases.getOAuth2ApplicationId() != oAuth2ApplicationId) ||
-							(oAuth2ApplicationScopeAliases.getScopeAliases() == null) ||
-							!oAuth2ApplicationScopeAliases.getScopeAliases()
-															  .equals(scopeAliases)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_O_S,
-							finderArgs, oAuth2ApplicationScopeAliases);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1640,8 +1637,6 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 	@Override
 	protected OAuth2ApplicationScopeAliases removeImpl(
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
-		oAuth2ApplicationScopeAliases = toUnwrappedModel(oAuth2ApplicationScopeAliases);
-
 		Session session = null;
 
 		try {
@@ -1673,9 +1668,23 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 	@Override
 	public OAuth2ApplicationScopeAliases updateImpl(
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
-		oAuth2ApplicationScopeAliases = toUnwrappedModel(oAuth2ApplicationScopeAliases);
-
 		boolean isNew = oAuth2ApplicationScopeAliases.isNew();
+
+		if (!(oAuth2ApplicationScopeAliases instanceof OAuth2ApplicationScopeAliasesModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuth2ApplicationScopeAliases.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuth2ApplicationScopeAliases);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuth2ApplicationScopeAliases proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuth2ApplicationScopeAliases implementation " +
+				oAuth2ApplicationScopeAliases.getClass());
+		}
 
 		OAuth2ApplicationScopeAliasesModelImpl oAuth2ApplicationScopeAliasesModelImpl =
 			(OAuth2ApplicationScopeAliasesModelImpl)oAuth2ApplicationScopeAliases;
@@ -1783,28 +1792,6 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 		oAuth2ApplicationScopeAliases.resetOriginalValues();
 
 		return oAuth2ApplicationScopeAliases;
-	}
-
-	protected OAuth2ApplicationScopeAliases toUnwrappedModel(
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
-		if (oAuth2ApplicationScopeAliases instanceof OAuth2ApplicationScopeAliasesImpl) {
-			return oAuth2ApplicationScopeAliases;
-		}
-
-		OAuth2ApplicationScopeAliasesImpl oAuth2ApplicationScopeAliasesImpl = new OAuth2ApplicationScopeAliasesImpl();
-
-		oAuth2ApplicationScopeAliasesImpl.setNew(oAuth2ApplicationScopeAliases.isNew());
-		oAuth2ApplicationScopeAliasesImpl.setPrimaryKey(oAuth2ApplicationScopeAliases.getPrimaryKey());
-
-		oAuth2ApplicationScopeAliasesImpl.setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
-		oAuth2ApplicationScopeAliasesImpl.setCompanyId(oAuth2ApplicationScopeAliases.getCompanyId());
-		oAuth2ApplicationScopeAliasesImpl.setUserId(oAuth2ApplicationScopeAliases.getUserId());
-		oAuth2ApplicationScopeAliasesImpl.setUserName(oAuth2ApplicationScopeAliases.getUserName());
-		oAuth2ApplicationScopeAliasesImpl.setCreateDate(oAuth2ApplicationScopeAliases.getCreateDate());
-		oAuth2ApplicationScopeAliasesImpl.setOAuth2ApplicationId(oAuth2ApplicationScopeAliases.getOAuth2ApplicationId());
-		oAuth2ApplicationScopeAliasesImpl.setScopeAliases(oAuth2ApplicationScopeAliases.getScopeAliases());
-
-		return oAuth2ApplicationScopeAliasesImpl;
 	}
 
 	/**
@@ -1961,15 +1948,46 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 
 		query.append(_SQL_SELECT_OAUTH2APPLICATIONSCOPEALIASES_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("oA2AScopeAliasesId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

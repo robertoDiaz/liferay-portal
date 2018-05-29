@@ -42,8 +42,11 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -53,8 +56,11 @@ import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.sql.Timestamp;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1701,11 +1707,15 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PUBLISHDATE;
-			finderArgs = new Object[] { publishDate };
+			finderArgs = new Object[] { _getTime(publishDate) };
 		}
 		else {
 			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_PUBLISHDATE;
-			finderArgs = new Object[] { publishDate, start, end, orderByComparator };
+			finderArgs = new Object[] {
+					_getTime(publishDate),
+					
+					start, end, orderByComparator
+				};
 		}
 
 		List<AssetEntry> list = null;
@@ -2091,7 +2101,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	public int countByPublishDate(Date publishDate) {
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_PUBLISHDATE;
 
-		Object[] finderArgs = new Object[] { publishDate };
+		Object[] finderArgs = new Object[] { _getTime(publishDate) };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2242,12 +2252,12 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				(orderByComparator == null)) {
 			pagination = false;
 			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EXPIRATIONDATE;
-			finderArgs = new Object[] { expirationDate };
+			finderArgs = new Object[] { _getTime(expirationDate) };
 		}
 		else {
 			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_EXPIRATIONDATE;
 			finderArgs = new Object[] {
-					expirationDate,
+					_getTime(expirationDate),
 					
 					start, end, orderByComparator
 				};
@@ -2637,7 +2647,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	public int countByExpirationDate(Date expirationDate) {
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_EXPIRATIONDATE;
 
-		Object[] finderArgs = new Object[] { expirationDate };
+		Object[] finderArgs = new Object[] { _getTime(expirationDate) };
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3390,13 +3400,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 					result = assetEntry;
 
 					cacheResult(assetEntry);
-
-					if ((assetEntry.getGroupId() != groupId) ||
-							(assetEntry.getClassUuid() == null) ||
-							!assetEntry.getClassUuid().equals(classUuid)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_CU,
-							finderArgs, assetEntry);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3630,12 +3633,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 					result = assetEntry;
 
 					cacheResult(assetEntry);
-
-					if ((assetEntry.getClassNameId() != classNameId) ||
-							(assetEntry.getClassPK() != classPK)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_C,
-							finderArgs, assetEntry);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -4436,13 +4433,15 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 			pagination = false;
 			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_P_E;
 			finderArgs = new Object[] {
-					groupId, classNameId, publishDate, expirationDate
+					groupId, classNameId, _getTime(publishDate),
+					_getTime(expirationDate)
 				};
 		}
 		else {
 			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_G_C_P_E;
 			finderArgs = new Object[] {
-					groupId, classNameId, publishDate, expirationDate,
+					groupId, classNameId, _getTime(publishDate),
+					_getTime(expirationDate),
 					
 					start, end, orderByComparator
 				};
@@ -4934,7 +4933,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_C_P_E;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, publishDate, expirationDate
+				groupId, classNameId, _getTime(publishDate),
+				_getTime(expirationDate)
 			};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
@@ -5248,8 +5248,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 	@Override
 	protected AssetEntry removeImpl(AssetEntry assetEntry) {
-		assetEntry = toUnwrappedModel(assetEntry);
-
 		assetEntryToAssetCategoryTableMapper.deleteLeftPrimaryKeyTableMappings(assetEntry.getPrimaryKey());
 
 		assetEntryToAssetTagTableMapper.deleteLeftPrimaryKeyTableMappings(assetEntry.getPrimaryKey());
@@ -5284,9 +5282,23 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 	@Override
 	public AssetEntry updateImpl(AssetEntry assetEntry) {
-		assetEntry = toUnwrappedModel(assetEntry);
-
 		boolean isNew = assetEntry.isNew();
+
+		if (!(assetEntry instanceof AssetEntryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(assetEntry.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(assetEntry);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in assetEntry proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom AssetEntry implementation " +
+				assetEntry.getClass());
+		}
 
 		AssetEntryModelImpl assetEntryModelImpl = (AssetEntryModelImpl)assetEntry;
 
@@ -5567,47 +5579,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		return assetEntry;
 	}
 
-	protected AssetEntry toUnwrappedModel(AssetEntry assetEntry) {
-		if (assetEntry instanceof AssetEntryImpl) {
-			return assetEntry;
-		}
-
-		AssetEntryImpl assetEntryImpl = new AssetEntryImpl();
-
-		assetEntryImpl.setNew(assetEntry.isNew());
-		assetEntryImpl.setPrimaryKey(assetEntry.getPrimaryKey());
-
-		assetEntryImpl.setEntryId(assetEntry.getEntryId());
-		assetEntryImpl.setGroupId(assetEntry.getGroupId());
-		assetEntryImpl.setCompanyId(assetEntry.getCompanyId());
-		assetEntryImpl.setUserId(assetEntry.getUserId());
-		assetEntryImpl.setUserName(assetEntry.getUserName());
-		assetEntryImpl.setCreateDate(assetEntry.getCreateDate());
-		assetEntryImpl.setModifiedDate(assetEntry.getModifiedDate());
-		assetEntryImpl.setClassNameId(assetEntry.getClassNameId());
-		assetEntryImpl.setClassPK(assetEntry.getClassPK());
-		assetEntryImpl.setClassUuid(assetEntry.getClassUuid());
-		assetEntryImpl.setClassTypeId(assetEntry.getClassTypeId());
-		assetEntryImpl.setListable(assetEntry.isListable());
-		assetEntryImpl.setVisible(assetEntry.isVisible());
-		assetEntryImpl.setStartDate(assetEntry.getStartDate());
-		assetEntryImpl.setEndDate(assetEntry.getEndDate());
-		assetEntryImpl.setPublishDate(assetEntry.getPublishDate());
-		assetEntryImpl.setExpirationDate(assetEntry.getExpirationDate());
-		assetEntryImpl.setMimeType(assetEntry.getMimeType());
-		assetEntryImpl.setTitle(assetEntry.getTitle());
-		assetEntryImpl.setDescription(assetEntry.getDescription());
-		assetEntryImpl.setSummary(assetEntry.getSummary());
-		assetEntryImpl.setUrl(assetEntry.getUrl());
-		assetEntryImpl.setLayoutUuid(assetEntry.getLayoutUuid());
-		assetEntryImpl.setHeight(assetEntry.getHeight());
-		assetEntryImpl.setWidth(assetEntry.getWidth());
-		assetEntryImpl.setPriority(assetEntry.getPriority());
-		assetEntryImpl.setViewCount(assetEntry.getViewCount());
-
-		return assetEntryImpl;
-	}
-
 	/**
 	 * Returns the asset entry with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -5756,15 +5727,46 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 		query.append(_SQL_SELECT_ASSETENTRY_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("entryId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 
@@ -6635,6 +6637,15 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	@BeanReference(type = AssetTagPersistence.class)
 	protected AssetTagPersistence assetTagPersistence;
 	protected TableMapper<AssetEntry, com.liferay.asset.kernel.model.AssetTag> assetEntryToAssetTagTableMapper;
+
+	private Long _getTime(Date date) {
+		if (date == null) {
+			return null;
+		}
+
+		return date.getTime();
+	}
+
 	private static final String _SQL_SELECT_ASSETENTRY = "SELECT assetEntry FROM AssetEntry assetEntry";
 	private static final String _SQL_SELECT_ASSETENTRY_WHERE_PKS_IN = "SELECT assetEntry FROM AssetEntry assetEntry WHERE entryId IN (";
 	private static final String _SQL_SELECT_ASSETENTRY_WHERE = "SELECT assetEntry FROM AssetEntry assetEntry WHERE ";

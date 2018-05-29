@@ -31,15 +31,19 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -251,8 +255,6 @@ public class TestEntityPersistenceImpl extends BasePersistenceImpl<TestEntity>
 
 	@Override
 	protected TestEntity removeImpl(TestEntity testEntity) {
-		testEntity = toUnwrappedModel(testEntity);
-
 		Session session = null;
 
 		try {
@@ -283,8 +285,6 @@ public class TestEntityPersistenceImpl extends BasePersistenceImpl<TestEntity>
 
 	@Override
 	public TestEntity updateImpl(TestEntity testEntity) {
-		testEntity = toUnwrappedModel(testEntity);
-
 		boolean isNew = testEntity.isNew();
 
 		Session session = null;
@@ -322,22 +322,6 @@ public class TestEntityPersistenceImpl extends BasePersistenceImpl<TestEntity>
 		testEntity.resetOriginalValues();
 
 		return testEntity;
-	}
-
-	protected TestEntity toUnwrappedModel(TestEntity testEntity) {
-		if (testEntity instanceof TestEntityImpl) {
-			return testEntity;
-		}
-
-		TestEntityImpl testEntityImpl = new TestEntityImpl();
-
-		testEntityImpl.setNew(testEntity.isNew());
-		testEntityImpl.setPrimaryKey(testEntity.getPrimaryKey());
-
-		testEntityImpl.setId(testEntity.getId());
-		testEntityImpl.setData(testEntity.getData());
-
-		return testEntityImpl;
 	}
 
 	/**
@@ -488,15 +472,46 @@ public class TestEntityPersistenceImpl extends BasePersistenceImpl<TestEntity>
 
 		query.append(_SQL_SELECT_TESTENTITY_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("id_");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

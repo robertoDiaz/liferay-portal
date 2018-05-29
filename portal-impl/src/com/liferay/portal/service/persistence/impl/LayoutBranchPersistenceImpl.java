@@ -34,13 +34,20 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.LayoutBranchPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.LayoutBranchImpl;
 import com.liferay.portal.model.impl.LayoutBranchModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1296,14 +1303,6 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 					result = layoutBranch;
 
 					cacheResult(layoutBranch);
-
-					if ((layoutBranch.getLayoutSetBranchId() != layoutSetBranchId) ||
-							(layoutBranch.getPlid() != plid) ||
-							(layoutBranch.getName() == null) ||
-							!layoutBranch.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_L_P_N,
-							finderArgs, layoutBranch);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2207,8 +2206,6 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 
 	@Override
 	protected LayoutBranch removeImpl(LayoutBranch layoutBranch) {
-		layoutBranch = toUnwrappedModel(layoutBranch);
-
 		Session session = null;
 
 		try {
@@ -2239,9 +2236,23 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 
 	@Override
 	public LayoutBranch updateImpl(LayoutBranch layoutBranch) {
-		layoutBranch = toUnwrappedModel(layoutBranch);
-
 		boolean isNew = layoutBranch.isNew();
+
+		if (!(layoutBranch instanceof LayoutBranchModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(layoutBranch.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(layoutBranch);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in layoutBranch proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom LayoutBranch implementation " +
+				layoutBranch.getClass());
+		}
 
 		LayoutBranchModelImpl layoutBranchModelImpl = (LayoutBranchModelImpl)layoutBranch;
 
@@ -2381,31 +2392,6 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 		layoutBranch.resetOriginalValues();
 
 		return layoutBranch;
-	}
-
-	protected LayoutBranch toUnwrappedModel(LayoutBranch layoutBranch) {
-		if (layoutBranch instanceof LayoutBranchImpl) {
-			return layoutBranch;
-		}
-
-		LayoutBranchImpl layoutBranchImpl = new LayoutBranchImpl();
-
-		layoutBranchImpl.setNew(layoutBranch.isNew());
-		layoutBranchImpl.setPrimaryKey(layoutBranch.getPrimaryKey());
-
-		layoutBranchImpl.setMvccVersion(layoutBranch.getMvccVersion());
-		layoutBranchImpl.setLayoutBranchId(layoutBranch.getLayoutBranchId());
-		layoutBranchImpl.setGroupId(layoutBranch.getGroupId());
-		layoutBranchImpl.setCompanyId(layoutBranch.getCompanyId());
-		layoutBranchImpl.setUserId(layoutBranch.getUserId());
-		layoutBranchImpl.setUserName(layoutBranch.getUserName());
-		layoutBranchImpl.setLayoutSetBranchId(layoutBranch.getLayoutSetBranchId());
-		layoutBranchImpl.setPlid(layoutBranch.getPlid());
-		layoutBranchImpl.setName(layoutBranch.getName());
-		layoutBranchImpl.setDescription(layoutBranch.getDescription());
-		layoutBranchImpl.setMaster(layoutBranch.isMaster());
-
-		return layoutBranchImpl;
 	}
 
 	/**
@@ -2556,15 +2542,46 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 
 		query.append(_SQL_SELECT_LAYOUTBRANCH_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("layoutBranchId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

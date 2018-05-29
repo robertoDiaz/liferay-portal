@@ -34,7 +34,10 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.PortletPreferencesPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.PortletPreferencesImpl;
@@ -42,6 +45,9 @@ import com.liferay.portal.model.impl.PortletPreferencesModelImpl;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5027,15 +5033,6 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 					result = portletPreferences;
 
 					cacheResult(portletPreferences);
-
-					if ((portletPreferences.getOwnerId() != ownerId) ||
-							(portletPreferences.getOwnerType() != ownerType) ||
-							(portletPreferences.getPlid() != plid) ||
-							(portletPreferences.getPortletId() == null) ||
-							!portletPreferences.getPortletId().equals(portletId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_O_O_P_P,
-							finderArgs, portletPreferences);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -5375,8 +5372,6 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 	@Override
 	protected PortletPreferences removeImpl(
 		PortletPreferences portletPreferences) {
-		portletPreferences = toUnwrappedModel(portletPreferences);
-
 		Session session = null;
 
 		try {
@@ -5407,9 +5402,23 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 
 	@Override
 	public PortletPreferences updateImpl(PortletPreferences portletPreferences) {
-		portletPreferences = toUnwrappedModel(portletPreferences);
-
 		boolean isNew = portletPreferences.isNew();
+
+		if (!(portletPreferences instanceof PortletPreferencesModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(portletPreferences.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(portletPreferences);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in portletPreferences proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom PortletPreferences implementation " +
+				portletPreferences.getClass());
+		}
 
 		PortletPreferencesModelImpl portletPreferencesModelImpl = (PortletPreferencesModelImpl)portletPreferences;
 
@@ -5665,29 +5674,6 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 		return portletPreferences;
 	}
 
-	protected PortletPreferences toUnwrappedModel(
-		PortletPreferences portletPreferences) {
-		if (portletPreferences instanceof PortletPreferencesImpl) {
-			return portletPreferences;
-		}
-
-		PortletPreferencesImpl portletPreferencesImpl = new PortletPreferencesImpl();
-
-		portletPreferencesImpl.setNew(portletPreferences.isNew());
-		portletPreferencesImpl.setPrimaryKey(portletPreferences.getPrimaryKey());
-
-		portletPreferencesImpl.setMvccVersion(portletPreferences.getMvccVersion());
-		portletPreferencesImpl.setPortletPreferencesId(portletPreferences.getPortletPreferencesId());
-		portletPreferencesImpl.setCompanyId(portletPreferences.getCompanyId());
-		portletPreferencesImpl.setOwnerId(portletPreferences.getOwnerId());
-		portletPreferencesImpl.setOwnerType(portletPreferences.getOwnerType());
-		portletPreferencesImpl.setPlid(portletPreferences.getPlid());
-		portletPreferencesImpl.setPortletId(portletPreferences.getPortletId());
-		portletPreferencesImpl.setPreferences(portletPreferences.getPreferences());
-
-		return portletPreferencesImpl;
-	}
-
 	/**
 	 * Returns the portlet preferences with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
@@ -5836,15 +5822,46 @@ public class PortletPreferencesPersistenceImpl extends BasePersistenceImpl<Portl
 
 		query.append(_SQL_SELECT_PORTLETPREFERENCES_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("portletPreferencesId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 
