@@ -20,7 +20,7 @@
 					}
 				}
 			<#else>
-				int databaseInClauseMaxLength = GetterUtil.getInteger(${propsUtil}.get("database.in.clause.max.length"));
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
 				if (${entityColumn.names}.length > databaseInClauseMaxLength) {
 					int curStart = 0;
