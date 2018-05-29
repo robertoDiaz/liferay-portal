@@ -43,8 +43,10 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -6706,11 +6708,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		if (types.length > 0) {
 			query.append("(");
 
-			query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+			int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(StringUtil.merge(types));
+			if (types.length > databaseInClauseMaxLength) {
+				int curStart = 0;
+				int curEnd = 0;
 
-			query.append(")");
+				while (curEnd < types.length) {
+					if (curStart == 0) {
+						curEnd = curEnd + databaseInClauseMaxLength;
+					}
+					else {
+						query.append(WHERE_OR);
+
+						curEnd = curEnd + databaseInClauseMaxLength;
+
+						if (curEnd > types.length) {
+							curEnd = types.length;
+						}
+					}
+
+					int[] copyOfRangeClassNames = Arrays.copyOfRange(types,
+							curStart, curEnd);
+
+					query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+
+					query.append(StringUtil.merge(copyOfRangeClassNames));
+
+					query.append(")");
+
+					curStart = curStart + databaseInClauseMaxLength;
+				}
+			}
+			else {
+				query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+
+				query.append(StringUtil.merge(types));
+
+				query.append(")");
+			}
 
 			query.append(")");
 		}
@@ -6903,11 +6939,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if (types.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_T_TYPE_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(types));
+				if (types.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < types.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > types.length) {
+								curEnd = types.length;
+							}
+						}
+
+						int[] copyOfRangeClassNames = Arrays.copyOfRange(types,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_T_TYPE_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_T_TYPE_7);
+
+					query.append(StringUtil.merge(types));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -7072,11 +7142,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if (types.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_T_TYPE_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(types));
+				if (types.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < types.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > types.length) {
+								curEnd = types.length;
+							}
+						}
+
+						int[] copyOfRangeClassNames = Arrays.copyOfRange(types,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_T_TYPE_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_T_TYPE_7);
+
+					query.append(StringUtil.merge(types));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -7199,11 +7303,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		if (types.length > 0) {
 			query.append("(");
 
-			query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+			int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(StringUtil.merge(types));
+			if (types.length > databaseInClauseMaxLength) {
+				int curStart = 0;
+				int curEnd = 0;
 
-			query.append(")");
+				while (curEnd < types.length) {
+					if (curStart == 0) {
+						curEnd = curEnd + databaseInClauseMaxLength;
+					}
+					else {
+						query.append(WHERE_OR);
+
+						curEnd = curEnd + databaseInClauseMaxLength;
+
+						if (curEnd > types.length) {
+							curEnd = types.length;
+						}
+					}
+
+					int[] copyOfRangeClassNames = Arrays.copyOfRange(types,
+							curStart, curEnd);
+
+					query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+
+					query.append(StringUtil.merge(copyOfRangeClassNames));
+
+					query.append(")");
+
+					curStart = curStart + databaseInClauseMaxLength;
+				}
+			}
+			else {
+				query.append(_FINDER_COLUMN_C_T_TYPE_7_SQL);
+
+				query.append(StringUtil.merge(types));
+
+				query.append(")");
+			}
 
 			query.append(")");
 		}
@@ -8433,11 +8571,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if (classPKs.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(classPKs));
+				if (classPKs.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < classPKs.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > classPKs.length) {
+								curEnd = classPKs.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(classPKs,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+					query.append(StringUtil.merge(classPKs));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -8760,11 +8932,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if (classPKs.length > 0) {
 				query.append("(");
 
-				query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+				int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-				query.append(StringUtil.merge(classPKs));
+				if (classPKs.length > databaseInClauseMaxLength) {
+					int curStart = 0;
+					int curEnd = 0;
 
-				query.append(")");
+					while (curEnd < classPKs.length) {
+						if (curStart == 0) {
+							curEnd = curEnd + databaseInClauseMaxLength;
+						}
+						else {
+							query.append(WHERE_OR);
+
+							curEnd = curEnd + databaseInClauseMaxLength;
+
+							if (curEnd > classPKs.length) {
+								curEnd = classPKs.length;
+							}
+						}
+
+						long[] copyOfRangeClassNames = Arrays.copyOfRange(classPKs,
+								curStart, curEnd);
+
+						query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+						query.append(StringUtil.merge(copyOfRangeClassNames));
+
+						query.append(")");
+
+						curStart = curStart + databaseInClauseMaxLength;
+					}
+				}
+				else {
+					query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+					query.append(StringUtil.merge(classPKs));
+
+					query.append(")");
+				}
 
 				query.append(")");
 			}
@@ -8898,11 +9104,45 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		if (classPKs.length > 0) {
 			query.append("(");
 
-			query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+			int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(StringUtil.merge(classPKs));
+			if (classPKs.length > databaseInClauseMaxLength) {
+				int curStart = 0;
+				int curEnd = 0;
 
-			query.append(")");
+				while (curEnd < classPKs.length) {
+					if (curStart == 0) {
+						curEnd = curEnd + databaseInClauseMaxLength;
+					}
+					else {
+						query.append(WHERE_OR);
+
+						curEnd = curEnd + databaseInClauseMaxLength;
+
+						if (curEnd > classPKs.length) {
+							curEnd = classPKs.length;
+						}
+					}
+
+					long[] copyOfRangeClassNames = Arrays.copyOfRange(classPKs,
+							curStart, curEnd);
+
+					query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+					query.append(StringUtil.merge(copyOfRangeClassNames));
+
+					query.append(")");
+
+					curStart = curStart + databaseInClauseMaxLength;
+				}
+			}
+			else {
+				query.append(_FINDER_COLUMN_C_C_C_CLASSPK_7);
+
+				query.append(StringUtil.merge(classPKs));
+
+				query.append(")");
+			}
 
 			query.append(")");
 		}
@@ -9691,15 +9931,46 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_SQL_SELECT_ROLE_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("roleId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

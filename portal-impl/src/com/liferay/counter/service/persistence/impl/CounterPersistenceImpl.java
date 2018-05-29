@@ -34,11 +34,14 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -444,15 +447,54 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 
 		query.append(_SQL_SELECT_COUNTER_WHERE_PKS_IN);
 
-		for (int i = 0; i < uncachedPrimaryKeys.size(); i++) {
-			query.append("?");
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("name");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				for (int i = 0; i < curUncachedPrimaryKeysList.size(); i++) {
+					query.append("?");
+
+					query.append(",");
+				}
+
+				query.append(")");
+			}
 		}
+		else {
+			for (int i = 0; i < uncachedPrimaryKeys.size(); i++) {
+				query.append("?");
 
-		query.setIndex(query.index() - 1);
+				query.append(",");
+			}
 
-		query.append(")");
+			query.setIndex(query.index() - 1);
+
+			query.append(")");
+		}
 
 		String sql = query.toString();
 

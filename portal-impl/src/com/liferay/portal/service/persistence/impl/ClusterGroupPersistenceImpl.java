@@ -30,13 +30,17 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClusterGroup;
 import com.liferay.portal.kernel.service.persistence.ClusterGroupPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ClusterGroupImpl;
 import com.liferay.portal.model.impl.ClusterGroupModelImpl;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -448,15 +452,46 @@ public class ClusterGroupPersistenceImpl extends BasePersistenceImpl<ClusterGrou
 
 		query.append(_SQL_SELECT_CLUSTERGROUP_WHERE_PKS_IN);
 
-		for (Serializable primaryKey : uncachedPrimaryKeys) {
-			query.append((long)primaryKey);
+		int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
-			query.append(",");
+		if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
+			List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
+
+			int curStart = 0;
+			int curEnd = 0;
+
+			while (curEnd < uncachedPrimaryKeys.size()) {
+				if (curStart == 0) {
+					curEnd = curEnd + databaseInClauseMaxLength;
+				}
+				else {
+					query.append(WHERE_OR);
+					query.append("clusterGroupId");
+					query.append(WHERE_IN);
+					query.append("(");
+
+					curEnd = curEnd + databaseInClauseMaxLength;
+
+					if (curEnd > uncachedPrimaryKeys.size()) {
+						curEnd = uncachedPrimaryKeys.size();
+					}
+				}
+
+				List<Serializable> curUncachedPrimaryKeysList = uncachedPrimaryKeysList.subList(curStart,
+						curEnd);
+
+				query.append(StringUtil.merge(curUncachedPrimaryKeysList));
+
+				query.append(")");
+			}
 		}
+		else {
+			query.append(StringUtil.merge(uncachedPrimaryKeys));
 
-		query.setIndex(query.index() - 1);
+			query.setIndex(query.index() - 1);
 
-		query.append(")");
+			query.append(")");
+		}
 
 		String sql = query.toString();
 
