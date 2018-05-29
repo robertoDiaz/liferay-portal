@@ -965,7 +965,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 			query.append(_SQL_SELECT_${entity.alias?upper_case}_WHERE_PKS_IN);
 
-			int databaseInClauseMaxLength = GetterUtil.getInteger(com.liferay.portal.util.PropsUtil.get("database.in.clause.max.length"));
+			int databaseInClauseMaxLength = GetterUtil.getInteger(PropsKeys.DATABASE_IN_CLAUSE_MAX_LENGTH);
 
 			if (uncachedPrimaryKeys.size() > databaseInClauseMaxLength) {
 				List<Serializable> uncachedPrimaryKeysList = new ArrayList<Serializable>(uncachedPrimaryKeys);
