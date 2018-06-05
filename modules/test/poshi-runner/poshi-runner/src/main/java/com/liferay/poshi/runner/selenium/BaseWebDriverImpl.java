@@ -1017,7 +1017,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public String getBodyText() {
-		WebElement webElement = findElement(By.tagName("body"));
+		WebElement webElement = getWebElement("//body");
 
 		return webElement.getText();
 	}
@@ -1672,7 +1672,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public boolean isTextPresent(String pattern) {
-		WebElement webElement = findElement(By.tagName("body"));
+		WebElement webElement = getWebElement("//body");
 
 		String text = webElement.getText();
 
@@ -1696,6 +1696,40 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	@Override
 	public void javaScriptClick(String locator) {
 		executeJavaScriptEvent(locator, "MouseEvent", "click");
+	}
+
+	public String javaScriptGetText(String locator, String timeout)
+		throws Exception {
+
+		if (locator.contains("x:")) {
+			return getHtmlNodeText(locator);
+		}
+
+		WebElement webElement = getWebElement(locator, timeout);
+
+		if (webElement == null) {
+			throw new Exception(
+				"Element is not present at \"" + locator + "\"");
+		}
+
+		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
+
+		WebDriver wrappedWebDriver = wrapsDriver.getWrappedDriver();
+
+		JavascriptExecutor javascriptExecutor =
+			(JavascriptExecutor)wrappedWebDriver;
+
+		StringBuilder sb = new StringBuilder(2);
+
+		sb.append("var element = arguments[0];");
+		sb.append("return element.innerText;");
+
+		String text = (String)javascriptExecutor.executeScript(
+			sb.toString(), webElement);
+
+		text = text.trim();
+
+		return text.replace("\n", " ");
 	}
 
 	@Override
@@ -2040,10 +2074,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		}
 
 		get(targetURL);
-
-		if (PropsValues.BROWSER_TYPE.equals("internetexplorer")) {
-			refresh();
-		}
 	}
 
 	@Override

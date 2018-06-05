@@ -180,7 +180,7 @@ public class PortletImpl extends PortletBaseImpl {
 		boolean showPortletInactive, boolean actionURLRedirect,
 		boolean restoreCurrentView, boolean maximizeEdit, boolean maximizeHelp,
 		boolean popUpPrint, boolean layoutCacheable, boolean instanceable,
-		boolean remoteable, boolean scopeable, boolean singlePageApplication,
+		boolean scopeable, boolean singlePageApplication,
 		String userPrincipalStrategy, boolean privateRequestAttributes,
 		boolean privateSessionAttributes, Set<String> autopropagatedParameters,
 		boolean requiresNamespacedParameters, int actionTimeout,
@@ -193,7 +193,9 @@ public class PortletImpl extends PortletBaseImpl {
 		boolean addDefaultResource, String roles, Set<String> unlinkedRoles,
 		Map<String, String> roleMappers, boolean system, boolean active,
 		boolean include, Map<String, String> initParams, Integer expCache,
-		Map<String, Set<String>> portletModes,
+		boolean asyncSupported, int multipartFileSizeThreshold,
+		String multipartLocation, long multipartMaxFileSize,
+		long multipartMaxRequestSize, Map<String, Set<String>> portletModes,
 		Map<String, Set<String>> windowStates, Set<String> supportedLocales,
 		String resourceBundle, PortletInfo portletInfo,
 		Map<String, PortletFilter> portletFilters, Set<QName> processingEvents,
@@ -265,7 +267,6 @@ public class PortletImpl extends PortletBaseImpl {
 		_popUpPrint = popUpPrint;
 		_layoutCacheable = layoutCacheable;
 		_instanceable = instanceable;
-		_remoteable = remoteable;
 		_scopeable = scopeable;
 		_singlePageApplication = singlePageApplication;
 		_userPrincipalStrategy = userPrincipalStrategy;
@@ -293,6 +294,11 @@ public class PortletImpl extends PortletBaseImpl {
 		_include = include;
 		_initParams = initParams;
 		_expCache = expCache;
+		_asyncSupported = asyncSupported;
+		_multipartFileSizeThreshold = multipartFileSizeThreshold;
+		_multipartLocation = multipartLocation;
+		_multipartMaxFileSize = multipartMaxFileSize;
+		_multipartMaxRequestSize = multipartMaxRequestSize;
 		_portletModes = portletModes;
 		_windowStates = windowStates;
 		_supportedLocales = supportedLocales;
@@ -300,102 +306,6 @@ public class PortletImpl extends PortletBaseImpl {
 		_portletInfo = portletInfo;
 		_portletFilters = portletFilters;
 		_portletApp = portletApp;
-	}
-
-	/**
-	 * Constructs a portlet with the specified parameters.
-	 *
-	 * @deprecated As of 7.0.0, with no direct replacement
-	 */
-	@Deprecated
-	public PortletImpl(
-		String portletId, Portlet rootPortlet, PluginPackage pluginPackage,
-		PluginSetting pluginSetting, long companyId, String icon,
-		String virtualPath, String strutsPath, String parentStrutsPath,
-		String portletName, String displayName, String portletClass,
-		String configurationActionClass, List<String> indexerClasses,
-		String openSearchClass, List<SchedulerEntry> schedulerEntries,
-		String portletURLClass, String friendlyURLMapperClass,
-		String friendlyURLMapping, String friendlyURLRoutes,
-		String urlEncoderClass, String portletDataHandlerClass,
-		List<String> stagedModelDataHandlerClasses, String templateHandlerClass,
-		String portletLayoutListenerClass, String pollerProcessorClass,
-		String popMessageListenerClass,
-		List<String> socialActivityInterpreterClasses,
-		String socialRequestInterpreterClass,
-		String userNotificationDefinitions,
-		List<String> userNotificationHandlerClasses, String webDAVStorageToken,
-		String webDAVStorageClass, String xmlRpcMethodClass,
-		String controlPanelEntryCategory, double controlPanelEntryWeight,
-		String controlPanelClass, List<String> assetRendererFactoryClasses,
-		List<String> atomCollectionAdapterClasses,
-		List<String> customAttributesDisplayClasses,
-		String permissionPropagatorClass, List<String> trashHandlerClasses,
-		List<String> workflowHandlerClasses, String defaultPreferences,
-		String preferencesValidator, boolean preferencesCompanyWide,
-		boolean preferencesUniquePerLayout, boolean preferencesOwnedByGroup,
-		boolean useDefaultTemplate, boolean showPortletAccessDenied,
-		boolean showPortletInactive, boolean actionURLRedirect,
-		boolean restoreCurrentView, boolean maximizeEdit, boolean maximizeHelp,
-		boolean popUpPrint, boolean layoutCacheable, boolean instanceable,
-		boolean remoteable, boolean scopeable, boolean singlePageApplication,
-		String userPrincipalStrategy, boolean privateRequestAttributes,
-		boolean privateSessionAttributes, Set<String> autopropagatedParameters,
-		boolean requiresNamespacedParameters, int actionTimeout,
-		int renderTimeout, int renderWeight, boolean ajaxable,
-		List<String> headerPortalCss, List<String> headerPortletCss,
-		List<String> headerPortalJavaScript,
-		List<String> headerPortletJavaScript, List<String> footerPortalCss,
-		List<String> footerPortletCss, List<String> footerPortalJavaScript,
-		List<String> footerPortletJavaScript, String cssClassWrapper,
-		String facebookIntegration, boolean addDefaultResource, String roles,
-		Set<String> unlinkedRoles, Map<String, String> roleMappers,
-		boolean system, boolean active, boolean include,
-		Map<String, String> initParams, Integer expCache,
-		Map<String, Set<String>> portletModes,
-		Map<String, Set<String>> windowStates, Set<String> supportedLocales,
-		String resourceBundle, PortletInfo portletInfo,
-		Map<String, PortletFilter> portletFilters, Set<QName> processingEvents,
-		Set<QName> publishingEvents,
-		Set<PublicRenderParameter> publicRenderParameters,
-		PortletApp portletApp) {
-
-		this(
-			portletId, rootPortlet, pluginPackage, pluginSetting, companyId,
-			icon, virtualPath, strutsPath, parentStrutsPath, portletName,
-			displayName, portletClass, configurationActionClass, indexerClasses,
-			openSearchClass, schedulerEntries, portletURLClass,
-			friendlyURLMapperClass, friendlyURLMapping, friendlyURLRoutes,
-			urlEncoderClass, portletDataHandlerClass,
-			stagedModelDataHandlerClasses, templateHandlerClass,
-			portletLayoutListenerClass, pollerProcessorClass,
-			popMessageListenerClass, socialActivityInterpreterClasses,
-			socialRequestInterpreterClass, userNotificationDefinitions,
-			userNotificationHandlerClasses, webDAVStorageToken,
-			webDAVStorageClass, xmlRpcMethodClass, controlPanelEntryCategory,
-			controlPanelEntryWeight, controlPanelClass,
-			assetRendererFactoryClasses, atomCollectionAdapterClasses,
-			customAttributesDisplayClasses, permissionPropagatorClass,
-			trashHandlerClasses, workflowHandlerClasses, defaultPreferences,
-			preferencesValidator, preferencesCompanyWide,
-			preferencesUniquePerLayout, preferencesOwnedByGroup,
-			useDefaultTemplate, showPortletAccessDenied, showPortletInactive,
-			actionURLRedirect, restoreCurrentView, maximizeEdit, maximizeHelp,
-			popUpPrint, layoutCacheable, instanceable, remoteable, scopeable,
-			singlePageApplication, userPrincipalStrategy,
-			privateRequestAttributes, privateSessionAttributes,
-			autopropagatedParameters, requiresNamespacedParameters,
-			actionTimeout, renderTimeout, renderWeight, ajaxable,
-			headerPortalCss, headerPortletCss, headerPortalJavaScript,
-			headerPortletJavaScript, footerPortalCss, footerPortletCss,
-			footerPortalJavaScript, footerPortletJavaScript, cssClassWrapper,
-			addDefaultResource, roles, unlinkedRoles, roleMappers, system,
-			active, include, initParams, expCache, portletModes, windowStates,
-			supportedLocales, resourceBundle, portletInfo, portletFilters,
-			processingEvents, publishingEvents, publicRenderParameters,
-			portletApp);
-
-		_facebookIntegration = facebookIntegration;
 	}
 
 	/**
@@ -497,22 +407,24 @@ public class PortletImpl extends PortletBaseImpl {
 			isShowPortletAccessDenied(), isShowPortletInactive(),
 			isActionURLRedirect(), isRestoreCurrentView(), isMaximizeEdit(),
 			isMaximizeHelp(), isPopUpPrint(), isLayoutCacheable(),
-			isInstanceable(), isRemoteable(), isScopeable(),
-			isSinglePageApplication(), getUserPrincipalStrategy(),
-			isPrivateRequestAttributes(), isPrivateSessionAttributes(),
-			getAutopropagatedParameters(), isRequiresNamespacedParameters(),
-			getActionTimeout(), getRenderTimeout(), getRenderWeight(),
-			isAjaxable(), getHeaderPortalCss(), getHeaderPortletCss(),
+			isInstanceable(), isScopeable(), isSinglePageApplication(),
+			getUserPrincipalStrategy(), isPrivateRequestAttributes(),
+			isPrivateSessionAttributes(), getAutopropagatedParameters(),
+			isRequiresNamespacedParameters(), getActionTimeout(),
+			getRenderTimeout(), getRenderWeight(), isAjaxable(),
+			getHeaderPortalCss(), getHeaderPortletCss(),
 			getHeaderPortalJavaScript(), getHeaderPortletJavaScript(),
 			getFooterPortalCss(), getFooterPortletCss(),
 			getFooterPortalJavaScript(), getFooterPortletJavaScript(),
 			getCssClassWrapper(), isAddDefaultResource(), getRoles(),
 			getUnlinkedRoles(), getRoleMappers(), isSystem(), isActive(),
-			isInclude(), getInitParams(), getExpCache(), getPortletModes(),
-			getWindowStates(), getSupportedLocales(), getResourceBundle(),
-			getPortletInfo(), getPortletFilters(), getProcessingEvents(),
-			getPublishingEvents(), getPublicRenderParameters(),
-			getPortletApp());
+			isInclude(), getInitParams(), getExpCache(), isAsyncSupported(),
+			getMultipartFileSizeThreshold(), getMultipartLocation(),
+			getMultipartMaxFileSize(), getMultipartMaxRequestSize(),
+			getPortletModes(), getWindowStates(), getSupportedLocales(),
+			getResourceBundle(), getPortletInfo(), getPortletFilters(),
+			getProcessingEvents(), getPublishingEvents(),
+			getPublicRenderParameters(), getPortletApp());
 
 		portletImpl.setApplicationTypes(getApplicationTypes());
 		portletImpl.setId(getId());
@@ -1214,6 +1126,42 @@ public class PortletImpl extends PortletBaseImpl {
 	}
 
 	/**
+	 * Returns the maximum size of buffered bytes before storing occurs.
+	 *
+	 * @return the maximum size of buffered bytes before storing occurs
+	 */
+	public int getMultipartFileSizeThreshold() {
+		return _multipartFileSizeThreshold;
+	}
+
+	/**
+	 * Returns the directory for storing uploaded files.
+	 *
+	 * @return the directory for storing uploaded files
+	 */
+	public String getMultipartLocation() {
+		return _multipartLocation;
+	}
+
+	/**
+	 * Returns the maximum number of bytes permitted for an uploaded file.
+	 *
+	 * @return the maximum number of bytes permitted for an uploaded file
+	 */
+	public long getMultipartMaxFileSize() {
+		return _multipartMaxFileSize;
+	}
+
+	/**
+	 * Returns the maximum number of bytes permitted for a multipart request.
+	 *
+	 * @return the maximum number of bytes permitted for a multipart request
+	 */
+	public long getMultipartMaxRequestSize() {
+		return _multipartMaxRequestSize;
+	}
+
+	/**
 	 * Returns the name of the open search class of the portlet.
 	 *
 	 * @return the name of the open search class of the portlet
@@ -1668,16 +1616,6 @@ public class PortletImpl extends PortletBaseImpl {
 	@Override
 	public boolean getReady() {
 		return isReady();
-	}
-
-	/**
-	 * Returns <code>true</code> if the portlet supports remoting.
-	 *
-	 * @return <code>true</code> if the portlet supports remoting
-	 */
-	@Override
-	public boolean getRemoteable() {
-		return _remoteable;
 	}
 
 	/**
@@ -2547,6 +2485,18 @@ public class PortletImpl extends PortletBaseImpl {
 		return _ajaxable;
 	}
 
+	/**
+	 * Returns <code>true</code> if the portlet supports asynchronous processing
+	 * in resource requests.
+	 *
+	 * @return <code>true</code> if the portlet supports asynchrounous
+	 *         processing in resource requests
+	 */
+	@Override
+	public boolean isAsyncSupported() {
+		return _asyncSupported;
+	}
+
 	@Override
 	public boolean isFullPageDisplayable() {
 		return _applicationTypes.contains(
@@ -2699,16 +2649,6 @@ public class PortletImpl extends PortletBaseImpl {
 		else {
 			return readiness._ready;
 		}
-	}
-
-	/**
-	 * Returns <code>true</code> if the portlet supports remoting.
-	 *
-	 * @return <code>true</code> if the portlet supports remoting
-	 */
-	@Override
-	public boolean isRemoteable() {
-		return _remoteable;
 	}
 
 	/**
@@ -2952,6 +2892,18 @@ public class PortletImpl extends PortletBaseImpl {
 		List<String> assetRendererFactoryClasses) {
 
 		_assetRendererFactoryClasses = assetRendererFactoryClasses;
+	}
+
+	/**
+	 * Set to <code>true</code> if the portlet supports asynchronous processing
+	 * in resource requests.
+	 *
+	 * @param asyncSupported boolean value for whether the portlet supports
+	 *        asynchronous processing in resource requests
+	 */
+	@Override
+	public void setAsyncSupported(boolean asyncSupported) {
+		_asyncSupported = asyncSupported;
 	}
 
 	/**
@@ -3342,6 +3294,45 @@ public class PortletImpl extends PortletBaseImpl {
 	}
 
 	/**
+	 * Sets the maximum size of buffered bytes before storing occurs.
+	 *
+	 * @param multipartFileSizeThreshold the maximum size of buffered bytes
+	 *        before storing occurs
+	 */
+	public void setMultipartFileSizeThreshold(int multipartFileSizeThreshold) {
+		_multipartFileSizeThreshold = multipartFileSizeThreshold;
+	}
+
+	/**
+	 * Sets the directory for storing uploaded files.
+	 *
+	 * @param multipartLocation the directory for storing uploaded files
+	 */
+	public void setMultipartLocation(String multipartLocation) {
+		_multipartLocation = multipartLocation;
+	}
+
+	/**
+	 * Sets the maximum number of bytes permitted for an uploaded file.
+	 *
+	 * @param multipartMaxFileSize the maximum number of bytes permitted for an
+	 *        uploaded file
+	 */
+	public void setMultipartMaxFileSize(long multipartMaxFileSize) {
+		_multipartMaxFileSize = multipartMaxFileSize;
+	}
+
+	/**
+	 * Sets the maximum number of bytes permitted for a multipart request.
+	 *
+	 * @param multipartMaxRequestSize the maximum number of bytes permitted for
+	 *        a multipart request
+	 */
+	public void setMultipartMaxRequestSize(long multipartMaxRequestSize) {
+		_multipartMaxRequestSize = multipartMaxRequestSize;
+	}
+
+	/**
 	 * Sets the name of the open search class of the portlet.
 	 *
 	 * @param openSearchClass the name of the open search class of the portlet
@@ -3691,17 +3682,6 @@ public class PortletImpl extends PortletBaseImpl {
 				serviceRegistrar.destroy();
 			}
 		}
-	}
-
-	/**
-	 * Set to <code>true</code> if the portlet supports remoting
-	 *
-	 * @param remoteable boolean value for whether or not the the portlet
-	 *        supports remoting
-	 */
-	@Override
-	public void setRemoteable(boolean remoteable) {
-		_remoteable = remoteable;
 	}
 
 	/**
@@ -4186,6 +4166,12 @@ public class PortletImpl extends PortletBaseImpl {
 	private List<String> _assetRendererFactoryClasses;
 
 	/**
+	 * <code>True</code> if the portlet supports asynchronous processing in
+	 * resource requests.
+	 */
+	private boolean _asyncSupported;
+
+	/**
 	 * The names of the classes that represents atom collection adapters
 	 * associated with the portlet.
 	 */
@@ -4370,6 +4356,26 @@ public class PortletImpl extends PortletBaseImpl {
 	private boolean _maximizeHelp;
 
 	/**
+	 * The maximum size of buffered bytes before storing occurs.
+	 */
+	private int _multipartFileSizeThreshold;
+
+	/**
+	 * The directory for storing uploaded files.
+	 */
+	private String _multipartLocation;
+
+	/**
+	 * The maximum number of bytes permitted for an uploaded file.
+	 */
+	private long _multipartMaxFileSize;
+
+	/**
+	 * The maximum number of bytes permitted for a multipart request.
+	 */
+	private long _multipartMaxRequestSize;
+
+	/**
 	 * The name of the open search class of the portlet.
 	 */
 	private String _openSearchClass;
@@ -4517,11 +4523,6 @@ public class PortletImpl extends PortletBaseImpl {
 	 * The publishing events of the portlet.
 	 */
 	private final Set<QName> _publishingEvents = new HashSet<>();
-
-	/**
-	 * <code>True</code> if the portlet supports remoting.
-	 */
-	private boolean _remoteable;
 
 	/**
 	 * The render timeout of the portlet.

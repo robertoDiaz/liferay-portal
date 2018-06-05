@@ -1858,10 +1858,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			GetterUtil.getBoolean(
 				portletElement.elementText("instanceable"),
 				portletModel.isInstanceable()));
-		portletModel.setRemoteable(
-			GetterUtil.getBoolean(
-				portletElement.elementText("remoteable"),
-				portletModel.isRemoteable()));
 		portletModel.setScopeable(
 			GetterUtil.getBoolean(
 				portletElement.elementText("scopeable"),
@@ -2420,6 +2416,28 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			containerRuntimeOptions.put(
 				containerRuntimeOptionPrefix.concat(name),
 				values.toArray(new String[values.size()]));
+		}
+
+		portletModel.setAsyncSupported(
+			GetterUtil.getBoolean(
+				portletElement.elementText("async-supported")));
+
+		Element multipartConfigElement = portletElement.element(
+			"multipart-config");
+
+		if (multipartConfigElement != null) {
+			portletModel.setMultipartFileSizeThreshold(
+				GetterUtil.getInteger(
+					multipartConfigElement.elementText("file-size-threshold")));
+			portletModel.setMultipartLocation(
+				multipartConfigElement.elementText("location"));
+			portletModel.setMultipartMaxFileSize(
+				GetterUtil.getLong(
+					multipartConfigElement.elementText("max-file-size"), -1L));
+			portletModel.setMultipartMaxRequestSize(
+				GetterUtil.getLong(
+					multipartConfigElement.elementText("max-request-size"),
+					-1L));
 		}
 
 		portletsMap.put(portletId, portletModel);

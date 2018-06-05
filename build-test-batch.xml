@@ -302,9 +302,11 @@ mariadb.executable=${mariadb.executable}]]></echo>
 
 					<set-portal-impl-system-ext-properties />
 
-					<exec executable="${database.service.executable}" failonerror="true">
+					<exec executable="${database.service.executable}" resultproperty="exec.result">
 						<arg line="${database.service.cmd.start}" />
 					</exec>
+
+					<diagnose-database-start database.type="@{database.type}" exec.result="${exec.result}" />
 
 					<antcall inheritall="false" target="copy-optional-jars">
 						<param name="database.type" value="@{database.type}" />
@@ -336,6 +338,29 @@ mariadb.executable=${mariadb.executable}]]></echo>
 					</exec>
 				</action>
 			</database-test-action>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="diagnose-database-start">
+		<attribute name="database.type" />
+		<attribute name="exec.result" />
+
+		<sequential>
+			<if>
+				<equals arg1="@{database.type}" arg2="db2" />
+				<then>
+					<if>
+						<not>
+							<equals arg1="@{exec.result}" arg2="0" />
+						</not>
+						<then>
+							<exec executable="db2diag">
+								<arg line="-H 1d" />
+							</exec>
+						</then>
+					</if>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -1012,6 +1037,27 @@ app.server.type=@{app.server.type}]]></echo>
 						</then>
 					</if>
 
+					<get-testcase-property property.name="osgi.app.includes" />
+
+					<if>
+						<and>
+							<isset property="env.CI_TEST_SUITE" />
+							<not>
+								<contains string="${osgi.app.includes}" substring="portal-search-solr" />
+							</not>
+						</and>
+						<then>
+							<propertycopy from="search.engine[${env.CI_TEST_SUITE}]" name="search.engine" silent="true" />
+
+							<if>
+								<equals arg1="${search.engine}" arg2="solr" />
+								<then>
+									<prepare-search-engine search.engine="${search.engine}" />
+								</then>
+							</if>
+						</then>
+					</if>
+
 					<echo if:set="env.JENKINS_HOME">ANT_OPTS=${env.ANT_OPTS}</echo>
 				</test-set-up>
 
@@ -1022,6 +1068,13 @@ app.server.type=@{app.server.type}]]></echo>
 							<antcall target="stop-app-server" />
 
 							<delete failonerror="false" file=".testable.portal.started" />
+						</then>
+					</if>
+
+					<if>
+						<isset property="search.engine" />
+						<then>
+							<stop-search-engine />
 						</then>
 					</if>
 				</test-tear-down>
@@ -1064,7 +1117,25 @@ app.server.type=@{app.server.type}]]></echo>
 							<prepare-test-build />
 						</else>
 					</if>
+
+					<if>
+						<isset property="env.CI_TEST_SUITE" />
+						<then>
+							<propertycopy from="search.engine[${env.CI_TEST_SUITE}]" name="search.engine" silent="true" />
+
+							<prepare-search-engine search.engine="${search.engine}" />
+						</then>
+					</if>
 				</test-set-up>
+
+				<test-tear-down>
+					<if>
+						<isset property="search.engine" />
+						<then>
+							<stop-search-engine />
+						</then>
+					</if>
+				</test-tear-down>
 			</run-batch-test>
 		</sequential>
 	</macrodef>
@@ -1351,44 +1422,35 @@ app.server.type=@{app.server.type}]]></echo>
 
 							<antcall inheritAll="false" target="prepare-system-ext-properties" />
 
-							<for param="app.dir">
-								<path>
-									<dirset
-										dir="modules"
-									>
-										<include name="apps/*" />
-										<include name="private/apps/*" />
-									</dirset>
-								</path>
-
-								<sequential>
-									<local name="app.name" />
-									<local name="Liferay-Releng-Bundle" />
-
-									<basename file="@{app.dir}" property="app.name" />
-
-									<property file="@{app.dir}/app.bnd" />
-
-									<if>
-										<equals arg1="${Liferay-Releng-Bundle}" arg2="true" />
-										<then>
-											<ant dir="modules" inheritAll="false" target="build-app-lpkg">
-												<property name="app.name" value="${app.name}" />
-												<property name="osgi.dir" value="${app.server.parent.dir}/osgi" />
-											</ant>
-										</then>
-									</if>
-								</sequential>
-							</for>
+							<ant dir="modules" inheritAll="false" target="build-app-lpkg-release" />
 
 							<delete dir="${liferay.home}/osgi/modules" />
 							<delete dir="${liferay.home}/osgi/portal" />
 							<delete dir="${liferay.home}/osgi/static" />
 							<delete dir="${liferay.home}/osgi/war" />
 
+							<delete>
+								<fileset
+									dir="${liferay.home}/osgi/test"
+									excludes="com.liferay.portal.test.jar,com.liferay.portal.test.integration.jar"
+								/>
+							</delete>
+
+							<ant dir="modules" inheritAll="false" target="index-modules-and-app-lpkgs">
+								<property name="app.server.parent.dir" value="${project.dir}/bundles" />
+								<property name="osgi.dir" value="${app.server.parent.dir}/osgi" />
+							</ant>
+
 							<trycatch>
 								<try>
 									<antcall inheritall="false" target="start-app-server" />
+
+									<gradle-execute dir="modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test" task="test">
+										<arg value="test" />
+										<arg value="--tests" />
+										<arg value="*.LPKGIndexValidatorLogScannerTest" />
+										<arg value="-Dliferay.home=${liferay.home}" />
+									</gradle-execute>
 
 									<gradle-execute dir="modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test" task="testIntegration">
 										<arg value="testIntegration" />
@@ -1438,6 +1500,13 @@ app.server.type=@{app.server.type}]]></echo>
 								<try>
 									<antcall inheritall="false" target="start-app-server" />
 
+									<gradle-execute dir="modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test" task="test">
+										<arg value="test" />
+										<arg value="--tests" />
+										<arg value="*.LPKGIndexValidatorLogScannerTest" />
+										<arg value="-Dliferay.home=${liferay.home}" />
+									</gradle-execute>
+
 									<gradle-execute dir="modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test" task="testIntegration">
 										<arg value="testIntegration" />
 										<arg value="--tests" />
@@ -1445,7 +1514,9 @@ app.server.type=@{app.server.type}]]></echo>
 									</gradle-execute>
 
 									<antcall inheritall="false" target="run-selenium-test">
+										<param name="test.batch.run.type" value="single" />
 										<param name="test.class" value="PortalSmoke#Smoke" />
+										<param name="test.skip.tear.down" value="false" />
 									</antcall>
 								</try>
 
@@ -1485,7 +1556,9 @@ app.server.type=@{app.server.type}]]></echo>
 									</gradle-execute>
 
 									<antcall inheritall="false" target="run-selenium-test">
+										<param name="test.batch.run.type" value="single" />
 										<param name="test.class" value="PortalSmoke#Smoke" />
+										<param name="test.skip.tear.down" value="false" />
 									</antcall>
 								</try>
 
@@ -1525,7 +1598,9 @@ app.server.type=@{app.server.type}]]></echo>
 									</gradle-execute>
 
 									<antcall inheritall="false" target="run-selenium-test">
+										<param name="test.batch.run.type" value="single" />
 										<param name="test.class" value="PortalSmoke#Smoke" />
+										<param name="test.skip.tear.down" value="false" />
 									</antcall>
 								</try>
 
@@ -1613,6 +1688,15 @@ app.server.type=@{app.server.type}]]></echo>
 					</if>
 
 					<if>
+						<isset property="env.CI_TEST_SUITE" />
+						<then>
+							<propertycopy from="search.engine[${env.CI_TEST_SUITE}]" name="search.engine" silent="true" />
+
+							<prepare-search-engine search.engine="${search.engine}" />
+						</then>
+					</if>
+
+					<if>
 						<equals arg1="@{subrepository.name}" arg2="" />
 						<then>
 							<antcall inheritAll="false" target="record-test-class-file-names">
@@ -1629,6 +1713,15 @@ app.server.type=@{app.server.type}]]></echo>
 						</else>
 					</if>
 				</test-set-up>
+
+				<test-tear-down>
+					<if>
+						<isset property="search.engine" />
+						<then>
+							<stop-search-engine />
+						</then>
+					</if>
+				</test-tear-down>
 			</run-batch-test>
 		</sequential>
 	</macrodef>
@@ -1845,6 +1938,92 @@ app.server.type=@{app.server.type}]]></echo>
 							CATALINA_OPTS="${CATALINA_OPTS} ${print.final.flags}"
 						]]>
 					</echo>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="wait-for-app-server-log-message">
+		<attribute name="log.message" />
+
+		<sequential>
+			<local name="timed.out.message" />
+
+			<beanshell>
+				<![CDATA[
+					import java.io.File;
+
+					import org.apache.commons.io.FileUtils;
+
+					import org.apache.tools.ant.DirectoryScanner;
+
+					public boolean isContainedInCatalinaLogFiles(String searchString) {
+						DirectoryScanner directoryScanner = new DirectoryScanner();
+
+						File liferayHomeDir = new File(project.getProperty("liferay.home"));
+
+						String canonicalLogFileLocation = liferayHomeDir.getCanonicalPath();
+
+						directoryScanner.setIncludes(new String[] {canonicalLogFileLocation + "/logs/liferay.*.log"});
+
+						directoryScanner.scan();
+
+						String osName = project.getProperty("os.name");
+
+						osName = osName.toLowerCase();
+
+						for (String filePath : directoryScanner.getIncludedFiles()) {
+							if (osName.contains("win")) {
+								filePath = filePath.replace("/", "\\");
+							}
+
+							File file = new File(filePath);
+
+							String fileContent = FileUtils.readFileToString(file);
+
+							if (fileContent.contains(searchString)) {
+								return true;
+							}
+						}
+
+						return false;
+					}
+
+					System.out.println("Waiting for '@{log.message}' to appear in log message");
+
+					int timeoutDuration = Integer.parseInt(project.getProperty("timeout.app.server.wait"));
+
+					long timeoutTime = System.currentTimeMillis() + (1000 * timeoutDuration);
+
+					while (true) {
+						try {
+							if (isContainedInCatalinaLogFiles("@{log.message}")) {
+								break;
+							}
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						long currentTime = System.currentTimeMillis();
+
+						if (currentTime > timeoutTime) {
+							project.setProperty("timed.out.message", "Unable to find log message after " + (timeoutDuration / 60) + " minutes.");
+
+							break;
+						}
+
+						Thread.sleep(1000);
+					}
+				]]>
+			</beanshell>
+
+			<if>
+				<isset property="timed.out.message" />
+				<then>
+					<get-jstack-output process.name="Bootstrap" />
+
+					<fail message="${timed.out.message}${line.separator}${jstack.output}" />
 				</then>
 			</if>
 		</sequential>
@@ -2151,6 +2330,26 @@ app.server.type=@{app.server.type}]]></echo>
 		/>
 	</target>
 
+	<target name="functional-bundle-tomcat-mysql57-jdk8">
+		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
+
+		<run-functional-test
+			app.server.type="tomcat"
+			database.type="mysql"
+			database.version="5.7"
+			setup.proxy="false"
+			test.build.fix.pack.zip.url="${test.build.fix.pack.zip.url}"
+			test.fix.pack.base.url="${test.fix.pack.base.url}"
+			test.license.xml.url="${test.license.xml.url}"
+			test.plugin.zip.url="${test.plugin.zip.url}"
+			test.plugins.war.zip.url="${test.plugins.war.zip.url}"
+			test.portal.bundle.version="${test.portal.bundle.version}"
+			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
+			test.portal.lpkg.name="${test.portal.lpkg.name}"
+			test.sql.zip.url="${test.sql.zip.url}"
+		/>
+	</target>
+
 	<target name="functional-bundle-tomcat-oracle121-jdk8">
 		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
 
@@ -2280,11 +2479,15 @@ app.server.type=@{app.server.type}]]></echo>
 		<antcall target="functional-bundle-tomcat-mysql56-jdk8" />
 	</target>
 
+	<target name="functional-smoke-bundle-tomcat-mysql57-jdk8">
+		<antcall target="functional-bundle-tomcat-mysql57-jdk8" />
+	</target>
+
 	<target name="functional-smoke-jboss70-mysql56-jdk8">
 		<run-functional-test app.server.type="jboss" database.type="mysql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-jboss70-mysql57-jdk8">
+	<target name="functional-smoke-jboss71-mysql57-jdk8">
 		<run-functional-test app.server.type="jboss" database.type="mysql" database.version="5.7" test.portal.log.assert="true" />
 	</target>
 
@@ -2360,7 +2563,7 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="websphere" database.type="mysql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-websphere85-mysql57-jdk8">
+	<target name="functional-smoke-websphere90-mysql57-jdk8">
 		<run-functional-test app.server.type="websphere" database.type="mysql" database.version="5.7" test.portal.log.assert="true" />
 	</target>
 
@@ -2444,7 +2647,7 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="jboss" database.type="mysql" />
 	</target>
 
-	<target name="functional-upgrade-jboss70-mysql57-jdk8">
+	<target name="functional-upgrade-jboss71-mysql57-jdk8">
 		<run-functional-test app.server.type="jboss" database.type="mysql" database.version="5.7" />
 	</target>
 
@@ -2598,6 +2801,159 @@ app.server.type=@{app.server.type}]]></echo>
 
 				<antcall target="doc" />
 			</test-action>
+		</run-batch-test>
+	</target>
+
+	<target name="jsf-jdk8">
+		<run-batch-test>
+			<test-action>
+				<database-test-run-test database.type="mysql" database.version="${database.version}" stop.app.server="true">
+					<test-action>
+						<get-database-property property.name="database.version" />
+
+						<antcall target="prepare-portal-ext-properties" />
+
+						<echo append="true" file="${app.server.classes.portal.dir}/portal-ext.properties"><![CDATA[
+							admin.email.from.address=${admin.email.from.address}
+							admin.email.from.name=${admin.email.from.name}
+							browser.launcher.url=
+							setup.wizard.enabled=false
+							terms.of.use.required=false
+							users.reminder.queries.enabled=false
+							users.reminder.queries.custom.question.enabled=false
+							layout.parallel.render.enable=false]]></echo>
+
+						<local name="portal.ext.properties" />
+
+						<loadfile
+							property="portal.ext.properties"
+							srcFile="${app.server.classes.portal.dir}/portal-ext.properties"
+						>
+							<filterchain>
+								<tokenfilter>
+									<replacestring from="captcha.max.challenges=-1" to="" />
+								</tokenfilter>
+								<trim />
+								<ignoreblank />
+							</filterchain>
+						</loadfile>
+
+						<echo file="${app.server.classes.portal.dir}/portal-ext.properties">${portal.ext.properties}</echo>
+
+						<propertycopy from="browser.firefox.bin.file[${browser.firefox.version}]" name="browser.firefox.bin.file" silent="true" />
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/demo">
+							mvn clean package -P liferay,mojarra,tomcat
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/issue">
+							mvn clean package -P liferay,mojarra,tomcat
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/tck">
+							mvn clean package -P liferay,mojarra,tomcat
+						</execute>
+
+						<execute dir="${liferay.faces.portal.dir}/demo">
+							mvn clean package -P liferay,mojarra,tomcat,validateCaptchaForTest
+						</execute>
+
+						<execute dir="${liferay.faces.portal.dir}/test/test-setup-hook">
+							mvn clean package -P liferay,mojarra,tomcat
+						</execute>
+
+						<copy
+							flatten="true"
+							todir="${liferay.home}/deploy/"
+						>
+							<fileset
+								dir="${liferay.faces.bridge.impl.dir}"
+								includes="**/target/*.war"
+							/>
+							<fileset
+								dir="${liferay.faces.portal.dir}"
+								excludes="**/target/com.liferay.faces.test.setup.hook*.war"
+								includes="**/target/*.war"
+							/>
+						</copy>
+
+						<antcall target="start-app-server" />
+
+						<copy
+							flatten="true"
+							todir="${liferay.home}/deploy/"
+						>
+							<fileset
+								dir="${liferay.faces.portal.dir}"
+								includes="**/target/com.liferay.faces.test.setup.hook*.war"
+							/>
+						</copy>
+
+						<wait-for-app-server-log-message log.message="Hook for com.liferay.faces.test.setup.hook is available for use" />
+
+						<execute dir="${liferay.faces.showcase.dir}/jsf-showcase-webapp">
+							mvn clean install --quiet -P selenium -Dit.test=none -DfailIfNoTests=false
+						</execute>
+
+						<execute dir="${liferay.faces.alloy.dir}/demo/alloy-showcase-webapp">
+							mvn clean install --quiet -P selenium -Dit.test=none -DfailIfNoTests=false
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/test/integration">
+							mvn clean install --quiet
+						</execute>
+
+						<execute dir="${liferay.faces.portal.dir}/test/integration">
+							mvn clean install --quiet
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/tck/">
+							mvn clean install --quiet
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/tck/bridge-tck-main-portlet" failonerror="false">
+							mvn verify -P selenium,firefox -Dwebdriver.firefox.bin=${browser.firefox.bin.file} -Dintegration.browser.driver.wait.time.out=300
+						</execute>
+
+						<execute dir="${liferay.faces.bridge.impl.dir}/test/integration" failonerror="false">
+							mvn verify -P selenium,firefox -Dwebdriver.firefox.bin=${browser.firefox.bin.file} -Dintegration.browser.driver.wait.time.out=300
+						</execute>
+
+						<execute dir="${liferay.faces.portal.dir}/test/integration" failonerror="false">
+							mvn verify -P selenium,firefox -Dwebdriver.firefox.bine=${browser.firefox.bin.file} -Dintegration.browser.driver.wait.time.out=300
+						</execute>
+
+						<execute dir="${liferay.faces.portal.dir}/test/integration" failonerror="false">
+							mvn verify -P selenium-portal-showcase,firefox -Dwebdriver.firefox.bin=${browser.firefox.bin.file} -Dintegration.browser.driver.wait.time.out=300
+						</execute>
+					</test-action>
+				</database-test-run-test>
+			</test-action>
+
+			<test-set-up>
+				<propertycopy from="app.server.${app.server.type}.bin.dir" name="test.app.server.bin.dir" />
+
+				<antcall inheritAll="false" target="prepare-test-bundle">
+					<param name="app.server.type" value="${app.server.type}" />
+					<param name="test.app.server.bin.dir" value="${test.app.server.bin.dir}" />
+					<param name="test.build.bundle.zip.url" value="${test.portal.bundle.zip.url}" />
+					<param name="test.build.fix.pack.zip.url" value="${test.build.fix.pack.zip.url}" />
+					<param name="test.build.portal.dependencies.zip.url" value="${test.portal.bundle.dependencies.zip.url}" />
+					<param name="test.build.portal.osgi.zip.url" value="${test.portal.bundle.osgi.zip.url}" />
+					<param name="test.build.portal.war.url" value="${test.portal.bundle.war.url}" />
+					<param name="test.fix.pack.base.url" value="${test.fix.pack.base.url}" />
+				</antcall>
+
+				<antcall target="deploy-license-xml">
+					<param name="test.build.license.xml.zip.url" value="${test.license.xml.url}" />
+				</antcall>
+
+				<antcall target="deploy-sql-zip">
+					<param name="test.sql.zip.url" value="${test.sql.zip.url}" />
+				</antcall>
+
+				<antcall inheritAll="false" target="setup-sdk" />
+			</test-set-up>
 		</run-batch-test>
 	</target>
 
@@ -2878,6 +3234,22 @@ ${output.content}</echo>
 		<run-functional-test
 			app.server.type="tomcat"
 			database.type="mysql"
+			test.build.fix.pack.zip.url="${test.build.fix.pack.zip.url}"
+			test.fix.pack.base.url="${test.fix.pack.base.url}"
+			test.license.xml.url="${test.license.xml.url}"
+			test.portal.bundle.version="${test.portal.bundle.version}"
+			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
+			test.sql.zip.url="${test.sql.zip.url}"
+		/>
+	</target>
+
+	<target name="plugins-functional-bundle-tomcat-mysql57-jdk8">
+		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
+
+		<run-functional-test
+			app.server.type="tomcat"
+			database.type="mysql"
+			database.version="5.7"
 			test.build.fix.pack.zip.url="${test.build.fix.pack.zip.url}"
 			test.fix.pack.base.url="${test.fix.pack.base.url}"
 			test.license.xml.url="${test.license.xml.url}"
@@ -3184,6 +3556,10 @@ ${output.content}</echo>
 		<antcall target="functional-bundle-tomcat-mysql56-jdk8" />
 	</target>
 
+	<target name="release-functional-smoke-bundle-tomcat-mysql57-jdk8">
+		<antcall target="functional-bundle-tomcat-mysql57-jdk8" />
+	</target>
+
 	<target name="ruby-sass-compiler-jdk8">
 		<antcall if:set="env.JENKINS_HOME" inheritAll="false" target="clean-up-java-processes" />
 
@@ -3366,9 +3742,12 @@ ${output.content}</echo>
 					<then>
 						<exec executable="git" output="${project.dir}/build.services.diff.txt">
 							<arg value="diff" />
-							<arg value="&quot;:!*/*-portlet-service.jar&quot;" />
-							<arg value="&quot;:!*/src/main/resources/service.properties&quot;" />
-							<arg value="&quot;:!*/src/service.properties&quot;" />
+							<arg value="--" />
+							<arg value="." />
+							<arg value=":!*/*-portlet-service.jar" />
+							<arg value=":!*/packageinfo" />
+							<arg value=":!*/src/main/resources/service.properties" />
+							<arg value=":!*/src/service.properties" />
 						</exec>
 
 						<loadfile
@@ -3561,6 +3940,14 @@ information. Make sure to commit in all build services results.
 		</trycatch>
 	</target>
 
+	<target name="subrepository-functional-bundle-tomcat80-mysql56-jdk8">
+		<antcall target="compile" />
+
+		<antcall inheritAll="false" target="install-portal-snapshots" />
+
+		<antcall target="functional-bundle-tomcat-mysql56-jdk8" />
+	</target>
+
 	<target name="subrepository-functional-tomcat80-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
@@ -3690,7 +4077,7 @@ information. Make sure to commit in all build services results.
 
 		<trycatch property="failure.property">
 			<try>
-				<gradle-execute dir="${project.dir}/modules/apps/foundation/petra" task="deploy">
+				<gradle-execute dir="${project.dir}/modules/apps/petra" task="deploy">
 					<arg value="-Dportal.build=true" />
 				</gradle-execute>
 

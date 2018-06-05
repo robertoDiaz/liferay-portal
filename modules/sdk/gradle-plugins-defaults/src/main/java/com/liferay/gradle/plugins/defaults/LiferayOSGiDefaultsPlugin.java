@@ -100,10 +100,10 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -206,9 +206,6 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.JUnitXmlReport;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.api.tasks.testing.TestTaskReports;
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat;
-import org.gradle.api.tasks.testing.logging.TestLogEvent;
-import org.gradle.api.tasks.testing.logging.TestLoggingContainer;
 import org.gradle.execution.ProjectConfigurer;
 import org.gradle.external.javadoc.CoreJavadocOptions;
 import org.gradle.external.javadoc.StandardJavadocDocletOptions;
@@ -1820,9 +1817,19 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		File appBndFile = _getAppBndFile(project, portalRootDir);
 
 		if (appBndFile != null) {
+			List<String> relativePaths = new ArrayList<>(2);
+
+			relativePaths.add(FileUtil.getRelativePath(project, appBndFile));
+
+			File suiteBndFile = _getSuiteBndFile(appBndFile, portalRootDir);
+
+			if (suiteBndFile != null) {
+				relativePaths.add(
+					FileUtil.getRelativePath(project, suiteBndFile));
+			}
+
 			bundleDefaultInstructions.put(
-				Constants.INCLUDE,
-				FileUtil.getRelativePath(project, appBndFile));
+				Constants.INCLUDE, StringUtil.merge(relativePaths, ","));
 		}
 
 		File packageJsonFile = project.file("package.json");
@@ -3303,7 +3310,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		_configureTaskTestIgnoreFailures(test);
 		_configureTaskTestJvmArgs(test, "junit.java.unit.gc");
-		_configureTaskTestLogging(test);
 
 		test.setEnableAssertions(false);
 	}
@@ -3318,7 +3324,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		_configureTaskTestIgnoreFailures(test);
 		_configureTaskTestJvmArgs(test, "junit.java.integration.gc");
-		_configureTaskTestLogging(test);
 
 		test.systemProperty("org.apache.maven.offline", Boolean.TRUE);
 
@@ -3340,14 +3345,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		if (Validator.isNotNull(jvmArgs)) {
 			test.jvmArgs((Object[])jvmArgs.split("\\s+"));
 		}
-	}
-
-	private void _configureTaskTestLogging(Test test) {
-		TestLoggingContainer testLoggingContainer = test.getTestLogging();
-
-		testLoggingContainer.setEvents(EnumSet.allOf(TestLogEvent.class));
-		testLoggingContainer.setExceptionFormat(TestExceptionFormat.FULL);
-		testLoggingContainer.setStackTraceFilters(Collections.emptyList());
 	}
 
 	private void _configureTaskTlddoc(Project project, File portalRootDir) {
@@ -3503,8 +3500,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		String path = FileUtil.relativize(
 			project.getProjectDir(), modulesPrivateDir);
 
-		if (File.pathSeparatorChar != '/') {
-			path = path.replace(File.pathSeparatorChar, '/');
+		if (File.separatorChar != '/') {
+			path = path.replace(File.separatorChar, '/');
 		}
 
 		while (true) {
@@ -3540,6 +3537,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		Configuration configuration =
 			configurationContainer.detachedConfiguration(dependency);
+
+		configuration.setTransitive(false);
 
 		_configureConfigurationNoCache(configuration);
 
@@ -3723,6 +3722,30 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	private String _getProjectDependency(Project project) {
 		return "project(\"" + project.getPath() + "\")";
+	}
+
+	private File _getSuiteBndFile(File appBndFile, File portalRootDir) {
+		if (appBndFile == null) {
+			return null;
+		}
+
+		Properties properties = GUtil.loadProperties(appBndFile);
+
+		String liferayRelengSuite = properties.getProperty(
+			"Liferay-Releng-Suite");
+
+		if (Validator.isNull(liferayRelengSuite)) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("modules/suites/");
+		sb.append(liferayRelengSuite);
+		sb.append('/');
+		sb.append(_SUITE_BND_FILE_NAME);
+
+		return new File(portalRootDir, sb.toString());
 	}
 
 	private Version _getVersion(Object version) {
@@ -4153,6 +4176,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	private static final String _SOURCE_FORMATTER_PORTAL_TOOL_NAME =
 		"com.liferay.source.formatter";
+
+	private static final String _SUITE_BND_FILE_NAME = "suite.bnd";
 
 	private static final String
 		_UPDATE_FILE_VERSIONS_EXACT_VERSION_PROPERTY_NAME = "exactVersion";

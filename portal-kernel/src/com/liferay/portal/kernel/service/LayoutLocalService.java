@@ -203,9 +203,10 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param layout the layout
 	* @return the layout that was removed
+	* @throws PortalException
 	*/
 	@Indexable(type = IndexableType.DELETE)
-	public Layout deleteLayout(Layout layout);
+	public Layout deleteLayout(Layout layout) throws PortalException;
 
 	/**
 	* Deletes the layout, its child layouts, and its associated resources.
@@ -952,7 +953,9 @@ public interface LayoutLocalService extends BaseLocalService,
 	* Returns all the layouts whose friendly URLs are <code>null</code>
 	*
 	* @return all the layouts whose friendly URLs are <code>null</code>
+	* @deprecated As of 7.0.0, with no direct replacement
 	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Layout> getNullFriendlyURLLayouts();
 

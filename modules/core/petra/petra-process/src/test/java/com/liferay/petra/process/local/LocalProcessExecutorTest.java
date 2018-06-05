@@ -93,9 +93,12 @@ public class LocalProcessExecutorTest {
 			@Override
 			public void appendAssertClasses(List<Class<?>> assertClasses) {
 				assertClasses.add(ProcessConfig.class);
+
 				Collections.addAll(
 					assertClasses, ProcessConfig.class.getDeclaredClasses());
+
 				assertClasses.add(LocalProcessLauncher.class);
+
 				Collections.addAll(
 					assertClasses,
 					LocalProcessLauncher.class.getDeclaredClasses());
@@ -1178,8 +1181,7 @@ public class LocalProcessExecutorTest {
 
 		Assert.assertFalse(
 			StringBundler.concat(
-				"After waited ", String.valueOf(time), " ",
-				String.valueOf(timeUnit), ". ", message),
+				"After waited ", time, " ", timeUnit, ". ", message),
 			supplier.get());
 	}
 

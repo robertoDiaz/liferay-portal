@@ -85,7 +85,7 @@ public class LocalGitSyncUtil {
 		gitWorkingDirectory.pushToRemote(
 			true, localBranch,
 			JenkinsResultsParserUtil.combine(
-				localBranch.getName(), "-", Long.toString(timestamp)),
+				localBranch.getName(), "-", String.valueOf(timestamp)),
 			remote);
 	}
 
@@ -110,7 +110,7 @@ public class LocalGitSyncUtil {
 		final GitWorkingDirectory.Branch upstreamBranch =
 			gitWorkingDirectory.getBranch(
 				gitWorkingDirectory.getUpstreamBranchName(),
-				gitWorkingDirectory.getRemote("upstream"));
+				gitWorkingDirectory.getRemote("upstream"), true);
 
 		List<Callable<Object>> callables = new ArrayList<>();
 
@@ -128,7 +128,7 @@ public class LocalGitSyncUtil {
 					if (upstreamUsername.equals("liferay")) {
 						GitWorkingDirectory.Branch localUpstreamBranch =
 							gitWorkingDirectory.getBranch(
-								upstreamBranch.getName(), null);
+								upstreamBranch.getName(), null, true);
 
 						gitWorkingDirectory.pushToRemote(
 							true, localUpstreamBranch, upstreamBranch.getName(),
@@ -241,9 +241,9 @@ public class LocalGitSyncUtil {
 
 		System.out.println(
 			JenkinsResultsParserUtil.combine(
-				"Found ", Integer.toString(branchCount), " cache branches on ",
-				remote.getRemoteURL(), " ", Integer.toString(deleteCount),
-				" were deleted. ", Integer.toString(branchCount - deleteCount),
+				"Found ", String.valueOf(branchCount), " cache branches on ",
+				remote.getRemoteURL(), " ", String.valueOf(deleteCount),
+				" were deleted. ", String.valueOf(branchCount - deleteCount),
 				" remain. The oldest branch is ",
 				JenkinsResultsParserUtil.toDurationString(oldestBranchAge),
 				" old."));
@@ -516,14 +516,14 @@ public class LocalGitSyncUtil {
 			System.out.println(
 				JenkinsResultsParserUtil.combine(
 					"Deleted ", remoteBranchName, " on ",
-					Integer.toString(remotes.size()), " git nodes in ",
+					String.valueOf(remotes.size()), " git nodes in ",
 					JenkinsResultsParserUtil.toDurationString(duration)));
 		}
 		else {
 			System.out.println(
 				JenkinsResultsParserUtil.combine(
 					"Pushed ", localBranch.getName(), " to ", remoteBranchName,
-					" on ", Integer.toString(remotes.size()), " git nodes in ",
+					" on ", String.valueOf(remotes.size()), " git nodes in ",
 					JenkinsResultsParserUtil.toDurationString(duration)));
 		}
 
@@ -600,7 +600,7 @@ public class LocalGitSyncUtil {
 
 					GitWorkingDirectory.Branch remoteCacheBranch =
 						gitWorkingDirectory.getBranch(
-							cacheBranchName, localGitRemote);
+							cacheBranchName, localGitRemote, true);
 
 					gitWorkingDirectory.fetch(null, remoteCacheBranch);
 
@@ -635,7 +635,7 @@ public class LocalGitSyncUtil {
 				gitWorkingDirectory.fetch(
 					localCacheBranch,
 					gitWorkingDirectory.getBranch(
-						senderBranchName, senderRemote));
+						senderBranchName, senderRemote, true));
 
 				updateLocalUpstreamBranch(
 					gitWorkingDirectory, upstreamBranchSHA);
@@ -648,7 +648,8 @@ public class LocalGitSyncUtil {
 
 					gitWorkingDirectory.rebase(
 						true,
-						gitWorkingDirectory.getBranch(upstreamBranchName, null),
+						gitWorkingDirectory.getBranch(
+							upstreamBranchName, null, true),
 						localCacheBranch);
 				}
 
@@ -764,7 +765,7 @@ public class LocalGitSyncUtil {
 
 				String newTimestampBranchName =
 					JenkinsResultsParserUtil.combine(
-						cacheBranchName, "-", Long.toString(currentTimestamp));
+						cacheBranchName, "-", String.valueOf(currentTimestamp));
 
 				System.out.println(
 					JenkinsResultsParserUtil.combine(
@@ -781,7 +782,8 @@ public class LocalGitSyncUtil {
 
 				if (currentBranch == null) {
 					currentBranch = gitWorkingDirectory.getBranch(
-						gitWorkingDirectory.getUpstreamBranchName(), null);
+						gitWorkingDirectory.getUpstreamBranchName(), null,
+						true);
 				}
 
 				GitWorkingDirectory.Branch newTimestampBranch =
@@ -831,7 +833,8 @@ public class LocalGitSyncUtil {
 
 		GitWorkingDirectory.Branch remoteUpstreamBranch =
 			gitWorkingDirectory.getBranch(
-				upstreamBranchName, gitWorkingDirectory.getRemote("upstream"));
+				upstreamBranchName, gitWorkingDirectory.getRemote("upstream"),
+				true);
 
 		GitWorkingDirectory.Branch localUpstreamBranch =
 			gitWorkingDirectory.getBranch(upstreamBranchName, null);

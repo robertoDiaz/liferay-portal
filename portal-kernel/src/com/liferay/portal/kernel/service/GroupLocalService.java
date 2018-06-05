@@ -785,7 +785,9 @@ public interface GroupLocalService extends BaseLocalService,
 	*
 	* @return the non-system groups having <code>null</code> or empty friendly
 	URLs
+	* @deprecated As of 7.0.0, with no direct replacement
 	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Group> getNullFriendlyURLGroups();
 
@@ -2142,4 +2144,8 @@ public interface GroupLocalService extends BaseLocalService,
 	*/
 	public Group updateSite(long groupId, boolean site)
 		throws PortalException;
+
+	public void validateRemote(long groupId, String remoteAddress,
+		int remotePort, String remotePathContext, boolean secureConnection,
+		long remoteGroupId) throws PortalException;
 }

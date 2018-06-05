@@ -29,14 +29,17 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ImageLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.util.MaintenanceUtil;
@@ -274,6 +277,36 @@ public class DocumentLibraryConvertProcess
 		}
 	}
 
+	protected void migrateGeneratedFiles(String path) throws Exception {
+		MaintenanceUtil.appendStatus("Migrating files from " + path);
+
+		ActionableDynamicQuery actionableDynamicQuery =
+			CompanyLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<Company>() {
+
+				@Override
+				public void performAction(Company company)
+					throws PortalException {
+
+					long companyId = company.getCompanyId();
+
+					String[] fileNames = _sourceStore.getFileNames(
+						companyId, DLPreviewableProcessor.REPOSITORY_ID, path);
+
+					for (String fileName : fileNames) {
+						migrateFile(
+							companyId, DLPreviewableProcessor.REPOSITORY_ID,
+							fileName, Store.VERSION_DEFAULT);
+					}
+				}
+
+			});
+
+		actionableDynamicQuery.performActions();
+	}
+
 	protected void migrateImages() throws PortalException {
 		int count = ImageLocalServiceUtil.getImagesCount();
 
@@ -302,6 +335,10 @@ public class DocumentLibraryConvertProcess
 	protected void migratePortlets() throws Exception {
 		migrateImages();
 		migrateDL();
+		migrateGeneratedFiles(
+			DLPreviewableProcessor.THUMBNAIL_PATH.replace("/", ""));
+		migrateGeneratedFiles(
+			DLPreviewableProcessor.PREVIEW_PATH.replace("/", ""));
 
 		Collection<DLStoreConvertProcess> dlStoreConvertProcesses =
 			_getDLStoreConvertProcesses();
