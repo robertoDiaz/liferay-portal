@@ -38,12 +38,15 @@ import com.liferay.portal.kernel.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.SubscriptionImpl;
 import com.liferay.portal.model.impl.SubscriptionModelImpl;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2681,14 +2684,6 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 					result = subscription;
 
 					cacheResult(subscription);
-
-					if ((subscription.getCompanyId() != companyId) ||
-							(subscription.getUserId() != userId) ||
-							(subscription.getClassNameId() != classNameId) ||
-							(subscription.getClassPK() != classPK)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_U_C_C,
-							finderArgs, subscription);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3098,8 +3093,6 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 
 	@Override
 	protected Subscription removeImpl(Subscription subscription) {
-		subscription = toUnwrappedModel(subscription);
-
 		Session session = null;
 
 		try {
@@ -3130,9 +3123,23 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 
 	@Override
 	public Subscription updateImpl(Subscription subscription) {
-		subscription = toUnwrappedModel(subscription);
-
 		boolean isNew = subscription.isNew();
+
+		if (!(subscription instanceof SubscriptionModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(subscription.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(subscription);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in subscription proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Subscription implementation " +
+				subscription.getClass());
+		}
 
 		SubscriptionModelImpl subscriptionModelImpl = (SubscriptionModelImpl)subscription;
 
@@ -3355,31 +3362,6 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		subscription.resetOriginalValues();
 
 		return subscription;
-	}
-
-	protected Subscription toUnwrappedModel(Subscription subscription) {
-		if (subscription instanceof SubscriptionImpl) {
-			return subscription;
-		}
-
-		SubscriptionImpl subscriptionImpl = new SubscriptionImpl();
-
-		subscriptionImpl.setNew(subscription.isNew());
-		subscriptionImpl.setPrimaryKey(subscription.getPrimaryKey());
-
-		subscriptionImpl.setMvccVersion(subscription.getMvccVersion());
-		subscriptionImpl.setSubscriptionId(subscription.getSubscriptionId());
-		subscriptionImpl.setGroupId(subscription.getGroupId());
-		subscriptionImpl.setCompanyId(subscription.getCompanyId());
-		subscriptionImpl.setUserId(subscription.getUserId());
-		subscriptionImpl.setUserName(subscription.getUserName());
-		subscriptionImpl.setCreateDate(subscription.getCreateDate());
-		subscriptionImpl.setModifiedDate(subscription.getModifiedDate());
-		subscriptionImpl.setClassNameId(subscription.getClassNameId());
-		subscriptionImpl.setClassPK(subscription.getClassPK());
-		subscriptionImpl.setFrequency(subscription.getFrequency());
-
-		return subscriptionImpl;
 	}
 
 	/**

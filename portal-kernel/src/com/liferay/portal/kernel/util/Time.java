@@ -97,7 +97,12 @@ public class Time {
 			else if (milliseconds < MINUTE) {
 				x = (int)(milliseconds / SECOND);
 
-				s = x + " Second";
+				if (x == 1) {
+					s = x + " second[time]";
+				}
+				else {
+					s = x + " second";
+				}
 			}
 			else if (milliseconds < HOUR) {
 				x = (int)(milliseconds / MINUTE);
@@ -192,8 +197,6 @@ public class Time {
 		long milliseconds, Locale locale, TimeZone timeZone,
 		Format dateTimeFormat) {
 
-		Format timeFormat = FastDateFormatFactoryUtil.getTime(locale, timeZone);
-
 		int daysBetween = DateUtil.getDaysBetween(
 			new Date(milliseconds), new Date(), timeZone);
 
@@ -216,6 +219,9 @@ public class Time {
 				locale, "x-hours-ago", millisAgo / Time.HOUR, false);
 		}
 		else if (daysBetween == 1) {
+			Format timeFormat = FastDateFormatFactoryUtil.getTime(
+				locale, timeZone);
+
 			return LanguageUtil.format(
 				locale, "yesterday-at-x", timeFormat.format(milliseconds),
 				false);

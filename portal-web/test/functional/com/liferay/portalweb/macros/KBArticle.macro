@@ -324,7 +324,7 @@
 
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_REQUEST_FAILED_TO_COMPLETE" value1="Your request failed to complete." />
+		<execute function="AssertElementPresent" locator1="Message#ERROR" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_ENTER_A_VALID_TITLE" value1="Please enter a valid title." />
 	</command>
 
@@ -652,9 +652,9 @@
 
 	<command name="deleteCP">
 		<if>
-			<condition function="IsElementPresent" locator1="Icon#DELETE" />
+			<condition function="IsElementPresent" locator1="Button#DELETE_ENTRY" />
 			<then>
-				<execute function="ClickNoError" locator1="Icon#DELETE" />
+				<execute function="ClickNoError" locator1="Button#DELETE_ENTRY" />
 			</then>
 			<else>
 				<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS">
@@ -1045,12 +1045,12 @@
 		<if>
 			<equals arg1="${rateUp}" arg2="true" />
 			<then>
-				<execute function="Click" locator1="KnowledgeBase#DISPLAY_VOTE_UP" />
+				<execute function="Click" locator1="Ratings#THUMB_UP" />
 			</then>
 			<elseif>
 				<equals arg1="${rateUp}" arg2="false" />
 				<then>
-					<execute function="Click" locator1="KnowledgeBase#DISPLAY_VOTE_DOWN" />
+					<execute function="Click" locator1="Ratings#THUMB_DOWN" />
 				</then>
 			</elseif>
 		</if>

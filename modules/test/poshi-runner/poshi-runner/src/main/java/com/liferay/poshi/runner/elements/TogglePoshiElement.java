@@ -17,7 +17,9 @@ package com.liferay.poshi.runner.elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * @author Kenji Heigel
@@ -35,21 +37,21 @@ public class TogglePoshiElement extends PoshiElement {
 
 	@Override
 	public PoshiElement clone(
-		PoshiElement parentPoshiElement, String readableSyntax) {
+		PoshiElement parentPoshiElement, String poshiScript) {
 
-		if (_isElementType(readableSyntax)) {
-			return new TogglePoshiElement(readableSyntax);
+		if (_isElementType(poshiScript)) {
+			return new TogglePoshiElement(parentPoshiElement, poshiScript);
 		}
 
 		return null;
 	}
 
 	@Override
-	public void parseReadableSyntax(String readableSyntax) {
-		for (String readableBlock : getReadableBlocks(readableSyntax)) {
-			if (readableBlock.startsWith("toggle (")) {
+	public void parsePoshiScript(String poshiScript) {
+		for (String poshiScriptSnippet : getPoshiScriptSnippets(poshiScript)) {
+			if (poshiScriptSnippet.startsWith("toggle (")) {
 				String parentheticalContent = getParentheticalContent(
-					readableBlock);
+					poshiScriptSnippet);
 
 				String summary = getQuotedContent(parentheticalContent);
 
@@ -58,12 +60,12 @@ public class TogglePoshiElement extends PoshiElement {
 				continue;
 			}
 
-			add(PoshiNodeFactory.newPoshiNode(this, readableBlock));
+			add(PoshiNodeFactory.newPoshiNode(this, poshiScriptSnippet));
 		}
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toPoshiScript() {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n");
@@ -71,12 +73,13 @@ public class TogglePoshiElement extends PoshiElement {
 		StringBuilder content = new StringBuilder();
 
 		for (PoshiElement poshiElement : toPoshiElements(elements())) {
-			content.append(poshiElement.toReadableSyntax());
+			content.append(poshiElement.toPoshiScript());
 		}
 
-		String readableBlock = createReadableBlock(content.toString());
+		String poshiScriptSnippet = createPoshiScriptSnippet(
+			content.toString());
 
-		sb.append(readableBlock);
+		sb.append(poshiScriptSnippet);
 
 		return sb.toString();
 	}
@@ -88,8 +91,14 @@ public class TogglePoshiElement extends PoshiElement {
 		super(_ELEMENT_NAME, element);
 	}
 
-	protected TogglePoshiElement(String readableSyntax) {
-		super(_ELEMENT_NAME, readableSyntax);
+	protected TogglePoshiElement(List<Attribute> attributes, List<Node> nodes) {
+		super(_ELEMENT_NAME, attributes, nodes);
+	}
+
+	protected TogglePoshiElement(
+		PoshiElement parentPoshiElement, String poshiScript) {
+
+		super(_ELEMENT_NAME, parentPoshiElement, poshiScript);
 	}
 
 	@Override
@@ -103,30 +112,34 @@ public class TogglePoshiElement extends PoshiElement {
 		return sb.toString();
 	}
 
-	protected List<String> getReadableBlocks(String readableSyntax) {
+	protected String getPoshiScriptKeyword() {
+		return getName();
+	}
+
+	protected List<String> getPoshiScriptSnippets(String poshiScript) {
 		StringBuilder sb = new StringBuilder();
 
-		List<String> readableBlocks = new ArrayList<>();
+		List<String> poshiScriptSnippets = new ArrayList<>();
 
-		for (String line : readableSyntax.split("\n")) {
-			String readableBlock = sb.toString();
+		for (String line : poshiScript.split("\n")) {
+			String poshiScriptSnippet = sb.toString();
 
-			readableBlock = readableBlock.trim();
+			poshiScriptSnippet = poshiScriptSnippet.trim();
 
-			if (line.startsWith(getReadableName() + " (") &&
-				line.endsWith("{") && (readableBlock.length() == 0)) {
+			if (line.startsWith(getPoshiScriptKeyword() + " (") &&
+				line.endsWith("{") && (poshiScriptSnippet.length() == 0)) {
 
-				readableBlocks.add(line);
+				poshiScriptSnippets.add(line);
 
 				continue;
 			}
 
-			if (line.endsWith("{") && readableBlocks.isEmpty()) {
+			if (line.endsWith("{") && poshiScriptSnippets.isEmpty()) {
 				continue;
 			}
 
-			if (isValidReadableBlock(readableBlock)) {
-				readableBlocks.add(readableBlock);
+			if (isValidPoshiScriptSnippet(poshiScriptSnippet)) {
+				poshiScriptSnippets.add(poshiScriptSnippet);
 
 				sb.setLength(0);
 			}
@@ -135,25 +148,21 @@ public class TogglePoshiElement extends PoshiElement {
 			sb.append("\n");
 		}
 
-		return readableBlocks;
+		return poshiScriptSnippets;
 	}
 
-	protected String getReadableName() {
-		return getName();
-	}
+	private boolean _isElementType(String poshiScript) {
+		poshiScript = poshiScript.trim();
 
-	private boolean _isElementType(String readableSyntax) {
-		readableSyntax = readableSyntax.trim();
-
-		if (!isBalancedReadableSyntax(readableSyntax)) {
+		if (!isBalancedPoshiScript(poshiScript)) {
 			return false;
 		}
 
-		if (!readableSyntax.startsWith("toggle (")) {
+		if (!poshiScript.startsWith("toggle (")) {
 			return false;
 		}
 
-		if (!readableSyntax.endsWith("}")) {
+		if (!poshiScript.endsWith("}")) {
 			return false;
 		}
 

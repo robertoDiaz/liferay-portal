@@ -1084,6 +1084,20 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	}
 
 	/**
+	* Returns the user with the matching external reference code and company.
+	*
+	* @param companyId the primary key of the company
+	* @param externalReferenceCode the user's external reference code
+	* @return the matching user, or <code>null</code> if a matching user could not be found
+	*/
+	@Override
+	public com.liferay.portal.kernel.model.User fetchUserByReferenceCode(
+		long companyId, String externalReferenceCode) {
+		return _userLocalService.fetchUserByReferenceCode(companyId,
+			externalReferenceCode);
+	}
+
+	/**
 	* Returns the user with the screen name.
 	*
 	* @param companyId the primary key of the user's company
@@ -1207,10 +1221,33 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.getGroupUsers(groupId);
 	}
 
+	/**
+	* @throws PortalException
+	*/
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
-		long groupId, int start, int end) {
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userLocalService.getGroupUsers(groupId, start, end);
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getGroupUsers(groupId, status, start, end, obc);
 	}
 
 	@Override
@@ -1219,6 +1256,24 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> orderByComparator) {
 		return _userLocalService.getGroupUsers(groupId, start, end,
 			orderByComparator);
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	* @return the users who belong to a group
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getGroupUsers(groupId, status, obc);
 	}
 
 	@Override
@@ -1316,10 +1371,34 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.getOrganizationUsers(organizationId);
 	}
 
+	/**
+	* @throws PortalException
+	*/
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
-		long organizationId, int start, int end) {
+		long organizationId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userLocalService.getOrganizationUsers(organizationId, start, end);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getOrganizationUsers(organizationId, status,
+			start, end, obc);
 	}
 
 	@Override
@@ -1328,6 +1407,25 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> orderByComparator) {
 		return _userLocalService.getOrganizationUsers(organizationId, start,
 			end, orderByComparator);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	* @return the users who belong to a group
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getOrganizationUsers(organizationId, status,
+			obc);
 	}
 
 	@Override

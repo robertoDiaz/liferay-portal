@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.Event;
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.StateAwareResponse;
@@ -83,6 +84,11 @@ public abstract class StateAwareResponseImpl
 	@Override
 	public Map<String, String[]> getRenderParameterMap() {
 		return _params;
+	}
+
+	@Override
+	public MutableRenderParameters getRenderParameters() {
+		throw new UnsupportedOperationException();
 	}
 
 	public User getUser() {
@@ -198,8 +204,8 @@ public abstract class StateAwareResponseImpl
 			throw new IllegalArgumentException();
 		}
 
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] == null) {
+		for (String value : values) {
+			if (value == null) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -225,12 +231,14 @@ public abstract class StateAwareResponseImpl
 
 			for (Map.Entry<String, String[]> entry : params.entrySet()) {
 				String key = entry.getKey();
-				String[] value = entry.getValue();
 
 				if (key == null) {
 					throw new IllegalArgumentException();
 				}
-				else if (value == null) {
+
+				String[] value = entry.getValue();
+
+				if (value == null) {
 					throw new IllegalArgumentException();
 				}
 
@@ -314,7 +322,7 @@ public abstract class StateAwareResponseImpl
 			}
 		}
 
-		_portletMode = null;
+		_portletMode = PortletMode.UNDEFINED;
 
 		_redirectLocation = null;
 
@@ -327,7 +335,7 @@ public abstract class StateAwareResponseImpl
 			}
 		}
 
-		_windowState = null;
+		_windowState = WindowState.UNDEFINED;
 
 		_calledSetRenderParameter = false;
 	}
@@ -364,10 +372,10 @@ public abstract class StateAwareResponseImpl
 	private final List<Event> _events = new ArrayList<>();
 	private Layout _layout;
 	private Map<String, String[]> _params = new LinkedHashMap<>();
-	private PortletMode _portletMode;
+	private PortletMode _portletMode = PortletMode.UNDEFINED;
 	private Map<String, String[]> _publicRenderParameters;
 	private String _redirectLocation;
 	private User _user;
-	private WindowState _windowState;
+	private WindowState _windowState = WindowState.UNDEFINED;
 
 }

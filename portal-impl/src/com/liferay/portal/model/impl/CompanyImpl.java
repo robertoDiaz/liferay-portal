@@ -61,17 +61,18 @@ public class CompanyImpl extends CompanyBaseImpl {
 	@Override
 	public int compareTo(Company company) {
 		String webId1 = getWebId();
-		String webId2 = company.getWebId();
 
 		if (webId1.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
 			return -1;
 		}
-		else if (webId2.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
+
+		String webId2 = company.getWebId();
+
+		if (webId2.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
 			return 1;
 		}
-		else {
-			return webId1.compareTo(webId2);
-		}
+
+		return webId1.compareTo(webId2);
 	}
 
 	@Override
@@ -267,8 +268,8 @@ public class CompanyImpl extends CompanyBaseImpl {
 			getCompanyId(), PropsKeys.ADMIN_MAIL_HOST_NAMES,
 			StringPool.NEW_LINE, PropsValues.ADMIN_MAIL_HOST_NAMES);
 
-		for (int i = 0; i < mailHostNames.length; i++) {
-			if (StringUtil.equalsIgnoreCase(mx, mailHostNames[i])) {
+		for (String mailHostName : mailHostNames) {
+			if (StringUtil.equalsIgnoreCase(mx, mailHostName)) {
 				return true;
 			}
 		}

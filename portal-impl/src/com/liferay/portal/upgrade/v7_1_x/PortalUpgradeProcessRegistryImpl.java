@@ -37,7 +37,7 @@ public class PortalUpgradeProcessRegistryImpl
 
 		upgradeProcesses.put(new Version("1.1.1"), new UpgradeCounter());
 
-		upgradeProcesses.put(new Version("1.1.2"), new UpgradeRepository());
+		upgradeProcesses.put(new Version("1.1.2"), new UpgradeDB2());
 	}
 
 }

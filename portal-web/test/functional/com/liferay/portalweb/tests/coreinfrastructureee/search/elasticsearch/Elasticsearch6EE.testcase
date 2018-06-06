@@ -40,13 +40,13 @@
 
 		<!-- LPS-67744 -->
 
-		<!--<execute macro="Elasticsearch#viewClusterStatusViaClusterHealthAPI">
+		<!--execute macro="Elasticsearch#viewClusterStatusViaClusterHealthAPI">
 			<var name="numberOfNodes" value="2" />
-		</execute>-->
+		</execute>
 
-		<!--<execute macro="Elasticsearch#viewReplicaAddedInConsole" />-->
+		<execute macro="Elasticsearch#viewReplicaAddedInConsole" />
 
-		<!--<execute macro="Navigator#openURL" />-->
+		<execute macro="Navigator#openURL" /> -->
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Content" />
@@ -289,19 +289,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="X-Pack Monitoring Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="X-Pack Monitoring Page" />
 			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
