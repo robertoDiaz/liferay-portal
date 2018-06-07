@@ -422,7 +422,7 @@
 <!--PAGE_CUSTOMIZATION-->
 <tr>
 	<td>PAGE_CUSTOMIZATION_MESSAGE_INFO</td>
-	<td>//li[contains(@class,'control-menu') and contains(@class,'nav-item')]/p[contains(.,'You can customize this page')]</td>
+	<td>//li[contains(@class,'control-menu') and contains(@class,'nav-item')]/span[contains(.,'You can customize this page')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -597,7 +597,7 @@
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_PORTLET_TITLE</td>
-	<td>//*[@data-qa-id='headerTitle' and contains(.,'${key_portletTitle}')]</td>
+	<td>//*[@class='header-title' and contains(.,'${key_portletTitle}')] | //*[@data-qa-id='headerTitle' and contains(.,'${key_portletTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
