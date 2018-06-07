@@ -21,7 +21,7 @@ String tabs1 = ParamUtil.getString(request, "tabs1", "sites");
 
 List<Group> groups = GroupLocalServiceUtil.getUserGroups(user.getUserId(), true);
 List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(user.getUserId());
-List<Role> roles = RoleLocalServiceUtil.getRoles(PortalUtil.getCompanyId(renderRequest));
+List<Role> roles = AnnouncementsUtil.getRoles(themeDisplay);
 List<UserGroup> userGroups = UserGroupLocalServiceUtil.getUserGroups(themeDisplay.getCompanyId());
 
 String tabs1Names = "sites";
