@@ -14,7 +14,11 @@
 
 package com.liferay.poshi.runner.elements;
 
+import java.util.List;
+
+import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * @author Kenji Heigel
@@ -32,10 +36,10 @@ public class FailPoshiElement extends EchoPoshiElement {
 
 	@Override
 	public PoshiElement clone(
-		PoshiElement parentPoshiElement, String readableSyntax) {
+		PoshiElement parentPoshiElement, String poshiScript) {
 
-		if (_isElementType(readableSyntax)) {
-			return new FailPoshiElement(readableSyntax);
+		if (_isElementType(poshiScript)) {
+			return new FailPoshiElement(parentPoshiElement, poshiScript);
 		}
 
 		return null;
@@ -48,8 +52,14 @@ public class FailPoshiElement extends EchoPoshiElement {
 		super(_ELEMENT_NAME, element);
 	}
 
-	protected FailPoshiElement(String readableSyntax) {
-		super(_ELEMENT_NAME, readableSyntax);
+	protected FailPoshiElement(List<Attribute> attributes, List<Node> nodes) {
+		super(_ELEMENT_NAME, attributes, nodes);
+	}
+
+	protected FailPoshiElement(
+		PoshiElement parentPoshiElement, String poshiScript) {
+
+		super(_ELEMENT_NAME, parentPoshiElement, poshiScript);
 	}
 
 	@Override
@@ -57,18 +67,18 @@ public class FailPoshiElement extends EchoPoshiElement {
 		return "fail";
 	}
 
-	private boolean _isElementType(String readableSyntax) {
-		readableSyntax = readableSyntax.trim();
+	private boolean _isElementType(String poshiScript) {
+		poshiScript = poshiScript.trim();
 
-		if (!isBalancedReadableSyntax(readableSyntax)) {
+		if (!isBalancedPoshiScript(poshiScript)) {
 			return false;
 		}
 
-		if (!readableSyntax.endsWith(");")) {
+		if (!poshiScript.endsWith(");")) {
 			return false;
 		}
 
-		if (!readableSyntax.startsWith("fail(")) {
+		if (!poshiScript.startsWith("fail(")) {
 			return false;
 		}
 

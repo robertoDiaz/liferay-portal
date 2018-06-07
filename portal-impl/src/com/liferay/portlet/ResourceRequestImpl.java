@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PublicRenderParameter;
@@ -21,31 +23,43 @@ import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.internal.PortletAsyncContextImpl;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.portlet.PortletAsyncContext;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.ResourceParameters;
 import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
 import javax.portlet.WindowState;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Neil Griffin
  */
+@ProviderType
 public class ResourceRequestImpl
 	extends ClientDataRequestImpl implements ResourceRequest {
 
 	@Override
 	public String getCacheability() {
 		return _cacheablity;
+	}
+
+	@Override
+	public DispatcherType getDispatcherType() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -56,6 +70,11 @@ public class ResourceRequestImpl
 	@Override
 	public String getLifecycle() {
 		return PortletRequest.RESOURCE_PHASE;
+	}
+
+	@Override
+	public PortletAsyncContext getPortletAsyncContext() {
+		return _portletAsyncContext;
 	}
 
 	@Override
@@ -99,6 +118,54 @@ public class ResourceRequestImpl
 	}
 
 	@Override
+	public ResourceParameters getResourceParameters() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isAsyncStarted() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isAsyncSupported() {
+		Portlet portlet = getPortlet();
+
+		return portlet.isAsyncSupported();
+	}
+
+	@Override
+	public PortletAsyncContext startPortletAsync()
+		throws IllegalStateException {
+
+		if (!isAsyncSupported()) {
+			throw new IllegalStateException();
+		}
+
+		// TODO
+
+		_portletAsyncContext = new PortletAsyncContextImpl();
+
+		return _portletAsyncContext;
+	}
+
+	@Override
+	public PortletAsyncContext startPortletAsync(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws IllegalStateException {
+
+		if (!isAsyncSupported()) {
+			throw new IllegalStateException();
+		}
+
+		// TODO
+
+		_portletAsyncContext = new PortletAsyncContextImpl();
+
+		return _portletAsyncContext;
+	}
+
+	@Override
 	protected void init(
 		HttpServletRequest request, Portlet portlet,
 		InvokerPortlet invokerPortlet, PortletContext portletContext,
@@ -128,6 +195,7 @@ public class ResourceRequestImpl
 	}
 
 	private String _cacheablity;
+	private PortletAsyncContext _portletAsyncContext;
 	private String _resourceID;
 
 }

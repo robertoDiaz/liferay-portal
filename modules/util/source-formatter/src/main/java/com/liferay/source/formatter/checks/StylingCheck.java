@@ -14,7 +14,15 @@
 
 package com.liferay.source.formatter.checks;
 
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.tools.ToolsUtil;
+import com.liferay.source.formatter.checks.util.JavaSourceUtil;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Hugo Huijser
@@ -35,14 +43,54 @@ public abstract class StylingCheck extends BaseFileCheck {
 		content = _formatStyling(
 			content, "String.valueOf(true)", "Boolean.TRUE.toString()");
 
-		content = _formatStyling(
-			content, "Objects.toString(", "String.valueOf(");
+		content = _formatToStringMethodCall(content, "Double");
+		content = _formatToStringMethodCall(content, "Float");
+		content = _formatToStringMethodCall(content, "Integer");
+		content = _formatToStringMethodCall(content, "Long");
+		content = _formatToStringMethodCall(content, "Objects");
+		content = _formatToStringMethodCall(content, "Short");
+
+		content = _fixBooleanStatement(content);
 
 		return content;
 	}
 
 	protected boolean isJavaSource(String content, int pos) {
 		return true;
+	}
+
+	private String _fixBooleanStatement(String content) {
+		Matcher matcher = _booleanPattern.matcher(content);
+
+		while (matcher.find()) {
+			if (ToolsUtil.isInsideQuotes(content, matcher.start())) {
+				continue;
+			}
+
+			boolean booleanValue = true;
+
+			if (matcher.group(1) != null) {
+				booleanValue = !booleanValue;
+			}
+
+			if (Objects.equals(matcher.group(3), "!=")) {
+				booleanValue = !booleanValue;
+			}
+
+			if (Objects.equals(matcher.group(4), "false")) {
+				booleanValue = !booleanValue;
+			}
+
+			if (booleanValue) {
+				return StringUtil.replaceFirst(
+					content, matcher.group(), "(" + matcher.group(2) + ")");
+			}
+
+			return StringUtil.replaceFirst(
+				content, matcher.group(), "(!" + matcher.group(2) + ")");
+		}
+
+		return content;
 	}
 
 	private String _formatStyling(
@@ -69,5 +117,34 @@ public abstract class StylingCheck extends BaseFileCheck {
 			}
 		}
 	}
+
+	private String _formatToStringMethodCall(String content, String className) {
+		Pattern pattern = Pattern.compile(
+			StringBundler.concat("\\W", className, "\\.toString\\((.*?)\\);\n"),
+			Pattern.DOTALL);
+
+		Matcher matcher = pattern.matcher(content);
+
+		while (matcher.find()) {
+			int pos = matcher.start();
+
+			if (!isJavaSource(content, pos)) {
+				continue;
+			}
+
+			List<String> parameterList = JavaSourceUtil.getParameterList(
+				matcher.group());
+
+			if (parameterList.size() == 1) {
+				return StringUtil.replaceFirst(
+					content, className + ".toString(", "String.valueOf(", pos);
+			}
+		}
+
+		return content;
+	}
+
+	private final Pattern _booleanPattern = Pattern.compile(
+		"\\((\\!)?(\\w+)\\s+(==|!=)\\s+(false|true)\\)");
 
 }

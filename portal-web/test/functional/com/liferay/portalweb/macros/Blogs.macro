@@ -80,7 +80,7 @@
 
 		<execute function="Pause" locator1="1000" />
 
-		<execute macro="PortletEntry#publish" />
+		<execute macro="Button#clickPublish" />
 	</command>
 
 	<command name="addEntryWithHTML">
@@ -530,7 +530,7 @@
 			<then>
 				<execute function="Click" locator1="Blogs#ENTRY_TABLE_ALL_CHECKBOX" />
 
-				<execute function="AssertClick" locator1="Button#MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
+				<execute function="AssertClick" locator1="Button#MOVE_TO_RECYCLE_BIN" value1="Move to Recycle Bin" />
 
 				<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
 			</then>
@@ -563,14 +563,14 @@
 	</command>
 
 	<command name="viewControlsPG">
-		<var name="key_text" value="New Blog Entry" />
+		<var name="key_text" value="New Entry" />
 
-		<execute function="AssertTextEquals" locator1="Button#ANY" value1="New Blog Entry" />
+		<execute function="AssertTextEquals" locator1="Button#ANY" value1="New Entry" />
 		<execute function="AssertTextEquals" locator1="Blogs#SUBSCRIBE_LINK" value1="Subscribe" />
 
-		<var name="key_text" value="rss RSS" />
+		<var name="key_text" value="rss-full RSS" />
 
-		<execute function="AssertTextEquals" locator1="Button#ANY" value1="rss RSS" />
+		<execute function="AssertTextEquals" locator1="Button#ANY" value1="rss-full RSS" />
 	</command>
 
 	<command name="viewNoEntryCP">
@@ -585,7 +585,7 @@
 
 	<command name="viewNoPermissionPG">
 		<execute function="AssertTextEquals" locator1="Portlet#HEADER" value1="Blogs" />
-		<var name="key_text" value="New Blog Entry" />
+		<var name="key_text" value="New Entry" />
 
 		<execute function="AssertElementNotPresent" locator1="Button#ANY" />
 		<execute function="AssertElementNotPresent" locator1="MenuItem#ANY_MENU_ITEM">
