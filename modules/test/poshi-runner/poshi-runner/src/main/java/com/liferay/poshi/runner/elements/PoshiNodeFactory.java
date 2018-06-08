@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.dom4j.Comment;
@@ -65,44 +67,75 @@ public abstract class PoshiNodeFactory {
 	}
 
 	public static PoshiNode<?, ?> newPoshiNode(
-		PoshiNode<?, ?> parentPoshiNode, String readableSyntax) {
+		PoshiNode<?, ?> parentPoshiNode, String poshiScript) {
 
 		PoshiNode<?, ?> newPoshiNode = null;
 
-		newPoshiNode = _newPoshiComment(readableSyntax);
+		newPoshiNode = _newPoshiComment(poshiScript);
 
 		if (newPoshiNode != null) {
 			return newPoshiNode;
 		}
 
 		newPoshiNode = _newPoshiElement(
-			(PoshiElement)parentPoshiNode, readableSyntax);
+			(PoshiElement)parentPoshiNode, poshiScript);
 
 		if (newPoshiNode != null) {
 			return newPoshiNode;
 		}
 
-		throw new RuntimeException("Unknown readble syntax\n" + readableSyntax);
+		throw new RuntimeException(
+			"Unknown Poshi script syntax\n" + poshiScript);
 	}
 
-	public static PoshiNode<?, ?> newPoshiNodeFromFile(String filePath) {
-		File file = new File(filePath);
+	public static PoshiNode<?, ?> newPoshiNode(
+		String content, String fileType) {
 
 		try {
-			String content = FileUtil.read(file);
+			DefinitionPoshiElement definitionPoshiElement = null;
+
+			for (PoshiElement poshiElement : _poshiElements) {
+				if (poshiElement instanceof DefinitionPoshiElement &&
+					fileType.equals(poshiElement.getFileType())) {
+
+					definitionPoshiElement =
+						(DefinitionPoshiElement)poshiElement;
+				}
+			}
 
 			if (content.contains("<definition")) {
 				Document document = Dom4JUtil.parse(content);
 
 				Element rootElement = document.getRootElement();
 
-				return newPoshiNode(rootElement);
+				return definitionPoshiElement.clone(rootElement);
 			}
 
-			return newPoshiNode(null, content);
+			return definitionPoshiElement.clone(content);
 		}
 		catch (Exception e) {
-			System.out.println("Unable to generate the Poshi element");
+			System.out.println("Unable to generate the Poshi XML");
+
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static PoshiNode<?, ?> newPoshiNodeFromFile(String filePath) {
+		try {
+			File file = new File(filePath);
+
+			String content = FileUtil.read(file);
+
+			int index = filePath.lastIndexOf(".");
+
+			String fileType = filePath.substring(index + 1);
+
+			return newPoshiNode(content, fileType);
+		}
+		catch (Exception e) {
+			System.out.println("Unable to generate the Poshi XML");
 
 			e.printStackTrace();
 		}
@@ -122,9 +155,9 @@ public abstract class PoshiNodeFactory {
 		return null;
 	}
 
-	private static PoshiComment _newPoshiComment(String readableSyntax) {
+	private static PoshiComment _newPoshiComment(String poshiScript) {
 		for (PoshiComment poshiComment : _poshiComments) {
-			PoshiComment newPoshiComment = poshiComment.clone(readableSyntax);
+			PoshiComment newPoshiComment = poshiComment.clone(poshiScript);
 
 			if (newPoshiComment != null) {
 				return newPoshiComment;
@@ -147,11 +180,11 @@ public abstract class PoshiNodeFactory {
 	}
 
 	private static PoshiElement _newPoshiElement(
-		PoshiElement parentPoshiElement, String readableSyntax) {
+		PoshiElement parentPoshiElement, String poshiScript) {
 
 		for (PoshiElement poshiElement : _poshiElements) {
 			PoshiElement newPoshiElement = poshiElement.clone(
-				parentPoshiElement, readableSyntax);
+				parentPoshiElement, poshiScript);
 
 			if (newPoshiElement != null) {
 				return newPoshiElement;
@@ -169,12 +202,30 @@ public abstract class PoshiNodeFactory {
 			ClassPath classPath = ClassPath.from(
 				PoshiNode.class.getClassLoader());
 
+			List<Class<?>> poshiElementClasses = new ArrayList<>();
+
 			for (ClassPath.ClassInfo classInfo :
 					classPath.getTopLevelClasses(
 						"com.liferay.poshi.runner.elements")) {
 
-				Class<?> clazz = classInfo.load();
+				poshiElementClasses.add(classInfo.load());
+			}
 
+			Collections.sort(
+				poshiElementClasses,
+				new Comparator<Class<?>>() {
+
+					@Override
+					public int compare(Class<?> class1, Class<?> class2) {
+						String className1 = class1.getName();
+						String className2 = class2.getName();
+
+						return className1.compareTo(className2);
+					}
+
+				});
+
+			for (Class<?> clazz : poshiElementClasses) {
 				if (Modifier.isAbstract(clazz.getModifiers()) ||
 					!(PoshiComment.class.isAssignableFrom(clazz) ||
 					PoshiElement.class.isAssignableFrom(clazz))) {

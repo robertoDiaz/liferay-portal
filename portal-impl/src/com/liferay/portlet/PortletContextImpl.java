@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -43,7 +45,9 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  * @author Brett Randall
+ * @author Neil Griffin
  */
+@ProviderType
 public class PortletContextImpl implements LiferayPortletContext {
 
 	public PortletContextImpl(Portlet portlet, ServletContext servletContext) {
@@ -70,8 +74,32 @@ public class PortletContextImpl implements LiferayPortletContext {
 	}
 
 	@Override
+	public ClassLoader getClassLoader() {
+		return _servletContext.getClassLoader();
+	}
+
+	@Override
 	public Enumeration<String> getContainerRuntimeOptions() {
 		return Collections.enumeration(_supportedRuntimeOptions);
+	}
+
+	@Override
+	public String getContextPath() {
+		return _servletContext.getContextPath();
+	}
+
+	@Override
+	public int getEffectiveMajorVersion() {
+		PortletApp portletApp = _portlet.getPortletApp();
+
+		return portletApp.getSpecMajorVersion();
+	}
+
+	@Override
+	public int getEffectiveMinorVersion() {
+		PortletApp portletApp = _portlet.getPortletApp();
+
+		return portletApp.getSpecMinorVersion();
 	}
 
 	@Override
@@ -237,7 +265,7 @@ public class PortletContextImpl implements LiferayPortletContext {
 		_servletContext.setAttribute(name, obj);
 	}
 
-	private static final int _MAJOR_VERSION = 2;
+	private static final int _MAJOR_VERSION = 3;
 
 	private static final int _MINOR_VERSION = 0;
 

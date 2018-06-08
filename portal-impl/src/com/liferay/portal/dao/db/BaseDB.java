@@ -273,9 +273,8 @@ public abstract class BaseDB implements DB {
 		try {
 			s = con.createStatement();
 
-			for (int i = 0; i < sqls.length; i++) {
-				String sql = buildSQL(
-					applyMaxStringIndexLengthLimitation(sqls[i]));
+			for (String sql : sqls) {
+				sql = buildSQL(applyMaxStringIndexLengthLimitation(sql));
 
 				sql = SQLTransformer.transform(sql.trim());
 
@@ -365,6 +364,16 @@ public abstract class BaseDB implements DB {
 			boolean failOnError)
 		throws IOException, NamingException, SQLException {
 
+		template = StringUtil.trim(template);
+
+		if ((template == null) || template.isEmpty()) {
+			return;
+		}
+
+		if (!template.endsWith(StringPool.SEMICOLON)) {
+			template += StringPool.SEMICOLON;
+		}
+
 		template = applyMaxStringIndexLengthLimitation(template);
 
 		if (evaluate) {
@@ -391,7 +400,13 @@ public abstract class BaseDB implements DB {
 				if (line.startsWith("@include ")) {
 					int pos = line.indexOf(" ");
 
-					String includeFileName = line.substring(pos + 1);
+					int end = line.length();
+
+					if (StringUtil.endsWith(line, StringPool.SEMICOLON)) {
+						end -= 1;
+					}
+
+					String includeFileName = line.substring(pos + 1, end);
 
 					ClassLoader classLoader =
 						ClassLoaderUtil.getContextClassLoader();
@@ -789,11 +804,11 @@ public abstract class BaseDB implements DB {
 
 			String tableNameLowerCase = StringUtil.toLowerCase(tableName);
 
-			boolean unique = index.isUnique();
-
 			validIndexNames.add(indexNameUpperCase);
 
 			if (indexNames.contains(indexNameLowerCase)) {
+				boolean unique = index.isUnique();
+
 				if (unique &&
 					indexesSQLLowerCase.contains(
 						"create unique index " + indexNameLowerCase + " ")) {
@@ -1025,9 +1040,9 @@ public abstract class BaseDB implements DB {
 
 					String portalTableData = portalData.substring(x, y);
 
-					for (int i = 0; i < columns.length; i++) {
+					for (String column : columns) {
 						if (portalTableData.contains(
-								columns[i].trim() + " BOOLEAN")) {
+								column.trim() + " BOOLEAN")) {
 
 							append = false;
 

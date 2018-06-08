@@ -14,6 +14,9 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayRenderResponse;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -31,6 +34,7 @@ import javax.portlet.PortletRequest;
  * @author Brian Wing Shun Chan
  * @author Eduardo Lundgren
  */
+@ProviderType
 public class RenderResponseImpl
 	extends MimeResponseImpl implements LiferayRenderResponse {
 
@@ -47,13 +51,19 @@ public class RenderResponseImpl
 		return _title;
 	}
 
-	public Boolean getUseDefaultTemplate() {
+	public boolean getUseDefaultTemplate() {
+		if (_useDefaultTemplate == null) {
+			Portlet portlet = getPortlet();
+
+			return portlet.isUseDefaultTemplate();
+		}
+
 		return _useDefaultTemplate;
 	}
 
 	@Override
 	public void setNextPossiblePortletModes(
-		Collection<PortletMode> portletModes) {
+		Collection<? extends PortletMode> portletModes) {
 	}
 
 	@Override

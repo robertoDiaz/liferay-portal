@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -49,6 +50,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -862,20 +864,6 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 					result = oAuth2ScopeGrant;
 
 					cacheResult(oAuth2ScopeGrant);
-
-					if ((oAuth2ScopeGrant.getCompanyId() != companyId) ||
-							(oAuth2ScopeGrant.getOAuth2ApplicationScopeAliasesId() != oAuth2ApplicationScopeAliasesId) ||
-							(oAuth2ScopeGrant.getApplicationName() == null) ||
-							!oAuth2ScopeGrant.getApplicationName()
-												 .equals(applicationName) ||
-							(oAuth2ScopeGrant.getBundleSymbolicName() == null) ||
-							!oAuth2ScopeGrant.getBundleSymbolicName()
-												 .equals(bundleSymbolicName) ||
-							(oAuth2ScopeGrant.getScope() == null) ||
-							!oAuth2ScopeGrant.getScope().equals(scope)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_O_A_B_S,
-							finderArgs, oAuth2ScopeGrant);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1285,8 +1273,6 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 	@Override
 	protected OAuth2ScopeGrant removeImpl(OAuth2ScopeGrant oAuth2ScopeGrant) {
-		oAuth2ScopeGrant = toUnwrappedModel(oAuth2ScopeGrant);
-
 		oAuth2ScopeGrantToOAuth2AuthorizationTableMapper.deleteLeftPrimaryKeyTableMappings(oAuth2ScopeGrant.getPrimaryKey());
 
 		Session session = null;
@@ -1319,9 +1305,23 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 
 	@Override
 	public OAuth2ScopeGrant updateImpl(OAuth2ScopeGrant oAuth2ScopeGrant) {
-		oAuth2ScopeGrant = toUnwrappedModel(oAuth2ScopeGrant);
-
 		boolean isNew = oAuth2ScopeGrant.isNew();
+
+		if (!(oAuth2ScopeGrant instanceof OAuth2ScopeGrantModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(oAuth2ScopeGrant.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(oAuth2ScopeGrant);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in oAuth2ScopeGrant proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom OAuth2ScopeGrant implementation " +
+				oAuth2ScopeGrant.getClass());
+		}
 
 		OAuth2ScopeGrantModelImpl oAuth2ScopeGrantModelImpl = (OAuth2ScopeGrantModelImpl)oAuth2ScopeGrant;
 
@@ -1400,27 +1400,6 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		oAuth2ScopeGrant.resetOriginalValues();
 
 		return oAuth2ScopeGrant;
-	}
-
-	protected OAuth2ScopeGrant toUnwrappedModel(
-		OAuth2ScopeGrant oAuth2ScopeGrant) {
-		if (oAuth2ScopeGrant instanceof OAuth2ScopeGrantImpl) {
-			return oAuth2ScopeGrant;
-		}
-
-		OAuth2ScopeGrantImpl oAuth2ScopeGrantImpl = new OAuth2ScopeGrantImpl();
-
-		oAuth2ScopeGrantImpl.setNew(oAuth2ScopeGrant.isNew());
-		oAuth2ScopeGrantImpl.setPrimaryKey(oAuth2ScopeGrant.getPrimaryKey());
-
-		oAuth2ScopeGrantImpl.setOAuth2ScopeGrantId(oAuth2ScopeGrant.getOAuth2ScopeGrantId());
-		oAuth2ScopeGrantImpl.setCompanyId(oAuth2ScopeGrant.getCompanyId());
-		oAuth2ScopeGrantImpl.setOAuth2ApplicationScopeAliasesId(oAuth2ScopeGrant.getOAuth2ApplicationScopeAliasesId());
-		oAuth2ScopeGrantImpl.setApplicationName(oAuth2ScopeGrant.getApplicationName());
-		oAuth2ScopeGrantImpl.setBundleSymbolicName(oAuth2ScopeGrant.getBundleSymbolicName());
-		oAuth2ScopeGrantImpl.setScope(oAuth2ScopeGrant.getScope());
-
-		return oAuth2ScopeGrantImpl;
 	}
 
 	/**

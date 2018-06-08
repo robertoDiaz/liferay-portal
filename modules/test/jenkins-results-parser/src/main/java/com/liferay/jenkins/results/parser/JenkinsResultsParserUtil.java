@@ -279,7 +279,7 @@ public class JenkinsResultsParserUtil {
 
 		processBuilder.directory(baseDir.getAbsoluteFile());
 
-		Process process = new BufferedProcess(1000000, processBuilder.start());
+		Process process = new BufferedProcess(2000000, processBuilder.start());
 
 		long duration = 0;
 		long start = System.currentTimeMillis();
@@ -288,6 +288,25 @@ public class JenkinsResultsParserUtil {
 		while (true) {
 			try {
 				returnCode = process.exitValue();
+
+				if (returnCode == 0) {
+					String standardOut = readInputStream(
+						process.getInputStream(), true);
+
+					duration = System.currentTimeMillis() - start;
+
+					while (!standardOut.contains(
+								"Finished executing Bash commands.") &&
+						   (duration < timeout)) {
+
+						sleep(10);
+
+						standardOut = readInputStream(
+							process.getInputStream(), true);
+
+						duration = System.currentTimeMillis() - start;
+					}
+				}
 
 				break;
 			}
@@ -307,24 +326,15 @@ public class JenkinsResultsParserUtil {
 		}
 
 		if (debug) {
-			InputStream inputStream = process.getInputStream();
-
-			inputStream.mark(Integer.MAX_VALUE);
-
 			System.out.println(
-				"Output stream: " + readInputStream(inputStream));
-
-			inputStream.reset();
+				"Output stream: " +
+					readInputStream(process.getInputStream(), true));
 		}
 
 		if (debug && (returnCode != 0)) {
-			InputStream inputStream = process.getErrorStream();
-
-			inputStream.mark(Integer.MAX_VALUE);
-
-			System.out.println("Error stream: " + readInputStream(inputStream));
-
-			inputStream.reset();
+			System.out.println(
+				"Error stream: " +
+					readInputStream(process.getErrorStream(), true));
 		}
 
 		return process;
@@ -381,7 +391,7 @@ public class JenkinsResultsParserUtil {
 			System.out.println(
 				combine(
 					"Response from ", urlObject.toString(), ": ",
-					Integer.toString(httpURLConnection.getResponseCode()), " ",
+					String.valueOf(httpURLConnection.getResponseCode()), " ",
 					httpURLConnection.getResponseMessage()));
 		}
 		catch (IOException ioe) {
@@ -721,6 +731,17 @@ public class JenkinsResultsParserUtil {
 		return Float.parseFloat(matcher.group(1));
 	}
 
+	public static GitWorkingDirectory getJenkinsGitWorkingDirectory()
+		throws IOException {
+
+		Properties buildProperties = getBuildProperties();
+
+		String workingDirectoryPath = buildProperties.getProperty(
+			"base.repository.dir") + "/liferay-jenkins-ee";
+
+		return new GitWorkingDirectory("master", workingDirectoryPath);
+	}
+
 	public static List<JenkinsMaster> getJenkinsMasters(
 		Properties buildProperties, String prefix) {
 
@@ -839,7 +860,7 @@ public class JenkinsResultsParserUtil {
 				"${baseInvocationURL}", baseInvocationURL);
 
 		loadBalancerServiceURL = loadBalancerServiceURL.replace(
-			"${invokedBatchSize}", Integer.toString(invokedBatchSize));
+			"${invokedBatchSize}", String.valueOf(invokedBatchSize));
 
 		try {
 			JSONObject jsonObject = toJSONObject(loadBalancerServiceURL);
@@ -908,6 +929,24 @@ public class JenkinsResultsParserUtil {
 		catch (IOException ioe) {
 			throw new RuntimeException("Unable to get relative path", ioe);
 		}
+	}
+
+	public static PortalGitWorkingDirectory getPortalGitWorkingDirectory(
+			String portalBranchName)
+		throws IOException {
+
+		Properties buildProperties = getBuildProperties();
+
+		String workingDirectoryPath = buildProperties.getProperty(
+			"base.repository.dir") + "/liferay-portal";
+
+		if (!portalBranchName.equals("master")) {
+			workingDirectoryPath = combine(
+				workingDirectoryPath, "-", portalBranchName);
+		}
+
+		return new PortalGitWorkingDirectory(
+			portalBranchName, workingDirectoryPath);
 	}
 
 	public static Properties getProperties(File... propertiesFiles) {
@@ -982,7 +1021,7 @@ public class JenkinsResultsParserUtil {
 
 	public static String getRegexLiteral(String string) {
 		if (string == null) {
-			throw new NullPointerException("String is NULL");
+			throw new NullPointerException("String is null");
 		}
 
 		String specialCharactersString = "\\^$.|?*+()[]{}";
@@ -1043,13 +1082,25 @@ public class JenkinsResultsParserUtil {
 		return getSlaves(getBuildProperties(), jenkinsMasterPatternString);
 	}
 
+	public static boolean isCINode() {
+		String hostName = getHostName("");
+
+		if (hostName.startsWith("cloud-10-0-") ||
+			hostName.startsWith("test-")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isFileInDirectory(File directory, File file) {
 		if (directory == null) {
-			throw new IllegalArgumentException("Directory is NULL");
+			throw new IllegalArgumentException("Directory is null");
 		}
 
 		if (file == null) {
-			throw new IllegalArgumentException("File is NULL");
+			throw new IllegalArgumentException("File is null");
 		}
 
 		if (!directory.isDirectory()) {
@@ -1088,6 +1139,25 @@ public class JenkinsResultsParserUtil {
 	public static String readInputStream(InputStream inputStream)
 		throws IOException {
 
+		return readInputStream(inputStream, false);
+	}
+
+	public static String readInputStream(
+			InputStream inputStream, boolean resetAfterReading)
+		throws IOException {
+
+		if (resetAfterReading && !inputStream.markSupported()) {
+			Class<?> inputStreamClass = inputStream.getClass();
+
+			System.out.println(
+				"Unable to reset after reading input stream " +
+					inputStreamClass.getName());
+		}
+
+		if (resetAfterReading && inputStream.markSupported()) {
+			inputStream.mark(Integer.MAX_VALUE);
+		}
+
 		StringBuffer sb = new StringBuffer();
 
 		byte[] bytes = new byte[1024];
@@ -1098,6 +1168,10 @@ public class JenkinsResultsParserUtil {
 			sb.append(new String(Arrays.copyOf(bytes, size)));
 
 			size = inputStream.read(bytes);
+		}
+
+		if (resetAfterReading && inputStream.markSupported()) {
+			inputStream.reset();
 		}
 
 		return sb.toString();
@@ -1742,7 +1816,7 @@ public class JenkinsResultsParserUtil {
 	private static File _getCacheFile(String key) {
 		String fileName = combine(
 			System.getProperty("java.io.tmpdir"), "/jenkins-cached-files/",
-			Integer.toString(key.hashCode()), ".txt");
+			String.valueOf(key.hashCode()), ".txt");
 
 		return new File(fileName);
 	}
