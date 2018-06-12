@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.ccpp.PortalProfileFactory;
 import com.liferay.portal.kernel.log.Log;
@@ -33,6 +35,7 @@ import com.liferay.portal.kernel.portlet.PortletQNameUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ProtectedPrincipal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -79,6 +82,7 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
+import javax.portlet.RenderParameters;
 import javax.portlet.WindowState;
 import javax.portlet.filter.PortletRequestWrapper;
 
@@ -91,7 +95,9 @@ import javax.servlet.http.HttpSession;
  * @author Brian Myunghun Kim
  * @author Sergey Ponomarev
  * @author Raymond Augé
+ * @author Neil Griffin
  */
+@ProviderType
 public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	public static PortletRequestImpl getPortletRequestImpl(
@@ -310,6 +316,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		return _portlet;
 	}
 
+	@Override
 	public PortletContext getPortletContext() {
 		return _portletContext;
 	}
@@ -346,7 +353,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	public PortletPreferences getPreferences() {
 		String lifecycle = getLifecycle();
 
-		if (lifecycle.equals(PortletRequest.RENDER_PHASE) &&
+		if ((lifecycle.equals(PortletRequest.HEADER_PHASE) ||
+			 lifecycle.equals(PortletRequest.RENDER_PHASE)) &&
 			PropsValues.PORTLET_PREFERENCES_STRICT_STORE) {
 
 			return DoPrivilegedUtil.wrap(
@@ -499,6 +507,11 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	@Override
+	public RenderParameters getRenderParameters() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public String getRequestedSessionId() {
 		if (_session != null) {
 			return _session.getId();
@@ -541,6 +554,11 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	@Override
 	public int getServerPort() {
 		return _request.getServerPort();
+	}
+
+	@Override
+	public String getUserAgent() {
+		return _request.getHeader(HttpHeaders.USER_AGENT);
 	}
 
 	public LinkedHashMap<String, String> getUserInfo() {
@@ -851,7 +869,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 				}
 			}
 
-			if (getLifecycle().equals(PortletRequest.RENDER_PHASE) &&
+			if ((getLifecycle().equals(PortletRequest.HEADER_PHASE) ||
+				 getLifecycle().equals(PortletRequest.RENDER_PHASE)) &&
 				!LiferayWindowState.isExclusive(request) &&
 				!LiferayWindowState.isPopUp(request)) {
 

@@ -148,6 +148,12 @@ public class SearchContainer<R> {
 		if (Validator.isNotNull(cssClass)) {
 			_cssClass = cssClass;
 		}
+
+		String keywords = ParamUtil.getString(portletRequest, "keywords");
+
+		if (Validator.isNotNull(keywords)) {
+			_search = true;
+		}
 	}
 
 	public SearchContainer(
@@ -328,6 +334,10 @@ public class SearchContainer<R> {
 		return _start;
 	}
 
+	public String getSummary() {
+		return _summary;
+	}
+
 	public int getTotal() {
 		return _total;
 	}
@@ -365,10 +375,6 @@ public class SearchContainer<R> {
 	}
 
 	public boolean isSearch() {
-		if (_searchTerms != null) {
-			return _searchTerms.isSearch();
-		}
-
 		return _search;
 	}
 
@@ -482,6 +488,10 @@ public class SearchContainer<R> {
 		_search = search;
 	}
 
+	public void setSummary(String summary) {
+		_summary = summary;
+	}
+
 	public void setTotal(int total) {
 		_total = total;
 
@@ -578,6 +588,7 @@ public class SearchContainer<R> {
 	private boolean _search;
 	private final DisplayTerms _searchTerms;
 	private int _start;
+	private String _summary;
 	private int _total;
 	private String _totalVar;
 	private boolean _uniqueId;

@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
@@ -74,7 +75,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 
@@ -478,12 +478,13 @@ public class AssetUtil {
 			addPortletURL.setParameter("layoutUuid", layout.getUuid());
 		}
 
-		if (addPortletURL instanceof PortletURLImpl) {
-			PortletURLImpl portletURLImpl = (PortletURLImpl)addPortletURL;
+		if (addPortletURL instanceof LiferayPortletURL) {
+			LiferayPortletURL liferayPortletURL =
+				(LiferayPortletURL)addPortletURL;
 
-			portletURLImpl.setRefererPlid(plid);
+			liferayPortletURL.setRefererPlid(plid);
 
-			return portletURLImpl.toString();
+			return liferayPortletURL.toString();
 		}
 
 		return HttpUtil.addParameter(
@@ -674,17 +675,15 @@ public class AssetUtil {
 				pos + AssetUtil.CLASSNAME_SEPARATOR.length());
 
 			className = className.substring(0, pos);
+
+			return message;
 		}
 
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				className);
 
-		if (pos == -1) {
-			message = assetRendererFactory.getTypeName(locale);
-		}
-
-		return message;
+		return assetRendererFactory.getTypeName(locale);
 	}
 
 	public static String getDefaultAssetPublisherId(Layout layout) {

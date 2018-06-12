@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.struts.StrutsActionPortletURL;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletResponseImpl;
-import com.liferay.portlet.PortletURLImpl;
 
 import java.lang.reflect.Constructor;
 
@@ -37,6 +36,7 @@ import java.security.PrivilegedAction;
 
 import java.util.Map;
 
+import javax.portlet.MimeResponse;
 import javax.portlet.PortletModeException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -52,7 +52,7 @@ public class LiferayPortletURLPrivilegedAction
 	implements PrivilegedAction<LiferayPortletURL> {
 
 	public LiferayPortletURLPrivilegedAction(
-		long plid, String portletName, String lifecycle,
+		long plid, String portletName, String lifecycle, MimeResponse.Copy copy,
 		boolean includeLinkToLayoutUuid, Layout layout, Portlet portlet,
 		PortletPreferences portletPreferences, PortletRequest portletRequest,
 		PortletResponseImpl portletResponseImpl, long requestPlid,
@@ -61,6 +61,7 @@ public class LiferayPortletURLPrivilegedAction
 		_plid = plid;
 		_portletName = portletName;
 		_lifecycle = lifecycle;
+		_copy = copy;
 		_includeLinkToLayoutUuid = includeLinkToLayoutUuid;
 		_layout = layout;
 		_portlet = portlet;
@@ -74,11 +75,12 @@ public class LiferayPortletURLPrivilegedAction
 	}
 
 	public LiferayPortletURLPrivilegedAction(
-		String portletName, String lifecycle, Layout layout, Portlet portlet,
-		HttpServletRequest request) {
+		String portletName, String lifecycle, MimeResponse.Copy copy,
+		Layout layout, Portlet portlet, HttpServletRequest request) {
 
 		_portletName = portletName;
 		_lifecycle = lifecycle;
+		_copy = copy;
 		_layout = layout;
 		_portlet = portlet;
 		_request = request;
@@ -96,7 +98,7 @@ public class LiferayPortletURLPrivilegedAction
 	public LiferayPortletURL run() {
 		if (_request != null) {
 			return PortletURLFactoryUtil.create(
-				_request, _portlet, _layout, _lifecycle);
+				_request, _portlet, _layout, _lifecycle, _copy);
 		}
 
 		boolean includeLinkToLayoutUuid = _includeLinkToLayoutUuid;
@@ -191,11 +193,11 @@ public class LiferayPortletURLPrivilegedAction
 		if (portletURL == null) {
 			if (_portletName.equals(portletId)) {
 				portletURL = PortletURLFactoryUtil.create(
-					_portletRequest, _portlet, plid, _lifecycle);
+					_portletRequest, _portlet, plid, _lifecycle, _copy);
 			}
 			else {
 				portletURL = PortletURLFactoryUtil.create(
-					_portletRequest, _portletName, plid, _lifecycle);
+					_portletRequest, _portletName, plid, _lifecycle, _copy);
 			}
 		}
 
@@ -231,6 +233,7 @@ public class LiferayPortletURLPrivilegedAction
 
 	private final Map<String, Constructor<? extends PortletURLImpl>>
 		_constructors;
+	private final MimeResponse.Copy _copy;
 	private final boolean _includeLinkToLayoutUuid;
 	private final Layout _layout;
 	private final String _lifecycle;

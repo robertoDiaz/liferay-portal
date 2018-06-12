@@ -444,6 +444,27 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public java.util.List<String> getHeaderPortletJavaScript();
 
 	/**
+	* Returns a list of attribute name prefixes that will be referenced after
+	* the HEADER_PHASE completes for each portlet. Header request attributes
+	* that have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @return a list of attribute name prefixes that will be referenced after
+	the HEADER_PHASE completes for each portlet. Header request
+	attributes that have names starting with any of the prefixes will
+	be copied from the header request to the subsequent render
+	request.
+	*/
+	public java.util.List<String> getHeaderRequestAttributePrefixes();
+
+	/**
+	* Returns the header timeout of the portlet.
+	*
+	* @return the header timeout of the portlet
+	*/
+	public int getHeaderTimeout();
+
+	/**
 	* Returns the icon of the portlet.
 	*
 	* @return the icon of the portlet
@@ -523,6 +544,34 @@ public interface Portlet extends PortletModel, PersistedModel {
 	when the user goes into the help mode
 	*/
 	public boolean getMaximizeHelp();
+
+	/**
+	* Returns the maximum size of buffered bytes before storing occurs.
+	*
+	* @return the maximum size of buffered bytes before storing occurs
+	*/
+	public int getMultipartFileSizeThreshold();
+
+	/**
+	* Returns the directory for storing uploaded files.
+	*
+	* @return the directory for storing uploaded files
+	*/
+	public String getMultipartLocation();
+
+	/**
+	* Returns the maximum number of bytes permitted for an uploaded file.
+	*
+	* @return the maximum number of bytes permitted for an uploaded file
+	*/
+	public long getMultipartMaxFileSize();
+
+	/**
+	* Returns the maximum number of bytes permitted for a multipart request.
+	*
+	* @return the maximum number of bytes permitted for a multipart request
+	*/
+	public long getMultipartMaxRequestSize();
 
 	/**
 	* Returns the name of the open search class of the portlet.
@@ -803,13 +852,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if the portlet is ready to be used
 	*/
 	public boolean getReady();
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	public boolean getRemoteable();
 
 	/**
 	* Returns the render timeout of the portlet.
@@ -1283,6 +1325,15 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*/
 	public boolean isAjaxable();
 
+	/**
+	* Returns <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @return <code>true</code> if the portlet supports asynchrounous
+	processing in resource requests
+	*/
+	public boolean isAsyncSupported();
+
 	public boolean isFullPageDisplayable();
 
 	/**
@@ -1389,13 +1440,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if the portlet is ready to be used
 	*/
 	public boolean isReady();
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	public boolean isRemoteable();
 
 	/**
 	* Returns <code>true</code> if the portlet will only process namespaced
@@ -1553,6 +1597,15 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*/
 	public void setAssetRendererFactoryClasses(
 		java.util.List<String> assetRendererFactoryClasses);
+
+	/**
+	* Set to <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @param asyncSupported boolean value for whether the portlet supports
+	asynchronous processing in resource requests
+	*/
+	public void setAsyncSupported(boolean asyncSupported);
 
 	/**
 	* Sets the names of the classes that represent atom collection adapters
@@ -1773,6 +1826,28 @@ public interface Portlet extends PortletModel, PersistedModel {
 		java.util.List<String> headerPortletJavaScript);
 
 	/**
+	* Sets a list of attribute name prefixes that will be referenced after the
+	* HEADER_PHASE completes for each portlet. Header request attributes that
+	* have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @param headerRequestAttributePrefixes a list of attribute name prefixes
+	that will be referenced after the HEADER_PHASE completes for each
+	portlet. Header request attributes that have names starting with
+	any of the prefixes will be copied from the header request to the
+	subsequent render request.
+	*/
+	public void setHeaderRequestAttributePrefixes(
+		java.util.List<String> headerRequestAttributePrefixes);
+
+	/**
+	* Sets the header timeout of the portlet.
+	*
+	* @param headerTimeout the header timeout of the portlet
+	*/
+	public void setHeaderTimeout(int headerTimeout);
+
+	/**
 	* Sets the icon of the portlet.
 	*
 	* @param icon the icon of the portlet
@@ -1839,6 +1914,37 @@ public interface Portlet extends PortletModel, PersistedModel {
 	maximized state when the user goes into the help mode
 	*/
 	public void setMaximizeHelp(boolean maximizeHelp);
+
+	/**
+	* Sets the maximum size of buffered bytes before storing occurs.
+	*
+	* @param multipartFileSizeThreshold the maximum size of buffered bytes
+	before storing occurs
+	*/
+	public void setMultipartFileSizeThreshold(int multipartFileSizeThreshold);
+
+	/**
+	* Sets the directory for storing uploaded files.
+	*
+	* @param multipartLocation the directory for storing uploaded files
+	*/
+	public void setMultipartLocation(String multipartLocation);
+
+	/**
+	* Sets the maximum number of bytes permitted for an uploaded file.
+	*
+	* @param multipartMaxFileSize the maximum number of bytes permitted for an
+	uploaded file
+	*/
+	public void setMultipartMaxFileSize(long multipartMaxFileSize);
+
+	/**
+	* Sets the maximum number of bytes permitted for a multipart request.
+	*
+	* @param multipartMaxRequestSize the maximum number of bytes permitted for
+	a multipart request
+	*/
+	public void setMultipartMaxRequestSize(long multipartMaxRequestSize);
 
 	/**
 	* Sets the name of the open search class of the portlet.
@@ -2045,14 +2151,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @param ready whether the portlet is ready to be used
 	*/
 	public void setReady(boolean ready);
-
-	/**
-	* Set to <code>true</code> if the portlet supports remoting
-	*
-	* @param remoteable boolean value for whether or not the the portlet
-	supports remoting
-	*/
-	public void setRemoteable(boolean remoteable);
 
 	/**
 	* Sets the render timeout of the portlet.
