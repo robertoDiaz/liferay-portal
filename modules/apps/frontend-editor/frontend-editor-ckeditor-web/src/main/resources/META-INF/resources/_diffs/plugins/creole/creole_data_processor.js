@@ -252,7 +252,7 @@
 			}
 
 			if (tagName == TAG_PARAGRAPH) {
-				if (!instance._isLastItemNewLine()) {
+				if (!instance._isLastItemNewLine() && !instance._hasParentNode(element, TAG_LIST_ITEM)) {
 					instance._endResult.push(NEW_LINE);
 				}
 			}
@@ -436,7 +436,7 @@
 		_handleParagraph: function(element, listTagsIn, listTagsOut) {
 			var instance = this;
 
-			if (instance._isDataAvailable()) {
+			if (instance._isDataAvailable() && !instance._hasParentNode(element, TAG_LIST_ITEM)) {
 				instance._appendNewLines(2);
 			}
 
