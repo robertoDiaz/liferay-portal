@@ -1066,7 +1066,9 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 	*
 	* @return the non-system groups having <code>null</code> or empty friendly
 	URLs
+	* @deprecated As of 7.0.0, with no direct replacement
 	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Group> getNullFriendlyURLGroups() {
 		return _groupLocalService.getNullFriendlyURLGroups();
@@ -2698,6 +2700,15 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 		boolean site)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _groupLocalService.updateSite(groupId, site);
+	}
+
+	@Override
+	public void validateRemote(long groupId, String remoteAddress,
+		int remotePort, String remotePathContext, boolean secureConnection,
+		long remoteGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_groupLocalService.validateRemote(groupId, remoteAddress, remotePort,
+			remotePathContext, secureConnection, remoteGroupId);
 	}
 
 	@Override

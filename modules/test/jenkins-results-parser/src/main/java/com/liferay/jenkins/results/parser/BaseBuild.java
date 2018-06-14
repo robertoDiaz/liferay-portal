@@ -135,7 +135,7 @@ public abstract class BaseBuild implements Build {
 
 		try {
 			writeArchiveFile(
-				Long.toString(System.currentTimeMillis()),
+				String.valueOf(System.currentTimeMillis()),
 				getArchivePath() + "/archive-marker");
 		}
 		catch (IOException ioe) {
@@ -200,7 +200,7 @@ public abstract class BaseBuild implements Build {
 		for (Integer badBuildNumber : badBuildNumbers) {
 			badBuildURLs.add(
 				JenkinsResultsParserUtil.combine(
-					jobURL, "/", Integer.toString(badBuildNumber), "/"));
+					jobURL, "/", String.valueOf(badBuildNumber), "/"));
 		}
 
 		return badBuildURLs;
@@ -681,10 +681,6 @@ public abstract class BaseBuild implements Build {
 			jobVariant = getParameterValue("JENKINS_JOB_VARIANT");
 		}
 
-		if ((jobVariant == null) || jobVariant.isEmpty()) {
-			jobVariant = getJobName();
-		}
-
 		return jobVariant;
 	}
 
@@ -963,15 +959,15 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public String getStatusSummary() {
 		return JenkinsResultsParserUtil.combine(
-			Integer.toString(getDownstreamBuildCount("starting")),
-			" Starting  ", "/ ",
-			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
-			"/ ", Integer.toString(getDownstreamBuildCount("queued")),
-			" Queued  ", "/ ",
-			Integer.toString(getDownstreamBuildCount("running")), " Running  ",
-			"/ ", Integer.toString(getDownstreamBuildCount("completed")),
-			" Completed  ", "/ ",
-			Integer.toString(getDownstreamBuildCount(null)), " Total ");
+			String.valueOf(getDownstreamBuildCount("starting")), " Starting  ",
+			"/ ", String.valueOf(getDownstreamBuildCount("missing")),
+			" Missing  ", "/ ",
+			String.valueOf(getDownstreamBuildCount("queued")), " Queued  ",
+			"/ ", String.valueOf(getDownstreamBuildCount("running")),
+			" Running  ", "/ ",
+			String.valueOf(getDownstreamBuildCount("completed")),
+			" Completed  ", "/ ", String.valueOf(getDownstreamBuildCount(null)),
+			" Total ");
 	}
 
 	@Override
@@ -1106,14 +1102,12 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public void reinvoke(ReinvokeRule reinvokeRule) {
-		String hostName = JenkinsResultsParserUtil.getHostName("");
-
 		Build parentBuild = getParentBuild();
 
 		String parentBuildStatus = parentBuild.getStatus();
 
 		if (!parentBuildStatus.equals("running") ||
-			!hostName.startsWith("cloud-10-0")) {
+			!JenkinsResultsParserUtil.isCINode()) {
 
 			return;
 		}
@@ -1398,7 +1392,7 @@ public abstract class BaseBuild implements Build {
 			content = Dom4JUtil.format(gitHubMessage, false);
 		}
 		catch (IOException ioe) {
-			throw new RuntimeException("Unable to format github message.", ioe);
+			throw new RuntimeException("Unable to format github message", ioe);
 		}
 
 		for (String contentFlag : _HIGH_PRIORITY_CONTENT_FLAGS) {

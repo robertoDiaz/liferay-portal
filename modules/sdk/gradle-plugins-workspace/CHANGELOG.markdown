@@ -25,7 +25,7 @@ applied:
 ## 1.2.0 - 2016-10-24
 
 ### Added
-- [LPS-68293]: Add the [Liferay CDN](https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public)
+- [LPS-68293]: Add the [Liferay CDN](https://repository-cdn.liferay.com/nexus/content/groups/public)
 as default repository in WAR projects. This behavior can be disabled by setting
 the `liferay.workspace.wars.default.repository.enabled` property in
 `gradle.properties` to `false`.
@@ -97,7 +97,7 @@ extension object into the public API.
 ### Added
 - [LPS-71724]: Add the ability to download and upgrade the Plugins SDK
 directories by executing the `upgradePluginsSDK` task in the root project.
-- [LPS-71724]: Add [Liferay CDN](https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public)
+- [LPS-71724]: Add [Liferay CDN](https://repository-cdn.liferay.com/nexus/content/groups/public)
 as the default repository in the root project. This behavior can be disabled by
 setting the `liferay.workspace.default.repository.enabled` property to `false`
 in `gradle.properties`.
@@ -189,6 +189,18 @@ Gradle plugin to the root project if the `target.platform.version` property in
 ### Changed
 - [LPS-74544]: Update the [Liferay Gradle Plugins] dependency to version 3.9.22.
 
+## 1.9.2 - 2018-05-02
+
+### Changed
+- [LPS-80281]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.27.
+
+## 1.10.0 - 2018-05-26
+
+### Added
+- [LPS-79453]: Add support for Ext OSGi modules.
+- [LPS-79453]: Add support for Ext plugins.
+
 [Gradle Download Task]: https://github.com/michel-kraemer/gradle-download-task/
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
 [Liferay Portal Tools Bundle Support]: https://github.com/liferay/liferay-portal/tree/master/modules/util/portal-tools-bundle-support
@@ -232,3 +244,5 @@ Gradle plugin to the root project if the `target.platform.version` property in
 [LPS-77586]: https://issues.liferay.com/browse/LPS-77586
 [LPS-78149]: https://issues.liferay.com/browse/LPS-78149
 [LPS-78911]: https://issues.liferay.com/browse/LPS-78911
+[LPS-79453]: https://issues.liferay.com/browse/LPS-79453
+[LPS-80281]: https://issues.liferay.com/browse/LPS-80281

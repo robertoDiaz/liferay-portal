@@ -14,16 +14,27 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.IOException;
 
 import javax.portlet.ActionResponse;
+import javax.portlet.MimeResponse;
 import javax.portlet.PortletRequest;
+import javax.portlet.RenderURL;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Neil Griffin
  */
+@ProviderType
 public class ActionResponseImpl
 	extends StateAwareResponseImpl implements ActionResponse {
+
+	@Override
+	public RenderURL createRedirectURL(MimeResponse.Copy copy) {
+		return createRenderURL(copy);
+	}
 
 	@Override
 	public String getLifecycle() {

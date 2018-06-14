@@ -14,7 +14,11 @@
 
 package com.liferay.poshi.runner.elements;
 
+import java.util.List;
+
+import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 /**
  * @author Kenji Heigel
@@ -32,24 +36,25 @@ public class TakeScreenshotPoshiElement extends PoshiElement {
 
 	@Override
 	public PoshiElement clone(
-		PoshiElement parentPoshiElement, String readableSyntax) {
+		PoshiElement parentPoshiElement, String poshiScript) {
 
-		if (_isElementType(readableSyntax)) {
-			return new TakeScreenshotPoshiElement(readableSyntax);
+		if (_isElementType(poshiScript)) {
+			return new TakeScreenshotPoshiElement(
+				parentPoshiElement, poshiScript);
 		}
 
 		return null;
 	}
 
 	@Override
-	public void parseReadableSyntax(String readableSyntax) {
+	public void parsePoshiScript(String poshiScript) {
 	}
 
 	@Override
-	public String toReadableSyntax() {
-		String readableSyntax = super.toReadableSyntax();
+	public String toPoshiScript() {
+		String poshiScript = super.toPoshiScript();
 
-		return createReadableBlock(readableSyntax);
+		return createPoshiScriptSnippet(poshiScript);
 	}
 
 	protected TakeScreenshotPoshiElement() {
@@ -59,12 +64,20 @@ public class TakeScreenshotPoshiElement extends PoshiElement {
 		super(_ELEMENT_NAME, element);
 	}
 
-	protected TakeScreenshotPoshiElement(String readableSyntax) {
-		super(_ELEMENT_NAME, readableSyntax);
+	protected TakeScreenshotPoshiElement(
+		List<Attribute> attributes, List<Node> nodes) {
+
+		super(_ELEMENT_NAME, attributes, nodes);
+	}
+
+	protected TakeScreenshotPoshiElement(
+		PoshiElement parentPoshiElement, String poshiScript) {
+
+		super(_ELEMENT_NAME, parentPoshiElement, poshiScript);
 	}
 
 	@Override
-	protected String createReadableBlock(String content) {
+	protected String createPoshiScriptSnippet(String content) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n\n");
@@ -80,8 +93,8 @@ public class TakeScreenshotPoshiElement extends PoshiElement {
 		return "takeScreenshot";
 	}
 
-	private boolean _isElementType(String readableSyntax) {
-		if (readableSyntax.startsWith(getBlockName())) {
+	private boolean _isElementType(String poshiScript) {
+		if (poshiScript.startsWith(getBlockName())) {
 			return true;
 		}
 

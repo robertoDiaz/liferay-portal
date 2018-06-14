@@ -22,12 +22,16 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
+import com.liferay.source.formatter.BNDSettings;
 import com.liferay.source.formatter.SourceFormatterExcludes;
 import com.liferay.source.formatter.SourceFormatterMessage;
 import com.liferay.source.formatter.checks.util.SourceUtil;
+import com.liferay.source.formatter.checkstyle.util.CheckstyleUtil;
 import com.liferay.source.formatter.util.CheckType;
 import com.liferay.source.formatter.util.FileUtil;
 import com.liferay.source.formatter.util.SourceFormatterUtil;
+
+import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 import java.io.File;
 
@@ -90,6 +94,13 @@ public abstract class BaseSourceCheck implements SourceCheck {
 	}
 
 	@Override
+	public void setCheckstyleConfiguration(
+		Configuration checkstyleConfiguration) {
+
+		_checkstyleConfiguration = checkstyleConfiguration;
+	}
+
+	@Override
 	public void setEnabled(boolean enabled) {
 		_enabled = enabled;
 	}
@@ -138,8 +149,8 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		addMessage(fileName, message, -1);
 	}
 
-	protected void addMessage(String fileName, String message, int lineCount) {
-		addMessage(fileName, message, null, lineCount);
+	protected void addMessage(String fileName, String message, int lineNumber) {
+		addMessage(fileName, message, null, lineNumber);
 	}
 
 	protected void addMessage(
@@ -150,7 +161,7 @@ public abstract class BaseSourceCheck implements SourceCheck {
 
 	protected void addMessage(
 		String fileName, String message, String markdownFileName,
-		int lineCount) {
+		int lineNumber) {
 
 		Set<SourceFormatterMessage> sourceFormatterMessages =
 			_sourceFormatterMessagesMap.get(fileName);
@@ -164,7 +175,7 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		sourceFormatterMessages.add(
 			new SourceFormatterMessage(
 				fileName, message, CheckType.SOURCE_CHECK,
-				clazz.getSimpleName(), markdownFileName, lineCount));
+				clazz.getSimpleName(), markdownFileName, lineNumber));
 
 		_sourceFormatterMessagesMap.put(fileName, sourceFormatterMessages);
 	}
@@ -175,6 +186,55 @@ public abstract class BaseSourceCheck implements SourceCheck {
 
 	protected String getBaseDirName() {
 		return _baseDirName;
+	}
+
+	protected BNDSettings getBNDSettings(String fileName) throws Exception {
+		for (Map.Entry<String, BNDSettings> entry :
+				_bndSettingsMap.entrySet()) {
+
+			String bndFileLocation = entry.getKey();
+
+			if (fileName.startsWith(bndFileLocation)) {
+				return entry.getValue();
+			}
+		}
+
+		String bndFileLocation = fileName;
+
+		while (true) {
+			int pos = bndFileLocation.lastIndexOf(StringPool.SLASH);
+
+			if (pos == -1) {
+				return null;
+			}
+
+			bndFileLocation = bndFileLocation.substring(0, pos + 1);
+
+			File file = new File(bndFileLocation + "bnd.bnd");
+
+			if (file.exists()) {
+				return new BNDSettings(
+					bndFileLocation + "bnd.bnd", FileUtil.read(file));
+			}
+
+			bndFileLocation = StringUtil.replaceLast(
+				bndFileLocation, CharPool.SLASH, StringPool.BLANK);
+		}
+	}
+
+	protected Map<String, String> getCheckstyleAttributesMap(String checkName)
+		throws Exception {
+
+		return CheckstyleUtil.getAttributesMap(
+			checkName, _checkstyleConfiguration);
+	}
+
+	protected String getCheckstyleAttributeValue(
+			String checkName, String attributeName)
+		throws Exception {
+
+		return CheckstyleUtil.getAttributeValue(
+			checkName, attributeName, _checkstyleConfiguration);
 	}
 
 	protected Map<String, String> getCompatClassNamesMap() throws Exception {
@@ -319,8 +379,8 @@ public abstract class BaseSourceCheck implements SourceCheck {
 			s, increaseLevelStrings, decreaseLevelStrings, startLevel);
 	}
 
-	protected String getLine(String content, int lineCount) {
-		int nextLineStartPos = getLineStartPos(content, lineCount);
+	protected String getLine(String content, int lineNumber) {
+		int nextLineStartPos = getLineStartPos(content, lineNumber);
 
 		if (nextLineStartPos == -1) {
 			return null;
@@ -336,14 +396,14 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		return content.substring(nextLineStartPos, nextLineEndPos);
 	}
 
-	protected int getLineCount(String content, int pos) {
-		return StringUtil.count(content, 0, pos, CharPool.NEW_LINE) + 1;
+	protected int getLineNumber(String content, int pos) {
+		return SourceUtil.getLineNumber(content, pos);
 	}
 
-	protected int getLineStartPos(String content, int lineCount) {
+	protected int getLineStartPos(String content, int lineNumber) {
 		int x = 0;
 
-		for (int i = 1; i < lineCount; i++) {
+		for (int i = 1; i < lineNumber; i++) {
 			x = content.indexOf(CharPool.NEW_LINE, x + 1);
 
 			if (x == -1) {
@@ -428,6 +488,26 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		return portalImplDir.getParentFile();
 	}
 
+	protected String getProjectName() {
+		if (_projectName != null) {
+			return _projectName;
+		}
+
+		if (Validator.isNull(_projectPathPrefix) ||
+			!_projectPathPrefix.contains(StringPool.COLON)) {
+
+			_projectName = StringPool.BLANK;
+
+			return _projectName;
+		}
+
+		int pos = _projectPathPrefix.lastIndexOf(StringPool.COLON);
+
+		_projectName = _projectPathPrefix.substring(pos + 1);
+
+		return _projectName;
+	}
+
 	protected String getProjectPathPrefix() {
 		return _projectPathPrefix;
 	}
@@ -441,7 +521,7 @@ public abstract class BaseSourceCheck implements SourceCheck {
 	}
 
 	protected boolean isExcludedPath(
-		Properties properties, String key, String path, int lineCount,
+		Properties properties, String key, String path, int lineNumber,
 		String parameter) {
 
 		List<String> excludes = ListUtil.fromString(
@@ -458,10 +538,10 @@ public abstract class BaseSourceCheck implements SourceCheck {
 			pathWithParameter = path + StringPool.AT + parameter;
 		}
 
-		String pathWithLineCount = null;
+		String pathWithLineNumber = null;
 
-		if (lineCount > 0) {
-			pathWithLineCount = path + StringPool.AT + lineCount;
+		if (lineNumber > 0) {
+			pathWithLineNumber = path + StringPool.AT + lineNumber;
 		}
 
 		for (String exclude : excludes) {
@@ -486,8 +566,8 @@ public abstract class BaseSourceCheck implements SourceCheck {
 			if (path.endsWith(exclude) ||
 				((pathWithParameter != null) &&
 				 pathWithParameter.endsWith(exclude)) ||
-				((pathWithLineCount != null) &&
-				 pathWithLineCount.endsWith(exclude))) {
+				((pathWithLineNumber != null) &&
+				 pathWithLineNumber.endsWith(exclude))) {
 
 				return true;
 			}
@@ -500,19 +580,19 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		return isExcludedPath(key, path, -1);
 	}
 
-	protected boolean isExcludedPath(String key, String path, int lineCount) {
-		return isExcludedPath(key, path, lineCount, null);
+	protected boolean isExcludedPath(String key, String path, int lineNumber) {
+		return isExcludedPath(key, path, lineNumber, null);
 	}
 
 	protected boolean isExcludedPath(
-		String key, String path, int lineCount, String parameter) {
+		String key, String path, int lineNumber, String parameter) {
 
 		for (Map.Entry<String, Properties> entry : _propertiesMap.entrySet()) {
 			String propertiesFileLocation = entry.getKey();
 
 			if (path.startsWith(propertiesFileLocation) &&
 				isExcludedPath(
-					entry.getValue(), key, path, lineCount, parameter)) {
+					entry.getValue(), key, path, lineNumber, parameter)) {
 
 				return true;
 			}
@@ -583,6 +663,10 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		return _subrepository;
 	}
 
+	protected void putBNDSettings(BNDSettings bndSettings) {
+		_bndSettingsMap.put(bndSettings.getFileLocation(), bndSettings);
+	}
+
 	protected String stripQuotes(String s) {
 		return stripQuotes(s, CharPool.APOSTROPHE, CharPool.QUOTE);
 	}
@@ -634,10 +718,14 @@ public abstract class BaseSourceCheck implements SourceCheck {
 		"run.outside.portal.excludes";
 
 	private String _baseDirName;
+	private final Map<String, BNDSettings> _bndSettingsMap =
+		new ConcurrentHashMap<>();
+	private Configuration _checkstyleConfiguration;
 	private boolean _enabled = true;
 	private int _maxLineLength;
 	private List<String> _pluginsInsideModulesDirectoryNames;
 	private boolean _portalSource;
+	private String _projectName;
 	private String _projectPathPrefix;
 	private Map<String, Properties> _propertiesMap;
 	private SourceFormatterExcludes _sourceFormatterExcludes;

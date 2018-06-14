@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -23,8 +25,8 @@ import com.liferay.portlet.extra.config.ExtraPortletAppConfigRegistry;
 
 import java.util.Locale;
 
+import javax.portlet.MimeResponse;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
@@ -34,7 +36,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Neil Griffin
  */
+@ProviderType
 public class ResourceResponseImpl
 	extends MimeResponseImpl implements ResourceResponse {
 
@@ -61,13 +65,8 @@ public class ResourceResponseImpl
 	}
 
 	@Override
-	public PortletURL createActionURL() {
-		return super.createActionURL();
-	}
-
-	@Override
 	public LiferayPortletURL createLiferayPortletURL(
-		long plid, String portletName, String lifecycle,
+		long plid, String portletName, String lifecycle, MimeResponse.Copy copy,
 		boolean includeLinkToLayoutUuid) {
 
 		ResourceRequest resourceRequest = (ResourceRequest)getPortletRequest();
@@ -88,22 +87,17 @@ public class ResourceResponseImpl
 		}
 
 		return super.createLiferayPortletURL(
-			plid, portletName, lifecycle, includeLinkToLayoutUuid);
-	}
-
-	@Override
-	public PortletURL createRenderURL() {
-		return super.createRenderURL();
-	}
-
-	@Override
-	public ResourceURL createResourceURL() {
-		return super.createResourceURL();
+			plid, portletName, lifecycle, copy, includeLinkToLayoutUuid);
 	}
 
 	@Override
 	public String getLifecycle() {
 		return PortletRequest.RESOURCE_PHASE;
+	}
+
+	@Override
+	public int getStatus() {
+		return response.getStatus();
 	}
 
 	@Override
@@ -116,6 +110,11 @@ public class ResourceResponseImpl
 	@Override
 	public void setContentLength(int length) {
 		response.setContentLength(length);
+	}
+
+	@Override
+	public void setContentLengthLong(long length) {
+		response.setContentLengthLong(length);
 	}
 
 	@Override
@@ -166,6 +165,11 @@ public class ResourceResponseImpl
 				_canSetLocaleEncoding = true;
 			}
 		}
+	}
+
+	@Override
+	public void setStatus(int statusCode) {
+		response.setStatus(statusCode);
 	}
 
 	private boolean _canSetLocaleEncoding = true;

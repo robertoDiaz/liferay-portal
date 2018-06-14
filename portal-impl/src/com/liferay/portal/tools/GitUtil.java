@@ -47,6 +47,14 @@ public class GitUtil {
 	}
 
 	public static List<String> getCurrentBranchFileNames(
+			String baseDirName, String gitWorkingBranchName)
+		throws Exception {
+
+		return getCurrentBranchFileNames(
+			baseDirName, gitWorkingBranchName, false);
+	}
+
+	public static List<String> getCurrentBranchFileNames(
 			String baseDirName, String gitWorkingBranchName,
 			boolean includeDeletedFileNames)
 		throws Exception {
@@ -66,6 +74,12 @@ public class GitUtil {
 		throws Exception {
 
 		return getFileContent(getLatestAuthorCommitId(), fileName);
+	}
+
+	public static List<String> getLatestAuthorFileNames(String baseDirName)
+		throws Exception {
+
+		return getLatestAuthorFileNames(baseDirName, false);
 	}
 
 	public static List<String> getLatestAuthorFileNames(
@@ -89,6 +103,12 @@ public class GitUtil {
 		return getFileContent("HEAD", fileName);
 	}
 
+	public static List<String> getLocalChangesFileNames(String baseDirName)
+		throws Exception {
+
+		return getLocalChangesFileNames(baseDirName, false);
+	}
+
 	public static List<String> getLocalChangesFileNames(
 			String baseDirName, boolean includeDeletedFileNames)
 		throws Exception {
@@ -107,8 +127,6 @@ public class GitUtil {
 
 		String baseDirName = ArgumentsUtil.getString(
 			arguments, "git.base.dir", "./");
-		String markerFileName = ArgumentsUtil.getString(
-			arguments, "git.marker.file", null);
 		String type = ArgumentsUtil.getString(
 			arguments, "git.type", "current-branch");
 
@@ -131,6 +149,9 @@ public class GitUtil {
 			else {
 				throw new IllegalArgumentException();
 			}
+
+			String markerFileName = ArgumentsUtil.getString(
+				arguments, "git.marker.file", null);
 
 			if (Validator.isNotNull(markerFileName)) {
 				fileNames = getDirNames(baseDirName, fileNames, markerFileName);
@@ -269,7 +290,7 @@ public class GitUtil {
 
 		unsyncBufferedReader = getGitCommandReader(
 			StringBundler.concat(
-				"git diff --diff-filter=AM --name-only ", commitId, " ",
+				"git diff --diff-filter=AMR --name-only ", commitId, " ",
 				latestCommitId));
 
 		String line = null;
@@ -300,7 +321,7 @@ public class GitUtil {
 
 			if (errorMessage.contains("Cannot run program")) {
 				throw new GitException(
-					"Add Git to your PATH system variable first.");
+					"Add Git to your PATH system variable first");
 			}
 
 			throw ioe;
@@ -311,18 +332,24 @@ public class GitUtil {
 	}
 
 	protected static int getGitLevel(String baseDirName) throws GitException {
-		for (int i = 0; i < ToolsUtil.PORTAL_MAX_DIR_LEVEL; i++) {
-			File file = new File(baseDirName + ".git");
+		File dir = new File(baseDirName);
 
-			if (file.exists()) {
+		for (int i = 0; i < ToolsUtil.PORTAL_MAX_DIR_LEVEL; i++) {
+			if ((dir == null) || !dir.exists()) {
+				continue;
+			}
+
+			File gitFile = new File(dir, ".git");
+
+			if (gitFile.exists()) {
 				return i;
 			}
 
-			baseDirName = "../" + baseDirName;
+			dir = dir.getParentFile();
 		}
 
 		throw new GitException(
-			"Unable to retrieve files because .git directory is missing.");
+			"Unable to retrieve files because .git directory is missing");
 	}
 
 	protected static String getLatestAuthorCommitId() throws Exception {

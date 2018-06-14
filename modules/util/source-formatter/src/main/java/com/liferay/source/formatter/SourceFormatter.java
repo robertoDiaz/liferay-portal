@@ -43,6 +43,7 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -101,6 +102,11 @@ public class SourceFormatter {
 				SourceFormatterArgs.BASE_DIR_NAME);
 
 			sourceFormatterArgs.setBaseDirName(baseDirName);
+
+			String checkName = ArgumentsUtil.getString(
+				arguments, "source.check.name", null);
+
+			sourceFormatterArgs.setCheckName(checkName);
 
 			boolean formatCurrentBranch = ArgumentsUtil.getBoolean(
 				arguments, "format.current.branch",
@@ -391,6 +397,49 @@ public class SourceFormatter {
 		return _sourceMismatchExceptions;
 	}
 
+	private void _addDependentFileNames() {
+		List<String> recentChangesFileNames =
+			_sourceFormatterArgs.getRecentChangesFileNames();
+
+		if (recentChangesFileNames == null) {
+			return;
+		}
+
+		Set<String> dependentFileNames = new HashSet<>();
+
+		for (String recentChangesFileName : recentChangesFileNames) {
+			if (!recentChangesFileName.endsWith("ServiceImpl.java")) {
+				continue;
+			}
+
+			String dirName = recentChangesFileName.substring(
+				0, recentChangesFileName.lastIndexOf(CharPool.SLASH));
+
+			while (true) {
+				String serviceFileName = dirName + "/service.xml";
+
+				File file = new File(
+					_sourceFormatterArgs.getBaseDirName() + serviceFileName);
+
+				if (file.exists()) {
+					dependentFileNames.add(serviceFileName);
+
+					break;
+				}
+
+				int pos = dirName.lastIndexOf(CharPool.SLASH);
+
+				if (pos == -1) {
+					break;
+				}
+
+				dirName = dirName.substring(0, pos);
+			}
+		}
+
+		_sourceFormatterArgs.addRecentChangesFileNames(dependentFileNames);
+	}
+
 	private List<String> _getCheckNames() {
 		List<String> checkNames = new ArrayList<>();
 
@@ -476,19 +525,26 @@ public class SourceFormatter {
 			return null;
 		}
 
-		File file = SourceFormatterUtil.getFile(
-			_sourceFormatterArgs.getBaseDirName(), "gradle.properties",
-			ToolsUtil.PORTAL_MAX_DIR_LEVEL);
+		String fileName = "gradle.properties";
 
-		if (file == null) {
-			return null;
+		for (int i = 0; i < ToolsUtil.PORTAL_MAX_DIR_LEVEL; i++) {
+			File file = new File(
+				_sourceFormatterArgs.getBaseDirName() + fileName);
+
+			if (file.exists()) {
+				Properties properties = new Properties();
+
+				properties.load(new FileInputStream(file));
+
+				if (properties.containsKey("project.path.prefix")) {
+					return properties.getProperty("project.path.prefix");
+				}
+			}
+
+			fileName = "../" + fileName;
 		}
 
-		Properties properties = new Properties();
-
-		properties.load(new FileInputStream(file));
-
-		return properties.getProperty("project.path.prefix");
+		return null;
 	}
 
 	private Properties _getProperties(File file) throws Exception {
@@ -534,6 +590,8 @@ public class SourceFormatter {
 		for (String modulePropertiesFileName : modulePropertiesFileNames) {
 			_readProperties(new File(modulePropertiesFileName));
 		}
+
+		_addDependentFileNames();
 
 		_pluginsInsideModulesDirectoryNames =
 			_getPluginsInsideModulesDirectoryNames();
