@@ -14,7 +14,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -24,8 +24,8 @@
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Wiki Test Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -121,7 +121,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPrivatePage">
@@ -131,13 +131,13 @@
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Child Site Page" />
-			<var name="privacy" value="Private" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Private Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Page#view">
 			<var name="pageName" value="Child Site Page" />
-			<var name="privacy" value="Private" />
+			<var name="privacy" value="Private Pages" />
 		</execute>
 
 		<execute macro="Navigator#gotoSpecificURLPage">
@@ -868,7 +868,7 @@
 		</execute>
 
 		<execute macro="WikiPage#addInlineImageViaEdit">
-			<var name="navTab" value="Page Attachments" />
+			<var name="navTab" value="Upload Image" />
 			<var name="uploadFileName" value="Document_1.jpg" />
 		</execute>
 

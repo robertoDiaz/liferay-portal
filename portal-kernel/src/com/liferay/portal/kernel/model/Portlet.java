@@ -79,6 +79,14 @@ public interface Portlet extends PortletModel, PersistedModel {
 		com.liferay.portal.kernel.application.type.ApplicationType applicationType);
 
 	/**
+	* Adds a portlet CSS/JavaScript resource dependency.
+	*
+	* @param portletDependency the portlet CSS/JavaScript resource dependency
+	*/
+	public void addPortletDependency(
+		com.liferay.portal.kernel.model.portlet.PortletDependency portletDependency);
+
+	/**
 	* Adds a processing event.
 	*/
 	public void addProcessingEvent(
@@ -444,6 +452,27 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public java.util.List<String> getHeaderPortletJavaScript();
 
 	/**
+	* Returns a list of attribute name prefixes that will be referenced after
+	* the HEADER_PHASE completes for each portlet. Header request attributes
+	* that have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @return a list of attribute name prefixes that will be referenced after
+	the HEADER_PHASE completes for each portlet. Header request
+	attributes that have names starting with any of the prefixes will
+	be copied from the header request to the subsequent render
+	request.
+	*/
+	public java.util.List<String> getHeaderRequestAttributePrefixes();
+
+	/**
+	* Returns the header timeout of the portlet.
+	*
+	* @return the header timeout of the portlet
+	*/
+	public int getHeaderTimeout();
+
+	/**
 	* Returns the icon of the portlet.
 	*
 	* @return the icon of the portlet
@@ -523,6 +552,34 @@ public interface Portlet extends PortletModel, PersistedModel {
 	when the user goes into the help mode
 	*/
 	public boolean getMaximizeHelp();
+
+	/**
+	* Returns the maximum size of buffered bytes before storing occurs.
+	*
+	* @return the maximum size of buffered bytes before storing occurs
+	*/
+	public int getMultipartFileSizeThreshold();
+
+	/**
+	* Returns the directory for storing uploaded files.
+	*
+	* @return the directory for storing uploaded files
+	*/
+	public String getMultipartLocation();
+
+	/**
+	* Returns the maximum number of bytes permitted for an uploaded file.
+	*
+	* @return the maximum number of bytes permitted for an uploaded file
+	*/
+	public long getMultipartMaxFileSize();
+
+	/**
+	* Returns the maximum number of bytes permitted for a multipart request.
+	*
+	* @return the maximum number of bytes permitted for a multipart request
+	*/
+	public long getMultipartMaxRequestSize();
 
 	/**
 	* Returns the name of the open search class of the portlet.
@@ -644,6 +701,13 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return the portlet data handler instance of the portlet
 	*/
 	public com.liferay.exportimport.kernel.lar.PortletDataHandler getPortletDataHandlerInstance();
+
+	/**
+	* Returns the portlet's CSS/JavaScript resource dependencies.
+	*
+	* @return the portlet's CSS/JavaScript resource dependencies
+	*/
+	public java.util.List<com.liferay.portal.kernel.model.portlet.PortletDependency> getPortletDependencies();
 
 	/**
 	* Returns the filters of the portlet.
@@ -803,13 +867,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if the portlet is ready to be used
 	*/
 	public boolean getReady();
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	public boolean getRemoteable();
 
 	/**
 	* Returns the render timeout of the portlet.
@@ -1283,6 +1340,15 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*/
 	public boolean isAjaxable();
 
+	/**
+	* Returns <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @return <code>true</code> if the portlet supports asynchrounous
+	processing in resource requests
+	*/
+	public boolean isAsyncSupported();
+
 	public boolean isFullPageDisplayable();
 
 	/**
@@ -1330,6 +1396,19 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public boolean isMaximizeHelp();
 
 	/**
+	* Returns <code>true</code> if the portlet's
+	* <code>serveResource(ResourceRequest,ResourceResponse)</code> method
+	* should be invoked during a partial action triggered by a different
+	* portlet on the same portal page.
+	*
+	* @return <code>true</code> if the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	public boolean isPartialActionServeResource();
+
+	/**
 	* Returns <code>true</code> if the portlet goes into the pop up state when
 	* the user goes into the print mode.
 	*
@@ -1337,6 +1416,31 @@ public interface Portlet extends PortletModel, PersistedModel {
 	the user goes into the print mode
 	*/
 	public boolean isPopUpPrint();
+
+	/**
+	* Returns <code>true</code> if the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified CSS resource dependencies are
+	to be referenced in the page's header
+	*/
+	public boolean isPortletDependencyCssEnabled();
+
+	/**
+	* Returns <code>true</code> if the JavaScript resource dependencies
+	* specified in <code>portlet.xml</code>, @{@link
+	* javax.portlet.annotations.Dependency}, {@link
+	* javax.portlet.HeaderResponse#addDependency(String, String, String)}, or
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String, String,
+	* String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified JavaScript resource
+	dependencies are to be referenced in the page's header
+	*/
+	public boolean isPortletDependencyJavaScriptEnabled();
 
 	/**
 	* Returns <code>true</code> if preferences are shared across the entire
@@ -1389,13 +1493,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return <code>true</code> if the portlet is ready to be used
 	*/
 	public boolean isReady();
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	public boolean isRemoteable();
 
 	/**
 	* Returns <code>true</code> if the portlet will only process namespaced
@@ -1553,6 +1650,15 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*/
 	public void setAssetRendererFactoryClasses(
 		java.util.List<String> assetRendererFactoryClasses);
+
+	/**
+	* Set to <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @param asyncSupported boolean value for whether the portlet supports
+	asynchronous processing in resource requests
+	*/
+	public void setAsyncSupported(boolean asyncSupported);
 
 	/**
 	* Sets the names of the classes that represent atom collection adapters
@@ -1773,6 +1879,28 @@ public interface Portlet extends PortletModel, PersistedModel {
 		java.util.List<String> headerPortletJavaScript);
 
 	/**
+	* Sets a list of attribute name prefixes that will be referenced after the
+	* HEADER_PHASE completes for each portlet. Header request attributes that
+	* have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @param headerRequestAttributePrefixes a list of attribute name prefixes
+	that will be referenced after the HEADER_PHASE completes for each
+	portlet. Header request attributes that have names starting with
+	any of the prefixes will be copied from the header request to the
+	subsequent render request.
+	*/
+	public void setHeaderRequestAttributePrefixes(
+		java.util.List<String> headerRequestAttributePrefixes);
+
+	/**
+	* Sets the header timeout of the portlet.
+	*
+	* @param headerTimeout the header timeout of the portlet
+	*/
+	public void setHeaderTimeout(int headerTimeout);
+
+	/**
 	* Sets the icon of the portlet.
 	*
 	* @param icon the icon of the portlet
@@ -1841,6 +1969,37 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setMaximizeHelp(boolean maximizeHelp);
 
 	/**
+	* Sets the maximum size of buffered bytes before storing occurs.
+	*
+	* @param multipartFileSizeThreshold the maximum size of buffered bytes
+	before storing occurs
+	*/
+	public void setMultipartFileSizeThreshold(int multipartFileSizeThreshold);
+
+	/**
+	* Sets the directory for storing uploaded files.
+	*
+	* @param multipartLocation the directory for storing uploaded files
+	*/
+	public void setMultipartLocation(String multipartLocation);
+
+	/**
+	* Sets the maximum number of bytes permitted for an uploaded file.
+	*
+	* @param multipartMaxFileSize the maximum number of bytes permitted for an
+	uploaded file
+	*/
+	public void setMultipartMaxFileSize(long multipartMaxFileSize);
+
+	/**
+	* Sets the maximum number of bytes permitted for a multipart request.
+	*
+	* @param multipartMaxRequestSize the maximum number of bytes permitted for
+	a multipart request
+	*/
+	public void setMultipartMaxRequestSize(long multipartMaxRequestSize);
+
+	/**
 	* Sets the name of the open search class of the portlet.
 	*
 	* @param openSearchClass the name of the open search class of the portlet
@@ -1853,6 +2012,18 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @param parentStrutsPath the parent struts path of the portlet
 	*/
 	public void setParentStrutsPath(String parentStrutsPath);
+
+	/**
+	* Sets whether the portlet's serve resource should be invoked during a
+	* partial action triggered by a different portlet on the same portal page.
+	*
+	* @param partialActionServeResource whether the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	public void setPartialActionServeResource(
+		boolean partialActionServeResource);
 
 	/**
 	* Sets the name of the permission propagator class of the portlet.
@@ -1884,11 +2055,11 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setPopMessageListenerClass(String popMessageListenerClass);
 
 	/**
-	* Set to <code>true</code> if the portlet goes into the pop up state when
-	* the user goes into the print mode.
+	* Sets whether the portlet goes into the pop up state when the user goes
+	* into the print mode.
 	*
-	* @param popUpPrint boolean value for whether the portlet goes into the pop
-	up state when the user goes into the print mode
+	* @param popUpPrint whether the portlet goes into the pop up state when the
+	user goes into the print mode
 	*/
 	public void setPopUpPrint(boolean popUpPrint);
 
@@ -1913,6 +2084,42 @@ public interface Portlet extends PortletModel, PersistedModel {
 	the portlet
 	*/
 	public void setPortletDataHandlerClass(String portletDataHandlerClass);
+
+	/**
+	* Sets whether the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyCssEnabled whether the CSS
+	resource dependencies that are specified in <code>portlet.xml</code>,
+	* @{@link javax.portlet.annotations.Dependency},
+	{@link javax.portlet.HeaderResponse#addDependency(String, String,
+	String)}, or {@link javax.portlet.HeaderResponse#addDependency(
+	String, String, String, String)} are to be referenced in the
+	page's header
+	*/
+	public void setPortletDependencyCssEnabled(
+		boolean portletDependencyCssEnabled);
+
+	/**
+	* Sets whether the JavaScript resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyJavaScriptEnabled whether the
+	JavaScript resource dependencies specified in
+	<code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	{@link javax.portlet.HeaderResponse#addDependency(String, String,
+	String)}, or {@link javax.portlet.HeaderResponse#addDependency(
+	String, String, String, String)} are to be referenced in the
+	page's header
+	*/
+	public void setPortletDependencyJavaScriptEnabled(
+		boolean portletDependencyJavaScriptEnabled);
 
 	/**
 	* Sets the filters of the portlet.
@@ -2045,14 +2252,6 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @param ready whether the portlet is ready to be used
 	*/
 	public void setReady(boolean ready);
-
-	/**
-	* Set to <code>true</code> if the portlet supports remoting
-	*
-	* @param remoteable boolean value for whether or not the the portlet
-	supports remoting
-	*/
-	public void setRemoteable(boolean remoteable);
 
 	/**
 	* Sets the render timeout of the portlet.

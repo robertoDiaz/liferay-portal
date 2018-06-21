@@ -623,6 +623,10 @@ public class GroupFinderImpl
 		}
 	}
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public List<Group> findByNullFriendlyURL() {
 		Session session = null;
@@ -902,9 +906,9 @@ public class GroupFinderImpl
 		}
 
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Group_.name)", StringPool.LIKE, false, names);
+			sql, "LOWER(Group_.name)", StringPool.LIKE, false, names);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Group_.description)", StringPool.LIKE, true,
+			sql, "LOWER(Group_.description)", StringPool.LIKE, true,
 			descriptions);
 		sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 
@@ -1020,9 +1024,9 @@ public class GroupFinderImpl
 		}
 
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Group_.name)", StringPool.LIKE, false, names);
+			sql, "LOWER(Group_.name)", StringPool.LIKE, false, names);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Group_.description)", StringPool.LIKE, true,
+			sql, "LOWER(Group_.description)", StringPool.LIKE, true,
 			descriptions);
 
 		sql = replaceJoinAndWhere(sql, params);
@@ -1052,12 +1056,13 @@ public class GroupFinderImpl
 		StringBundler sb = new StringBundler(params.size());
 
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			String key = entry.getKey();
 			Object value = entry.getValue();
 
 			if (Validator.isNull(value)) {
 				continue;
 			}
+
+			String key = entry.getKey();
 
 			if (key.equals("rolePermissions")) {
 				key = "rolePermissions_6";
@@ -1287,7 +1292,7 @@ public class GroupFinderImpl
 				if (value instanceof Integer) {
 					Integer valueInteger = (Integer)value;
 
-					if (Validator.isNotNull(valueInteger)) {
+					if (valueInteger != null) {
 						qPos.add(valueInteger);
 					}
 				}

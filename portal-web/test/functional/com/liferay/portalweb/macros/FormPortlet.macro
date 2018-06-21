@@ -1,6 +1,4 @@
 <definition>
-	<var name="validationErrorMessage" value="This field is required." />
-
 	<command name="changeLocale">
 		<execute function="Click" locator1="FormPortlet#LOCALIZATION_BUTTON" />
 
@@ -14,7 +12,7 @@
 	</command>
 
 	<command name="clickSubmit">
-		<execute function="AssertClick" locator1="Button#SUBMIT" value1="Submit" />
+		<execute function="AssertClick" locator1="Button#MAIN_CONTENT_SUBMIT" value1="Submit" />
 	</command>
 
 	<command name="gotoFormPage">
@@ -55,9 +53,7 @@
 	</command>
 
 	<command name="submitLocalizedSuccessfully">
-		<execute macro="Button#clickSubmitLocalized">
-			<var name="buttonName" value="${buttonName}" />
-		</execute>
+		<execute function="AssertClick" locator1="Button#MAIN_CONTENT_SUBMIT" value1="${buttonName}" />
 
 		<execute macro="Alert#viewSuccessMessage" />
 	</command>
@@ -71,13 +67,15 @@
 	<command name="submitWithError">
 		<execute macro="FormPortlet#submit" />
 
-		<execute function="AssertTextEquals" locator1="Message#ERROR" value1="${errorMessage}" />
+		<execute macro="Alert#viewErrorMessage">
+			<var name="errorMessage" value="${errorMessage}" />
+		</execute>
 	</command>
 
 	<command name="submitWithValidationError">
 		<execute macro="FormPortlet#submit" />
 
-		<execute function="AssertTextEquals" locator1="Message#ERROR_FORM_FIELD_REQUIRED" value1="${validationErrorMessage}" />
+		<execute function="AssertTextEquals" locator1="Message#ERROR_FORM_FIELD_REQUIRED" value1="This field is required." />
 	</command>
 
 	<command name="viewSuccessPage">

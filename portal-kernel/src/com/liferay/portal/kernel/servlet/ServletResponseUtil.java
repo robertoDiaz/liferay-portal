@@ -413,12 +413,12 @@ public class ServletResponseUtil {
 						ByteBuffer.wrap(bytes, offset, contentLength));
 				}
 				else {
-					ServletOutputStream servletOutputStream =
-						response.getOutputStream();
-
 					if ((contentLength == 0) && ServerDetector.isJetty()) {
 					}
 					else {
+						ServletOutputStream servletOutputStream =
+							response.getOutputStream();
+
 						servletOutputStream.write(bytes, offset, contentLength);
 					}
 				}
@@ -429,7 +429,7 @@ public class ServletResponseUtil {
 				isClientAbortException(ioe)) {
 
 				if (_log.isWarnEnabled()) {
-					_log.warn(ioe);
+					_log.warn(ioe, ioe);
 				}
 			}
 			else {
@@ -469,7 +469,7 @@ public class ServletResponseUtil {
 				isClientAbortException(ioe)) {
 
 				if (_log.isWarnEnabled()) {
-					_log.warn(ioe);
+					_log.warn(ioe, ioe);
 				}
 			}
 			else {

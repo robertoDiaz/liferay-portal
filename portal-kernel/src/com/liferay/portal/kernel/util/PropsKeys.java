@@ -19,8 +19,6 @@ package com.liferay.portal.kernel.util;
  */
 public interface PropsKeys {
 
-	public static final String ADMIN_ANALYTICS_KEY = "admin.analytics.key";
-
 	public static final String ADMIN_ANALYTICS_TYPES = "admin.analytics.types";
 
 	public static final String ADMIN_DEFAULT_GROUP_NAMES = "admin.default.group.names";
@@ -54,6 +52,8 @@ public interface PropsKeys {
 	public static final String ADMIN_EMAIL_VERIFICATION_BODY = "admin.email.verification.body";
 
 	public static final String ADMIN_EMAIL_VERIFICATION_SUBJECT = "admin.email.verification.subject";
+
+	public static final String ADMIN_LIFERAY_ANALYTICS_KEY = "admin.liferay.analytics.key";
 
 	public static final String ADMIN_MAIL_HOST_NAMES = "admin.mail.host.names";
 
@@ -544,6 +544,8 @@ public interface PropsKeys {
 	public static final String CUSTOM_SQL_FUNCTION_ISNOTNULL = "custom.sql.function.isnotnull";
 
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL = "custom.sql.function.isnull";
+
+	public static final String DATABASE_IN_MAX_PARAMETERS = "database.in.max.parameters";
 
 	public static final String DATABASE_INDEXES_UPDATE_ON_STARTUP = "database.indexes.update.on.startup";
 
@@ -1564,6 +1566,8 @@ public interface PropsKeys {
 
 	public static final String MODULE_FRAMEWORK_REGISTER_LIFERAY_SERVICES = "module.framework.register.liferay.services";
 
+	public static final String MODULE_FRAMEWORK_RESOLVER_REVISION_BATCH_SIZE = "module.framework.resolver.revision.batch.size";
+
 	public static final String MODULE_FRAMEWORK_RUNTIME_START_LEVEL = "module.framework.runtime.start.level";
 
 	public static final String MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES = "module.framework.services.ignored.interfaces";
@@ -1965,6 +1969,10 @@ public interface PropsKeys {
 	public static final String PORTLET_CROSS_LAYOUT_INVOCATION_MODE = "portlet.cross.layout.invocation.mode";
 
 	public static final String PORTLET_CSS_ENABLED = "portlet.css.enabled";
+
+	public static final String PORTLET_DEPENDENCY_CSS_URN = "portlet.dependency.css.urn";
+
+	public static final String PORTLET_DEPENDENCY_JAVASCRIPT_URN = "portlet.dependency.javascript.urn";
 
 	public static final String PORTLET_DISPLAY_TEMPLATES_ERROR = "portlet.display.templates.error";
 

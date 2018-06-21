@@ -22,7 +22,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Tomas Polesovsky
  */
 @ExtendedObjectClassDefinition(
-	category = "foundation", scope = ExtendedObjectClassDefinition.Scope.COMPANY
+	category = "oauth2", scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
 	id = "com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration",
@@ -32,7 +32,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface AuthorizeScreenConfiguration {
 
 	@Meta.AD(
-		deflt = "/group/guest/authorize-oauth2-application",
+		deflt = "/?p_p_id=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet&p_p_state=maximized",
 		description = "authorize-screen-url-description",
 		id = "authorize.screen.url", name = "authorize-screen-url",
 		required = false

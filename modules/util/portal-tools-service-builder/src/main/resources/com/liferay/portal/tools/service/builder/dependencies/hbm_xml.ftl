@@ -17,6 +17,8 @@
 
 					<#if serviceBuilder.isHBMCamelCasePropertyAccessor(entityColumn.name)>
 						access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
+					<#elseif serviceBuilder.isVersionGTE_7_1_0()>
+						access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor"
 					</#if>
 
 					<#if entityColumn.name != entityColumn.DBName>
@@ -42,6 +44,8 @@
 			<id
 				<#if serviceBuilder.isHBMCamelCasePropertyAccessor(entityColumn.name)>
 					access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
+				<#elseif serviceBuilder.isVersionGTE_7_1_0()>
+					access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor"
 				</#if>
 
 				<#if entityColumn.name != entityColumn.DBName>
@@ -63,14 +67,15 @@
 					<#assign class = "assigned" />
 				</#if>
 
-				<generator class="${class}"
+				<generator
+					class="${class}"
 
-				<#if stringUtil.equals(class, "sequence")>
-						><param name="sequence">${entityColumn.idParam}</param>
-					</generator>
-				<#else>
-					/>
-				</#if>
+					<#if stringUtil.equals(class, "sequence")>
+							><param name="sequence">${entityColumn.idParam}</param>
+						</generator>
+					<#else>
+						/>
+					</#if>
 			</id>
 		</#if>
 
@@ -84,6 +89,8 @@
 
 				<#if serviceBuilder.isHBMCamelCasePropertyAccessor(entityColumn.name)>
 					access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
+				<#elseif serviceBuilder.isVersionGTE_7_1_0()>
+					access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor"
 				</#if>
 
 				<#if entityColumn.name != entityColumn.DBName>

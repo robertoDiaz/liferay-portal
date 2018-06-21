@@ -176,7 +176,7 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Configuration" />
+			<var name="panel" value="Configuration" />
 		</execute>
 
 		<execute function="Paste" locator1="TextInput#TRACKBACKS" />
@@ -238,6 +238,8 @@
 	</command>
 
 	<command name="editContentViaCardViewPG">
+		<execute function="MouseOver" locator1="Portlet#PORTLET_CONTENT" />
+
 		<execute macro="LexiconEntry#gotoEllipsisMenuItem">
 			<var name="menuItem" value="Edit" />
 		</execute>
@@ -436,7 +438,7 @@
 	</command>
 
 	<command name="moveToRecycleBinNoPermissionPG">
-		<execute function="AssertElementNotPresent" locator1="Link#MOVE_TO_THE_RECYCLING_BIN" />
+		<execute function="AssertElementNotPresent" locator1="Link#MOVE_TO_RECYCLING_BIN" />
 	</command>
 
 	<command name="moveToRecycleBinPG">
@@ -450,13 +452,11 @@
 			<var name="portletTitleName" value="Blogs" />
 		</execute>
 
-		<var name="key_assetHeader" value="${entryTitle}" />
-
 		<execute function="Click" locator1="Icon#BODY_VERTICAL_ELLIPSIS" />
 
 		<execute macro="PortletEntry#clickMoveToRecycleBin" />
 
-		<execute macro="Alert#viewSuccessMessage" />
+		<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
 
 		<execute function="AssertElementNotPresent" locator1="BlogsEntry#TITLE" />
 		<execute function="AssertElementNotPresent" locator1="BlogsEntry#CONTENT" />
@@ -465,7 +465,7 @@
 	<command name="publishWithInvalidContent">
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="BlogsEntry#CONTENT_FIELD_HELPER" value1="This field is required." />
+		<execute macro="Alert#viewRequiredField" />
 		<execute function="AssertElementNotPresent" locator1="Message#SUCCESS" />
 	</command>
 
@@ -505,7 +505,7 @@
 
 		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 
-		<execute function="Click" locator1="Ratings#THUMBS_DOWN" />
+		<execute function="Click" locator1="Ratings#THUMB_DOWN" />
 	</command>
 
 	<command name="rateThumbsUp">
@@ -513,11 +513,10 @@
 
 		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 
-		<execute function="Click" locator1="Ratings#THUMBS_UP" />
+		<execute function="Click" locator1="Ratings#THUMB_UP" />
 	</command>
 
 	<command name="removeViewPermissionsPG">
-		<var name="key_assetHeader" value="${entryTitle}" />
 		<var method="StringUtil#replace('${roleTitle}', ' ', '-')" name="key_roleTitle" />
 		<var method="StringUtil#lowerCase('${key_roleTitle}')" name="key_roleTitle" />
 
@@ -568,7 +567,7 @@
 
 		<var method="selenium#getElementValue(TextInput#DISPLAY_DATE_HOUR)" name="displayDateHour" />
 
-		<var name="displayDateHourLength" value="${displayDateHour?length()}" />
+		<var method="StringUtil#length('${displayDateHour}')" name="displayDateHourLength" />
 
 		<if>
 			<equals arg1="${displayDateHourLength}" arg2="1" />
@@ -581,7 +580,7 @@
 
 		<var method="MathUtil#sum('${displayDateMinute}','3')" name="displayDateMinuteFuture" />
 
-		<var name="displayDateMinuteFutureLength" value="${displayDateMinuteFuture?length()}" />
+		<var method="StringUtil#length('${displayDateMinuteFuture}')" name="displayDateMinuteFutureLength" />
 
 		<if>
 			<equals arg1="${displayDateMinuteFutureLength}" arg2="1" />
@@ -891,8 +890,8 @@
 	<command name="viewEntryTable">
 		<var name="key_entryTitle" value="${entryTitle}" />
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 
 		<execute function="AssertElementPresent" locator1="Blogs#ENTRY_TABLE_CHECKBOX" />
@@ -932,7 +931,7 @@
 	</command>
 
 	<command name="viewNoAddPermissions">
-		<var name="key_text" value="New Blog Entry" />
+		<var name="key_text" value="New Entry" />
 
 		<execute function="AssertElementNotPresent" locator1="Button#ANY" />
 	</command>
@@ -1103,9 +1102,9 @@
 	</command>
 
 	<command name="viewRSS">
-		<var name="key_text" value="rss RSS" />
+		<var name="key_text" value="RSS" />
 
-		<execute function="AssertClick" locator1="Button#ANY" value1="rss RSS" />
+		<execute function="AssertClick" locator1="Button#ANY" value1="rss-full RSS" />
 
 		<execute function="Pause" locator1="3000" />
 
@@ -1188,7 +1187,7 @@
 
 				<execute function="AssertClick" locator1="BlogsEntry#TAG" value1="${tagName}" />
 
-				<execute function="AssertTextEquals#assertPartialText" locator1="AssetCategorization#TAG_FILTER_TITLE" value1="Entries with tag ${tagName}" />
+				<execute function="AssertTextEquals#assertPartialText" locator1="AssetCategorization#TAG_FILTER_TITLE" value1="${tagName}" />
 				<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 			</else>
 		</if>
@@ -1199,7 +1198,7 @@
 
 		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 
-		<execute function="AssertTextEquals" locator1="Ratings#THUMBS_DOWN" value1="${voteCount}" />
+		<execute function="AssertTextEquals" locator1="Ratings#THUMB_DOWN" value1="${voteCount}" />
 	</command>
 
 	<command name="viewThumbsUp">
@@ -1207,7 +1206,7 @@
 
 		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
 
-		<execute function="AssertTextEquals" locator1="Ratings#THUMBS_UP" value1="${voteCount}" />
+		<execute function="AssertTextEquals" locator1="Ratings#THUMB_UP" value1="${voteCount}" />
 	</command>
 
 	<command name="viewTitle">
@@ -1338,8 +1337,8 @@
 	<command name="viewWithWorkflowCP">
 		<var name="key_entryTitle" value="${entryTitle}" />
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 
 		<execute function="AssertTextEquals" locator1="Blogs#ENTRY_TABLE_TITLE" value1="${entryTitle}" />

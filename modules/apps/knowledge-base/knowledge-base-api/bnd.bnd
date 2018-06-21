@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Knowledge Base API
 Bundle-SymbolicName: com.liferay.knowledge.base.api
-Bundle-Version: 5.0.0
+Bundle-Version: 6.0.0
 Export-Package:\
 	com.liferay.knowledge.base.configuration,\
 	com.liferay.knowledge.base.constants,\
@@ -10,5 +10,3 @@ Export-Package:\
 	com.liferay.knowledge.base.service.persistence,\
 	com.liferay.knowledge.base.util,\
 	com.liferay.knowledge.base.util.comparator
-Liferay-Releng-Module-Group-Description:
-Liferay-Releng-Module-Group-Title: Knowledge Base

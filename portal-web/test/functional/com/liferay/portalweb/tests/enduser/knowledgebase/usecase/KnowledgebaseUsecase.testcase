@@ -1,5 +1,6 @@
 <definition component-name="portal-knowledge-base">
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
+	<property name="osgi.app.includes" value="knowledge-base" />
 	<property name="portal.release" value="true" />
 	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Knowledge Base" />
@@ -119,19 +120,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -204,19 +205,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -309,19 +310,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -394,19 +395,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -486,19 +487,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -613,19 +614,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -744,19 +745,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -778,19 +779,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -869,19 +870,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -917,19 +918,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -953,19 +954,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1018,19 +1019,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1096,19 +1097,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1149,19 +1150,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1232,19 +1233,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1305,19 +1306,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1389,19 +1390,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1474,19 +1475,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1591,19 +1592,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="KB Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="KB Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1626,19 +1627,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1708,19 +1709,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1860,19 +1861,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page 1" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page 1" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1898,19 +1899,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page 2" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page 2" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1988,19 +1989,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2061,19 +2062,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2191,19 +2192,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2359,19 +2360,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -2545,19 +2546,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2711,19 +2712,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2845,19 +2846,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -3112,19 +3113,19 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="sitePageType" value="Layout" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -3239,7 +3240,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicChildPage">
@@ -3250,8 +3251,8 @@
 		<execute macro="SitePages#configurePage">
 			<var name="columnName" value="1 Column" />
 			<var name="pageName" value="Knowledge Base Display Page" />
-			<var name="privacy" value="Public" />
-			<var name="sitePageType" value="Layout" />
+			<var name="privacy" value="Public Pages" />
+			<var name="sitePageType" value="Widget Page" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />

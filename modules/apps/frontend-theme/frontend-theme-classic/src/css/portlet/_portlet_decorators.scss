@@ -1,0 +1,12 @@
+.portlet-decorate {
+	.portlet {
+		margin-bottom: 24px;
+	}
+
+	.portlet-content {
+		background-color: $portlet-decorate-bg;
+		border: $portlet-decorate-border;
+		border-radius: 0.5rem;
+		padding: 24px;
+	}
+}

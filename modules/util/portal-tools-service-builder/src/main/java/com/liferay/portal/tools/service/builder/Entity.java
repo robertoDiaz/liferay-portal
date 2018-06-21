@@ -91,22 +91,25 @@ public class Entity implements Comparable<Entity> {
 		return false;
 	}
 
-	public Entity(String name) {
+	public Entity(ServiceBuilder serviceBuilder, String name) {
 		this(
-			null, null, null, name, null, null, null, false, false, false, true,
-			null, null, null, null, null, true, false, false, false, false,
-			false, null, null, null, null, null, null, null, null, null, null,
-			false, null);
+			serviceBuilder, null, null, null, name, null, null, null, false,
+			false, false, false, true, null, null, null, null, null, true,
+			false, false, false, false, null, false, null, null, false, null,
+			null, null, null, null, null, null, null, null, null, false);
 	}
 
 	public Entity(
-		String packagePath, String apiPackagePath, String portletShortName,
-		String name, String humanName, String table, String alias, boolean uuid,
-		boolean uuidAccessor, boolean localService, boolean remoteService,
-		String persistenceClass, String finderClassName, String dataSource,
-		String sessionFactory, String txManager, boolean cacheEnabled,
-		boolean dynamicUpdateEnabled, boolean jsonEnabled, boolean mvccEnabled,
-		boolean trashEnabled, boolean deprecated,
+		ServiceBuilder serviceBuilder, String packagePath,
+		String apiPackagePath, String portletShortName, String name,
+		String humanName, String table, String alias, boolean uuid,
+		boolean uuidAccessor, boolean externalReferenceCode,
+		boolean localService, boolean remoteService, String persistenceClass,
+		String finderClassName, String dataSource, String sessionFactory,
+		String txManager, boolean cacheEnabled, boolean dynamicUpdateEnabled,
+		boolean jsonEnabled, boolean mvccEnabled, boolean trashEnabled,
+		String uadApplicationName, boolean uadAutoDelete, String uadOutputPath,
+		String uadPackagePath, boolean deprecated,
 		List<EntityColumn> pkEntityColumns,
 		List<EntityColumn> regularEntityColumns,
 		List<EntityColumn> blobEntityColumns,
@@ -114,9 +117,9 @@ public class Entity implements Comparable<Entity> {
 		List<EntityColumn> entityColumns, EntityOrder entityOrder,
 		List<EntityFinder> entityFinders, List<Entity> referenceEntities,
 		List<String> unresolvedReferenceEntityNames,
-		List<String> txRequiredMethodNames, boolean resourceActionModel,
-		String uadTypeDescription) {
+		List<String> txRequiredMethodNames, boolean resourceActionModel) {
 
+		_serviceBuilder = serviceBuilder;
 		_packagePath = packagePath;
 		_apiPackagePath = apiPackagePath;
 		_portletShortName = portletShortName;
@@ -125,6 +128,7 @@ public class Entity implements Comparable<Entity> {
 		_alias = alias;
 		_uuid = uuid;
 		_uuidAccessor = uuidAccessor;
+		_externalReferenceCode = externalReferenceCode;
 		_localService = localService;
 		_remoteService = remoteService;
 		_persistenceClassName = persistenceClass;
@@ -133,6 +137,10 @@ public class Entity implements Comparable<Entity> {
 		_jsonEnabled = jsonEnabled;
 		_mvccEnabled = mvccEnabled;
 		_trashEnabled = trashEnabled;
+		_uadApplicationName = uadApplicationName;
+		_uadAutoDelete = uadAutoDelete;
+		_uadOutputPath = uadOutputPath;
+		_uadPackagePath = uadPackagePath;
 		_deprecated = deprecated;
 		_pkEntityColumns = pkEntityColumns;
 		_regularEntityColumns = regularEntityColumns;
@@ -145,7 +153,6 @@ public class Entity implements Comparable<Entity> {
 		_unresolvedReferenceEntityNames = unresolvedReferenceEntityNames;
 		_txRequiredMethodNames = txRequiredMethodNames;
 		_resourceActionModel = resourceActionModel;
-		_uadTypeDescription = uadTypeDescription;
 
 		_humanName = GetterUtil.getString(
 			humanName, ServiceBuilder.toHumanName(name));
@@ -395,6 +402,13 @@ public class Entity implements Comparable<Entity> {
 			interfaceNames.add("TrashedModel");
 		}
 
+		if (_versionEntity != null) {
+			interfaceNames.add("VersionedModel<" + _name + "Version>");
+		}
+		else if (_versionedEntity != null) {
+			interfaceNames.add("VersionModel<" + _versionedEntity._name + ">");
+		}
+
 		if (isWorkflowEnabled()) {
 			interfaceNames.add("WorkflowedModel");
 		}
@@ -472,6 +486,15 @@ public class Entity implements Comparable<Entity> {
 		if (isTypedModel()) {
 			overrideColumnName.add("className");
 			overrideColumnName.add("classNameId");
+		}
+
+		if (_versionEntity != null) {
+			overrideColumnName.add("headId");
+			overrideColumnName.add("primaryKey");
+		}
+		else if (_versionedEntity != null) {
+			overrideColumnName.add("primaryKey");
+			overrideColumnName.add("version");
 		}
 
 		if (isWorkflowEnabled()) {
@@ -619,6 +642,14 @@ public class Entity implements Comparable<Entity> {
 		return uadAnonymizableEntityColumnsMap;
 	}
 
+	public String getUADApplicationName() {
+		return _uadApplicationName;
+	}
+
+	public boolean getUADAutoDelete() {
+		return _uadAutoDelete;
+	}
+
 	public List<EntityColumn> getUADEntityColumns() {
 		List<EntityColumn> uadEntityColumns = new ArrayList<>();
 
@@ -650,8 +681,18 @@ public class Entity implements Comparable<Entity> {
 		return uadNonanonymizableEntityColumns;
 	}
 
-	public String getUADTypeDescription() {
-		return _uadTypeDescription;
+	public String getUADOutputPath() {
+		return _uadOutputPath;
+	}
+
+	public String getUADPackagePath() {
+		return _uadPackagePath;
+	}
+
+	public String getUADTestIntegrationOutputPath() {
+		return StringUtil.replace(
+			getUADOutputPath(), new String[] {"-uad/", "/main/"},
+			new String[] {"-uad-test/", "/testIntegration/"});
 	}
 
 	public List<String> getUADUserIdColumnNames() {
@@ -696,6 +737,14 @@ public class Entity implements Comparable<Entity> {
 
 	public String getVarNames() {
 		return TextFormatter.formatPlural(getVarName());
+	}
+
+	public Entity getVersionedEntity() {
+		return _versionedEntity;
+	}
+
+	public Entity getVersionEntity() {
+		return _versionEntity;
 	}
 
 	public boolean hasActionableDynamicQuery() {
@@ -759,6 +808,10 @@ public class Entity implements Comparable<Entity> {
 		}
 
 		return true;
+	}
+
+	public boolean hasExternalReferenceCode() {
+		return _externalReferenceCode;
 	}
 
 	public boolean hasFinderClassName() {
@@ -970,11 +1023,26 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public boolean isPermissionCheckEnabled(EntityFinder entityFinder) {
+		boolean resourceActionModel = _resourceActionModel;
+
+		if (_serviceBuilder.isVersionLTE_7_1_0()) {
+
+			// See LPS-82433. Add this hack to prevent
+			// 4d29a89578e0a712ddcb6793d93c8fc9128c3b03 in 7.1.x from requring
+			// a major breaking change in portal-kernel.
+
+			if (_packagePath.equals("com.liferay.portlet.asset") &&
+				_name.equals("AssetTag")) {
+
+				resourceActionModel = true;
+			}
+		}
+
 		String entityFinderName = entityFinder.getName();
 
 		if (_name.equals("Group") || _name.equals("User") ||
 			entityFinderName.equals("UUID_G") || !entityFinder.isCollection() ||
-			!hasPrimitivePK() || !_resourceActionModel) {
+			!hasPrimitivePK() || !resourceActionModel) {
 
 			return false;
 		}
@@ -1142,6 +1210,16 @@ public class Entity implements Comparable<Entity> {
 		_transients = transients;
 	}
 
+	public void setVersionedEntity(Entity versionedEntity) {
+		_versionedEntity = versionedEntity;
+	}
+
+	public void setVersionEntity(Entity versionEntity) {
+		_versionEntity = versionEntity;
+
+		_referenceEntities.add(versionEntity);
+	}
+
 	private EntityColumn _getPKEntityColumn() {
 		if (_pkEntityColumns.isEmpty()) {
 			throw new RuntimeException(
@@ -1171,6 +1249,7 @@ public class Entity implements Comparable<Entity> {
 	private final List<EntityColumn> _entityColumns;
 	private final List<EntityFinder> _entityFinders;
 	private final EntityOrder _entityOrder;
+	private final boolean _externalReferenceCode;
 	private final String _finderClassName;
 	private final List<EntityColumn> _finderEntityColumns;
 	private final String _humanName;
@@ -1190,15 +1269,21 @@ public class Entity implements Comparable<Entity> {
 	private final List<EntityColumn> _regularEntityColumns;
 	private final boolean _remoteService;
 	private final boolean _resourceActionModel;
+	private ServiceBuilder _serviceBuilder;
 	private final String _sessionFactory;
 	private final String _table;
 	private List<String> _transients;
 	private final boolean _trashEnabled;
 	private final String _txManager;
 	private final List<String> _txRequiredMethodNames;
-	private final String _uadTypeDescription;
+	private final String _uadApplicationName;
+	private final boolean _uadAutoDelete;
+	private final String _uadOutputPath;
+	private final String _uadPackagePath;
 	private List<String> _unresolvedReferenceEntityNames;
 	private final boolean _uuid;
 	private final boolean _uuidAccessor;
+	private Entity _versionedEntity;
+	private Entity _versionEntity;
 
 }

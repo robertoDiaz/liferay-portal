@@ -295,18 +295,18 @@ public class OrganizationFinderImpl
 			String sql = sb.toString();
 
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Organization_.name)", StringPool.LIKE, false,
+				sql, "LOWER(Organization_.name)", StringPool.LIKE, false,
 				names);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street1)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street1)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street2)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street2)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street3)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street3)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.city)", StringPool.LIKE, false, cities);
+				sql, "LOWER(Address.city)", StringPool.LIKE, false, cities);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.zip)", StringPool.LIKE, true, zips);
+				sql, "LOWER(Address.zip)", StringPool.LIKE, true, zips);
 
 			if (regionId == null) {
 				sql = StringUtil.replace(sql, _REGION_ID_SQL, StringPool.BLANK);
@@ -693,17 +693,17 @@ public class OrganizationFinderImpl
 		sql = StringUtil.replace(sql, "[$WHERE$]", getWhere(params));
 		sql = sql.concat(StringPool.CLOSE_PARENTHESIS);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Organization_.name)", StringPool.LIKE, false, names);
+			sql, "LOWER(Organization_.name)", StringPool.LIKE, false, names);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street1)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street1)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street2)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street2)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street3)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street3)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.city)", StringPool.LIKE, false, cities);
+			sql, "LOWER(Address.city)", StringPool.LIKE, false, cities);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.zip)", StringPool.LIKE, true, zips);
+			sql, "LOWER(Address.zip)", StringPool.LIKE, true, zips);
 
 		if (parentOrganizationIdComparator.equals(StringPool.EQUAL)) {
 			sql = StringUtil.replace(
@@ -1129,13 +1129,12 @@ public class OrganizationFinderImpl
 
 				if (!organizationsTree.isEmpty()) {
 					for (Organization organization : organizationsTree) {
-						StringBundler sb = new StringBundler(5);
+						StringBundler sb = new StringBundler(4);
 
 						sb.append(StringPool.PERCENT);
 						sb.append(StringPool.SLASH);
 						sb.append(organization.getOrganizationId());
 						sb.append(StringPool.SLASH);
-						sb.append(StringPool.PERCENT);
 
 						qPos.add(sb.toString());
 					}

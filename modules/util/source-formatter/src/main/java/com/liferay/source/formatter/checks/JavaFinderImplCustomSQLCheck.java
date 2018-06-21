@@ -34,11 +34,6 @@ import org.dom4j.Element;
 public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 
 	@Override
-	public void init() throws Exception {
-		_portalCustomSQLDocument = getPortalCustomSQLDocument();
-	}
-
-	@Override
 	public boolean isPortalCheck() {
 		return true;
 	}
@@ -58,7 +53,7 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 		}
 
 		Document customSQLDocument = getCustomSQLDocument(
-			fileName, absolutePath, _portalCustomSQLDocument);
+			fileName, absolutePath, getPortalCustomSQLDocument());
 		String finderName = className.substring(0, className.length() - 4);
 
 		List<JavaTerm> childJavaTerms = javaClass.getChildJavaTerms();
@@ -89,7 +84,7 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 			Document customSQLDocument, String finderName)
 		throws Exception {
 
-		if (customSQLDocument == null) {
+		if ((customSQLDocument == null) || !customSQLDocument.hasContent()) {
 			return;
 		}
 
@@ -136,7 +131,7 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 				StringBundler.concat(
 					"SQL '", replaceSQLValue,
 					"' does not exist in the custom-sql file"),
-				getLineCount(fileContent, pos));
+				getLineNumber(fileContent, pos));
 		}
 	}
 
@@ -156,7 +151,7 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 			return;
 		}
 
-		if (customSQLDocument != null) {
+		if ((customSQLDocument != null) && customSQLDocument.hasContent()) {
 			Element rootElement = customSQLDocument.getRootElement();
 
 			for (Element sqlElement :
@@ -175,7 +170,7 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 		addMessage(
 			fileName,
 			"'" + variableName + "' points to non-existing custom query",
-			getLineCount(fileContent, pos));
+			getLineNumber(fileContent, pos));
 	}
 
 	private String _getReplaceSQLValue(String content, String parameterValue) {
@@ -225,7 +220,6 @@ public class JavaFinderImplCustomSQLCheck extends BaseJavaTermCheck {
 
 	private final Pattern _customQueryVariablePattern = Pattern.compile(
 		"=\\s+(\\w+)\\.class\\.getName\\(\\)\\s+\\+\\s+\"([\\.\\w]+)\";");
-	private Document _portalCustomSQLDocument;
 	private final Pattern _stringUtilReplacePattern = Pattern.compile(
 		"sql = StringUtil.replace\\(.*?\\);\n", Pattern.DOTALL);
 

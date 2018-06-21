@@ -15,7 +15,7 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
@@ -676,6 +676,19 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		List<Layout> ancestors = layout.getAncestors();
 
 		return filterLayouts(ancestors);
+	}
+
+	/**
+	 * Returns primary key of the matching default layout for the group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  privateLayout whether the layout is private to the group
+	 * @return the primary key of the default layout for the group; {@link
+	 *         LayoutConstants#DEFAULT_PLID}) otherwise
+	 */
+	@Override
+	public long getDefaultPlid(long groupId, boolean privateLayout) {
+		return layoutLocalService.getDefaultPlid(groupId, privateLayout);
 	}
 
 	/**
@@ -1482,7 +1495,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		User user = userPersistence.findByPrimaryKey(getUserId());
 
 		Map<String, Serializable> publishLayoutLocalSettingsMap =
-			ExportImportConfigurationSettingsMapFactory.
+			ExportImportConfigurationSettingsMapFactoryUtil.
 				buildPublishLayoutLocalSettingsMap(
 					user, sourceGroupId, targetGroupId, privateLayout,
 					layoutIds, parameterMap);
@@ -1596,7 +1609,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		User user = userPersistence.findByPrimaryKey(getUserId());
 
 		Map<String, Serializable> publishLayoutRemoteSettingsMap =
-			ExportImportConfigurationSettingsMapFactory.
+			ExportImportConfigurationSettingsMapFactoryUtil.
 				buildPublishLayoutRemoteSettingsMap(
 					getUserId(), sourceGroupId, privateLayout, layoutIdMap,
 					parameterMap, remoteAddress, remotePort, remotePathContext,

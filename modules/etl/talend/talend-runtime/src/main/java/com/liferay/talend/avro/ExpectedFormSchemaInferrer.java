@@ -46,7 +46,7 @@ public class ExpectedFormSchemaInferrer {
 		String methodName = operation.getMethod();
 		Schema schema = SchemaProperties.EMPTY_SCHEMA;
 
-		if (methodName.equals(Action.DELETE.getMethodName())) {
+		if (methodName.equals(Action.Delete.getMethodName())) {
 			schema = _getDeleteSchema();
 		}
 		else {
@@ -63,6 +63,7 @@ public class ExpectedFormSchemaInferrer {
 			AvroConstants.ID, AvroUtils._string(), null, (Object)null);
 
 		designField.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
+
 		schemaFields.add(designField);
 
 		Schema schema = Schema.createRecord(
