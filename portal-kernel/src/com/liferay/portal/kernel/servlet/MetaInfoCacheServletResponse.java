@@ -200,13 +200,13 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #finishResponse()}}
+	 * @deprecated As of Judson, replaced by {@link #finishResponse()}}
 	 */
 	@Deprecated
 	public void finishResponse(boolean reapplyMetaData) throws IOException {
-		HttpServletResponse response = (HttpServletResponse)getResponse();
-
 		if (reapplyMetaData) {
+			HttpServletResponse response = (HttpServletResponse)getResponse();
+
 			finishResponse(_metaData, response);
 		}
 

@@ -1,9 +1,8 @@
-package ${packagePath}.uad.anonymizer.test;
+package ${entity.UADPackagePath}.uad.anonymizer.test;
 
 import ${apiPackagePath}.model.${entity.name};
 import ${apiPackagePath}.service.${entity.name}LocalService;
-import ${packagePath}.uad.constants.${portletShortName}UADConstants;
-import ${packagePath}.uad.test.${entity.name}UADTestHelper;
+import ${entity.UADPackagePath}.uad.test.${entity.name}UADTestHelper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.User;
@@ -11,7 +10,6 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.user.associated.data.aggregator.UADAggregator;
 import com.liferay.user.associated.data.anonymizer.UADAnonymizer;
 import com.liferay.user.associated.data.test.util.BaseUADAnonymizerTestCase;
 
@@ -29,7 +27,6 @@ import org.junit.runner.RunWith;
 
 /**
  * @author ${author}
- * @generated
  */
 @RunWith(Arquillian.class)
 public class ${entity.name}UADAnonymizerTest extends BaseUADAnonymizerTestCase<${entity.name}> <#if entity.hasEntityColumn("statusByUserId")>implements WhenHasStatusByUserIdField </#if>{
@@ -76,47 +73,46 @@ public class ${entity.name}UADAnonymizerTest extends BaseUADAnonymizerTestCase<$
 	}
 
 	@Override
-	protected UADAggregator getUADAggregator() {
-		return _uadAggregator;
-	}
-
-	@Override
 	protected UADAnonymizer getUADAnonymizer() {
 		return _uadAnonymizer;
 	}
 
 	@Override
 	protected boolean isBaseModelAutoAnonymized(long baseModelPK, User user) throws Exception {
-		${entity.name} ${entity.varName} = _${entity.varName}LocalService.get${entity.name}(baseModelPK);
+		<#if entity.UADAutoDelete>
+			return isBaseModelDeleted(baseModelPK);
+		<#else>
+			${entity.name} ${entity.varName} = _${entity.varName}LocalService.get${entity.name}(baseModelPK);
 
-		<#list entity.UADUserIdColumnNames as uadUserIdColumnName>
-			<#list entity.UADAnonymizableEntityColumnsMap[uadUserIdColumnName] as uadAnonymizableEntityColumn>
-				<#if !uadAnonymizableEntityColumn.isPrimitiveType()>
-					${uadAnonymizableEntityColumn.type} ${uadAnonymizableEntityColumn.name} = ${entity.varName}.get${uadAnonymizableEntityColumn.methodName}();
-				</#if>
-			</#list>
-		</#list>
-
-		if (<#list entity.UADUserIdColumnNames as uadUserIdColumnName>
+			<#list entity.UADUserIdColumnNames as uadUserIdColumnName>
 				<#list entity.UADAnonymizableEntityColumnsMap[uadUserIdColumnName] as uadAnonymizableEntityColumn>
-					<#if uadAnonymizableEntityColumn.isPrimitiveType()>
-						(${entity.varName}.get${uadAnonymizableEntityColumn.methodName}() !=
-					<#else>
-						!${uadAnonymizableEntityColumn.name}.equals(
+					<#if !uadAnonymizableEntityColumn.isPrimitiveType()>
+						${uadAnonymizableEntityColumn.type} ${uadAnonymizableEntityColumn.name} = ${entity.varName}.get${uadAnonymizableEntityColumn.methodName}();
 					</#if>
+				</#list>
+			</#list>
 
-					user.get${textFormatter.format(uadAnonymizableEntityColumn.UADAnonymizeFieldName, 6)}())
+			if (<#list entity.UADUserIdColumnNames as uadUserIdColumnName>
+					<#list entity.UADAnonymizableEntityColumnsMap[uadUserIdColumnName] as uadAnonymizableEntityColumn>
+						<#if uadAnonymizableEntityColumn.isPrimitiveType()>
+							(${entity.varName}.get${uadAnonymizableEntityColumn.methodName}() !=
+						<#else>
+							!${uadAnonymizableEntityColumn.name}.equals(
+						</#if>
+
+						user.get${textFormatter.format(uadAnonymizableEntityColumn.UADAnonymizeFieldName, 6)}())
+
+						<#sep> && </#sep>
+					</#list>
 
 					<#sep> && </#sep>
-				</#list>
+				</#list>) {
 
-				<#sep> && </#sep>
-			</#list>) {
+				return true;
+			}
 
-			return true;
-		}
-
-		return false;
+			return false;
+		</#if>
 	}
 
 	@Override
@@ -137,14 +133,7 @@ public class ${entity.name}UADAnonymizerTest extends BaseUADAnonymizerTestCase<$
 	@Inject
 	private ${entity.name}UADTestHelper _${entity.varName}UADTestHelper;
 
-	@Inject(
-		filter = "model.class.name=" + ${portletShortName}UADConstants.CLASS_NAME_${entity.constantName}
-	)
-	private UADAggregator _uadAggregator;
-
-	@Inject(
-		filter = "model.class.name=" + ${portletShortName}UADConstants.CLASS_NAME_${entity.constantName}
-	)
+	@Inject(filter = "component.name=*.${entity.name}UADAnonymizer")
 	private UADAnonymizer _uadAnonymizer;
 
 }

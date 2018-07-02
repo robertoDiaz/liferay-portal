@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.ContactModel;
 import com.liferay.portal.kernel.model.ContactSoap;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -494,6 +495,8 @@ public class ContactModelImpl extends BaseModelImpl<Contact>
 
 	@Override
 	public void setContactId(long contactId) {
+		_columnBitmask = -1L;
+
 		_contactId = contactId;
 	}
 
@@ -1033,17 +1036,23 @@ public class ContactModelImpl extends BaseModelImpl<Contact>
 
 	@Override
 	public int compareTo(Contact contact) {
-		long primaryKey = contact.getPrimaryKey();
+		int value = 0;
 
-		if (getPrimaryKey() < primaryKey) {
-			return -1;
+		if (getContactId() < contact.getContactId()) {
+			value = -1;
 		}
-		else if (getPrimaryKey() > primaryKey) {
-			return 1;
+		else if (getContactId() > contact.getContactId()) {
+			value = 1;
 		}
 		else {
-			return 0;
+			value = 0;
 		}
+
+		if (value != 0) {
+			return value;
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -1483,7 +1492,7 @@ public class ContactModelImpl extends BaseModelImpl<Contact>
 
 	private static final ClassLoader _classLoader = Contact.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			Contact.class
+			Contact.class, ModelWrapper.class
 		};
 	private long _mvccVersion;
 	private long _contactId;

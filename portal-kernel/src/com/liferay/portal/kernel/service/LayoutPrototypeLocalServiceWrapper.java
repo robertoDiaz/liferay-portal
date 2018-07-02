@@ -56,8 +56,9 @@ public class LayoutPrototypeLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #addLayoutPrototype(long,
-	long, Map, Map, boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#addLayoutPrototype(long, long, Map, Map, boolean,
+	ServiceContext)}
 	*/
 	@Deprecated
 	@Override
@@ -218,6 +219,13 @@ public class LayoutPrototypeLocalServiceWrapper
 		return _layoutPrototypeLocalService.fetchLayoutPrototype(layoutPrototypeId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.model.LayoutPrototype fetchLayoutPrototype(
+		long companyId, String name, java.util.Locale locale) {
+		return _layoutPrototypeLocalService.fetchLayoutPrototype(companyId,
+			name, locale);
+	}
+
 	/**
 	* Returns the layout prototype with the matching UUID and company.
 	*
@@ -230,6 +238,12 @@ public class LayoutPrototypeLocalServiceWrapper
 		String uuid, long companyId) {
 		return _layoutPrototypeLocalService.fetchLayoutPrototypeByUuidAndCompanyId(uuid,
 			companyId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutPrototype fetchLayoutProtoype(
+		long companyId, String name) {
+		return _layoutPrototypeLocalService.fetchLayoutProtoype(companyId, name);
 	}
 
 	@Override
@@ -260,6 +274,21 @@ public class LayoutPrototypeLocalServiceWrapper
 		long layoutPrototypeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutPrototypeLocalService.getLayoutPrototype(layoutPrototypeId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutPrototype getLayoutPrototype(
+		long companyId, String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutPrototypeLocalService.getLayoutPrototype(companyId, name);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutPrototype getLayoutPrototype(
+		long companyId, String name, java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutPrototypeLocalService.getLayoutPrototype(companyId, name,
+			locale);
 	}
 
 	/**
@@ -359,8 +388,9 @@ public class LayoutPrototypeLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateLayoutPrototype(long,
-	Map, Map, boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#updateLayoutPrototype(long, Map, Map, boolean,
+	ServiceContext)}
 	*/
 	@Deprecated
 	@Override

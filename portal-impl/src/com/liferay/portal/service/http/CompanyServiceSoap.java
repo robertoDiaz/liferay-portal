@@ -123,6 +123,25 @@ public class CompanyServiceSoap {
 	}
 
 	/**
+	* Returns all the companies.
+	*
+	* @return the companies
+	*/
+	public static com.liferay.portal.kernel.model.CompanySoap[] getCompanies()
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.Company> returnValue = CompanyServiceUtil.getCompanies();
+
+			return com.liferay.portal.kernel.model.CompanySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
 	* Returns the company with the primary key.
 	*
 	* @param companyId the primary key of the company
@@ -343,9 +362,9 @@ public class CompanyServiceSoap {
 	* @param size the company's account size (optionally
 	<code>null</code>)
 	* @return the the company with the primary key
-	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
-	String, String, boolean, byte[], String, String, String,
-	String, String, String, String, String, String)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateCompany(long,
+	String, String, String, boolean, byte[], String, String,
+	String, String, String, String, String, String, String)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.CompanySoap updateCompany(

@@ -14,9 +14,6 @@
 
 package com.liferay.poshi.runner.util;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,6 +34,22 @@ import org.json.JSONObject;
  * @author Michael Hashimoto
  */
 public class JSONCurlUtil {
+
+	public static String delete(String requestString)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "DELETE");
+
+		return request.send();
+	}
+
+	public static String delete(String requestString, String jsonPath)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "DELETE");
+
+		return _getParsedResponse(request, jsonPath);
+	}
 
 	public static String get(String requestString)
 		throws IOException, TimeoutException {
@@ -70,6 +83,22 @@ public class JSONCurlUtil {
 		return _getParsedResponse(request, jsonPath);
 	}
 
+	public static String put(String requestString)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "PUT");
+
+		return request.send();
+	}
+
+	public static String put(String requestString, String jsonPath)
+		throws IOException, TimeoutException {
+
+		Request request = new Request(requestString, "PUT");
+
+		return _getParsedResponse(request, jsonPath);
+	}
+
 	protected Request getRequest(String requestString, String requestMethod) {
 		return new Request(requestString, requestMethod);
 	}
@@ -79,16 +108,7 @@ public class JSONCurlUtil {
 
 		String response = request.send();
 
-		DocumentContext documentContext = JsonPath.parse(response);
-
-		Object object = documentContext.read(jsonPath);
-
-		if (object == null) {
-			throw new IOException(
-				"Invalid JSON path " + jsonPath + " in " + response);
-		}
-
-		return object.toString();
+		return JSONUtil.getWithJSONPath(response, jsonPath);
 	}
 
 	private static class Request {
@@ -96,7 +116,7 @@ public class JSONCurlUtil {
 		public Request(String requestString, String requestMethod) {
 			_requestMethod = requestMethod;
 
-			requestString = requestString.replaceAll("\\s+\\\\?\\s*\\n", "\n");
+			requestString = requestString.replaceAll("\\s+\\\\?\\s*\\n", " ");
 
 			requestString = _encodeCurlData(requestString);
 
@@ -123,23 +143,16 @@ public class JSONCurlUtil {
 
 			InputStream inputStream = process.getInputStream();
 
-			inputStream.mark(Integer.MAX_VALUE);
-
-			String response = ExecUtil.readInputStream(inputStream);
+			String response = ExecUtil.readInputStream(inputStream, true);
 
 			System.out.println("Response: " + response);
-
-			inputStream.reset();
 
 			if (process.exitValue() != 0) {
 				inputStream = process.getErrorStream();
 
-				inputStream.mark(Integer.MAX_VALUE);
-
 				System.out.println(
-					"Error stream: " + ExecUtil.readInputStream(inputStream));
-
-				inputStream.reset();
+					"Error stream: " +
+						ExecUtil.readInputStream(inputStream, true));
 
 				throw new RuntimeException(
 					"Command finished with exit value: " + process.exitValue());
@@ -264,7 +277,7 @@ public class JSONCurlUtil {
 		}
 
 		private static Pattern _escapePattern = Pattern.compile(
-			"<CURL_DATA\\[(.*?)\\]CURL_DATA>");
+			"<CURL_DATA\\[([\\s\\S]*?)\\]CURL_DATA>");
 		private static Pattern _requestPattern = Pattern.compile(
 			"(-[\\w#:\\.]|--[\\w#:\\.-]{2,}|https?:[^\\s]+)(\\s+|\\Z)");
 
@@ -280,9 +293,7 @@ public class JSONCurlUtil {
 		public RequestOption(String optionType, String optionValue) {
 			_optionType = optionType;
 
-			_optionValue = _formatOptionValue(optionValue);
-
-			_validateRequestOption();
+			_optionValue = _formatOptionValue(optionType, optionValue);
 		}
 
 		public String getRequestOptionType() {
@@ -299,23 +310,41 @@ public class JSONCurlUtil {
 			sb.append(getRequestOptionType());
 
 			if (!_optionValue.isEmpty()) {
-				sb.append(" \"");
-				sb.append(_unEscapeOptionValue(_optionValue));
-				sb.append("\"");
+				sb.append(" ");
+				sb.append(_escapeOptionValue(_optionValue));
 			}
 
 			return sb.toString();
 		}
 
 		private String _escapeOptionValue(String optionValue) {
-			if (optionValue == null) {
-				return null;
+			StringBuilder sb = new StringBuilder();
+
+			if (OSDetector.isWindows()) {
+				sb.append("\"");
+
+				optionValue = optionValue.replaceAll(
+					"\\\\\"", "\\\\\\\\\\\\\\\"");
+				optionValue = optionValue.replaceAll("(?<!\\\\)\"", "\\\\\\\"");
+
+				sb.append(optionValue);
+
+				sb.append("\"");
+			}
+			else {
+				sb.append("'");
+				sb.append(optionValue);
+				sb.append("'");
 			}
 
-			return optionValue.replaceAll("\\\\\"", "\"");
+			return sb.toString();
 		}
 
-		private String _formatOptionValue(String optionValue) {
+		private String _formatOptionValue(
+			String optionType, String optionValue) {
+
+			optionValue = optionValue.trim();
+
 			if ((optionValue.startsWith("'") && optionValue.endsWith("'")) ||
 				(optionValue.startsWith("\"") && optionValue.endsWith("\""))) {
 
@@ -323,29 +352,19 @@ public class JSONCurlUtil {
 					1, optionValue.length() - 1);
 			}
 
-			return _escapeOptionValue(optionValue);
-		}
-
-		private String _unEscapeOptionValue(String optionValue) {
-			if (optionValue == null) {
-				return null;
-			}
-
-			optionValue = optionValue.replaceAll("(?<!\\\\)\"", "\\\\\"");
-
-			return optionValue;
-		}
-
-		private void _validateRequestOption() {
-			if (_optionType.equals("--json-data")) {
+			if (optionType.equals("--json-data")) {
 				try {
-					new JSONObject(_optionValue);
+					JSONObject jsonObject = new JSONObject(optionValue);
+
+					optionValue = jsonObject.toString();
 				}
 				catch (JSONException jsone) {
 					throw new RuntimeException(
-						"Invalid JSON: '" + _optionValue + "'");
+						"Invalid JSON: '" + optionValue + "'");
 				}
 			}
+
+			return optionValue;
 		}
 
 		private static Map<String, String> _customOptionsMap = new HashMap<>();

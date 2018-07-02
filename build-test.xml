@@ -1670,6 +1670,14 @@ logExceptionsOnly=B&quot;false&quot;</echo>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="prepare-oauth2-configuration">
+		<sequential>
+			<echo file="${liferay.home}/osgi/configs/com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration-default.config">mapping=[&quot;example-scope-1,example-scope-2\=everything&quot;]
+osgi.jaxrs.name=&quot;liferay-oauth2-scope-sample-qa-app&quot;
+passthrough=&quot;true&quot;</echo>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="prepare-patching-tool">
 		<attribute default="${app.server.parent.dir}/patching-tool" name="patching.tool.dir" />
 
@@ -1827,15 +1835,26 @@ delay 1
 
 tell application "System Events"
 	tell process "Safari"
+		click menu item "Preferences…" of menu "Safari" of ¬
+			menu bar item "Safari" of menu bar 1
+		set frontmost to true
+		tell window 1
+			click button "Advanced" of toolbar 1
+			delay 1
+			set checkValue to (value of checkbox "Show Develop menu in menu bar" of group 1 of group 1)
+			if checkValue is not equal to 1 then
+				click checkbox "Show Develop menu in menu bar" of group 1 of group 1
+			end if
+		end tell
 		tell menu bar item "Develop" of menu bar 1
 			click
 			delay 1
-				set checkValue to (value of attribute "AXMenuItemMarkChar" of menu item "Allow Remote Automation" of menu 1)
-				if checkValue is not equal to "✓" then
-					click menu item "Allow Remote Automation" of menu 1
-				else
-					key code 53
-				end if
+			set checkValue to (value of attribute "AXMenuItemMarkChar" of menu item "Allow Remote Automation" of menu 1)
+			if checkValue is not equal to "✓" then
+				click menu item "Allow Remote Automation" of menu 1
+			else
+				key code 53
+			end if
 		end tell
 	end tell
 end tell
@@ -1853,6 +1872,23 @@ tell application "Safari" to quit
 				<else>
 					<fail message="Operating system is not supported." />
 				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-search-engine">
+		<attribute name="search.engine" />
+
+		<sequential>
+			<echo>Preparing search engine: @{search.engine}</echo>
+
+			<if>
+				<equals arg1="@{search.engine}" arg2="solr" />
+				<then>
+					<ant antfile="build-test-solr.xml" inheritAll="false" target="deploy-solr" />
+
+					<ant antfile="build-test-solr.xml" inheritAll="false" target="start-solr" />
+				</then>
 			</if>
 		</sequential>
 	</macrodef>
@@ -2037,7 +2073,7 @@ tell application "Safari" to quit
 								<arg value="-Dportal.build=true" />
 							</gradle-execute>
 
-							<gradle-execute dir="${project.dir}/modules/apps/foundation/petra" task="deploy">
+							<gradle-execute dir="${project.dir}/modules/apps/petra" task="deploy">
 								<arg value="-Dportal.build=true" />
 							</gradle-execute>
 						</then>
@@ -2355,16 +2391,31 @@ ${tomcat-gc-log}
 
 	<macrodef name="record-test-class-file-names">
 		<sequential>
+			<fail message="Please set the property ${test.batch.name}." unless="test.batch.name" />
+
+			<local name="portal.branch.name" />
+
+			<condition else="${git.working.branch.name}" property="portal.branch.name" value="${env.TEST_PORTAL_BRANCH_NAME}">
+				<isset property="env.TEST_PORTAL_BRANCH_NAME" />
+			</condition>
+
+			<local name="top.level.job.name" />
+
+			<condition else="test-portal-acceptance-upstream(${portal.branch.name})" property="top.level.job.name" value="${env.TOP_LEVEL_JOB_NAME}">
+				<isset property="env.TOP_LEVEL_JOB_NAME" />
+			</condition>
+
 			<beanshell>
 				<![CDATA[
-					import com.liferay.jenkins.results.parser.AxisTestClassGroup;
-					import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
-					import com.liferay.jenkins.results.parser.TestClassGroup;
-					import com.liferay.jenkins.results.parser.TestClassGroupFactory;
+					import com.liferay.jenkins.results.parser.Job;
+					import com.liferay.jenkins.results.parser.JobFactory;
+					import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
+					import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
+					import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
 
-					PortalGitWorkingDirectory portalGitWorkingDirectory = new PortalGitWorkingDirectory(project.getProperty("git.working.branch.name"), project.getProperty("project.dir"));
+					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"));
 
-					TestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), portalGitWorkingDirectory, project.getProperty("env.CI_TEST_SUITE"));
+					BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
 
 					int axisCount = batchTestClassGroup.getAxisCount();
 
@@ -2407,6 +2458,8 @@ ${tomcat-gc-log}
 			</beanshell>
 
 			<echo file="test.class.file.names.properties">${test.class.file.names.properties.content}</echo>
+
+			<print-file file.name="test.class.file.names.properties" />
 		</sequential>
 	</macrodef>
 
@@ -2864,12 +2917,7 @@ go</echo>
 					</then>
 				</elseif>
 				<elseif>
-					<or>
-						<equals arg1="@{liferay.portal.bundle}" arg2="6.2.4" />
-						<equals arg1="@{liferay.portal.bundle}" arg2="6.2.5" />
-						<equals arg1="@{liferay.portal.bundle}" arg2="6.2.10.14" />
-						<equals arg1="@{liferay.portal.bundle}" arg2="6.2.10.15" />
-					</or>
+					<contains string="@{liferay.portal.bundle}" substring="6.2" />
 					<then>
 						<var name="app.server.tomcat.version" value="7.0.62" />
 					</then>
@@ -3650,26 +3698,41 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 						<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.admin.bin.dir}" />
 						<then>
 							<waitfor maxwait="5" maxwaitunit="minute" timeoutproperty="app.server.stopping.timeout">
-								<not>
-									<http url="http://localhost:${test.app.server.leading.port.number}180/console" />
-								</not>
+								<and>
+									<not>
+										<http url="http://localhost:${test.app.server.leading.port.number}180/console" />
+									</not>
+									<not>
+										<http url="http://localhost:${test.app.server.leading.port.number}099" />
+									</not>
+								</and>
 							</waitfor>
 						</then>
 						<elseif>
 							<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.agent.bin.dir}" />
 							<then>
 								<waitfor maxwait="5" maxwaitunit="minute" timeoutproperty="app.server.stopping.timeout">
-									<not>
-										<http url="http://localhost:${test.app.server.leading.port.number}080" />
-									</not>
+									<and>
+										<not>
+											<http url="http://localhost:${test.app.server.leading.port.number}080" />
+										</not>
+										<not>
+											<http url="http://localhost:${test.app.server.leading.port.number}099" />
+										</not>
+									</and>
 								</waitfor>
 							</then>
 						</elseif>
 						<else>
 							<waitfor maxwait="5" maxwaitunit="minute" timeoutproperty="app.server.stopping.timeout">
-								<not>
-									<http url="http://localhost:${test.app.server.leading.port.number}080/web/guest" />
-								</not>
+								<and>
+									<not>
+										<http url="http://localhost:${test.app.server.leading.port.number}080/web/guest" />
+									</not>
+									<not>
+										<http url="http://localhost:${test.app.server.leading.port.number}099" />
+									</not>
+								</and>
 							</waitfor>
 
 							<if>
@@ -3865,6 +3928,17 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<socket port="@{app.server.leading.port.number}080" server="localhost" />
 				</not>
 			</waitfor>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-search-engine">
+		<sequential>
+			<if>
+				<equals arg1="${search.engine}" arg2="solr" />
+				<then>
+					<ant antfile="build-test-solr.xml" target="stop-solr-core" />
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -4079,6 +4153,12 @@ war.path=${app.server.weblogic.portal.dir}/</echo>
 							<property name="portal.version.url.path" value="6.2.5-ga6" />
 						</then>
 					</elseif>
+					<elseif>
+						<equals arg1="${portal.version}" arg2="7.0.4" />
+						<then>
+							<property name="portal.version.url.path" value="7.0.4-ga5" />
+						</then>
+					</elseif>
 					<else>
 						<property name="portal.version.url.path" value="${portal.version}" />
 					</else>
@@ -4090,6 +4170,7 @@ war.path=${app.server.weblogic.portal.dir}/</echo>
 						<equals arg1="${portal.version}" arg2="6.1.2" />
 						<equals arg1="${portal.version}" arg2="6.2.3" />
 						<equals arg1="${portal.version}" arg2="6.2.5" />
+						<equals arg1="${portal.version}" arg2="7.0.4" />
 					</or>
 					<then>
 						<propertycopy from="sql.legacy.base.url[ce]" name="sql.legacy.base.url" />
@@ -4792,7 +4873,7 @@ go]]></replacevalue>
 				</if>
 
 				<execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-portlet">
-					mvn archetype:generate --batch-mode -DarchetypeArtifactId=com.liferay.project.templates.npm.portlet -DarchetypeGroupId=com.liferay -DarchetypeVersion=1.0.4 -DartifactId=com.npm.simple -Dauthor=liferay -DbuildType=maven -DclassName=Foo -DgroupId=com.test -DinteractiveMode=false -DliferayVersion=7.1 -Dpackage=com.test -DprojectType=standalone -Dversion=1.0.0
+					mvn archetype:generate --batch-mode -DarchetypeArtifactId=com.liferay.project.templates.npm.portlet -DarchetypeGroupId=com.liferay -DarchetypeVersion=1.0.5 -DartifactId=com.npm.simple -Dauthor=liferay -DbuildType=maven -DclassName=Foo -DgroupId=com.test -DinteractiveMode=false -DliferayVersion=7.1 -Dpackage=com.test -DprojectType=standalone -Dversion=1.0.0
 				</execute>
 
 				<execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-portlet/com.npm.simple">
@@ -4813,7 +4894,7 @@ go]]></replacevalue>
 				</if>
 
 				<execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-${blade.templates}-portlet">
-					mvn archetype:generate --batch-mode -DarchetypeArtifactId=com.liferay.project.templates.npm.${blade.templates}.portlet -DarchetypeGroupId=com.liferay -DarchetypeVersion=1.0.4 -DartifactId=com.npm.${blade.templates} -Dauthor=liferay -DbuildType=maven -DclassName=Foo -DgroupId=com.test -DinteractiveMode=false -DliferayVersion=7.1 -Dpackage=com.test -DprojectType=standalone -Dversion=1.0.0
+					mvn archetype:generate --batch-mode -DarchetypeArtifactId=com.liferay.project.templates.npm.${blade.templates}.portlet -DarchetypeGroupId=com.liferay -DarchetypeVersion=1.0.5 -DartifactId=com.npm.${blade.templates} -Dauthor=liferay -DbuildType=maven -DclassName=Foo -DgroupId=com.test -DinteractiveMode=false -DliferayVersion=7.1 -Dpackage=com.test -DprojectType=standalone -Dversion=1.0.0
 				</execute>
 
 				<execute dir="${project.dir}/modules/sdk/project-templates/project-templates-npm-${blade.templates}-portlet/com.npm.${blade.templates}">
@@ -4848,6 +4929,20 @@ go]]></replacevalue>
 						/>
 					</sequential>
 				</for>
+			</then>
+		</if>
+
+		<get-testcase-property property.name="prepare.oauth2.global.scopes" />
+
+		<if>
+			<equals arg1="${prepare.oauth2.global.scopes}" arg2="true" />
+			<then>
+				<echo>Copying ${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/com.liferay.oauth2.provider.scope.sample.qa.jar to ${liferay.home}/deploy/com.liferay.oauth2.provider.scope.sample.qa.jar</echo>
+
+				<copy
+					file="${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/com.liferay.oauth2.provider.scope.sample.qa.jar"
+					todir="${liferay.home}/deploy"
+				/>
 			</then>
 		</if>
 	</target>
@@ -5079,12 +5174,29 @@ go]]></replacevalue>
 									<else>
 										<echo>Deploying all relevant modules that make up ${Liferay-Releng-App-Title}.lpkg.</echo>
 
+										<local name="app.name" />
+
+										<propertyregex
+											input="@{app.dir}"
+											property="app.name"
+											regexp=".*\/(.*)"
+											select="\1"
+										/>
+
 										<for param="module.dir.path">
 											<path>
 												<dirset
 													dir="@{app.dir}"
 												>
-													<include name="*" />
+													<exclude name="**/*-test*" />
+													<include name="**" />
+													<present targetdir="@{app.dir}">
+														<mapper
+															from="*"
+															to="*/bnd.bnd"
+															type="glob"
+														/>
+													</present>
 												</dirset>
 											</path>
 											<sequential>
@@ -5098,7 +5210,12 @@ go]]></replacevalue>
 													</fileset>
 												</delete>
 
-												<echo file="@{module.dir.path}/.lfrbuild-portal" />
+												<if>
+													<contains string="${test.modules.force.deploy}" substring="${app.name}" />
+													<then>
+														<echo file="@{module.dir.path}/.lfrbuild-portal" />
+													</then>
+												</if>
 											</sequential>
 										</for>
 
@@ -5108,21 +5225,9 @@ go]]></replacevalue>
 
 										<ant antfile="build.xml" dir="modules" target="build-app-lpkg">
 											<property name="app.name" value="${osgi.app.name}" />
+											<property name="output.dir" value="${liferay.home}/osgi/marketplace" />
 											<property name="osgi.dir" value="${liferay.home}/osgi" />
 										</ant>
-
-										<for param="module.dir.path">
-											<path>
-												<dirset
-													dir="@{app.dir}"
-												>
-													<include name="*" />
-												</dirset>
-											</path>
-											<sequential>
-												<delete file="@{module.dir.path}/.lfrbuild-portal" />
-											</sequential>
-										</for>
 
 										<gradle-execute dir="@{app.dir}" task="clean" />
 									</else>
@@ -5705,6 +5810,24 @@ go]]></replacevalue>
 				>
 					<include name="**/TEST-*.xml" />
 				</fileset>
+				<fileset
+					dir="${liferay.faces.bridge.impl.dir}/tck/bridge-tck-main-portlet"
+					erroronmissingdir="false"
+				>
+					<include name="**/TEST-*.xml" />
+				</fileset>
+				<fileset
+					dir="${liferay.faces.bridge.impl.dir}/test/integration"
+					erroronmissingdir="false"
+				>
+					<include name="**/TEST-*.xml" />
+				</fileset>
+				<fileset
+					dir="${liferay.faces.portal.dir}/test/integration"
+					erroronmissingdir="false"
+				>
+					<include name="**/TEST-*.xml" />
+				</fileset>
 				<report format="frames" todir="test-results/html" />
 			</junitreport>
 		</parallel>
@@ -6004,7 +6127,7 @@ osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</
 	</root>
 </log4j:configuration>]]></echo>
 
-		<echo file="${liferay.home}/osgi/log4j/com.liferay.portal.osgi.web.wab.generator-log4j-ext.xml"><![CDATA[<?xml version="1.0"?>
+		<echo file="${liferay.home}/osgi/log4j/com.liferay.portal.osgi.web.wab.generator.impl-log4j-ext.xml"><![CDATA[<?xml version="1.0"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
@@ -6071,6 +6194,15 @@ osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</
 			</not>
 			<then>
 				<prepare-elasticsearch-configuration />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="prepare.oauth2.global.scopes" />
+
+		<if>
+			<equals arg1="${prepare.oauth2.global.scopes}" arg2="true" />
+			<then>
+				<prepare-oauth2-configuration />
 			</then>
 		</if>
 	</target>
@@ -7543,28 +7675,82 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 	<target name="prepare-selenium-google-properties">
 		<if>
-			<isset property="google.api.key" />
+			<isset property="google.api.key.1" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					google.api.key=${google.api.key}
+					google.api.key.1=${google.api.key.1}
 				</echo>
 			</then>
 		</if>
 
 		<if>
-			<isset property="google.client.id" />
+			<isset property="google.api.key.2" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					google.client.id=${google.client.id}
+					google.api.key.2=${google.api.key.2}
 				</echo>
 			</then>
 		</if>
 
 		<if>
-			<isset property="google.client.secret" />
+			<isset property="google.api.key.3" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					google.client.secret=${google.client.secret}
+					google.api.key.3=${google.api.key.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.id.1" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.id.1=${google.client.id.1}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.id.2" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.id.2=${google.client.id.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.id.3" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.id.3=${google.client.id.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.secret.1" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.secret.1=${google.client.secret.1}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.secret.2" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.secret.2=${google.client.secret.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="google.client.secret.3" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					google.client.secret.3=${google.client.secret.3}
 				</echo>
 			</then>
 		</if>
@@ -7960,7 +8146,7 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 							dir="${app.server.websphere.dir}"
 						>
 							<include name="bin/**/*.sh" />
-							<include name="java*/bin/*" />
+							<include name="java*/**/bin/*" />
 						</fileset>
 					</chmod>
 				</then>
@@ -8171,6 +8357,24 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 				</unzip>
 
 				<delete file="liferay-portal-osgi.zip" />
+
+				<mirrors-get
+					dest="liferay-portal-tools.zip"
+					src="${test.build.portal.tools.zip.url}"
+				/>
+
+				<unzip
+					dest="${liferay.home}/tools"
+					src="liferay-portal-tools.zip"
+				>
+					<mapper
+						from="[^/]+/(tools/)?(.*)"
+						to="\2"
+						type="regexp"
+					/>
+				</unzip>
+
+				<delete file="liferay-portal-tools.zip" />
 			</else>
 		</if>
 
@@ -8390,7 +8594,11 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 						</if>
 					</then>
 					<elseif>
-						<equals arg1="${database.type}" arg2="hypersonic" />
+						<and>
+							<available file="sql/${database.name}.properties" />
+							<available file="sql/${database.name}.script" />
+							<equals arg1="${database.type}" arg2="hypersonic" />
+						</and>
 						<then>
 							<delete dir="${liferay.home}/data" includeemptydirs="true" />
 
@@ -8963,16 +9171,29 @@ if (ppstate.equals("normal")) {
 			<isset property="test.batch.name" />
 		</condition>
 
+		<local name="portal.branch.name" />
+
+		<condition else="${git.working.branch.name}" property="portal.branch.name" value="${env.TEST_PORTAL_BRANCH_NAME}">
+			<isset property="env.TEST_PORTAL_BRANCH_NAME" />
+		</condition>
+
+		<local name="top.level.job.name" />
+
+		<condition else="test-portal-acceptance-upstream(${portal.branch.name})" property="top.level.job.name" value="${env.TOP_LEVEL_JOB_NAME}">
+			<isset property="env.TOP_LEVEL_JOB_NAME" />
+		</condition>
+
 		<beanshell>
 			<![CDATA[
-				import com.liferay.jenkins.results.parser.AxisTestClassGroup;
-				import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
-				import com.liferay.jenkins.results.parser.TestClassGroup;
-				import com.liferay.jenkins.results.parser.TestClassGroupFactory;
+				import com.liferay.jenkins.results.parser.Job;
+				import com.liferay.jenkins.results.parser.JobFactory;
+				import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
+				import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
+				import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
 
-				PortalGitWorkingDirectory portalGitWorkingDirectory = new PortalGitWorkingDirectory(project.getProperty("git.working.branch.name"), project.getProperty("project.dir"));
+				Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"));
 
-				TestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), portalGitWorkingDirectory, project.getProperty("env.CI_TEST_SUITE"));
+				BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
 
 				int axisCount = batchTestClassGroup.getAxisCount();
 
@@ -9015,6 +9236,8 @@ if (ppstate.equals("normal")) {
 		</beanshell>
 
 		<echo file="test.plugin.names.properties">${test.plugin.names.properties.content}</echo>
+
+		<print-file file.name="test.plugin.names.properties" />
 	</target>
 
 	<target name="remove-plugin">

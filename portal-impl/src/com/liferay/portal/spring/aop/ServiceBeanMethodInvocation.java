@@ -38,7 +38,7 @@ public class ServiceBeanMethodInvocation
 	implements MethodInvocation, Serializable {
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of Judson, replaced by {@link
 	 *             #ServiceBeanMethodInvocation(Object, Method, Object[])}
 	 */
 	@Deprecated
@@ -173,7 +173,7 @@ public class ServiceBeanMethodInvocation
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of Judson, with no direct replacement
 	 */
 	@Deprecated
 	public ServiceBeanMethodInvocation toCacheKeyModel() {
@@ -204,9 +204,7 @@ public class ServiceBeanMethodInvocation
 		sb.append(_method.getName());
 		sb.append(StringPool.OPEN_PARENTHESIS);
 
-		for (int i = 0; i < parameterTypes.length; i++) {
-			Class<?> parameterType = parameterTypes[i];
-
+		for (Class<?> parameterType : parameterTypes) {
 			sb.append(parameterType.getName());
 
 			sb.append(StringPool.COMMA);

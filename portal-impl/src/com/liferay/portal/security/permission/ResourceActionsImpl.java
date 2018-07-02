@@ -174,7 +174,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce
 	 */
 	@Deprecated
 	@Override
@@ -191,7 +191,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce
 	 */
 	@Deprecated
 	@Override
@@ -647,7 +647,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce
 	 */
 	@Deprecated
 	@Override
@@ -1090,12 +1090,18 @@ public class ResourceActionsImpl implements ResourceActions {
 
 			_read(servletContextName, classLoader, file, portletNames);
 
-			String extFile = StringUtil.replace(file, ".xml", "-ext.xml");
+			String extFileName = StringUtil.replace(file, ".xml", "-ext.xml");
 
-			_read(servletContextName, classLoader, extFile, portletNames);
+			_read(servletContextName, classLoader, extFileName, portletNames);
 		}
 
 		_read(servletContextName, document, portletNames);
+
+		if (source.endsWith(".xml") && !source.endsWith("-ext.xml")) {
+			String extFileName = StringUtil.replace(source, ".xml", "-ext.xml");
+
+			_read(servletContextName, classLoader, extFileName, portletNames);
+		}
 	}
 
 	private void _read(

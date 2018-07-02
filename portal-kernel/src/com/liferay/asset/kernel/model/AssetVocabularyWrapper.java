@@ -61,6 +61,7 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("uuid", getUuid());
+		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("vocabularyId", getVocabularyId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -83,6 +84,13 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		String externalReferenceCode = (String)attributes.get(
+				"externalReferenceCode");
+
+		if (externalReferenceCode != null) {
+			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long vocabularyId = (Long)attributes.get("vocabularyId");
@@ -290,6 +298,16 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 	}
 
 	/**
+	* Returns the external reference code of this asset vocabulary.
+	*
+	* @return the external reference code of this asset vocabulary
+	*/
+	@Override
+	public String getExternalReferenceCode() {
+		return _assetVocabulary.getExternalReferenceCode();
+	}
+
+	/**
 	* Returns the group ID of this asset vocabulary.
 	*
 	* @return the group ID of this asset vocabulary
@@ -370,7 +388,7 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Wilberforce, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -563,7 +581,8 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #isRequired(long, long)}
+	* @deprecated As of Wilberforce, replaced by {@link #isRequired(long,
+	long)}
 	*/
 	@Deprecated
 	@Override
@@ -698,6 +717,16 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 	}
 
 	/**
+	* Sets the external reference code of this asset vocabulary.
+	*
+	* @param externalReferenceCode the external reference code of this asset vocabulary
+	*/
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_assetVocabulary.setExternalReferenceCode(externalReferenceCode);
+	}
+
+	/**
 	* Sets the group ID of this asset vocabulary.
 	*
 	* @param groupId the group ID of this asset vocabulary
@@ -768,7 +797,7 @@ public class AssetVocabularyWrapper implements AssetVocabulary,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Wilberforce, with no direct replacement
 	*/
 	@Deprecated
 	@Override

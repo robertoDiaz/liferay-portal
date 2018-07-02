@@ -282,7 +282,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	@Override
 	public T remove(T model) {
-		if (model instanceof ModelWrapper) {
+		while (model instanceof ModelWrapper) {
 			ModelWrapper<T> modelWrapper = (ModelWrapper<T>)model;
 
 			model = modelWrapper.getWrappedModel();
@@ -321,6 +321,11 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 			PropsUtil.get(
 				PropsKeys.DATABASE_ORDER_BY_MAX_COLUMNS,
 				new Filter(dbType.getName())));
+
+		databaseInMaxParameters = GetterUtil.getInteger(
+			PropsUtil.get(
+				PropsKeys.DATABASE_IN_MAX_PARAMETERS,
+				new Filter(dbType.getName())));
 	}
 
 	@Override
@@ -330,7 +335,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	@Override
 	public T update(T model) {
-		if (model instanceof ModelWrapper) {
+		while (model instanceof ModelWrapper) {
 			ModelWrapper<T> modelWrapper = (ModelWrapper<T>)model;
 
 			model = modelWrapper.getWrappedModel();
@@ -536,8 +541,10 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	protected static final NullModel nullModel = new NullModel();
 
+	protected int databaseInMaxParameters;
+
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of Wilberforce, with no direct replacement
 	 */
 	@Deprecated
 	protected ModelListener<T>[] listeners = new ModelListener[0];

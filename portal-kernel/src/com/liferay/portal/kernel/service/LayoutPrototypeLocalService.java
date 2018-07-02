@@ -80,8 +80,9 @@ public interface LayoutPrototypeLocalService extends BaseLocalService,
 		throws PortalException;
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #addLayoutPrototype(long,
-	long, Map, Map, boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#addLayoutPrototype(long, long, Map, Map, boolean,
+	ServiceContext)}
 	*/
 	@Deprecated
 	public LayoutPrototype addLayoutPrototype(long userId, long companyId,
@@ -192,6 +193,10 @@ public interface LayoutPrototypeLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LayoutPrototype fetchLayoutPrototype(long layoutPrototypeId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutPrototype fetchLayoutPrototype(long companyId, String name,
+		Locale locale);
+
 	/**
 	* Returns the layout prototype with the matching UUID and company.
 	*
@@ -202,6 +207,9 @@ public interface LayoutPrototypeLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LayoutPrototype fetchLayoutPrototypeByUuidAndCompanyId(String uuid,
 		long companyId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutPrototype fetchLayoutProtoype(long companyId, String name);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -223,6 +231,14 @@ public interface LayoutPrototypeLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LayoutPrototype getLayoutPrototype(long layoutPrototypeId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutPrototype getLayoutPrototype(long companyId, String name)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutPrototype getLayoutPrototype(long companyId, String name,
+		Locale locale) throws PortalException;
 
 	/**
 	* Returns the layout prototype with the matching UUID and company.
@@ -293,8 +309,9 @@ public interface LayoutPrototypeLocalService extends BaseLocalService,
 		throws PortalException;
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateLayoutPrototype(long,
-	Map, Map, boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#updateLayoutPrototype(long, Map, Map, boolean,
+	ServiceContext)}
 	*/
 	@Deprecated
 	public LayoutPrototype updateLayoutPrototype(long layoutPrototypeId,

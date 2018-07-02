@@ -60,6 +60,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
+		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("userId", getUserId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("createDate", getCreateDate());
@@ -116,6 +117,13 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		String externalReferenceCode = (String)attributes.get(
+				"externalReferenceCode");
+
+		if (externalReferenceCode != null) {
+			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long userId = (Long)attributes.get("userId");
@@ -546,7 +554,8 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @param portalURL the portal's URL
 	* @param mainPath the main path
 	* @return the user's display URL
-	* @deprecated As of 7.0.0, replaced by {@link #getDisplayURL(ThemeDisplay)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#getDisplayURL(ThemeDisplay)}
 	*/
 	@Deprecated
 	@Override
@@ -586,7 +595,8 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	is available for the user's profile
 	* @return the user's display URL
 	* @throws PortalException
-	* @deprecated As of 7.0.0, replaced by {@link #getDisplayURL(ThemeDisplay)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#getDisplayURL(ThemeDisplay)}
 	*/
 	@Deprecated
 	@Override
@@ -699,6 +709,16 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _user.getExpandoBridge();
+	}
+
+	/**
+	* Returns the external reference code of this user.
+	*
+	* @return the external reference code of this user
+	*/
+	@Override
+	public String getExternalReferenceCode() {
+		return _user.getExternalReferenceCode();
 	}
 
 	/**
@@ -1584,6 +1604,16 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_user.setExpandoBridgeAttributes(serviceContext);
+	}
+
+	/**
+	* Sets the external reference code of this user.
+	*
+	* @param externalReferenceCode the external reference code of this user
+	*/
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_user.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**

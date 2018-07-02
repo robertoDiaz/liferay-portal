@@ -15,7 +15,7 @@
 </tr>
 <tr>
 	<td>ACTIVE_NAV_ITEM_LINK</td>
-	<td>//div[contains(@class,'navbar')]//li[contains(@class,'active')]//a[normalize-space()='${key_navItem}'] | //div[contains(@class,'navbar')]//a[normalize-space()='${key_navItem}']</td>
+	<td>//div[contains(@class,'navbar')]//li[contains(@class,'active')]//a[normalize-space()='${key_navItem}'] | //div[contains(@class,'navbar')]//a[normalize-space()='${key_navItem}'] | //ul[contains(@class,'nav-stacked')]//a[contains(@class,'active') and normalize-space()='${key_navItem}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -46,6 +46,11 @@
 <tr>
 	<td>ASSET_TITLE</td>
 	<td>//a[contains(@class,'nav-link')]//span[contains(text(),'${key_assetTitle}')] | //a[@title='${key_assetTitle}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_TITLE_LINK</td>
+	<td>//a[contains(@class,'nav-link')]//span[contains(text(),'${key_assetTitle}')]/../../a</td>
 	<td></td>
 </tr>
 <tr>
@@ -120,7 +125,7 @@
 </tr>
 <tr>
 	<td>HOME</td>
-	<td>//div[contains(@class,'navbar')]//a[contains(.,'Home')]</td>
+	<td>//ul[contains(@class,'breadcrumb')]/li//a[contains(.,'Home')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -155,7 +160,7 @@
 </tr>
 <tr>
 	<td>NAV_ITEM_LINK</td>
-	<td>//div[contains(@class,'navbar')]//a[normalize-space()='${key_navItem}']</td>
+	<td>//div[contains(@class,'navbar')]//a[normalize-space()='${key_navItem}'] | //ul[contains(@class,'nav-stacked')]//a[normalize-space()='${key_navItem}']</td>
 	<td></td>
 </tr>
 <tr>

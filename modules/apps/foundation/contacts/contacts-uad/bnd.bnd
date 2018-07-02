@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Contacts UAD
-Bundle-SymbolicName: com.liferay.contacts.uad
-Bundle-Version: 1.0.0
--dsannotations-options: inherit

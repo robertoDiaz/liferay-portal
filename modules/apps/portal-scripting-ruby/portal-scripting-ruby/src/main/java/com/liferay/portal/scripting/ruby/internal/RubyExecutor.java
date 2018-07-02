@@ -59,14 +59,16 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Alberto Montero
- * @author Raymond Augé
+ * @author     Alberto Montero
+ * @author     Raymond Augé
+ * @deprecated As of Judson, with no direct replacement
  */
 @Component(
 	configurationPid = "com.liferay.portal.scripting.ruby.configuration.RubyScriptingConfiguration",
 	immediate = true, property = "scripting.language=" + RubyExecutor.LANGUAGE,
 	service = ScriptingExecutor.class
 )
+@Deprecated
 public class RubyExecutor extends BaseScriptingExecutor {
 
 	public static final String LANGUAGE = "ruby";

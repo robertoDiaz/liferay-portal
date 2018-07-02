@@ -24,6 +24,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -50,7 +51,7 @@ import java.util.Map;
  * @see AssetTagStatsImpl
  * @see AssetTagStats
  * @see AssetTagStatsModel
- * @deprecated As of 7.0.0, replaced by {@link
+ * @deprecated As of Judson, replaced by {@link
             com.liferay.asset.tag.stats.model.impl.AssetTagStatsImpl}
  * @generated
  */
@@ -470,7 +471,7 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 
 	private static final ClassLoader _classLoader = AssetTagStats.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			AssetTagStats.class
+			AssetTagStats.class, ModelWrapper.class
 		};
 	private long _tagStatsId;
 	private long _companyId;

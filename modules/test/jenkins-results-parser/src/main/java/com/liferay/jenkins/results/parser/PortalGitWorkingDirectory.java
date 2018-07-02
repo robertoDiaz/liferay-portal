@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -53,11 +55,21 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 	}
 
 	public List<File> getModifiedModuleDirsList() throws IOException {
+		return getModifiedModuleDirsList(null, null);
+	}
+
+	public List<File> getModifiedModuleDirsList(
+			List<PathMatcher> excludesPathMatchers,
+			List<PathMatcher> includesPathMatchers)
+		throws IOException {
+
 		List<File> modifiedModuleDirsList = new ArrayList<>();
 
 		List<File> modifiedFilesList = getModifiedFilesList();
 
-		for (File moduleDir : getModuleDirsList()) {
+		for (File moduleDir :
+				getModuleDirsList(excludesPathMatchers, includesPathMatchers)) {
+
 			for (File modifiedFile : modifiedFilesList) {
 				if (JenkinsResultsParserUtil.isFileInDirectory(
 						moduleDir, modifiedFile)) {
@@ -84,12 +96,38 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		return modifiedModuleDirsList;
 	}
 
+	public List<File> getModuleAppDirs() throws IOException {
+		List<File> moduleAppDirs = new ArrayList<>();
+
+		List<File> moduleAppBndFiles = JenkinsResultsParserUtil.findFiles(
+			new File(getWorkingDirectory(), "modules"), "app\\.bnd");
+
+		for (File moduleAppBndFile : moduleAppBndFiles) {
+			moduleAppDirs.add(moduleAppBndFile.getParentFile());
+		}
+
+		return moduleAppDirs;
+	}
+
 	public List<File> getModuleDirsList() throws IOException {
+		return getModuleDirsList(null, null);
+	}
+
+	public List<File> getModuleDirsList(
+			List<PathMatcher> excludesPathMatchers,
+			List<PathMatcher> includesPathMatchers)
+		throws IOException {
+
 		final File modulesDir = new File(getWorkingDirectory(), "modules");
 
 		if (!modulesDir.exists()) {
 			return new ArrayList<>();
 		}
+
+		final List<PathMatcher> excludedModulesPathMatchers =
+			excludesPathMatchers;
+		final List<PathMatcher> includedModulesPathMatchers =
+			includesPathMatchers;
 
 		final List<File> moduleDirsList = new ArrayList<>();
 
@@ -126,6 +164,10 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 				public FileVisitResult preVisitDirectory(
 					Path filePath, BasicFileAttributes attrs) {
 
+					if (_pathExcluded(filePath) || !_pathIncluded(filePath)) {
+						return FileVisitResult.CONTINUE;
+					}
+
 					Module currentModule = Module.getModule(filePath);
 
 					if (currentModule == null) {
@@ -147,6 +189,38 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 					return FileVisitResult.CONTINUE;
 				}
 
+				private boolean _pathExcluded(Path path) {
+					if ((excludedModulesPathMatchers == null) ||
+						excludedModulesPathMatchers.isEmpty()) {
+
+						return false;
+					}
+
+					return _pathMatches(path, excludedModulesPathMatchers);
+				}
+
+				private boolean _pathIncluded(Path path) {
+					if ((includedModulesPathMatchers == null) ||
+						includedModulesPathMatchers.isEmpty()) {
+
+						return true;
+					}
+
+					return _pathMatches(path, includedModulesPathMatchers);
+				}
+
+				private boolean _pathMatches(
+					Path path, List<PathMatcher> pathMatchers) {
+
+					for (PathMatcher pathMatcher : pathMatchers) {
+						if (pathMatcher.matches(path)) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
 				private Module _module;
 
 			});
@@ -154,6 +228,18 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		Collections.sort(moduleDirsList);
 
 		return moduleDirsList;
+	}
+
+	public List<File> getNPMTestModuleDirsList() throws IOException {
+		List<File> npmModuleDirsList = new ArrayList<>();
+
+		for (File moduleDir : getModuleDirsList()) {
+			if (_isNPMTestModuleDir(moduleDir)) {
+				npmModuleDirsList.add(moduleDir);
+			}
+		}
+
+		return npmModuleDirsList;
 	}
 
 	private boolean _isNPMTestModuleDir(File moduleDir) {
@@ -168,8 +254,16 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 					JenkinsResultsParserUtil.read(packageJSONFile));
 			}
 			catch (IOException ioe) {
-				throw new RuntimeException(
-					"Unable to read file " + packageJSONFile.getPath(), ioe);
+				System.out.println(
+					"Unable to read invalid JSON " + packageJSONFile.getPath());
+
+				continue;
+			}
+			catch (JSONException jsone) {
+				System.out.println(
+					"Invalid JSON file " + packageJSONFile.getPath());
+
+				continue;
 			}
 
 			if (!jsonObject.has("scripts")) {
@@ -221,7 +315,7 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		@Override
 		public String toString() {
 			return JenkinsResultsParserUtil.combine(
-				Integer.toString(_priority), " ", _file.toString());
+				String.valueOf(_priority), " ", _file.toString());
 		}
 
 		private Module(File file, int priority) {

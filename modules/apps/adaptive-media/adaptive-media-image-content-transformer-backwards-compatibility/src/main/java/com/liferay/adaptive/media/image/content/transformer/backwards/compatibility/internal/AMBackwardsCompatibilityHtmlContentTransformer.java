@@ -19,6 +19,7 @@ import com.liferay.adaptive.media.content.transformer.ContentTransformer;
 import com.liferay.adaptive.media.content.transformer.ContentTransformerContentType;
 import com.liferay.adaptive.media.content.transformer.constants.ContentTransformerContentTypes;
 import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
+import com.liferay.adaptive.media.image.html.constants.AMImageHTMLConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -48,9 +49,23 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 	}
 
 	@Override
+	public String transform(String html) throws PortalException {
+		if (html == null) {
+			return null;
+		}
+
+		if (!html.contains("<img") || !html.contains("/documents/")) {
+			return html;
+		}
+
+		return super.transform(html);
+	}
+
+	@Override
 	protected FileEntry getFileEntry(Matcher matcher) throws PortalException {
 		if (StringUtil.containsIgnoreCase(
-				matcher.group(0), "data-fileEntryId")) {
+				matcher.group(0),
+				AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID)) {
 
 			return null;
 		}

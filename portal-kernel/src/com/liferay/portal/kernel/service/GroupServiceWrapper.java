@@ -80,8 +80,8 @@ public class GroupServiceWrapper implements GroupService,
 	staging
 	* @return the group
 	* @throws PortalException if a portal exception occurred
-	* @deprecated As of 7.0.0, replaced by {@link #addGroup(long, long, Map,
-	Map, int, boolean, int, String, boolean, boolean,
+	* @deprecated As of Wilberforce, replaced by {@link #addGroup(long, long,
+	Map, Map, int, boolean, int, String, boolean, boolean,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -229,6 +229,57 @@ public class GroupServiceWrapper implements GroupService,
 		long companyId, long parentGroupId, boolean site)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _groupService.getGroups(companyId, parentGroupId, site);
+	}
+
+	/**
+	* Returns all the groups that are direct children of the parent group.
+	*
+	* @param companyId the primary key of the company
+	* @param parentGroupId the primary key of the parent group
+	* @param site whether the group is to be associated with a main site
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @return the matching groups, or <code>null</code> if no matches were
+	found
+	* @throws PortalException if a portal exception occurred
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Group> getGroups(
+		long companyId, long parentGroupId, boolean site, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _groupService.getGroups(companyId, parentGroupId, site, start,
+			end);
+	}
+
+	/**
+	* Returns the number of groups that are direct children of the parent
+	* group.
+	*
+	* @param companyId the primary key of the company
+	* @param parentGroupId the primary key of the parent group
+	* @param site whether the group is to be associated with a main site
+	* @return the number of matching groups
+	*/
+	@Override
+	public int getGroupsCount(long companyId, long parentGroupId, boolean site)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _groupService.getGroupsCount(companyId, parentGroupId, site);
+	}
+
+	/**
+	* Returns the number of groups that are direct children of the parent group
+	* with the matching className.
+	*
+	* @param companyId the primary key of the company
+	* @param className the class name of the group
+	* @param parentGroupId the primary key of the parent group
+	* @return the number of matching groups
+	*/
+	@Override
+	public int getGroupsCount(long companyId, String className,
+		long parentGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _groupService.getGroupsCount(companyId, className, parentGroupId);
 	}
 
 	/**
@@ -611,8 +662,8 @@ public class GroupServiceWrapper implements GroupService,
 	tag names for the group.
 	* @return the group
 	* @throws PortalException if a portal exception occurred
-	* @deprecated As of 7.0.0, replaced by {@link #updateGroup(long, long, Map,
-	Map, int, boolean, int, String, boolean, boolean,
+	* @deprecated As of Wilberforce, replaced by {@link #updateGroup(long,
+	long, Map, Map, int, boolean, int, String, boolean, boolean,
 	ServiceContext)}
 	*/
 	@Deprecated

@@ -479,7 +479,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
+	* @deprecated As of Wilberforce, replaced by {@link #getFile(long, String,
 	boolean)}
 	*/
 	@Deprecated
@@ -491,7 +491,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
+	* @deprecated As of Wilberforce, replaced by {@link #getFile(long, String,
 	boolean, int)}
 	*/
 	@Deprecated
@@ -517,7 +517,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
+	* @deprecated As of Wilberforce, replaced by {@link #getFileAsStream(long,
 	String)}
 	*/
 	@Deprecated
@@ -528,7 +528,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
+	* @deprecated As of Wilberforce, replaced by {@link #getFileAsStream(long,
 	String, boolean)}
 	*/
 	@Deprecated
@@ -541,7 +541,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
+	* @deprecated As of Wilberforce, replaced by {@link #getFileAsStream(long,
 	String, boolean, int)}
 	*/
 	@Deprecated
@@ -628,7 +628,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Wilberforce, with no direct replacement
 	*/
 	@Deprecated
 	public static int getFileEntriesCount(long groupId,
@@ -742,6 +742,10 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
+	/**
+	* @deprecated As of Judson, with no direct replacement
+	*/
+	@Deprecated
 	public static java.util.List<com.liferay.document.library.kernel.model.DLFileEntry> getMisversionedFileEntries() {
 		return getService().getMisversionedFileEntries();
 	}
@@ -750,6 +754,10 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().getNoAssetFileEntries();
 	}
 
+	/**
+	* @deprecated As of Judson, with no direct replacement
+	*/
+	@Deprecated
 	public static java.util.List<com.liferay.document.library.kernel.model.DLFileEntry> getOrphanedFileEntries() {
 		return getService().getOrphanedFileEntries();
 	}
@@ -816,8 +824,8 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #isKeepFileVersionLabel(long,
-	boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#isKeepFileVersionLabel(long, boolean, ServiceContext)}
 	*/
 	@Deprecated
 	public static boolean isKeepFileVersionLabel(long fileEntryId,
