@@ -2209,6 +2209,51 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the users belonging to a group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  status the workflow status
+	 * @param  start the lower bound of the range of users
+	 * @param  end the upper bound of the range of users (not inclusive)
+	 * @param  obc the comparator to order the users by (optionally
+	 *         <code>null</code>)
+	 * @return the matching users
+	 */
+	@Override
+	public List<User> getGroupUsers(
+			long groupId, int status, int start, int end,
+			OrderByComparator<User> obc)
+		throws PortalException {
+
+		Group group = groupPersistence.findByPrimaryKey(groupId);
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+
+		params.put("usersGroups", Long.valueOf(groupId));
+
+		return search(
+			group.getCompanyId(), null, status, params, start, end, obc);
+	}
+
+	/**
+	 * Returns the users belonging to a group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  status the workflow status
+	 * @param  obc the comparator to order the users by (optionally
+	 *         <code>null</code>)
+	 * @return the matching users
+	 */
+	@Override
+	public List<User> getGroupUsers(
+			long groupId, int status, OrderByComparator<User> obc)
+		throws PortalException {
+
+		return getGroupUsers(
+			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+	}
+
+	/**
 	 * Returns the number of users with the status belonging to the group.
 	 *
 	 * @param  groupId the primary key of the group
@@ -2260,8 +2305,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	/**
 	 * Returns all the users who do not have any contacts.
 	 *
-	 * @return the users who do not have any contacts
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @return     the users who do not have any contacts
+	 * @deprecated As of Judson, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -2289,6 +2334,52 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	@Override
 	public long[] getOrganizationUserIds(long organizationId) {
 		return organizationPersistence.getUserPrimaryKeys(organizationId);
+	}
+
+	/**
+	 * Returns the users belonging to the organization with the status.
+	 *
+	 * @param  organizationId the primary key of the organization
+	 * @param  status the workflow status
+	 * @param  start the lower bound of the range of users
+	 * @param  end the upper bound of the range of users (not inclusive)
+	 * @param  obc the comparator to order the users by (optionally
+	 *         <code>null</code>)
+	 * @return the matching users
+	 */
+	@Override
+	public List<User> getOrganizationUsers(
+			long organizationId, int status, int start, int end,
+			OrderByComparator<User> obc)
+		throws PortalException {
+
+		Organization organization = organizationPersistence.findByPrimaryKey(
+			organizationId);
+
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+
+		params.put("usersOrgs", Long.valueOf(organizationId));
+
+		return search(
+			organization.getCompanyId(), null, status, params, start, end, obc);
+	}
+
+	/**
+	 * Returns the users belonging to the organization with the status.
+	 *
+	 * @param  organizationId the primary key of the organization
+	 * @param  status the workflow status
+	 * @param  obc the comparator to order the users by (optionally
+	 *         <code>null</code>)
+	 * @return the matching users
+	 */
+	@Override
+	public List<User> getOrganizationUsers(
+			long organizationId, int status, OrderByComparator<User> obc)
+		throws PortalException {
+
+		return getOrganizationUsers(
+			organizationId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 	}
 
 	/**
@@ -2366,8 +2457,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *             <code>null</code>)
 	 * @return     the ordered range of users with a social relation of the type
 	 *             with the user
-	 * @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	 *             String, int, int, OrderByComparator)}
+	 * @deprecated As of Wilberforce, replaced by {@link #getSocialUsers(long,
+	 *             int, String, int, int, OrderByComparator)}
 	 */
 	@Deprecated
 	@Override
@@ -2400,8 +2491,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *             <code>null</code>)
 	 * @return     the ordered range of users with a social relation with the
 	 *             user
-	 * @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	 *             String, int, int, OrderByComparator)}
+	 * @deprecated As of Wilberforce, replaced by {@link #getSocialUsers(long,
+	 *             int, String, int, int, OrderByComparator)}
 	 */
 	@Deprecated
 	@Override
@@ -2562,8 +2653,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *
 	 * @param      userId the primary key of the user
 	 * @return     the number of users with a social relation with the user
-	 * @deprecated As of 7.0.0, replaced by {@link #getSocialUsersCount(long,
-	 *             int, String)}
+	 * @deprecated As of Wilberforce, replaced by {@link
+	 *             #getSocialUsersCount(long, int, String)}
 	 */
 	@Deprecated
 	@Override
@@ -2582,8 +2673,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *             types can be found in {@link SocialRelationConstants}.
 	 * @return     the number of users with a social relation of the type with
 	 *             the user
-	 * @deprecated As of 7.0.0, replaced by {@link #getSocialUsersCount(long,
-	 *             int, String)}
+	 * @deprecated As of Wilberforce, replaced by {@link
+	 *             #getSocialUsersCount(long, int, String)}
 	 */
 	@Deprecated
 	@Override
@@ -2981,7 +3072,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param      user the user
 	 * @return     <code>true</code> if the user's password is expiring soon;
 	 *             <code>false</code> otherwise
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Judson
 	 */
 	@Deprecated
 	@Override
@@ -5111,8 +5202,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param      userId the primary key of the user
 	 * @param      status the user's new workflow status
 	 * @return     the user
-	 * @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
-	 *             ServiceContext)}
+	 * @deprecated As of Wilberforce, replaced by {@link #updateStatus(long,
+	 *             int, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -5519,12 +5610,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *             <code>uuid</code> attribute), asset category IDs, asset tag
 	 *             names, and expando bridge attributes for the user.
 	 * @return     the user
-	 * @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
-	 *             String, String, boolean, String, String, String, String,
-	 *             long, String, boolean, byte[], String, String, String,
-	 *             String, String, String, String, long, long, boolean, int,
-	 *             int, int, String, String, String, String, String, String,
-	 *             long[], long[], long[], List, long[], ServiceContext)}
+	 * @deprecated As of Wilberforce, replaced by {@link #updateUser(long,
+	 *             String, String, String, boolean, String, String, String,
+	 *             String, long, String, boolean, byte[], String, String,
+	 *             String, String, String, String, String, long, long, boolean,
+	 *             int, int, int, String, String, String, String, String,
+	 *             String, long[], long[], long[], List, long[],
+	 *             ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -6504,8 +6596,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			mailService.deleteEmailAddress(user.getCompanyId(), userId);
 		}
 
-		user.setEmailAddress(emailAddress);
 		user.setDigest(StringPool.BLANK);
+		user.setEmailAddress(emailAddress);
 	}
 
 	protected void trackPassword(User user) throws PortalException {

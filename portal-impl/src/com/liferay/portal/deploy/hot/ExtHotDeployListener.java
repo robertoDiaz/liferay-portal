@@ -207,7 +207,7 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce
 	 */
 	@Deprecated
 	protected void installExt(ServletContext servletContext) throws Exception {
@@ -271,12 +271,10 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 
 		File tempDir = tempDirPath.toFile();
 
-		WebXMLBuilder.main(
-			new String[] {
-				portalWebDir + "WEB-INF/web.xml",
-				pluginWebDir + "WEB-INF/ext-web/docroot/WEB-INF/web.xml",
-				tempDir.getAbsolutePath() + "/web.xml"
-			});
+		WebXMLBuilder.mergeWebXML(
+			portalWebDir + "WEB-INF/web.xml",
+			pluginWebDir + "WEB-INF/ext-web/docroot/WEB-INF/web.xml",
+			tempDir.getAbsolutePath() + "/web.xml");
 
 		File portalWebXml = new File(portalWebDir + "WEB-INF/web.xml");
 		File tmpWebXml = new File(tempDir + "/web.xml");

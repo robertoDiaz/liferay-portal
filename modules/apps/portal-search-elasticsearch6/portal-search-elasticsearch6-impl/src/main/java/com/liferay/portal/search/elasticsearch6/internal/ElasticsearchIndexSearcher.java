@@ -22,8 +22,8 @@ import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexSearcher;
+import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.GeoDistanceSort;
 import com.liferay.portal.kernel.search.GroupBy;
@@ -39,6 +39,8 @@ import com.liferay.portal.kernel.search.Stats;
 import com.liferay.portal.kernel.search.StatsResults;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
@@ -46,17 +48,22 @@ import com.liferay.portal.kernel.search.query.QueryTranslator;
 import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch6.constants.ElasticsearchSearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch6.internal.facet.AggregationFilteringFacetProcessorContext;
 import com.liferay.portal.search.elasticsearch6.internal.facet.CompositeFacetProcessor;
 import com.liferay.portal.search.elasticsearch6.internal.facet.FacetCollectorFactory;
 import com.liferay.portal.search.elasticsearch6.internal.facet.FacetProcessor;
+import com.liferay.portal.search.elasticsearch6.internal.facet.FacetProcessorContext;
+import com.liferay.portal.search.elasticsearch6.internal.facet.FacetUtil;
 import com.liferay.portal.search.elasticsearch6.internal.groupby.GroupByTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
 import com.liferay.portal.search.elasticsearch6.internal.stats.StatsTranslator;
@@ -69,6 +76,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -85,6 +93,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.tophits.TopHits;
@@ -187,7 +196,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				_log.info(
 					StringBundler.concat(
 						"Searching ", query.toString(), " took ",
-						String.valueOf(stopWatch.getTime()), " ms"));
+						stopWatch.getTime(), " ms"));
 			}
 		}
 	}
@@ -221,7 +230,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				_log.info(
 					StringBundler.concat(
 						"Searching ", query.toString(), " took ",
-						String.valueOf(stopWatch.getTime()), " ms"));
+						stopWatch.getTime(), " ms"));
 			}
 		}
 	}
@@ -243,17 +252,48 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	protected void addFacets(
 		SearchRequestBuilder searchRequestBuilder,
-		SearchContext searchContext) {
+		List<QueryBuilder> queryBuilders, SearchContext searchContext) {
 
 		Map<String, Facet> facetsMap = searchContext.getFacets();
 
-		for (Facet facet : facetsMap.values()) {
+		Collection<Facet> facets = facetsMap.values();
+
+		FacetProcessorContext facetProcessorContext = getFacetProcessorContext(
+			facets, searchContext);
+
+		for (Facet facet : facets) {
 			if (facet.isStatic()) {
 				continue;
 			}
 
-			facetProcessor.processFacet(searchRequestBuilder, facet);
+			addFilterQuery(queryBuilders, facet, searchContext);
+
+			Optional<AggregationBuilder> optional = facetProcessor.processFacet(
+				facet);
+
+			optional.map(
+				aggregationBuilder -> postProcessAggregationBuilder(
+					aggregationBuilder, facetProcessorContext)
+			).ifPresent(
+				searchRequestBuilder::addAggregation
+			);
 		}
+	}
+
+	protected void addFilterQuery(
+		List<QueryBuilder> queryBuilders, Facet facet,
+		SearchContext searchContext) {
+
+		BooleanClause<Filter> booleanClause =
+			facet.getFacetFilterBooleanClause();
+
+		if (booleanClause == null) {
+			return;
+		}
+
+		QueryBuilder queryBuilder = translate(booleanClause, searchContext);
+
+		queryBuilders.add(queryBuilder);
 	}
 
 	protected void addGroupBy(
@@ -278,7 +318,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			fieldName, queryConfig.getHighlightFragmentSize(),
 			queryConfig.getHighlightSnippetSize());
 
-		String localizedFieldName = DocumentImpl.getLocalizedName(
+		String localizedFieldName = Field.getLocalizedName(
 			queryConfig.getLocale(), fieldName);
 
 		highlightBuilder.field(
@@ -308,7 +348,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			queryConfig.isHighlightRequireFieldMatch();
 
 		boolean luceneSyntax = GetterUtil.getBoolean(
-			searchContext.getAttribute("luceneSyntax"));
+			searchContext.getAttribute(
+				SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX));
 
 		if (luceneSyntax) {
 			highlighterRequireFieldMatch = false;
@@ -356,8 +397,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		Document document, Map<String, HighlightField> highlightFields,
 		String fieldName, Locale locale) {
 
-		String snippetFieldName = DocumentImpl.getLocalizedName(
-			locale, fieldName);
+		String snippetFieldName = Field.getLocalizedName(locale, fieldName);
 
 		HighlightField highlightField = highlightFields.get(snippetFieldName);
 
@@ -499,8 +539,10 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		addStats(searchRequestBuilder, searchContext);
 
+		List<QueryBuilder> queryBuilders = new ArrayList<>();
+
 		if (!count) {
-			addFacets(searchRequestBuilder, searchContext);
+			addFacets(searchRequestBuilder, queryBuilders, searchContext);
 			addGroupBy(searchRequestBuilder, searchContext, start, end);
 			addHighlights(searchRequestBuilder, searchContext, queryConfig);
 			addPagination(searchRequestBuilder, start, end);
@@ -515,10 +557,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		}
 
 		if (query.getPostFilter() != null) {
-			QueryBuilder postFilterQueryBuilder = filterTranslator.translate(
-				query.getPostFilter(), searchContext);
+			queryBuilders.add(
+				filterTranslator.translate(
+					query.getPostFilter(), searchContext));
+		}
 
-			searchRequestBuilder.setPostFilter(postFilterQueryBuilder);
+		if (!ListUtil.isEmpty(queryBuilders)) {
+			searchRequestBuilder.setPostFilter(getPostFilter(queryBuilders));
 		}
 
 		QueryBuilder queryBuilder = queryTranslator.translate(
@@ -552,7 +597,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			_log.info(
 				StringBundler.concat(
 					"The search engine processed ", searchRequestBuilderString,
-					" in ", String.valueOf(searchResponse.getTook())));
+					" in ", searchResponse.getTook()));
 		}
 
 		return searchResponse;
@@ -578,6 +623,44 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			searchContext, query, start, end, false);
 
 		return processResponse(searchResponse, searchContext, query);
+	}
+
+	protected FacetCollector getFacetCollector(
+		Facet facet, Map<String, Aggregation> aggregationsMap) {
+
+		FacetCollectorFactory facetCollectorFactory =
+			new FacetCollectorFactory();
+
+		return facetCollectorFactory.getFacetCollector(
+			aggregationsMap.get(FacetUtil.getAggregationName(facet)));
+	}
+
+	protected FacetProcessorContext getFacetProcessorContext(
+		Collection<Facet> facets, SearchContext searchContext) {
+
+		boolean basicFacetSelection = GetterUtil.getBoolean(
+			searchContext.getAttribute(
+				SearchContextAttributes.ATTRIBUTE_KEY_BASIC_FACET_SELECTION));
+
+		if (basicFacetSelection) {
+			return null;
+		}
+
+		return AggregationFilteringFacetProcessorContext.newInstance(facets);
+	}
+
+	protected QueryBuilder getPostFilter(List<QueryBuilder> queryBuilders) {
+		if (queryBuilders.size() == 1) {
+			return queryBuilders.get(0);
+		}
+
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+		for (QueryBuilder queryBuilder : queryBuilders) {
+			boolQueryBuilder.must(queryBuilder);
+		}
+
+		return boolQueryBuilder;
 	}
 
 	protected String[] getSelectedIndexNames(
@@ -612,7 +695,19 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			return sortFieldName;
 		}
 
-		return DocumentImpl.getSortFieldName(sort, scoreFieldName);
+		return Field.getSortFieldName(sort, scoreFieldName);
+	}
+
+	protected AggregationBuilder postProcessAggregationBuilder(
+		AggregationBuilder aggregationBuilder,
+		FacetProcessorContext facetProcessorContext) {
+
+		if (facetProcessorContext != null) {
+			return facetProcessorContext.postProcessAggregationBuilder(
+				aggregationBuilder);
+		}
+
+		return aggregationBuilder;
 	}
 
 	protected Hits processResponse(
@@ -674,6 +769,17 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return hits;
 	}
 
+	protected QueryBuilder translate(
+		BooleanClause<Filter> booleanClause, SearchContext searchContext) {
+
+		BooleanFilter booleanFilter = new BooleanFilter();
+
+		booleanFilter.add(
+			booleanClause.getClause(), booleanClause.getBooleanClauseOccur());
+
+		return filterTranslator.translate(booleanFilter, searchContext);
+	}
+
 	protected void updateFacetCollectors(
 		SearchContext searchContext, SearchResponse searchResponse) {
 
@@ -688,18 +794,10 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		Map<String, Facet> facetsMap = searchContext.getFacets();
 
 		for (Facet facet : facetsMap.values()) {
-			if (facet.isStatic()) {
-				continue;
+			if (!facet.isStatic()) {
+				facet.setFacetCollector(
+					getFacetCollector(facet, aggregationsMap));
 			}
-
-			FacetCollectorFactory facetCollectorFactory =
-				new FacetCollectorFactory();
-
-			FacetCollector facetCollector =
-				facetCollectorFactory.getFacetCollector(
-					aggregationsMap.get(facet.getFieldName()));
-
-			facet.setFacetCollector(facetCollector);
 		}
 	}
 

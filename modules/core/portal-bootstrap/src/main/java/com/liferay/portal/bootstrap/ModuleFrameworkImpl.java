@@ -706,6 +706,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			PropsValues.MODULE_FRAMEWORK_STATE_DIR);
 
 		properties.put("eclipse.security", null);
+		properties.put(
+			"equinox.resolver.revision.batch.size",
+			PropsValues.MODULE_FRAMEWORK_RESOLVER_REVISION_BATCH_SIZE);
 		properties.put("java.security.manager", null);
 		properties.put("org.osgi.framework.security", null);
 
@@ -1022,7 +1025,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private boolean _hasLazyActivationPolicy(Bundle bundle) {
-		Dictionary<String, String> headers = bundle.getHeaders();
+		Dictionary<String, String> headers = bundle.getHeaders(
+			StringPool.BLANK);
 
 		String fragmentHost = headers.get(Constants.FRAGMENT_HOST);
 
@@ -1315,7 +1319,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		for (Bundle bundle : bundleContext.getBundles()) {
 			String location = bundle.getLocation();
 
-			if (!location.contains("static=true")) {
+			if (!location.contains("protocol=jar&static=true")) {
 				continue;
 			}
 
@@ -1459,7 +1463,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		List<String> hostBundleSymbolicNames = new ArrayList<>();
 
 		for (Bundle bundle : installedBundles) {
-			Dictionary<String, String> headers = bundle.getHeaders();
+			Dictionary<String, String> headers = bundle.getHeaders(
+				StringPool.BLANK);
 
 			String fragmentHost = headers.get(Constants.FRAGMENT_HOST);
 
@@ -1514,6 +1519,29 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	private void _startDynamicBundles(Set<Bundle> installedBundles)
 		throws Exception {
+
+		Bundle fileInstallBundle = null;
+
+		for (Bundle bundle : installedBundles) {
+			if ("org.apache.felix.fileinstall".equals(
+					bundle.getSymbolicName())) {
+
+				fileInstallBundle = bundle;
+
+				break;
+			}
+		}
+
+		if (fileInstallBundle == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to find the Apache Felix File Install bundle to " +
+						"synchronize the starting of dynamic bundles");
+			}
+		}
+		else {
+			fileInstallBundle.stop(Bundle.STOP_TRANSIENT);
+		}
 
 		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
 			FrameworkStartLevel.class);
@@ -1571,6 +1599,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 						be);
 				}
 			}
+		}
+
+		if (fileInstallBundle != null) {
+			fileInstallBundle.start(Bundle.START_TRANSIENT);
 		}
 	}
 

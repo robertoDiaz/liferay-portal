@@ -148,8 +148,8 @@ public class GroupServiceSoap {
 	staging
 	* @return the group
 	* @throws PortalException if a portal exception occurred
-	* @deprecated As of 7.0.0, replaced by {@link #addGroup(long, long, Map,
-	Map, int, boolean, int, String, boolean, boolean,
+	* @deprecated As of Wilberforce, replaced by {@link #addGroup(long, long,
+	Map, Map, int, boolean, int, String, boolean, boolean,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -368,6 +368,82 @@ public class GroupServiceSoap {
 					parentGroupId, site);
 
 			return com.liferay.portal.kernel.model.GroupSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns all the groups that are direct children of the parent group.
+	*
+	* @param companyId the primary key of the company
+	* @param parentGroupId the primary key of the parent group
+	* @param site whether the group is to be associated with a main site
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @return the matching groups, or <code>null</code> if no matches were
+	found
+	* @throws PortalException if a portal exception occurred
+	*/
+	public static com.liferay.portal.kernel.model.GroupSoap[] getGroups(
+		long companyId, long parentGroupId, boolean site, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.Group> returnValue = GroupServiceUtil.getGroups(companyId,
+					parentGroupId, site, start, end);
+
+			return com.liferay.portal.kernel.model.GroupSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the number of groups that are direct children of the parent
+	* group.
+	*
+	* @param companyId the primary key of the company
+	* @param parentGroupId the primary key of the parent group
+	* @param site whether the group is to be associated with a main site
+	* @return the number of matching groups
+	*/
+	public static int getGroupsCount(long companyId, long parentGroupId,
+		boolean site) throws RemoteException {
+		try {
+			int returnValue = GroupServiceUtil.getGroupsCount(companyId,
+					parentGroupId, site);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the number of groups that are direct children of the parent group
+	* with the matching className.
+	*
+	* @param companyId the primary key of the company
+	* @param className the class name of the group
+	* @param parentGroupId the primary key of the parent group
+	* @return the number of matching groups
+	*/
+	public static int getGroupsCount(long companyId, String className,
+		long parentGroupId) throws RemoteException {
+		try {
+			int returnValue = GroupServiceUtil.getGroupsCount(companyId,
+					className, parentGroupId);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -859,8 +935,8 @@ public class GroupServiceSoap {
 	tag names for the group.
 	* @return the group
 	* @throws PortalException if a portal exception occurred
-	* @deprecated As of 7.0.0, replaced by {@link #updateGroup(long, long, Map,
-	Map, int, boolean, int, String, boolean, boolean,
+	* @deprecated As of Wilberforce, replaced by {@link #updateGroup(long,
+	long, Map, Map, int, boolean, int, String, boolean, boolean,
 	ServiceContext)}
 	*/
 	@Deprecated

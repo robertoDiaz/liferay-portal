@@ -460,6 +460,52 @@ public class UserServiceUtil {
 	}
 
 	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getGroupUsers(groupId, status, start, end, obc);
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getGroupUsers(groupId, status, obc);
+	}
+
+	/**
+	* Returns the number of users with the status belonging to the group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @return the number of users with the status belonging to the group
+	*/
+	public static int getGroupUsersCount(long groupId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getGroupUsersCount(groupId, status);
+	}
+
+	/**
 	* Returns the primary keys of all the users belonging to the organization.
 	*
 	* @param organizationId the primary key of the organization
@@ -480,6 +526,54 @@ public class UserServiceUtil {
 		long organizationId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getOrganizationUsers(organizationId);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getOrganizationUsers(organizationId, status, start, end, obc);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getOrganizationUsers(organizationId, status, obc);
+	}
+
+	/**
+	* Returns the number of users with the status belonging to the
+	* organization.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @return the number of users with the status belonging to the organization
+	*/
+	public static int getOrganizationUsersCount(long organizationId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getOrganizationUsersCount(organizationId, status);
 	}
 
 	/**
@@ -543,6 +637,20 @@ public class UserServiceUtil {
 		long userGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getUserGroupUsers(userGroupId);
+	}
+
+	/**
+	* Returns the users belonging to the user group with the status.
+	*
+	* @param userGroupId the primary key of the user group
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @return the matching users
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.User> getUserGroupUsers(
+		long userGroupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getUserGroupUsers(userGroupId, start, end);
 	}
 
 	/**
@@ -987,8 +1095,8 @@ public class UserServiceUtil {
 	* @param userId the primary key of the user
 	* @param status the user's new workflow status
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
-	ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateStatus(long,
+	int, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.User updateStatus(
@@ -1152,13 +1260,13 @@ public class UserServiceUtil {
 	<code>uuid</code> attribute), asset category IDs, asset tag
 	names, and expando bridge attributes for the user.
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
-	String, String, boolean, String, String, String, String,
-	long, String, boolean, byte[], String, String, String,
-	String, String, String, String, long, long, boolean, int,
-	int, int, String, String, String, String, String, String,
-	long[], long[], long[], List, long[], List, List, List, List,
-	List, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateUser(long,
+	String, String, String, boolean, String, String, String,
+	String, long, String, boolean, byte[], String, String,
+	String, String, String, String, String, long, long, boolean,
+	int, int, int, String, String, String, String, String,
+	String, long[], long[], long[], List, long[], List, List,
+	List, List, List, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.User updateUser(long userId,

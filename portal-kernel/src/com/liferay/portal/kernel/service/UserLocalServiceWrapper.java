@@ -1084,6 +1084,20 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	}
 
 	/**
+	* Returns the user with the matching external reference code and company.
+	*
+	* @param companyId the primary key of the company
+	* @param externalReferenceCode the user's external reference code
+	* @return the matching user, or <code>null</code> if a matching user could not be found
+	*/
+	@Override
+	public com.liferay.portal.kernel.model.User fetchUserByReferenceCode(
+		long companyId, String externalReferenceCode) {
+		return _userLocalService.fetchUserByReferenceCode(companyId,
+			externalReferenceCode);
+	}
+
+	/**
 	* Returns the user with the screen name.
 	*
 	* @param companyId the primary key of the user's company
@@ -1207,10 +1221,33 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.getGroupUsers(groupId);
 	}
 
+	/**
+	* @throws PortalException
+	*/
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
-		long groupId, int start, int end) {
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userLocalService.getGroupUsers(groupId, start, end);
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getGroupUsers(groupId, status, start, end, obc);
 	}
 
 	@Override
@@ -1219,6 +1256,23 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> orderByComparator) {
 		return _userLocalService.getGroupUsers(groupId, start, end,
 			orderByComparator);
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getGroupUsers(
+		long groupId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getGroupUsers(groupId, status, obc);
 	}
 
 	@Override
@@ -1269,7 +1323,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	* Returns all the users who do not have any contacts.
 	*
 	* @return the users who do not have any contacts
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -1316,10 +1370,34 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.getOrganizationUsers(organizationId);
 	}
 
+	/**
+	* @throws PortalException
+	*/
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
-		long organizationId, int start, int end) {
+		long organizationId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userLocalService.getOrganizationUsers(organizationId, start, end);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getOrganizationUsers(organizationId, status,
+			start, end, obc);
 	}
 
 	@Override
@@ -1328,6 +1406,24 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> orderByComparator) {
 		return _userLocalService.getOrganizationUsers(organizationId, start,
 			end, orderByComparator);
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.User> getOrganizationUsers(
+		long organizationId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.getOrganizationUsers(organizationId, status,
+			obc);
 	}
 
 	@Override
@@ -1449,8 +1545,8 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	<code>null</code>)
 	* @return the ordered range of users with a social relation of the type
 	with the user
-	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	String, int, int, OrderByComparator)}
+	* @deprecated As of Wilberforce, replaced by {@link #getSocialUsers(long,
+	int, String, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	@Override
@@ -1482,8 +1578,8 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	<code>null</code>)
 	* @return the ordered range of users with a social relation with the
 	user
-	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	String, int, int, OrderByComparator)}
+	* @deprecated As of Wilberforce, replaced by {@link #getSocialUsers(long,
+	int, String, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	@Override
@@ -1573,8 +1669,8 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	*
 	* @param userId the primary key of the user
 	* @return the number of users with a social relation with the user
-	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsersCount(long,
-	int, String)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#getSocialUsersCount(long, int, String)}
 	*/
 	@Deprecated
 	@Override
@@ -1592,8 +1688,8 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	types can be found in {@link SocialRelationConstants}.
 	* @return the number of users with a social relation of the type with
 	the user
-	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsersCount(long,
-	int, String)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#getSocialUsersCount(long, int, String)}
 	*/
 	@Deprecated
 	@Override
@@ -2056,7 +2152,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	* @param user the user
 	* @return <code>true</code> if the user's password is expiring soon;
 	<code>false</code> otherwise
-	* @deprecated As of 7.0.0
+	* @deprecated As of Judson
 	*/
 	@Deprecated
 	@Override
@@ -3107,8 +3203,8 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	* @param userId the primary key of the user
 	* @param status the user's new workflow status
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
-	ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateStatus(long,
+	int, ServiceContext)}
 	*/
 	@Deprecated
 	@Override
@@ -3256,12 +3352,13 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	<code>uuid</code> attribute), asset category IDs, asset tag
 	names, and expando bridge attributes for the user.
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
-	String, String, boolean, String, String, String, String,
-	long, String, boolean, byte[], String, String, String,
-	String, String, String, String, long, long, boolean, int,
-	int, int, String, String, String, String, String, String,
-	long[], long[], long[], List, long[], ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateUser(long,
+	String, String, String, boolean, String, String, String,
+	String, long, String, boolean, byte[], String, String,
+	String, String, String, String, String, long, long, boolean,
+	int, int, int, String, String, String, String, String,
+	String, long[], long[], long[], List, long[],
+	ServiceContext)}
 	*/
 	@Deprecated
 	@Override

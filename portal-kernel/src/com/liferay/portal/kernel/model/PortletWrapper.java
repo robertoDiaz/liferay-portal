@@ -116,6 +116,17 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Adds a portlet CSS/JavaScript resource dependency.
+	*
+	* @param portletDependency the portlet CSS/JavaScript resource dependency
+	*/
+	@Override
+	public void addPortletDependency(
+		com.liferay.portal.kernel.model.portlet.PortletDependency portletDependency) {
+		_portlet.addPortletDependency(portletDependency);
+	}
+
+	/**
 	* Adds a processing event.
 	*/
 	@Override
@@ -495,7 +506,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns the Facebook integration method of the portlet.
 	*
 	* @return the Facebook integration method of the portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -642,6 +653,33 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Returns a list of attribute name prefixes that will be referenced after
+	* the HEADER_PHASE completes for each portlet. Header request attributes
+	* that have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @return a list of attribute name prefixes that will be referenced after
+	the HEADER_PHASE completes for each portlet. Header request
+	attributes that have names starting with any of the prefixes will
+	be copied from the header request to the subsequent render
+	request.
+	*/
+	@Override
+	public java.util.List<String> getHeaderRequestAttributePrefixes() {
+		return _portlet.getHeaderRequestAttributePrefixes();
+	}
+
+	/**
+	* Returns the header timeout of the portlet.
+	*
+	* @return the header timeout of the portlet
+	*/
+	@Override
+	public int getHeaderTimeout() {
+		return _portlet.getHeaderTimeout();
+	}
+
+	/**
 	* Returns the icon of the portlet.
 	*
 	* @return the icon of the portlet
@@ -760,6 +798,46 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean getMaximizeHelp() {
 		return _portlet.getMaximizeHelp();
+	}
+
+	/**
+	* Returns the maximum size of buffered bytes before storing occurs.
+	*
+	* @return the maximum size of buffered bytes before storing occurs
+	*/
+	@Override
+	public int getMultipartFileSizeThreshold() {
+		return _portlet.getMultipartFileSizeThreshold();
+	}
+
+	/**
+	* Returns the directory for storing uploaded files.
+	*
+	* @return the directory for storing uploaded files
+	*/
+	@Override
+	public String getMultipartLocation() {
+		return _portlet.getMultipartLocation();
+	}
+
+	/**
+	* Returns the maximum number of bytes permitted for an uploaded file.
+	*
+	* @return the maximum number of bytes permitted for an uploaded file
+	*/
+	@Override
+	public long getMultipartMaxFileSize() {
+		return _portlet.getMultipartMaxFileSize();
+	}
+
+	/**
+	* Returns the maximum number of bytes permitted for a multipart request.
+	*
+	* @return the maximum number of bytes permitted for a multipart request
+	*/
+	@Override
+	public long getMultipartMaxRequestSize() {
+		return _portlet.getMultipartMaxRequestSize();
 	}
 
 	/**
@@ -942,6 +1020,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public com.liferay.exportimport.kernel.lar.PortletDataHandler getPortletDataHandlerInstance() {
 		return _portlet.getPortletDataHandlerInstance();
+	}
+
+	/**
+	* Returns the portlet's CSS/JavaScript resource dependencies.
+	*
+	* @return the portlet's CSS/JavaScript resource dependencies
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.portlet.PortletDependency> getPortletDependencies() {
+		return _portlet.getPortletDependencies();
 	}
 
 	/**
@@ -1186,16 +1274,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean getReady() {
 		return _portlet.getReady();
-	}
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	@Override
-	public boolean getRemoteable() {
-		return _portlet.getRemoteable();
 	}
 
 	/**
@@ -1893,6 +1971,18 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 		return _portlet.isAjaxable();
 	}
 
+	/**
+	* Returns <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @return <code>true</code> if the portlet supports asynchrounous
+	processing in resource requests
+	*/
+	@Override
+	public boolean isAsyncSupported() {
+		return _portlet.isAsyncSupported();
+	}
+
 	@Override
 	public boolean isCachedModel() {
 		return _portlet.isCachedModel();
@@ -1973,6 +2063,22 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Returns <code>true</code> if the portlet's
+	* <code>serveResource(ResourceRequest,ResourceResponse)</code> method
+	* should be invoked during a partial action triggered by a different
+	* portlet on the same portal page.
+	*
+	* @return <code>true</code> if the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	@Override
+	public boolean isPartialActionServeResource() {
+		return _portlet.isPartialActionServeResource();
+	}
+
+	/**
 	* Returns <code>true</code> if the portlet goes into the pop up state when
 	* the user goes into the print mode.
 	*
@@ -1982,6 +2088,37 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isPopUpPrint() {
 		return _portlet.isPopUpPrint();
+	}
+
+	/**
+	* Returns <code>true</code> if the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified CSS resource dependencies are
+	to be referenced in the page's header
+	*/
+	@Override
+	public boolean isPortletDependencyCssEnabled() {
+		return _portlet.isPortletDependencyCssEnabled();
+	}
+
+	/**
+	* Returns <code>true</code> if the JavaScript resource dependencies
+	* specified in <code>portlet.xml</code>, @{@link
+	* javax.portlet.annotations.Dependency}, {@link
+	* javax.portlet.HeaderResponse#addDependency(String, String, String)}, or
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String, String,
+	* String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified JavaScript resource
+	dependencies are to be referenced in the page's header
+	*/
+	@Override
+	public boolean isPortletDependencyJavaScriptEnabled() {
+		return _portlet.isPortletDependencyJavaScriptEnabled();
 	}
 
 	/**
@@ -2052,16 +2189,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isReady() {
 		return _portlet.isReady();
-	}
-
-	/**
-	* Returns <code>true</code> if the portlet supports remoting.
-	*
-	* @return <code>true</code> if the portlet supports remoting
-	*/
-	@Override
-	public boolean isRemoteable() {
-		return _portlet.isRemoteable();
 	}
 
 	/**
@@ -2294,6 +2421,18 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Set to <code>true</code> if the portlet supports asynchronous processing
+	* in resource requests.
+	*
+	* @param asyncSupported boolean value for whether the portlet supports
+	asynchronous processing in resource requests
+	*/
+	@Override
+	public void setAsyncSupported(boolean asyncSupported) {
+		_portlet.setAsyncSupported(asyncSupported);
+	}
+
+	/**
 	* Sets the names of the classes that represent atom collection adapters
 	* associated with the portlet.
 	*
@@ -2467,7 +2606,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*
 	* @param facebookIntegration the Facebook integration method of the
 	portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -2614,6 +2753,34 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Sets a list of attribute name prefixes that will be referenced after the
+	* HEADER_PHASE completes for each portlet. Header request attributes that
+	* have names starting with any of the prefixes will be copied from the
+	* header request to the subsequent render request.
+	*
+	* @param headerRequestAttributePrefixes a list of attribute name prefixes
+	that will be referenced after the HEADER_PHASE completes for each
+	portlet. Header request attributes that have names starting with
+	any of the prefixes will be copied from the header request to the
+	subsequent render request.
+	*/
+	@Override
+	public void setHeaderRequestAttributePrefixes(
+		java.util.List<String> headerRequestAttributePrefixes) {
+		_portlet.setHeaderRequestAttributePrefixes(headerRequestAttributePrefixes);
+	}
+
+	/**
+	* Sets the header timeout of the portlet.
+	*
+	* @param headerTimeout the header timeout of the portlet
+	*/
+	@Override
+	public void setHeaderTimeout(int headerTimeout) {
+		_portlet.setHeaderTimeout(headerTimeout);
+	}
+
+	/**
 	* Sets the icon of the portlet.
 	*
 	* @param icon the icon of the portlet
@@ -2716,6 +2883,49 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Sets the maximum size of buffered bytes before storing occurs.
+	*
+	* @param multipartFileSizeThreshold the maximum size of buffered bytes
+	before storing occurs
+	*/
+	@Override
+	public void setMultipartFileSizeThreshold(int multipartFileSizeThreshold) {
+		_portlet.setMultipartFileSizeThreshold(multipartFileSizeThreshold);
+	}
+
+	/**
+	* Sets the directory for storing uploaded files.
+	*
+	* @param multipartLocation the directory for storing uploaded files
+	*/
+	@Override
+	public void setMultipartLocation(String multipartLocation) {
+		_portlet.setMultipartLocation(multipartLocation);
+	}
+
+	/**
+	* Sets the maximum number of bytes permitted for an uploaded file.
+	*
+	* @param multipartMaxFileSize the maximum number of bytes permitted for an
+	uploaded file
+	*/
+	@Override
+	public void setMultipartMaxFileSize(long multipartMaxFileSize) {
+		_portlet.setMultipartMaxFileSize(multipartMaxFileSize);
+	}
+
+	/**
+	* Sets the maximum number of bytes permitted for a multipart request.
+	*
+	* @param multipartMaxRequestSize the maximum number of bytes permitted for
+	a multipart request
+	*/
+	@Override
+	public void setMultipartMaxRequestSize(long multipartMaxRequestSize) {
+		_portlet.setMultipartMaxRequestSize(multipartMaxRequestSize);
+	}
+
+	/**
 	* Sets the mvcc version of this portlet.
 	*
 	* @param mvccVersion the mvcc version of this portlet
@@ -2748,6 +2958,21 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setParentStrutsPath(String parentStrutsPath) {
 		_portlet.setParentStrutsPath(parentStrutsPath);
+	}
+
+	/**
+	* Sets whether the portlet's serve resource should be invoked during a
+	* partial action triggered by a different portlet on the same portal page.
+	*
+	* @param partialActionServeResource whether the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	@Override
+	public void setPartialActionServeResource(
+		boolean partialActionServeResource) {
+		_portlet.setPartialActionServeResource(partialActionServeResource);
 	}
 
 	/**
@@ -2792,11 +3017,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Set to <code>true</code> if the portlet goes into the pop up state when
-	* the user goes into the print mode.
+	* Sets whether the portlet goes into the pop up state when the user goes
+	* into the print mode.
 	*
-	* @param popUpPrint boolean value for whether the portlet goes into the pop
-	up state when the user goes into the print mode
+	* @param popUpPrint whether the portlet goes into the pop up state when the
+	user goes into the print mode
 	*/
 	@Override
 	public void setPopUpPrint(boolean popUpPrint) {
@@ -2832,6 +3057,43 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setPortletDataHandlerClass(String portletDataHandlerClass) {
 		_portlet.setPortletDataHandlerClass(portletDataHandlerClass);
+	}
+
+	/**
+	* Sets whether the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyCssEnabled whether the CSS resource dependencies
+	that are specified in <code>portlet.xml</code>,
+	*/
+	@Override
+	public void setPortletDependencyCssEnabled(
+		boolean portletDependencyCssEnabled) {
+		_portlet.setPortletDependencyCssEnabled(portletDependencyCssEnabled);
+	}
+
+	/**
+	* Sets whether the JavaScript resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyJavaScriptEnabled whether the JavaScript resource
+	dependencies specified in <code>portlet.xml</code>, @{@link
+	javax.portlet.annotations.Dependency}, {@link
+	javax.portlet.HeaderResponse#addDependency(String, String,
+	String)}, or {@link
+	javax.portlet.HeaderResponse#addDependency(String, String, String,
+	String)} are to be referenced in the page's header
+	*/
+	@Override
+	public void setPortletDependencyJavaScriptEnabled(
+		boolean portletDependencyJavaScriptEnabled) {
+		_portlet.setPortletDependencyJavaScriptEnabled(portletDependencyJavaScriptEnabled);
 	}
 
 	/**
@@ -3035,17 +3297,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setReady(boolean ready) {
 		_portlet.setReady(ready);
-	}
-
-	/**
-	* Set to <code>true</code> if the portlet supports remoting
-	*
-	* @param remoteable boolean value for whether or not the the portlet
-	supports remoting
-	*/
-	@Override
-	public void setRemoteable(boolean remoteable) {
-		_portlet.setRemoteable(remoteable);
 	}
 
 	/**

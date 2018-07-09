@@ -340,7 +340,7 @@
 </tr>
 <tr>
 	<td>SELECT_FIELD_MULTIPLE_OPTION_REMOVE</td>
-	<td>//div[contains(@data-fieldname,'${key_fieldName}')]//span[contains(.,'${key_selectOption}')]//a</td>
+	<td>//div[contains(@data-fieldname,'${key_fieldName}')]//span[contains(.,'${key_selectOption}')]//button[contains(@class,'trigger-label-item-close')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -381,18 +381,18 @@
 </tr>
 <!--VALIDATION-->
 <tr>
-	<td>VALIDATION_TYPE</td>
-	<td>//div[contains(@data-fieldname,'validation')]/div/following-sibling::div//select[contains(@class,'type')]</td>
+	<td>VALIDATION_ARGUMENT</td>
+	<td>//div[contains(@data-fieldname,'validation')]//div[contains(@class,'select-field-trigger')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>VALIDATION_ARGUMENT</td>
-	<td>//div[contains(@data-fieldname,'validation')]/div/following-sibling::div//select[contains(@class,'validation')]</td>
+	<td>VALIDATION_ARGUMENT_OPTION</td>
+	<td>//div[contains(@data-fieldname,'validation')]//ul[contains(@class,'results-chosen')]//li[contains(.,'${key_validationArgument}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>VALIDATION_INPUT</td>
-	<td>//input[contains(@class,'parameter-input')]</td>
+	<td>//div[contains(@class,'validation-input')]//input</td>
 	<td></td>
 </tr>
 <tr>

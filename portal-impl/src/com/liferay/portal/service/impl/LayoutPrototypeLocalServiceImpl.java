@@ -15,6 +15,7 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.NoSuchLayoutPrototypeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredLayoutPrototypeException;
 import com.liferay.portal.kernel.model.Group;
@@ -114,8 +115,9 @@ public class LayoutPrototypeLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #addLayoutPrototype(long,
-	 *             long, Map, Map, boolean, ServiceContext)}
+	 * @deprecated As of Wilberforce, replaced by {@link
+	 *             #addLayoutPrototype(long, long, Map, Map, boolean,
+	 *             ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -198,6 +200,54 @@ public class LayoutPrototypeLocalServiceImpl
 	}
 
 	@Override
+	public LayoutPrototype fetchLayoutPrototype(
+		long companyId, String name, Locale locale) {
+
+		List<LayoutPrototype> layoutPrototypes =
+			layoutPrototypePersistence.findByCompanyId(companyId);
+
+		for (LayoutPrototype layoutPrototype : layoutPrototypes) {
+			String layoutPrototypeName = layoutPrototype.getName(locale);
+
+			if (layoutPrototypeName.equals(name)) {
+				return layoutPrototype;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public LayoutPrototype fetchLayoutProtoype(long companyId, String name) {
+		return layoutPrototypeLocalService.fetchLayoutPrototype(
+			companyId, name, LocaleUtil.getDefault());
+	}
+
+	@Override
+	public LayoutPrototype getLayoutPrototype(long companyId, String name)
+		throws PortalException {
+
+		return layoutPrototypeLocalService.getLayoutPrototype(
+			companyId, name, LocaleUtil.getDefault());
+	}
+
+	@Override
+	public LayoutPrototype getLayoutPrototype(
+			long companyId, String name, Locale locale)
+		throws PortalException {
+
+		LayoutPrototype layoutPrototype =
+			layoutPrototypeLocalService.fetchLayoutPrototype(
+				companyId, name, locale);
+
+		if (layoutPrototype == null) {
+			throw new NoSuchLayoutPrototypeException();
+		}
+
+		return layoutPrototype;
+	}
+
+	@Override
 	public LayoutPrototype getLayoutPrototypeByUuidAndCompanyId(
 			String uuid, long companyId)
 		throws PortalException {
@@ -265,8 +315,9 @@ public class LayoutPrototypeLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #updateLayoutPrototype(long,
-	 *             Map, Map, boolean, ServiceContext)}
+	 * @deprecated As of Wilberforce, replaced by {@link
+	 *             #updateLayoutPrototype(long, Map, Map, boolean,
+	 *             ServiceContext)}
 	 */
 	@Deprecated
 	@Override

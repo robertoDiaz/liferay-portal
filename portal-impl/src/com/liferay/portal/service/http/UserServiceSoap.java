@@ -649,6 +649,81 @@ public class UserServiceSoap {
 	}
 
 	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static com.liferay.portal.kernel.model.UserSoap[] getGroupUsers(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getGroupUsers(groupId,
+					status, start, end, obc);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the users belonging to a group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static com.liferay.portal.kernel.model.UserSoap[] getGroupUsers(
+		long groupId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getGroupUsers(groupId,
+					status, obc);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the number of users with the status belonging to the group.
+	*
+	* @param groupId the primary key of the group
+	* @param status the workflow status
+	* @return the number of users with the status belonging to the group
+	*/
+	public static int getGroupUsersCount(long groupId, int status)
+		throws RemoteException {
+		try {
+			int returnValue = UserServiceUtil.getGroupUsersCount(groupId, status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
 	* Returns the primary keys of all the users belonging to the organization.
 	*
 	* @param organizationId the primary key of the organization
@@ -680,6 +755,83 @@ public class UserServiceSoap {
 			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getOrganizationUsers(organizationId);
 
 			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static com.liferay.portal.kernel.model.UserSoap[] getOrganizationUsers(
+		long organizationId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getOrganizationUsers(organizationId,
+					status, start, end, obc);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the users belonging to the organization with the status.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @param obc the comparator to order the users by (optionally
+	<code>null</code>)
+	* @return the matching users
+	*/
+	public static com.liferay.portal.kernel.model.UserSoap[] getOrganizationUsers(
+		long organizationId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.User> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getOrganizationUsers(organizationId,
+					status, obc);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the number of users with the status belonging to the
+	* organization.
+	*
+	* @param organizationId the primary key of the organization
+	* @param status the workflow status
+	* @return the number of users with the status belonging to the organization
+	*/
+	public static int getOrganizationUsersCount(long organizationId, int status)
+		throws RemoteException {
+		try {
+			int returnValue = UserServiceUtil.getOrganizationUsersCount(organizationId,
+					status);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -775,6 +927,29 @@ public class UserServiceSoap {
 		long userGroupId) throws RemoteException {
 		try {
 			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getUserGroupUsers(userGroupId);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns the users belonging to the user group with the status.
+	*
+	* @param userGroupId the primary key of the user group
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @return the matching users
+	*/
+	public static com.liferay.portal.kernel.model.UserSoap[] getUserGroupUsers(
+		long userGroupId, int start, int end) throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.kernel.model.User> returnValue = UserServiceUtil.getUserGroupUsers(userGroupId,
+					start, end);
 
 			return com.liferay.portal.kernel.model.UserSoap.toSoapModels(returnValue);
 		}
@@ -1451,8 +1626,8 @@ public class UserServiceSoap {
 	* @param userId the primary key of the user
 	* @param status the user's new workflow status
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
-	ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateStatus(long,
+	int, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.UserSoap updateStatus(
@@ -1657,13 +1832,13 @@ public class UserServiceSoap {
 	<code>uuid</code> attribute), asset category IDs, asset tag
 	names, and expando bridge attributes for the user.
 	* @return the user
-	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
-	String, String, boolean, String, String, String, String,
-	long, String, boolean, byte[], String, String, String,
-	String, String, String, String, long, long, boolean, int,
-	int, int, String, String, String, String, String, String,
-	long[], long[], long[], List, long[], List, List, List, List,
-	List, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateUser(long,
+	String, String, String, boolean, String, String, String,
+	String, long, String, boolean, byte[], String, String,
+	String, String, String, String, String, long, long, boolean,
+	int, int, int, String, String, String, String, String,
+	String, long[], long[], long[], List, long[], List, List,
+	List, List, List, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.UserSoap updateUser(

@@ -44,7 +44,7 @@ import org.gradle.api.tasks.compile.JavaCompile;
 public class LiferayOSGiExtension {
 
 	/**
-	 * @deprecated As of 3.6.0, with no direct replacement
+	 * @deprecated As of Judson, with no direct replacement
 	 */
 	@Deprecated
 	public static final String
@@ -118,6 +118,7 @@ public class LiferayOSGiExtension {
 		_bundleDefaultInstructions.put(
 			BUNDLE_DEFAULT_INSTRUCTION_LIFERAY_SERVICE_XML,
 			"service.xml,*/service.xml");
+		_bundleDefaultInstructions.put("-contract", "JavaPortlet,JavaServlet");
 		_bundleDefaultInstructions.put("-jsp", "*.jsp,*.jspf");
 		_bundleDefaultInstructions.put("-sass", "*");
 	}

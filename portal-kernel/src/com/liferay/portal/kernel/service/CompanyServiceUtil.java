@@ -78,6 +78,15 @@ public class CompanyServiceUtil {
 	}
 
 	/**
+	* Returns all the companies.
+	*
+	* @return the companies
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.Company> getCompanies() {
+		return getService().getCompanies();
+	}
+
+	/**
 	* Returns the company with the primary key.
 	*
 	* @param companyId the primary key of the company
@@ -294,9 +303,9 @@ public class CompanyServiceUtil {
 	* @param size the company's account size (optionally
 	<code>null</code>)
 	* @return the the company with the primary key
-	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
-	String, String, boolean, byte[], String, String, String,
-	String, String, String, String, String, String)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateCompany(long,
+	String, String, String, boolean, byte[], String, String,
+	String, String, String, String, String, String, String)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.Company updateCompany(
@@ -343,10 +352,10 @@ public class CompanyServiceUtil {
 	* @param websites the company's websites
 	* @param properties the company's properties
 	* @return the company with the primary key
-	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
-	String, String, boolean, byte[], String, String, String,
+	* @deprecated As of Wilberforce, replaced by {@link #updateCompany(long,
+	String, String, String, boolean, byte[], String, String,
 	String, String, String, String, String, String, String,
-	String, List, List, List, List, UnicodeProperties)}
+	String, String, List, List, List, List, UnicodeProperties)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.Company updateCompany(

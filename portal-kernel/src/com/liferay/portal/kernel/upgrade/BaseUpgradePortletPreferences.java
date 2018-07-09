@@ -37,7 +37,7 @@ import javax.portlet.ReadOnlyException;
 public abstract class BaseUpgradePortletPreferences extends UpgradeProcess {
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of Judson, with no direct replacement
 	 */
 	@Deprecated
 	protected void deletePortletPreferences(long portletPreferencesId)
@@ -279,14 +279,9 @@ public abstract class BaseUpgradePortletPreferences extends UpgradeProcess {
 				ResultSet rs = ps1.executeQuery()) {
 
 				while (rs.next()) {
-					long portletPreferencesId = rs.getLong(
-						"portletPreferencesId");
 					long ownerId = rs.getLong("ownerId");
 					int ownerType = rs.getInt("ownerType");
 					long plid = rs.getLong("plid");
-					String portletId = rs.getString("portletId");
-					String preferences = GetterUtil.getString(
-						rs.getString("preferences"));
 
 					long companyId = 0;
 
@@ -333,7 +328,14 @@ public abstract class BaseUpgradePortletPreferences extends UpgradeProcess {
 							"Unsupported owner type " + ownerType);
 					}
 
+					long portletPreferencesId = rs.getLong(
+						"portletPreferencesId");
+
 					if (companyId > 0) {
+						String portletId = rs.getString("portletId");
+						String preferences = GetterUtil.getString(
+							rs.getString("preferences"));
+
 						String newPreferences = upgradePreferences(
 							companyId, ownerId, ownerType, plid, portletId,
 							preferences);
@@ -360,7 +362,7 @@ public abstract class BaseUpgradePortletPreferences extends UpgradeProcess {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Judson
 	 */
 	@Deprecated
 	protected void updatePortletPreferences(

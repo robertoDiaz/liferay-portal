@@ -167,7 +167,7 @@ public class UserGroupFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of Wilberforce, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -239,9 +239,9 @@ public class UserGroupFinderImpl
 			String sql = CustomSQLUtil.get(COUNT_BY_C_N_D);
 
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(UserGroup.name)", StringPool.LIKE, false, names);
+				sql, "LOWER(UserGroup.name)", StringPool.LIKE, false, names);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(UserGroup.description)", StringPool.LIKE, true,
+				sql, "LOWER(UserGroup.description)", StringPool.LIKE, true,
 				descriptions);
 			sql = StringUtil.replace(sql, "[$JOIN$]", getJoin(params));
 			sql = StringUtil.replace(sql, "[$WHERE$]", getWhere(params));
@@ -325,9 +325,9 @@ public class UserGroupFinderImpl
 			String sql = CustomSQLUtil.get(FIND_BY_C_N_D);
 
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(UserGroup.name)", StringPool.LIKE, false, names);
+				sql, "LOWER(UserGroup.name)", StringPool.LIKE, false, names);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(UserGroup.description)", StringPool.LIKE, true,
+				sql, "LOWER(UserGroup.description)", StringPool.LIKE, true,
 				descriptions);
 
 			sql = StringUtil.replace(sql, "[$JOIN$]", getJoin(params));
@@ -549,9 +549,9 @@ public class UserGroupFinderImpl
 			else if (value instanceof Long[]) {
 				Long[] valueArray = (Long[])value;
 
-				for (int i = 0; i < valueArray.length; i++) {
-					if (Validator.isNotNull(valueArray[i])) {
-						qPos.add(valueArray[i]);
+				for (Long curValue : valueArray) {
+					if (Validator.isNotNull(curValue)) {
+						qPos.add(curValue);
 					}
 				}
 			}

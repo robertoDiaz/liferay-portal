@@ -92,7 +92,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="Page#viewNoDeletePagesAssociatedWithSiteTemplate">
@@ -126,7 +126,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#gotoPageMenuItem">
@@ -169,6 +169,8 @@
 	</command>
 
 	<command name="PortletPreferencesPersistWithSiteTemplateWhenSamePortletAddedOnSecondPage" priority="4">
+		<description message="This is a use case for LPS-81629" />
+
 		<execute macro="TestCase#getSiteName">
 			<return from="siteName" name="siteName" />
 			<var name="siteName" value="${siteName}" />
@@ -261,7 +263,7 @@
 			<var name="siteTemplateName" value="Site Template Name" />
 		</execute>
 
-		<execute function="AssertClick" locator1="Home#PAGE_TEMPLATE_3" value1="Page2 Name" />
+		<execute function="AssertClick" locator1="Home#PAGE_TEMPLATE_2" value1="Page2 Name" />
 
 		<execute macro="Portlet#addPG">
 			<var name="defaultURL" value="false" />
@@ -311,7 +313,7 @@
 			<execute macro="ProductMenu#gotoPortlet">
 				<var name="category" value="Build" />
 				<var name="panel" value="Site Administration" />
-				<var name="portlet" value="Site Pages" />
+				<var name="portlet" value="Pages" />
 			</execute>
 
 			<execute macro="Page#viewNoDeletePagesAssociatedWithSiteTemplate">

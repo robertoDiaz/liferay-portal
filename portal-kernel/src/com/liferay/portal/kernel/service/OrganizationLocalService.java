@@ -307,6 +307,17 @@ public interface OrganizationLocalService extends BaseLocalService,
 	public Organization fetchOrganization(long companyId, String name);
 
 	/**
+	* Returns the organization with the matching external reference code and company.
+	*
+	* @param companyId the primary key of the company
+	* @param externalReferenceCode the organization's external reference code
+	* @return the matching organization, or <code>null</code> if a matching organization could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Organization fetchOrganizationByReferenceCode(long companyId,
+		String externalReferenceCode);
+
+	/**
 	* Returns the organization with the matching UUID and company.
 	*
 	* @param uuid the organization's UUID
@@ -1235,9 +1246,10 @@ public interface OrganizationLocalService extends BaseLocalService,
 	names for the organization, and merge expando bridge
 	attributes for the organization.
 	* @return the organization
-	* @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
-	long, long, String, String, long, long, long, String,
-	boolean, byte[], boolean, ServiceContext)}
+	* @deprecated As of Wilberforce, replaced by {@link
+	#updateOrganization(long, long, long, String, String, long,
+	long, long, String, boolean, byte[], boolean,
+	ServiceContext)}
 	*/
 	@Deprecated
 	public Organization updateOrganization(long companyId, long organizationId,

@@ -673,6 +673,16 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	public static long searchCount(long companyId, long[] groupIds,
+		long userId, String className, long classTypeId, String keywords,
+		String assetCategoryIds, String assetTagNames, boolean showInvisible,
+		boolean showNonindexable, int[] statuses, boolean andSearch) {
+		return getService()
+				   .searchCount(companyId, groupIds, userId, className,
+			classTypeId, keywords, assetCategoryIds, assetTagNames,
+			showInvisible, showNonindexable, statuses, andSearch);
+	}
+
+	public static long searchCount(long companyId, long[] groupIds,
 		long userId, String className, long classTypeId, String userName,
 		String title, String description, String assetCategoryIds,
 		String assetTagNames, boolean showInvisible, boolean showNonindexable,
@@ -733,7 +743,7 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
+	* @deprecated As of Judson, replaced by {@link #updateEntry(long, long,
 	Date, Date, String, long, String, long, long[], String[],
 	boolean, boolean, Date, Date, Date, Date, String, String,
 	String, String, String, String, int, int, Double)}
@@ -758,10 +768,10 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
-	Date, Date, String, long, String, long, long[], String[],
-	boolean, boolean, Date, Date, Date, Date, String, String,
-	String, String, String, String, int, int, Double)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateEntry(long,
+	long, Date, Date, String, long, String, long, long[],
+	String[], boolean, boolean, Date, Date, Date, Date, String,
+	String, String, String, String, String, int, int, Double)}
 	*/
 	@Deprecated
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
@@ -790,8 +800,8 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(String, long,
-	Date, Date, boolean, boolean)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateEntry(String,
+	long, Date, Date, boolean, boolean)}
 	*/
 	@Deprecated
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
@@ -802,8 +812,8 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(String, long,
-	Date, Date, boolean, boolean)}
+	* @deprecated As of Wilberforce, replaced by {@link #updateEntry(String,
+	long, Date, Date, boolean, boolean)}
 	*/
 	@Deprecated
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
@@ -852,8 +862,8 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #validate(long, String, long,
-	long[], String[])}
+	* @deprecated As of Wilberforce, replaced by {@link #validate(long, String,
+	long, long[], String[])}
 	*/
 	@Deprecated
 	public static void validate(long groupId, String className,

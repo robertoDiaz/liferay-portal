@@ -144,7 +144,7 @@
 
 		<execute macro="Button#clickSave" />
 
-		<execute function="AssertTextEquals" locator1="Message#ERROR_FIELD_REQUIRED" value1="This field is required." />
+		<execute macro="Alert#viewRequiredField" />
 	</command>
 
 	<command name="deleteByIconCP">
@@ -243,7 +243,7 @@
 
 		<execute macro="Alert#viewRequestFailedToComplete" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="You do not have the required permissions." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_1" value1="You do not have the required permissions." />
 	</command>
 
 	<command name="editCP">
@@ -281,6 +281,12 @@
 		<execute function="Type" locator1="CategoriesEditCategory#PROPERTIES_VALUE_FIELD_1" value1="${propertiesValueFieldEdit}" />
 
 		<execute macro="PortletEntry#save" />
+	</command>
+
+	<command name="getAssetId" returns="assetId">
+		<var method="selenium#getAttribute('//table[contains(@class,\'table-list\')]//tr[contains(.,\'${assetName}\')]/td[1]//input@value')" name="assetId" />
+
+		<return name="assetId" value="${assetId}" />
 	</command>
 
 	<command name="moveViaEditCP">

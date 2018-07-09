@@ -1827,7 +1827,7 @@ public class HookHotDeployListener
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, as of 7.0.0, with no direct replacement
+	 * @deprecated As of Judson, as of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	protected void initServices(
@@ -2307,12 +2307,12 @@ public class HookHotDeployListener
 			Object serviceProxy)
 		throws Exception {
 
-		AdvisedSupport advisedSupport = ServiceBeanAopProxy.getAdvisedSupport(
-			serviceProxy);
-
 		Class<?> proxyClass = serviceProxy.getClass();
 
 		if (ProxyUtil.isProxyClass(proxyClass)) {
+			AdvisedSupport advisedSupport =
+				ServiceBeanAopProxy.getAdvisedSupport(serviceProxy);
+
 			Object previousService = advisedSupport.getTarget();
 
 			ServiceWrapper<?> serviceWrapper =
