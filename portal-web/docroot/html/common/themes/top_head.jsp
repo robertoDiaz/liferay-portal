@@ -28,7 +28,7 @@
 if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 	String completeURL = PortalUtil.getCurrentCompleteURL(request);
 
-	String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout);
+	String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, false, false);
 %>
 
 	<link data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" rel="canonical" />
@@ -163,7 +163,7 @@ if (markupHeaders != null) {
 	}
 }
 
-StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
+com.liferay.petra.string.StringBundler pageTopSB = OutputTag.getDataSB(request, WebKeys.PAGE_TOP);
 %>
 
 <c:if test="<%= pageTopSB != null %>">
@@ -173,6 +173,16 @@ StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
 	%>
 
 </c:if>
+
+<script type="text/javascript">
+	var portlet = portlet || {};
+
+	portlet.impl = portlet.impl || {};
+
+	portlet.impl.getInitData = function() {
+		return <%= RenderStateUtil.generateJSON(request, themeDisplay) %>;
+	}
+</script>
 
 <%-- Theme CSS --%>
 

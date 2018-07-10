@@ -34,6 +34,10 @@ public class DLWebDAVUtil {
 		return URLCodec.encodeURL(escapeRawTitle(title), true);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getRepresentableTitle(String title, int i) {
 		return StringUtil.replace(
 			title, PropsValues.DL_WEBDAV_SUBSTITUTION_CHAR,

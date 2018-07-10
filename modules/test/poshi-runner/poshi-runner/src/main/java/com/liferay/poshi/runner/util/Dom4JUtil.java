@@ -45,6 +45,12 @@ public class Dom4JUtil {
 				continue;
 			}
 
+			if (item instanceof Attribute) {
+				element.add((Attribute)item);
+
+				continue;
+			}
+
 			if (item instanceof Element) {
 				element.add((Element)item);
 
@@ -58,7 +64,7 @@ public class Dom4JUtil {
 			}
 
 			throw new IllegalArgumentException(
-				"Only elements and strings may be added");
+				"Only attributes, elements, and strings may be added");
 		}
 	}
 
@@ -126,6 +132,24 @@ public class Dom4JUtil {
 		SAXReader saxReader = new SAXReader();
 
 		return saxReader.read(new StringReader(xml));
+	}
+
+	public static void removeWhiteSpaceTextNodes(Element element) {
+		for (Node node : toNodeList(element.content())) {
+			if (node instanceof Text) {
+				String nodeText = node.getText();
+
+				nodeText = nodeText.trim();
+
+				if (nodeText.length() == 0) {
+					node.detach();
+				}
+			}
+		}
+
+		for (Element childElement : toElementList(element.elements())) {
+			removeWhiteSpaceTextNodes(childElement);
+		}
 	}
 
 	public static void replace(

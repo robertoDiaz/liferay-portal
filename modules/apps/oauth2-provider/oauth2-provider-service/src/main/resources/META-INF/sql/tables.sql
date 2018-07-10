@@ -17,7 +17,7 @@ create table OAuth2Application (
 	clientId VARCHAR(75) null,
 	clientProfile INTEGER,
 	clientSecret VARCHAR(75) null,
-	description VARCHAR(75) null,
+	description STRING null,
 	features STRING null,
 	homePageURL STRING null,
 	iconFileEntryId LONG,
@@ -33,7 +33,8 @@ create table OAuth2ApplicationScopeAliases (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	oAuth2ApplicationId LONG,
-	scopeAliases TEXT null
+	scopeAliases TEXT null,
+	scopeAliasesHash LONG
 );
 
 create table OAuth2Authorization (
@@ -45,10 +46,12 @@ create table OAuth2Authorization (
 	oAuth2ApplicationId LONG,
 	oA2AScopeAliasesId LONG,
 	accessTokenContent TEXT null,
+	accessTokenContentHash LONG,
 	accessTokenCreateDate DATE null,
 	accessTokenExpirationDate DATE null,
 	remoteIPInfo VARCHAR(75) null,
 	refreshTokenContent TEXT null,
+	refreshTokenContentHash LONG,
 	refreshTokenCreateDate DATE null,
 	refreshTokenExpirationDate DATE null
 );

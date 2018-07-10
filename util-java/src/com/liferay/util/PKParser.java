@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * @author     Brian Wing Shun Chan
- * @deprecated As of 7.0.0, with no direct replacement
+ * @deprecated As of Judson (7.1.x), with no direct replacement
  */
 @Deprecated
 public class PKParser {
@@ -40,8 +40,8 @@ public class PKParser {
 
 		String[] array = StringUtil.split(pk);
 
-		for (int i = 0; i < array.length; i++) {
-			String[] kvp = StringUtil.split(array[i], CharPool.EQUAL);
+		for (String s : array) {
+			String[] kvp = StringUtil.split(s, CharPool.EQUAL);
 
 			String key = kvp[0].trim();
 			String value = kvp[1].trim();
