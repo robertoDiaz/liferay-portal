@@ -107,9 +107,9 @@ public class OrganizationFinderImpl
 		OrganizationFinder.class.getName() + ".joinO_ByUsersOrgs";
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #countO_ByKeywords(long,
-	 *             long, String, String, String, Long, Long,
-	 *             LinkedHashMap<String, Object>)}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #countO_ByKeywords(long, long, String, String, String, Long,
+	 *             Long, LinkedHashMap<String, Object>)}
 	 */
 	@Deprecated
 	@Override
@@ -124,7 +124,8 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #countO_ByO_U(long, long)}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link #countO_ByO_U(long,
+	 *             long)}
 	 */
 	@Deprecated
 	@Override
@@ -133,7 +134,7 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             #countO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String,
 	 *             String, String, String, String, Long, Long,
 	 *             LinkedHashMap<String, Object>, boolean)}
@@ -153,7 +154,7 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             #countO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String[],
 	 *             String, String[], String[], String[], Long, Long,
 	 *             LinkedHashMap<String, Object>, boolean)}
@@ -295,18 +296,18 @@ public class OrganizationFinderImpl
 			String sql = sb.toString();
 
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Organization_.name)", StringPool.LIKE, false,
+				sql, "LOWER(Organization_.name)", StringPool.LIKE, false,
 				names);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street1)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street1)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street2)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street2)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.street3)", StringPool.LIKE, true, streets);
+				sql, "LOWER(Address.street3)", StringPool.LIKE, true, streets);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.city)", StringPool.LIKE, false, cities);
+				sql, "LOWER(Address.city)", StringPool.LIKE, false, cities);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "lower(Address.zip)", StringPool.LIKE, true, zips);
+				sql, "LOWER(Address.zip)", StringPool.LIKE, true, zips);
 
 			if (regionId == null) {
 				sql = StringUtil.replace(sql, _REGION_ID_SQL, StringPool.BLANK);
@@ -449,9 +450,10 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #findO_ByKeywords(long, long,
-	 *             String, String, String, Long, Long, LinkedHashMap<String,
-	 *             Object>, int, int, OrderByComparator<Organization>)}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #findO_ByKeywords(long, long, String, String, String, Long,
+	 *             Long, LinkedHashMap<String, Object>, int, int,
+	 *             OrderByComparator<Organization>)}
 	 */
 	@Deprecated
 	@Override
@@ -467,7 +469,7 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #findO_ByNoAssets()}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link #findO_ByNoAssets()}
 	 */
 	@Deprecated
 	@Override
@@ -476,8 +478,8 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #findO_ByC_P(long, long,
-	 *             long, int)}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link #findO_ByC_P(long,
+	 *             long, long, int)}
 	 */
 	@Deprecated
 	@Override
@@ -490,7 +492,7 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             #findO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String,
 	 *             String, String, String, String, Long, Long,
 	 *             LinkedHashMap<String, Object>, boolean, int, int,
@@ -512,7 +514,7 @@ public class OrganizationFinderImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             #findO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String[],
 	 *             String, String[], String[], String[], Long, Long,
 	 *             LinkedHashMap<String, Object>, boolean, int, int
@@ -693,17 +695,17 @@ public class OrganizationFinderImpl
 		sql = StringUtil.replace(sql, "[$WHERE$]", getWhere(params));
 		sql = sql.concat(StringPool.CLOSE_PARENTHESIS);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Organization_.name)", StringPool.LIKE, false, names);
+			sql, "LOWER(Organization_.name)", StringPool.LIKE, false, names);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street1)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street1)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street2)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street2)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.street3)", StringPool.LIKE, true, streets);
+			sql, "LOWER(Address.street3)", StringPool.LIKE, true, streets);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.city)", StringPool.LIKE, false, cities);
+			sql, "LOWER(Address.city)", StringPool.LIKE, false, cities);
 		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(Address.zip)", StringPool.LIKE, true, zips);
+			sql, "LOWER(Address.zip)", StringPool.LIKE, true, zips);
 
 		if (parentOrganizationIdComparator.equals(StringPool.EQUAL)) {
 			sql = StringUtil.replace(
@@ -1129,13 +1131,12 @@ public class OrganizationFinderImpl
 
 				if (!organizationsTree.isEmpty()) {
 					for (Organization organization : organizationsTree) {
-						StringBundler sb = new StringBundler(5);
+						StringBundler sb = new StringBundler(4);
 
 						sb.append(StringPool.PERCENT);
 						sb.append(StringPool.SLASH);
 						sb.append(organization.getOrganizationId());
 						sb.append(StringPool.SLASH);
-						sb.append(StringPool.PERCENT);
 
 						qPos.add(sb.toString());
 					}
