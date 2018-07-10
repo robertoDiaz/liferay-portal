@@ -577,6 +577,26 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public void assertNotVisibleInPage(String locator) throws Exception {
+		assertElementPresent(locator);
+
+		if (isVisibleInPage(locator)) {
+			throw new Exception(
+				"Element is visible in page at \"" + locator + "\"");
+		}
+	}
+
+	@Override
+	public void assertNotVisibleInViewport(String locator) throws Exception {
+		assertElementPresent(locator);
+
+		if (isVisibleInViewport(locator)) {
+			throw new Exception(
+				"Element is visible in viewport at \"" + locator + "\"");
+		}
+	}
+
+	@Override
 	public void assertPartialConfirmation(String pattern) throws Exception {
 		String confirmation = getConfirmation();
 
@@ -717,6 +737,26 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		if (isNotVisible(locator)) {
 			throw new Exception(
 				"Element is not visible at \"" + locator + "\"");
+		}
+	}
+
+	@Override
+	public void assertVisibleInPage(String locator) throws Exception {
+		assertElementPresent(locator);
+
+		if (isNotVisibleInPage(locator)) {
+			throw new Exception(
+				"Element is not visible in page at \"" + locator + "\"");
+		}
+	}
+
+	@Override
+	public void assertVisibleInViewport(String locator) throws Exception {
+		assertElementPresent(locator);
+
+		if (isNotVisibleInViewport(locator)) {
+			throw new Exception(
+				"Element is not visible in viewport at \"" + locator + "\"");
 		}
 	}
 
@@ -1017,7 +1057,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public String getBodyText() {
-		WebElement webElement = findElement(By.tagName("body"));
+		WebElement webElement = getWebElement("//body");
 
 		return webElement.getText();
 	}
@@ -1592,6 +1632,16 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public boolean isNotVisibleInPage(String locator) {
+		return !isVisibleInPage(locator);
+	}
+
+	@Override
+	public boolean isNotVisibleInViewport(String locator) {
+		return !isVisibleInViewport(locator);
+	}
+
+	@Override
 	public boolean isPartialText(String locator, String value) {
 		WebElement webElement = getWebElement(locator, "1");
 
@@ -1672,7 +1722,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public boolean isTextPresent(String pattern) {
-		WebElement webElement = findElement(By.tagName("body"));
+		WebElement webElement = getWebElement("//body");
 
 		String text = webElement.getText();
 
@@ -1686,6 +1736,11 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public boolean isVisible(String locator) {
+		return isVisibleInPage(locator);
+	}
+
+	@Override
+	public boolean isVisibleInPage(String locator) {
 		WebElement webElement = getWebElement(locator, "1");
 
 		scrollWebElementIntoView(webElement);
@@ -1694,8 +1749,49 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public boolean isVisibleInViewport(String locator) {
+		WebElement webElement = getWebElement(locator, "1");
+
+		return webElement.isDisplayed();
+	}
+
+	@Override
 	public void javaScriptClick(String locator) {
 		executeJavaScriptEvent(locator, "MouseEvent", "click");
+	}
+
+	public String javaScriptGetText(String locator, String timeout)
+		throws Exception {
+
+		if (locator.contains("x:")) {
+			return getHtmlNodeText(locator);
+		}
+
+		WebElement webElement = getWebElement(locator, timeout);
+
+		if (webElement == null) {
+			throw new Exception(
+				"Element is not present at \"" + locator + "\"");
+		}
+
+		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
+
+		WebDriver wrappedWebDriver = wrapsDriver.getWrappedDriver();
+
+		JavascriptExecutor javascriptExecutor =
+			(JavascriptExecutor)wrappedWebDriver;
+
+		StringBuilder sb = new StringBuilder(2);
+
+		sb.append("var element = arguments[0];");
+		sb.append("return element.innerText;");
+
+		String text = (String)javascriptExecutor.executeScript(
+			sb.toString(), webElement);
+
+		text = text.trim();
+
+		return text.replace("\n", " ");
 	}
 
 	@Override
@@ -2040,10 +2136,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		}
 
 		get(targetURL);
-
-		if (PropsValues.BROWSER_TYPE.equals("internetexplorer")) {
-			refresh();
-		}
 	}
 
 	@Override
@@ -3156,6 +3248,44 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public void waitForNotVisibleInPage(String locator) throws Exception {
+		for (int second = 0;; second++) {
+			if (second >= PropsValues.TIMEOUT_EXPLICIT_WAIT) {
+				assertNotVisibleInPage(locator);
+			}
+
+			try {
+				if (isNotVisibleInPage(locator)) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+	}
+
+	@Override
+	public void waitForNotVisibleInViewport(String locator) throws Exception {
+		for (int second = 0;; second++) {
+			if (second >= PropsValues.TIMEOUT_EXPLICIT_WAIT) {
+				assertNotVisibleInViewport(locator);
+			}
+
+			try {
+				if (isNotVisibleInViewport(locator)) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+	}
+
+	@Override
 	public void waitForPartialText(String locator, String value)
 		throws Exception {
 
@@ -3395,6 +3525,44 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 			try {
 				if (isVisible(locator)) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+	}
+
+	@Override
+	public void waitForVisibleInPage(String locator) throws Exception {
+		for (int second = 0;; second++) {
+			if (second >= PropsValues.TIMEOUT_EXPLICIT_WAIT) {
+				assertVisibleInPage(locator);
+			}
+
+			try {
+				if (isVisibleInPage(locator)) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+	}
+
+	@Override
+	public void waitForVisibleInViewport(String locator) throws Exception {
+		for (int second = 0;; second++) {
+			if (second >= PropsValues.TIMEOUT_EXPLICIT_WAIT) {
+				assertVisibleInViewport(locator);
+			}
+
+			try {
+				if (isVisibleInViewport(locator)) {
 					break;
 				}
 			}

@@ -91,7 +91,7 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 
 		String directoryPath = absolutePath.substring(0, x + 1);
 
-		List<String> importNames = _getImportNames(detailAST);
+		List<String> importNames = DetailASTUtil.getImportNames(detailAST);
 		String packageName = _getPackageName(detailAST);
 
 		List<DetailAST> methodCallASTList = DetailASTUtil.getAllChildTokens(
@@ -182,7 +182,15 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 			return _bundleSymbolicNamesMap;
 		}
 
-		File modulesDir = new File(_getRootDirName() + "/modules");
+		_bundleSymbolicNamesMap = new HashMap<>();
+
+		String rootDirName = _getRootDirName();
+
+		if (Validator.isNull(rootDirName)) {
+			return _bundleSymbolicNamesMap;
+		}
+
+		File modulesDir = new File(rootDirName + "/modules");
 
 		final List<File> files = new ArrayList<>();
 
@@ -215,8 +223,6 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 				}
 
 			});
-
-		_bundleSymbolicNamesMap = new HashMap<>();
 
 		for (File file : files) {
 			String content = FileUtil.read(file);
@@ -283,10 +289,16 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 	}
 
 	private File _getFile(String fullyQualifiedName, String... dirNames) {
+		String rootDirName = _getRootDirName();
+
+		if (Validator.isNull(rootDirName)) {
+			return null;
+		}
+
 		for (String dirName : dirNames) {
 			StringBundler sb = new StringBundler(5);
 
-			sb.append(_getRootDirName());
+			sb.append(rootDirName);
 			sb.append("/");
 			sb.append(dirName);
 			sb.append(StringUtil.replace(fullyQualifiedName, '.', '/'));
@@ -300,27 +312,6 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 		}
 
 		return null;
-	}
-
-	private List<String> _getImportNames(DetailAST detailAST) {
-		List<String> importASTList = new ArrayList<>();
-
-		DetailAST sibling = detailAST.getPreviousSibling();
-
-		while (true) {
-			if (sibling.getType() == TokenTypes.IMPORT) {
-				FullIdent importIdent = FullIdent.createFullIdentBelow(sibling);
-
-				importASTList.add(importIdent.getText());
-			}
-			else {
-				break;
-			}
-
-			sibling = sibling.getPreviousSibling();
-		}
-
-		return importASTList;
 	}
 
 	private Tuple _getJavaMethodsTuple(
@@ -524,22 +515,22 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 	}
 
 	private String _getPackageName(DetailAST detailAST) {
-		DetailAST sibling = detailAST.getPreviousSibling();
+		DetailAST siblingAST = detailAST.getPreviousSibling();
 
 		while (true) {
-			if (sibling == null) {
+			if (siblingAST == null) {
 				return null;
 			}
 
-			if (sibling.getType() == TokenTypes.PACKAGE_DEF) {
-				DetailAST dotAST = sibling.findFirstToken(TokenTypes.DOT);
+			if (siblingAST.getType() == TokenTypes.PACKAGE_DEF) {
+				DetailAST dotAST = siblingAST.findFirstToken(TokenTypes.DOT);
 
 				FullIdent fullIdent = FullIdent.createFullIdent(dotAST);
 
 				return fullIdent.getText();
 			}
 
-			sibling = sibling.getPreviousSibling();
+			siblingAST = siblingAST.getPreviousSibling();
 		}
 	}
 
@@ -558,10 +549,10 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 			elistAST, false, TokenTypes.EXPR);
 
 		for (DetailAST exprAST : exprASTList) {
-			DetailAST firstChild = exprAST.getFirstChild();
+			DetailAST firstChildAST = exprAST.getFirstChild();
 
-			if (firstChild.getType() == TokenTypes.IDENT) {
-				String parameterName = firstChild.getText();
+			if (firstChildAST.getType() == TokenTypes.IDENT) {
+				String parameterName = firstChildAST.getText();
 
 				String parameterTypeName = DetailASTUtil.getVariableTypeName(
 					methodCallAST, parameterName, false);
@@ -573,7 +564,7 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 					parameterTypeNames.add(_TYPE_UNKNOWN);
 				}
 			}
-			else if (firstChild.getType() == TokenTypes.STRING_LITERAL) {
+			else if (firstChildAST.getType() == TokenTypes.STRING_LITERAL) {
 				parameterTypeNames.add("String");
 			}
 			else {
@@ -600,7 +591,9 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 			int x = absolutePath.lastIndexOf("/");
 
 			if (x == -1) {
-				return null;
+				_rootDirName = StringPool.BLANK;
+
+				return _rootDirName;
 			}
 
 			absolutePath = absolutePath.substring(0, x);
@@ -608,7 +601,9 @@ public class DeprecatedMethodCallsCheck extends BaseCheck {
 			File file = new File(absolutePath + "/portal-impl");
 
 			if (file.exists()) {
-				return absolutePath;
+				_rootDirName = absolutePath;
+
+				return _rootDirName;
 			}
 		}
 	}

@@ -21,13 +21,6 @@
 		</execute>
 	</set-up>
 
-	<command name="ViewNestedPortletsArchive6012" priority="5">
-		<property name="data.archive.type" value="data-archive-nested-portlets" />
-		<property name="portal.version" value="6.0.12" />
-
-		<execute macro="Upgrade#viewNestedPortlets" />
-	</command>
-
 	<command name="ViewNestedPortletsArchive612" priority="5">
 		<property name="data.archive.type" value="data-archive-nested-portlets" />
 		<property name="portal.version" value="6.1.2" />
@@ -49,9 +42,9 @@
 		<execute macro="Upgrade#viewNestedPortlets" />
 	</command>
 
-	<command name="ViewNestedPortletsArchive623" priority="5">
+	<command name="ViewNestedPortletsArchive621021" priority="5">
 		<property name="data.archive.type" value="data-archive-nested-portlets" />
-		<property name="portal.version" value="6.2.3" />
+		<property name="portal.version" value="6.2.10.21" />
 
 		<execute macro="Upgrade#viewNestedPortlets" />
 	</command>
@@ -68,6 +61,15 @@
 
 		<property name="data.archive.type" value="data-archive-staging-nested-portlets" />
 		<property name="portal.version" value="6.2.10.15" />
+
+		<execute macro="Upgrade#viewStagingNestedPortlets" />
+	</command>
+
+	<command name="ViewStagingNestedPortletsArchive621021" priority="5">
+		<description message="This is a use case for LPS-66141." />
+
+		<property name="data.archive.type" value="data-archive-staging-nested-portlets" />
+		<property name="portal.version" value="6.2.10.21" />
 
 		<execute macro="Upgrade#viewStagingNestedPortlets" />
 	</command>

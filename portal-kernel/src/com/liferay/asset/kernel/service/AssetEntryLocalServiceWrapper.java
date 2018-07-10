@@ -758,6 +758,16 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 
 	@Override
 	public long searchCount(long companyId, long[] groupIds, long userId,
+		String className, long classTypeId, String keywords,
+		String assetCategoryIds, String assetTagNames, boolean showInvisible,
+		boolean showNonindexable, int[] statuses, boolean andSearch) {
+		return _assetEntryLocalService.searchCount(companyId, groupIds, userId,
+			className, classTypeId, keywords, assetCategoryIds, assetTagNames,
+			showInvisible, showNonindexable, statuses, andSearch);
+	}
+
+	@Override
+	public long searchCount(long companyId, long[] groupIds, long userId,
 		String className, long classTypeId, String userName, String title,
 		String description, String assetCategoryIds, String assetTagNames,
 		boolean showInvisible, boolean showNonindexable, int[] statuses,
@@ -820,10 +830,10 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
-	Date, Date, String, long, String, long, long[], String[],
-	boolean, boolean, Date, Date, Date, Date, String, String,
-	String, String, String, String, int, int, Double)}
+	* @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
+	long, Date, Date, String, long, String, long, long[],
+	String[], boolean, boolean, Date, Date, Date, Date, String,
+	String, String, String, String, String, int, int, Double)}
 	*/
 	@Deprecated
 	@Override
@@ -844,10 +854,11 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
-	Date, Date, String, long, String, long, long[], String[],
-	boolean, boolean, Date, Date, Date, Date, String, String,
-	String, String, String, String, int, int, Double)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#updateEntry(long, long, Date, Date, String, long, String,
+	long, long[], String[], boolean, boolean, Date, Date, Date,
+	Date, String, String, String, String, String, String, int,
+	int, Double)}
 	*/
 	@Deprecated
 	@Override
@@ -877,8 +888,8 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(String, long,
-	Date, Date, boolean, boolean)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#updateEntry(String, long, Date, Date, boolean, boolean)}
 	*/
 	@Deprecated
 	@Override
@@ -891,8 +902,8 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(String, long,
-	Date, Date, boolean, boolean)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#updateEntry(String, long, Date, Date, boolean, boolean)}
 	*/
 	@Deprecated
 	@Override
@@ -944,8 +955,8 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #validate(long, String, long,
-	long[], String[])}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link #validate(long,
+	String, long, long[], String[])}
 	*/
 	@Deprecated
 	@Override

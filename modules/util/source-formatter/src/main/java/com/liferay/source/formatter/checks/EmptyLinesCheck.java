@@ -61,9 +61,9 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 		matcher = _emptyLineBetweenTagsPattern2.matcher(content);
 
 		while (matcher.find()) {
-			int lineCount = getLineCount(content, matcher.start());
+			int lineNumber = getLineNumber(content, matcher.start());
 
-			String line = getLine(content, lineCount);
+			String line = getLine(content, lineNumber);
 
 			String tabs = SourceUtil.getIndent(line);
 
@@ -79,7 +79,7 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 				continue;
 			}
 
-			line = getLine(content, lineCount + 1);
+			line = getLine(content, lineNumber + 1);
 
 			if (line.contains("\"hidden\"")) {
 				continue;
@@ -545,12 +545,12 @@ public abstract class EmptyLinesCheck extends BaseFileCheck {
 	private final Pattern _missingEmptyLinePattern3 = Pattern.compile(
 		"\n(.*\\) \\{)\n[\t ]*[^ \n\t\\}]");
 	private final Pattern _missingEmptyLinePattern4 = Pattern.compile(
-		"[^{:/\n]\n\t*(for|if|try) \\(");
+		"[^{:/\n]\n\t*(for|if|try) [({]");
 	private final Pattern _missingEmptyLinePattern5 = Pattern.compile(
 		"[\t\n]\\}\n[\t ]*(?!(/\\*|\\}|\\)|//|catch |else |finally |while ))" +
 			"\\S");
 	private final Pattern _missingEmptyLinePattern6 = Pattern.compile(
-		"[^:\\{\\s]\n\t*return ");
+		"[^:\\{\\s]\n\t*(return|throw)[ ;]");
 	private final Pattern _missingEmptyLinePattern7 = Pattern.compile(
 		"[^\\{\\s]\n\t*break;");
 	private final Pattern _redundantEmptyLinePattern1 = Pattern.compile(
