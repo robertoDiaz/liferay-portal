@@ -168,7 +168,7 @@
 			<var name="rowEntry" value="Element Set 1" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
+		<execute macro="Form#addTranslation">
 			<var name="localizedLanguage" value="Chinese (China)" />
 		</execute>
 
@@ -220,7 +220,7 @@
 
 		<execute macro="Form#closeSidebar" />
 
-		<execute macro="DDLRecord#addTranslation">
+		<execute macro="Form#addTranslation">
 			<var name="localizedLanguage" value="Chinese (China)" />
 		</execute>
 
@@ -260,7 +260,7 @@
 
 		<execute function="AssertNotVisible" locator1="Form#ADD_FIELD" />
 
-		<execute macro="DDLRecord#selectTranslation">
+		<execute macro="Form#selectTranslation">
 			<var name="localizedLanguage" value="English (United States)" />
 		</execute>
 
@@ -356,7 +356,7 @@
 			<var name="elementSetTitle" value="Element Set 1" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
+		<execute macro="Form#addTranslation">
 			<var name="localizedLanguage" value="Chinese (China)" />
 		</execute>
 
@@ -384,7 +384,7 @@
 
 		<execute macro="Form#closeSidebar" />
 
-		<execute macro="DDLRecord#selectTranslation">
+		<execute macro="Form#selectTranslation">
 			<var name="localizedLanguage" value="English (United States)" />
 		</execute>
 
@@ -474,7 +474,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPrivatePage">
@@ -659,7 +659,7 @@
 		<execute macro="FormFields#duplicateField" />
 
 		<execute macro="FormFields#viewFieldName">
-			<var name="fieldName" value="TextField1" />
+			<var name="fieldName" value="CopyOfTextField" />
 		</execute>
 
 		<execute macro="Form#editFieldLabel">
@@ -718,7 +718,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1162,7 +1162,7 @@
 		</execute>
 
 		<execute macro="SystemSettings#gotoConfiguration">
-			<var name="configurationCategory" value="Dynamic Data Mapping" />
+			<var name="configurationCategory" value="Forms" />
 			<var name="configurationName" value="Forms" />
 			<var name="configurationScope" value="Site Scope" />
 		</execute>
@@ -1306,7 +1306,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1385,8 +1385,8 @@
 			<var name="portlet" value="Forms" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="FormsAdminNavigator#gotoViewEntries" />
@@ -1912,7 +1912,7 @@
 
 		<execute macro="FormFields#selectSelectOption">
 			<var name="fieldName" value="defaultDisplayView" />
-			<var name="selectOption" value="Descriptive" />
+			<var name="selectOption" value="List" />
 		</execute>
 
 		<execute macro="SystemSettings#saveConfiguration" />
@@ -1931,7 +1931,7 @@
 
 		<execute macro="FormFields#viewSelectOption">
 			<var name="fieldName" value="defaultDisplayView" />
-			<var name="selectOption" value="Descriptive" />
+			<var name="selectOption" value="List" />
 		</execute>
 
 		<execute macro="SystemSettings#resetConfiguration">
@@ -2047,7 +2047,7 @@
 		<execute macro="SystemSettings#exitEditConfiguration" />
 
 		<execute macro="SystemSettings#gotoConfiguration">
-			<var name="configurationCategory" value="Frontend Infrastructure" />
+			<var name="configurationCategory" value="Infrastructure" />
 			<var name="configurationName" value="JavaScript Loader" />
 			<var name="configurationScope" value="System Scope" />
 		</execute>
@@ -2086,7 +2086,7 @@
 		<execute macro="SystemSettings#exitEditConfiguration" />
 
 		<execute macro="SystemSettings#gotoConfiguration">
-			<var name="configurationCategory" value="Frontend Infrastructure" />
+			<var name="configurationCategory" value="Infrastructure" />
 			<var name="configurationName" value="JavaScript Loader" />
 			<var name="configurationScope" value="System Scope" />
 		</execute>
@@ -2112,41 +2112,7 @@
 			<var name="portlet" value="Forms" />
 		</execute>
 
-		<execute macro="Portlet#viewDefaultDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Configuration" />
-			<var name="panel" value="Control Panel" />
-			<var name="portlet" value="System Settings" />
-		</execute>
-
-		<execute macro="SystemSettings#gotoConfiguration">
-			<var name="configurationCategory" value="Dynamic Data Mapping" />
-			<var name="configurationName" value="Forms" />
-			<var name="configurationScope" value="Site Scope" />
-		</execute>
-
-		<execute macro="FormFields#viewSelectOption">
-			<var name="fieldName" value="DisplayView" />
-			<var name="selectOption" value="Descriptive" />
-		</execute>
-
-		<execute macro="FormFields#selectSelectOption">
-			<var name="fieldName" value="DisplayView" />
-			<var name="selectOption" value="List" />
-		</execute>
-
-		<execute macro="PortletEntry#save" />
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Forms" />
-		</execute>
-
-		<execute macro="Portlet#viewDefaultDisplayStyle">
+		<execute macro="LexiconEntry#viewActiveDisplayStyle">
 			<var name="displayStyle" value="list" />
 		</execute>
 
@@ -2157,7 +2123,41 @@
 		</execute>
 
 		<execute macro="SystemSettings#gotoConfiguration">
-			<var name="configurationCategory" value="Dynamic Data Mapping" />
+			<var name="configurationCategory" value="Forms" />
+			<var name="configurationName" value="Forms" />
+			<var name="configurationScope" value="Site Scope" />
+		</execute>
+
+		<execute macro="FormFields#viewSelectOption">
+			<var name="fieldName" value="DisplayView" />
+			<var name="selectOption" value="List" />
+		</execute>
+
+		<execute macro="FormFields#selectSelectOption">
+			<var name="fieldName" value="DisplayView" />
+			<var name="selectOption" value="Table" />
+		</execute>
+
+		<execute macro="PortletEntry#save" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Forms" />
+		</execute>
+
+		<execute macro="LexiconEntry#viewActiveDisplayStyle">
+			<var name="displayStyle" value="table" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Configuration" />
+			<var name="panel" value="Control Panel" />
+			<var name="portlet" value="System Settings" />
+		</execute>
+
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Forms" />
 			<var name="configurationName" value="Forms" />
 			<var name="configurationScope" value="Site Scope" />
 		</execute>
@@ -2172,8 +2172,8 @@
 			<var name="portlet" value="Forms" />
 		</execute>
 
-		<execute macro="Portlet#viewDefaultDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#viewActiveDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 	</command>
 
@@ -2313,7 +2313,7 @@
 			<var method="StringUtil#extractFirst('${locale}', ':'')" name="locale" />
 			<var method="StringUtil#extractLast('${locale}', ':')" name="translated" />
 
-			<execute macro="DDLRecord#addTranslation">
+			<execute macro="Form#addTranslation">
 				<var name="localizedLanguage" value="${locale}" />
 			</execute>
 
@@ -2384,7 +2384,7 @@
 			<var method="StringUtil#extractFirst('${locale}', ':'')" name="locale" />
 			<var method="StringUtil#extractLast('${locale}', ':')" name="translated" />
 
-			<execute macro="DDLRecord#selectTranslation">
+			<execute macro="Form#selectTranslation">
 				<var name="localizedLanguage" value="${locale}" />
 			</execute>
 
@@ -2689,6 +2689,19 @@
 			<var name="rowNumberStart" value="3" />
 		</execute>
 
+		<if>
+			<condition function="IsTextNotEqual" locator1="FormFields#OPTIONS_OPTION_VALUE_FIELD" value1="Checkbox 4">
+				<var name="key_rowNumber" value="2" />
+			</condition>
+
+			<then>
+				<execute macro="FormFields#moveOptionsRow">
+					<var name="rowNumberEnd" value="2" />
+					<var name="rowNumberStart" value="3" />
+				</execute>
+			</then>
+		</if>
+
 		<execute macro="FormFields#viewOptionsRowFieldValue">
 			<var name="fieldValue" value="Checkbox 3" />
 			<var name="rowNumber" value="1" />
@@ -2743,7 +2756,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2923,164 +2936,8 @@
 		</execute>
 	</command>
 
-	<command ignore="true" name="SubmitForm3x3Layout" priority="4">
-		<property name="portal.subrepo" value="false" />
-		<execute macro="Navigator#openURL" />
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Forms" />
-		</execute>
-
-		<execute macro="FormsAdminNavigator#gotoAddForm" />
-
-		<execute macro="Form#editName" />
-
-		<execute macro="Form#editDescription" />
-
-		<execute macro="Form#gotoAddField">
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="one" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#addColumn">
-			<var name="columnLineNumber" value="3" />
-		</execute>
-
-		<execute macro="Form#gotoAddField">
-			<var name="columnSize" value="10" />
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="two" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#addColumn">
-			<var name="columnLineNumber" value="10" />
-		</execute>
-
-		<execute macro="Form#gotoAddField">
-			<var name="columnSize" value="3" />
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="three" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#gotoAddField">
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="four" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#addColumn">
-			<var name="columnLineNumber" value="2" />
-			<var name="rowNumber" value="2" />
-		</execute>
-
-		<execute macro="Form#gotoAddField">
-			<var name="columnSize" value="11" />
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="five" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#addColumn">
-			<var name="columnLineNumber" value="7" />
-			<var name="rowNumber" value="2" />
-		</execute>
-
-		<execute macro="Form#gotoAddField">
-			<var name="columnSize" value="6" />
-			<var name="fieldType" value="Text Field" />
-		</execute>
-
-		<execute macro="Form#editFieldLabel">
-			<var name="fieldValue" value="six" />
-		</execute>
-
-		<execute macro="Form#closeSidebar" />
-
-		<execute macro="Form#save" />
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Build" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
-		</execute>
-
-		<execute macro="SitePages#addPublicPage">
-			<var name="pageName" value="Form Page" />
-		</execute>
-
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="Form Page" />
-		</execute>
-
-		<execute macro="Portlet#addPG">
-			<var name="pageName" value="Form Page" />
-			<var name="portletName" value="Form" />
-		</execute>
-
-		<execute macro="FormPortletNavigator#gotoSelectForm" />
-
-		<execute macro="FormPortletConfiguration#selectForm" />
-
-		<execute macro="PortletEntry#save" />
-
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="Form Page" />
-		</execute>
-
-		<for list="one,two,three,four,five,six" param="fieldName">
-			<execute macro="FormFields#editText">
-				<var name="fieldName" value="${fieldName}" />
-				<var name="fieldValue" value="Field ${fieldName}" />
-			</execute>
-		</for>
-
-		<execute macro="FormPortlet#submit" />
-
-		<execute macro="Navigator#openURL" />
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Forms" />
-		</execute>
-
-		<execute macro="FormsAdminNavigator#gotoViewEntries" />
-
-		<for list="one,two,three,four,five" param="fieldLabel">
-			<execute macro="FormsAdmin#viewFormTableEntry">
-				<var name="fieldLabel" value="${fieldLabel}" />
-				<var name="fieldValue" value="Field ${fieldLabel}" />
-			</execute>
-		</for>
-	</command>
-
 	<command name="SubmitFormAfterEditingFields" priority="5">
-		<property name="portal.acceptance" value="true" />
+		<property name="portal.acceptance" value="quarantine" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="Navigator#openURL" />
@@ -3194,7 +3051,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3492,7 +3349,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3602,7 +3459,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3712,7 +3569,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3782,7 +3639,7 @@
 	<command name="SubmitFormWithAllFieldTypesAndThreePages" priority="5">
 		<description message="This is a use case for LPS-64798." />
 
-		<property name="portal.acceptance" value="true" />
+		<property name="portal.acceptance" value="quarantine" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="Navigator#openURL" />
@@ -3990,7 +3847,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4191,7 +4048,7 @@
 		</execute>
 
 		<execute macro="FormFields#editValidation">
-			<var name="validationArgument" value="Contains" />
+			<var name="validationArgument" value="Does not contain" />
 			<var name="validationErrorMessage" value="Text must contain &apos;&apos;Test&apos;&apos;" />
 			<var name="validationInput" value="Test" />
 		</execute>
@@ -4203,7 +4060,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4356,7 +4213,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4432,8 +4289,8 @@
 			<var name="portlet" value="Forms" />
 		</execute>
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<execute macro="FormsAdminNavigator#gotoViewEntries" />
@@ -4526,7 +4383,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4624,7 +4481,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4731,7 +4588,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4831,7 +4688,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -4925,7 +4782,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -5031,7 +4888,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -5457,7 +5314,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -5655,7 +5512,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -5729,7 +5586,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -5842,7 +5699,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

@@ -17,14 +17,14 @@ package com.liferay.gradle.plugins.target.platform;
 import com.liferay.gradle.plugins.target.platform.extensions.TargetPlatformExtension;
 import com.liferay.gradle.plugins.target.platform.internal.util.GradleUtil;
 import com.liferay.gradle.plugins.target.platform.internal.util.SkipIfExecutingParentTaskSpec;
+import com.liferay.gradle.plugins.target.platform.internal.util.TargetPlatformPluginUtil;
 import com.liferay.gradle.plugins.target.platform.tasks.ResolveTask;
 
 import groovy.lang.Closure;
 
 import io.spring.gradle.dependencymanagement.DependencyManagementPlugin;
-import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension;
-import io.spring.gradle.dependencymanagement.dsl.ImportsHandler;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -34,7 +34,6 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.invocation.Gradle;
@@ -90,8 +89,6 @@ public class TargetPlatformPlugin implements Plugin<Project> {
 			targetPlatformDistroConfiguration,
 			targetPlatformRequirementsConfiguration);
 
-		_configureDependencyManagement(
-			project, targetPlatformBomsConfiguration);
 		_configureTasksResolve(project, targetPlatformExtension);
 
 		PluginContainer pluginContainer = project.getPlugins();
@@ -107,6 +104,10 @@ public class TargetPlatformPlugin implements Plugin<Project> {
 						project.getDependencies(),
 						targetPlatformBundlesConfiguration,
 						targetPlatformRequirementsConfiguration);
+
+					TargetPlatformPluginUtil.configureDependencyManagement(
+						project, targetPlatformBomsConfiguration,
+						_configurationNames);
 				}
 
 			});
@@ -242,51 +243,6 @@ public class TargetPlatformPlugin implements Plugin<Project> {
 		return resolveTask;
 	}
 
-	private void _configureDependencyManagement(
-		Project project, Configuration targetPlatformBomsConfiguration) {
-
-		final DependencyManagementExtension dependencyManagementExtension =
-			GradleUtil.getExtension(
-				project, DependencyManagementExtension.class);
-
-		DependencySet dependencySet =
-			targetPlatformBomsConfiguration.getAllDependencies();
-
-		dependencySet.all(
-			new Action<Dependency>() {
-
-				@Override
-				public void execute(Dependency dependency) {
-					_configureDependencyManagementImportsHandler(
-						dependencyManagementExtension, dependency);
-				}
-
-			});
-	}
-
-	private void _configureDependencyManagementImportsHandler(
-		DependencyManagementExtension dependencyManagementExtension,
-		final Dependency dependency) {
-
-		dependencyManagementExtension.imports(
-			new Action<ImportsHandler>() {
-
-				@Override
-				public void execute(ImportsHandler importsHandler) {
-					StringBuilder sb = new StringBuilder();
-
-					sb.append(dependency.getGroup());
-					sb.append(':');
-					sb.append(dependency.getName());
-					sb.append(':');
-					sb.append(dependency.getVersion());
-
-					importsHandler.mavenBom(sb.toString());
-				}
-
-			});
-	}
-
 	private void _configureSubproject(
 		Project subproject, DependencyHandler dependencyHandler, Logger logger,
 		Configuration targetPlatformBomsConfiguration,
@@ -321,8 +277,8 @@ public class TargetPlatformPlugin implements Plugin<Project> {
 
 		GradleUtil.applyPlugin(subproject, DependencyManagementPlugin.class);
 
-		_configureDependencyManagement(
-			subproject, targetPlatformBomsConfiguration);
+		TargetPlatformPluginUtil.configureDependencyManagement(
+			subproject, targetPlatformBomsConfiguration, _configurationNames);
 
 		spec = targetPlatformExtension.getResolveOnlyIf();
 
@@ -378,6 +334,14 @@ public class TargetPlatformPlugin implements Plugin<Project> {
 			});
 	}
 
+	private static final Iterable<String> _configurationNames = Arrays.asList(
+		JavaPlugin.COMPILE_CONFIGURATION_NAME, "compileClasspath",
+		"compileInclude", "compileOnly", Dependency.DEFAULT_CONFIGURATION,
+		"implementation", JavaPlugin.RUNTIME_CONFIGURATION_NAME,
+		"runtimeClasspath", "runtimeImplementation", "runtimeOnly",
+		"testCompileClasspath", "testCompileOnly", "testIntegration",
+		"testImplementation", JavaPlugin.TEST_RUNTIME_CONFIGURATION_NAME,
+		"testRuntimeClasspath", "testRuntimeOnly");
 	private static final Spec<Task> _skipIfExecutingParentTaskSpec =
 		new SkipIfExecutingParentTaskSpec();
 

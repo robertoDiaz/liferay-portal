@@ -1,4 +1,6 @@
 <definition component-name="portal-search">
+	<property name="osgi.module.configuration.file.names" value="com.liferay.portal.search.web.internal.configuration.SearchWebConfiguration.config" />
+	<property name="osgi.module.configurations" value="classicSearchPortletInFrontPage=&quot;true&quot;" />
 	<property name="portal.release" value="true" />
 	<property name="portal.suite.search.engine" value="elasticsearch6,solr" />
 	<property name="portal.upstream" value="true" />
@@ -15,7 +17,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -284,7 +286,7 @@
 		</execute>
 	</command>
 
-	<command name="SearchBlogsEntryCategoryQuotes" priority="4">
+	<command ignore="true" name="SearchBlogsEntryCategoryQuotes" priority="4">
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -865,7 +867,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1306,7 +1308,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

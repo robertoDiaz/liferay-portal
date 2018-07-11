@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 /**
@@ -34,7 +35,7 @@ public class XMLFriendlyURLRoutesFileCheck extends BaseFileCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws DocumentException {
 
 		if (fileName.endsWith("routes.xml")) {
 			_checkDTDVersion(fileName, content);
@@ -60,11 +61,13 @@ public class XMLFriendlyURLRoutesFileCheck extends BaseFileCheck {
 				fileName,
 				"Major version for dtd should be '" + mainMajorReleaseVersion +
 					"'",
-				getLineCount(content, matcher.start()));
+				getLineNumber(content, matcher.start()));
 		}
 	}
 
-	private void _checkOrder(String fileName, String content) throws Exception {
+	private void _checkOrder(String fileName, String content)
+		throws DocumentException {
+
 		Document document = SourceUtil.readXML(content);
 
 		Element rootElement = document.getRootElement();

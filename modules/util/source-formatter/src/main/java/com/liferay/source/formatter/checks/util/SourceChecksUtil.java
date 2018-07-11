@@ -15,7 +15,6 @@
 package com.liferay.source.formatter.checks.util;
 
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,6 +37,7 @@ import com.liferay.source.formatter.util.DebugUtil;
 import com.liferay.source.formatter.util.SourceFormatterUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.lang.reflect.Constructor;
 
@@ -58,17 +58,20 @@ public class SourceChecksUtil {
 			SourceFormatterConfiguration sourceFormatterConfiguration,
 			String sourceProcessorName, Map<String, Properties> propertiesMap,
 			boolean portalSource, boolean subrepository,
-			boolean includeModuleChecks)
+			boolean includeModuleChecks, String checkName)
 		throws Exception {
+
+		// SKIP
 
 		List<SourceCheck> sourceChecks = _getSourceChecks(
 			sourceFormatterConfiguration, sourceProcessorName, propertiesMap,
-			portalSource, subrepository, includeModuleChecks);
+			portalSource, subrepository, includeModuleChecks, checkName);
 
 		sourceChecks.addAll(
 			_getSourceChecks(
 				sourceFormatterConfiguration, "all", propertiesMap,
-				includeModuleChecks, subrepository, includeModuleChecks));
+				includeModuleChecks, subrepository, includeModuleChecks,
+				checkName));
 
 		return sourceChecks;
 	}
@@ -80,6 +83,8 @@ public class SourceChecksUtil {
 			SourceFormatterSuppressions sourceFormatterSuppressions,
 			boolean showDebugInformation)
 		throws Exception {
+
+		// SKIP
 
 		SourceChecksResult sourceChecksResult = new SourceChecksResult(content);
 
@@ -113,19 +118,8 @@ public class SourceChecksUtil {
 			}
 			else if (sourceCheck instanceof GradleFileCheck) {
 				if (gradleFile == null) {
-					try {
-						gradleFile = GradleFileParser.parse(
-							fileName, sourceChecksResult.getContent());
-					}
-					catch (ParseException pe) {
-						sourceChecksResult.addSourceFormatterMessage(
-							new SourceFormatterMessage(
-								fileName, pe.getMessage(),
-								CheckType.SOURCE_CHECK, clazz.getSimpleName(),
-								null, -1));
-
-						continue;
-					}
+					gradleFile = GradleFileParser.parse(
+						fileName, sourceChecksResult.getContent());
 				}
 
 				sourceChecksResult = _processGradleFileCheck(
@@ -198,8 +192,10 @@ public class SourceChecksUtil {
 			SourceFormatterConfiguration sourceFormatterConfiguration,
 			String sourceProcessorName, Map<String, Properties> propertiesMap,
 			boolean portalSource, boolean subrepository,
-			boolean includeModuleChecks)
+			boolean includeModuleChecks, String checkName)
 		throws Exception {
+
+		// SKIP
 
 		List<SourceCheck> sourceChecks = new ArrayList<>();
 
@@ -214,12 +210,15 @@ public class SourceChecksUtil {
 		for (SourceCheckConfiguration sourceCheckConfiguration :
 				sourceCheckConfigurations) {
 
-			String sourceCheckName = sourceCheckConfiguration.getName();
+			String sourceCheckName = SourceFormatterUtil.getSimpleName(
+				sourceCheckConfiguration.getName());
 
-			if (!sourceCheckName.contains(StringPool.PERIOD)) {
-				sourceCheckName =
-					"com.liferay.source.formatter.checks." + sourceCheckName;
+			if ((checkName != null) && !checkName.equals(sourceCheckName)) {
+				continue;
 			}
+
+			sourceCheckName =
+				"com.liferay.source.formatter.checks." + sourceCheckName;
 
 			Class<?> sourceCheckClass = null;
 
@@ -292,6 +291,8 @@ public class SourceChecksUtil {
 			String fileName, String absolutePath)
 		throws Exception {
 
+		// SKIP
+
 		sourceChecksResult.setContent(
 			fileCheck.process(
 				fileName, absolutePath, sourceChecksResult.getContent()));
@@ -310,7 +311,7 @@ public class SourceChecksUtil {
 			SourceChecksResult sourceChecksResult,
 			GradleFileCheck gradleFileCheck, GradleFile gradleFile,
 			String fileName, String absolutePath)
-		throws Exception {
+		throws IOException {
 
 		String content = gradleFileCheck.process(
 			fileName, absolutePath, gradleFile,
@@ -333,6 +334,8 @@ public class SourceChecksUtil {
 			JavaClass javaClass, List<JavaClass> anonymousClasses,
 			String fileName, String absolutePath)
 		throws Exception {
+
+		// SKIP
 
 		sourceChecksResult.setContent(
 			javaTermCheck.process(

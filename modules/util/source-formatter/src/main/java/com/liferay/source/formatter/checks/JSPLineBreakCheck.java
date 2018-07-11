@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.source.formatter.checks.util.JSPSourceUtil;
 
+import java.io.IOException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +33,7 @@ public class JSPLineBreakCheck extends LineBreakCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws IOException {
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
@@ -39,13 +41,13 @@ public class JSPLineBreakCheck extends LineBreakCheck {
 			String line = null;
 			String previousLine = StringPool.BLANK;
 
-			int lineCount = 0;
+			int lineNumber = 0;
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
-				lineCount++;
+				lineNumber++;
 
 				if (!line.startsWith(StringPool.POUND)) {
-					checkLineBreaks(line, previousLine, fileName, lineCount);
+					checkLineBreaks(line, previousLine, fileName, lineNumber);
 				}
 
 				previousLine = line;

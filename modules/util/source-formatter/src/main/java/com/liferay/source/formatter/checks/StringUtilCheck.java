@@ -33,7 +33,7 @@ public class StringUtilCheck extends BaseFileCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		if (!absolutePath.contains("poshi")) {
 			_checkReplaceCalls(fileName, content);
@@ -43,7 +43,7 @@ public class StringUtilCheck extends BaseFileCheck {
 	}
 
 	private void _checkReplaceCalls(String fileName, String content)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		Matcher matcher = _stringUtilReplacePattern.matcher(content);
 
@@ -92,7 +92,7 @@ public class StringUtilCheck extends BaseFileCheck {
 
 			addMessage(
 				fileName, sb.toString(), "string_methods.markdown",
-				getLineCount(content, matcher.start()));
+				getLineNumber(content, matcher.start()));
 		}
 	}
 

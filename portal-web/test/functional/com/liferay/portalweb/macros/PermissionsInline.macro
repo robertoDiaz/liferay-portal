@@ -118,7 +118,7 @@
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
-		<execute function="Click" locator1="Button#INFO" />
+		<execute function="Click" locator1="Icon#INFO" />
 
 		<execute macro="LexiconEntry#gotoEllipsisMenuItem">
 			<var name="menuItem" value="Permissions" />
@@ -165,6 +165,10 @@
 			<var name="key_threadSubject" value="${threadSubject}" />
 		</execute>
 
+		<execute function="AssertElementPresent" locator1="MessageBoards#THREAD_REPLY_ACTIONS">
+			<var name="key_threadReplyBody" value="${threadReplyBody}" />
+		</execute>
+
 		<execute function="Click" locator1="MessageBoards#THREAD_REPLY_ACTIONS">
 			<var name="key_threadReplyBody" value="${threadReplyBody}" />
 		</execute>
@@ -180,11 +184,12 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
-		<execute macro="LexiconEntry#gotoHeaderMenuItem">
+		<execute macro="SitePages#gotoPageMenuItem">
 			<var name="menuItem" value="Permissions" />
+			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
@@ -206,8 +211,13 @@
 	</command>
 
 	<command name="gotoSitepageCP">
-		<execute macro="LexiconEntry#gotoHeaderMenuItem">
+		<execute macro="SitePages#togglePrivacy">
+			<var name="privacy" value="${privacy}" />
+		</execute>
+
+		<execute macro="SitePages#gotoPageMenuItem">
 			<var name="menuItem" value="Permissions" />
+			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="IFrame#selectPermissionsFrame" />
@@ -236,11 +246,12 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
-		<execute macro="LexiconEntry#gotoHeaderMenuItem">
+		<execute macro="SitePages#gotoPageMenuItem">
 			<var name="menuItem" value="Permissions" />
+			<var name="pageName" value="${page}" />
 		</execute>
 	</command>
 

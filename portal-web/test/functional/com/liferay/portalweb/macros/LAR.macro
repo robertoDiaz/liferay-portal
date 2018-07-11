@@ -562,11 +562,11 @@
 	<command name="filterCompletedProcesses">
 		<execute function="Pause" locator1="5000" />
 
-		<execute function="Click" locator1="Dropdown#FILTER" />
+		<execute function="Click" locator1="Dropdown#FILTER_AND_ORDER" />
 
-		<var name="key_filterValue" value="Completed" />
-
-		<execute function="AssertClick" locator1="Dropdown#FILTER_VALUES" value1="Completed" />
+		<execute function="Click" locator1="MenuItem#ANY_MENU_ITEM" value1="Completed">
+			<var name="key_menuItem" value="Completed" />
+		</execute>
 	</command>
 
 	<command name="gotoExport">
@@ -624,7 +624,7 @@
 
 	<command name="moveToTheRecycleBinExportTemplate">
 		<execute macro="LexiconEntry#gotoEllipsisMenuItem">
-			<var name="menuItem" value="Move to the Recycle Bin" />
+			<var name="menuItem" value="Move to Recycle Bin" />
 		</execute>
 
 		<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
@@ -635,9 +635,9 @@
 
 		<execute function="Click" locator1="Dropdown#FILTER_ORDER" />
 
-		<var name="key_filterValue" value="Completion Date" />
-
-		<execute function="AssertClick" locator1="Dropdown#FILTER_ORDER_VALUES" value1="Completion Date" />
+		<execute function="Click" locator1="MenuItem#ANY_MENU_ITEM" value1="Completion Date">
+			<var name="key_menuItem" value="Completion Date" />
+		</execute>
 	</command>
 
 	<command name="saveExportTemplateCP">
@@ -872,8 +872,8 @@
 	</command>
 
 	<command name="viewProcessesInListView">
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 	</command>
 </definition>

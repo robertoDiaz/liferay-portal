@@ -24,7 +24,7 @@
 	<command name="addDisplayTemplateCP">
 		<execute macro="DDLNavigator#gotoManageDataDefinitions" />
 
-		<execute function="Click" locator1="NavBar#BASIC_SEARCH_FIELD" />
+		<execute function="Click" locator1="TextInput#SEARCH" />
 
 		<execute macro="Search#searchCP">
 			<var name="searchTerm" value="${ddlDataDefinitionName}" />
@@ -221,7 +221,7 @@
 
 		<execute macro="PortletEntry#selectAll" />
 
-		<execute function="ClickNoError" locator1="Icon#DELETE" />
+		<execute function="ClickNoError" locator1="Icon#TIMES" />
 
 		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
 
@@ -247,11 +247,9 @@
 			<var name="key_menuItem" value="Manage Templates" />
 		</execute>
 
-		<execute macro="Search#searchCP">
-			<var name="searchTerm" value="${ddlTemplateName}" />
+		<execute macro="Portlet#viewEmptyMessage">
+			<var name="message" value="There are no templates." />
 		</execute>
-
-		<execute function="AssertTextEquals" locator1="Message#DDM_TEMPLATE_INFO" value1="There are no results." />
 	</command>
 
 	<command name="editDisplayTemplateCP">
@@ -419,7 +417,7 @@
 					<then>
 						<execute function="Check#checkAll" locator1="DDMSelectTemplate#TEMPLATE_TABLE_ALL_CHECKBOX" />
 
-						<execute function="ClickNoError" locator1="Icon#DELETE" />
+						<execute function="ClickNoError" locator1="Icon#TIMES" />
 
 						<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
 
@@ -428,14 +426,6 @@
 				</if>
 			</then>
 		</if>
-	</command>
-
-	<command name="viewDefaultNoTemplatesCP">
-		<execute macro="DDLNavigator#gotoManageTemplates">
-			<var name="ddlDataDefinitionName" value="${ddlDataDefinitionName}" />
-		</execute>
-
-		<execute function="AssertTextEquals" locator1="Message#DDM_TEMPLATE_INFO" value1="There are no results." />
 	</command>
 
 	<command name="viewDisplayTemplateCP">
