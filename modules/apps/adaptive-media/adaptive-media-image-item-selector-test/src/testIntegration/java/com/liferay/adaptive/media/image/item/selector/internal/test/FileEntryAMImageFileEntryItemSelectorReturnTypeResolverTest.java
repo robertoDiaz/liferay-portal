@@ -19,7 +19,6 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
@@ -79,9 +78,8 @@ public class FileEntryAMImageFileEntryItemSelectorReturnTypeResolverTest {
 		long fileEntryId = jsonObject.getLong("fileEntryId");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			url);
 
 		Assert.assertEquals(fileEntry.getFileEntryId(), fileEntryId);
