@@ -69,9 +69,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolver
 		String previewURL = null;
 
 		if (fileEntry.getGroupId() == fileEntry.getRepositoryId()) {
-			previewURL = DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), themeDisplay,
-				StringPool.BLANK, false, false);
+			previewURL = DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), themeDisplay);
 		}
 		else {
 			previewURL = PortletFileRepositoryUtil.getPortletFileEntryURL(

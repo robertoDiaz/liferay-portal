@@ -120,9 +120,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -165,9 +164,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -214,9 +212,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -255,9 +252,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -296,9 +292,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -337,9 +332,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -378,9 +372,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -419,9 +412,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -460,9 +452,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");
@@ -501,9 +492,8 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		String defaultSource = jsonObject.getString("defaultSource");
 
 		Assert.assertEquals(
-			DLUtil.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK,
-				false, false),
+			DLUtil.getImagePreviewURL(
+				fileEntry, fileEntry.getFileVersion(), null),
 			defaultSource);
 
 		JSONArray sourcesJSONArray = jsonObject.getJSONArray("sources");

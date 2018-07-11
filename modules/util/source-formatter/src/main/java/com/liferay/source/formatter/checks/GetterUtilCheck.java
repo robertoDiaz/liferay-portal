@@ -35,7 +35,7 @@ public class GetterUtilCheck extends BaseFileCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		if (!fileName.endsWith("GetterUtilTest.java")) {
 			_checkGetterUtilGet(fileName, content);
@@ -45,7 +45,7 @@ public class GetterUtilCheck extends BaseFileCheck {
 	}
 
 	private void _checkGetterUtilGet(String fileName, String content)
-		throws Exception {
+		throws ReflectiveOperationException {
 
 		Matcher matcher = _getterUtilGetPattern.matcher(content);
 
@@ -84,7 +84,7 @@ public class GetterUtilCheck extends BaseFileCheck {
 					fileName,
 					"No need to pass default value '" + parametersList.get(1) +
 						"'",
-					getLineCount(content, matcher.start()));
+					getLineNumber(content, matcher.start()));
 			}
 		}
 	}

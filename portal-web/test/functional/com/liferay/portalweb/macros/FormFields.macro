@@ -168,7 +168,11 @@
 	</command>
 
 	<command name="editValidation">
-		<execute function="Select" locator1="FormFields#VALIDATION_ARGUMENT" value1="${validationArgument}" />
+		<execute function="Click" locator1="FormFields#VALIDATION_ARGUMENT" />
+
+		<execute function="AssertClick" locator1="FormFields#VALIDATION_ARGUMENT_OPTION" value1="${validationArgument}">
+			<var name="key_validationArgument" value="${validationArgument}" />
+		</execute>
 
 		<execute function="Type" locator1="FormFields#VALIDATION_INPUT" value1="${validationInput}" />
 		<execute function="Type" locator1="FormFields#VALIDATION_ERROR_MESSAGE" value1="${validationErrorMessage}" />
@@ -220,7 +224,9 @@
 		<var name="key_rowNumber1" value="${rowNumberStart}" />
 		<var name="key_rowNumber2" value="${rowNumberEnd}" />
 
-		<execute function="DragAndDrop" locator1="FormFields#OPTIONS_DRAG_ICON_1" locator2="FormFields#OPTIONS_DRAG_ICON_2" value1="" />
+		<execute function="Click" locator1="FormFields#OPTIONS_DRAG_ICON_1" />
+
+		<execute function="DragAndDrop#dragAndDropToObject" locator1="FormFields#OPTIONS_DRAG_ICON_1" locator2="FormFields#OPTIONS_DRAG_ICON_2" value1="" />
 	</command>
 
 	<command name="removeRepeatableField">
