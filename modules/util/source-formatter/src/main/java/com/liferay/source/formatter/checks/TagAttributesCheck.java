@@ -16,12 +16,16 @@ package com.liferay.source.formatter.checks;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.source.formatter.checks.TagAttributesCheck.Tag;
 import com.liferay.source.formatter.checks.util.SourceUtil;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -49,7 +53,7 @@ public abstract class TagAttributesCheck extends BaseFileCheck {
 					fileName,
 					"There should be a line break after '" + matcher.group(2) +
 						"'",
-					getLineCount(content, matcher.start(2)));
+					getLineNumber(content, matcher.start(2)));
 
 				continue;
 			}
@@ -89,6 +93,8 @@ public abstract class TagAttributesCheck extends BaseFileCheck {
 	protected String formatMultiLinesTagAttributes(
 			String absolutePath, String content, boolean escapeQuotes)
 		throws Exception {
+
+		// SKIP
 
 		Matcher matcher = _multilineTagPattern.matcher(content);
 
@@ -140,6 +146,8 @@ public abstract class TagAttributesCheck extends BaseFileCheck {
 			boolean forceSingleLine)
 		throws Exception {
 
+		// SKIP
+
 		Tag tag = _parseTag(s, escapeQuotes);
 
 		if (tag == null) {
@@ -158,10 +166,38 @@ public abstract class TagAttributesCheck extends BaseFileCheck {
 	}
 
 	protected Tag formatTagAttributeType(Tag tag) throws Exception {
+
+		// SKIP
+
 		return tag;
 	}
 
 	protected Tag sortHTMLTagAttributes(Tag tag) {
+		String tagName = tag.getName();
+
+		if (tagName.equals("liferay-ui:tabs")) {
+			return tag;
+		}
+
+		Map<String, String> attributesMap = tag.getAttributesMap();
+
+		for (Map.Entry<String, String> entry : attributesMap.entrySet()) {
+			String attributeValue = entry.getValue();
+
+			if (!attributeValue.matches("([-a-z0-9]+ )+[-a-z0-9]+")) {
+				continue;
+			}
+
+			List<String> htmlAttributes = ListUtil.fromArray(
+				StringUtil.split(attributeValue, StringPool.SPACE));
+
+			Collections.sort(htmlAttributes);
+
+			tag.putAttribute(
+				entry.getKey(),
+				StringUtil.merge(htmlAttributes, StringPool.SPACE));
+		}
+
 		return tag;
 	}
 

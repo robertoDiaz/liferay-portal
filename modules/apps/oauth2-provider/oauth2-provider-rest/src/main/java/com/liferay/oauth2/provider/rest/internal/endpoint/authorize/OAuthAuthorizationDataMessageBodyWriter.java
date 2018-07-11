@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.authorize;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration;
-import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
@@ -29,14 +28,14 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import java.net.URI;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -59,8 +58,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(
-	property = OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_OAUTH2_ENDPOINT_JAXRS_PROVIDER + "=true",
-	service = Object.class
+	property = {
+		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.OAuth2.Application)",
+		"osgi.jaxrs.extension=true",
+		"osgi.jaxrs.name=OAuthAuthorizationDataMessageBodyWriter"
+	}
 )
 @Produces("text/html")
 @Provider
@@ -158,12 +160,17 @@ public class OAuthAuthorizationDataMessageBodyWriter
 				authorizeScreenURL, OAuthConstants.SCOPE);
 		}
 
-		throw new WebApplicationException(
-			Response.status(
-				Response.Status.FOUND
-			).location(
-				URI.create(authorizeScreenURL)
-			).build());
+		_messageContext.put("http.request.redirected", Boolean.TRUE);
+
+		HttpServletResponse httpServletResponse =
+			_messageContext.getHttpServletResponse();
+
+		try {
+			httpServletResponse.sendRedirect(authorizeScreenURL);
+		}
+		catch (IOException ioe) {
+			throw new WebApplicationException(ioe);
+		}
 	}
 
 	@Activate

@@ -335,7 +335,7 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 
 		<gradle-execute dir="../modules" task="buildService">
 			<arg value="-DbuildService.skipReadOnly=${build.services.skip.read.only}" />
-			<arg value="-Pcom.liferay.portal.tools.service.builder.ignore.local=false" />
+			<arg value="-Pcom.liferay.portal.tools.service.builder.ignore.local=true" />
 		</gradle-execute>
 	</target>
 
@@ -713,6 +713,7 @@ Please run the following command from ${source.formatter.modules.dir.absolute.pa
 			<arg value="show.documentation=${source.formatter.show.documentation}" />
 			<arg value="source.auto.fix=${source.auto.fix}" />
 			<arg value="source.base.dir=${source.base.dir}" />
+			<arg value="source.check.name=${source.check.name}" />
 			<arg value="source.file.extensions=${source.file.extensions}" />
 			<arg value="source.files=${source.files}" />
 			<arg value="source.print.errors=${source.print.errors}" />

@@ -110,7 +110,7 @@
 	</command>
 
 	<command name="AddFormTemplate" priority="5">
-		<property name="portal.acceptance" value="quarantine" />
+		<property name="portal.acceptance" value="true" />
 
 		<execute macro="Navigator#openURL" />
 
@@ -1498,7 +1498,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1884,7 +1884,7 @@
 
 		<execute macro="DDLRecord#populateFieldBoolean">
 			<var name="ddlRecordFieldData" value="Yes" />
-			<var name="fieldFieldLabel" value="Boolean Required" />
+			<var name="fieldFieldLabel" value="Boolean asterisk Required" />
 			<var name="fieldName" value="Boolean" />
 		</execute>
 
@@ -2294,8 +2294,12 @@
 			<var name="portlet" value="Dynamic Data Lists" />
 		</execute>
 
-		<execute macro="DDLTemplate#viewDefaultNoTemplatesCP">
+		<execute macro="DDLNavigator#gotoManageTemplates">
 			<var name="ddlDataDefinitionName" value="Data Definition Copy" />
+		</execute>
+
+		<execute macro="Portlet#viewEmptyMessage">
+			<var name="message" value="There are no templates." />
 		</execute>
 	</command>
 

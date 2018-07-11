@@ -17,6 +17,7 @@ package com.liferay.poshi.runner;
 import com.liferay.poshi.runner.elements.PoshiElement;
 import com.liferay.poshi.runner.elements.PoshiNode;
 import com.liferay.poshi.runner.elements.PoshiNodeFactory;
+import com.liferay.poshi.runner.prose.PoshiProseDefinition;
 import com.liferay.poshi.runner.selenium.SeleniumUtil;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.ExternalMethod;
@@ -156,7 +157,7 @@ public class PoshiRunnerGetterUtil {
 	public static String getClassTypeFromFileExtension(String fileExtension) {
 		String classType = fileExtension;
 
-		if (fileExtension.equals("testcase")) {
+		if (fileExtension.equals("testcase") || fileExtension.equals("prose")) {
 			classType = "test-case";
 		}
 
@@ -261,6 +262,9 @@ public class PoshiRunnerGetterUtil {
 
 				parameter = GetterUtil.getInteger((String)parameter);
 			}
+			else if (className.endsWith("StringUtil")) {
+				parameter = String.valueOf(parameter);
+			}
 
 			parameters[i] = parameter;
 		}
@@ -346,11 +350,25 @@ public class PoshiRunnerGetterUtil {
 	}
 
 	public static Element getRootElementFromURL(URL url) throws Exception {
+		return getRootElementFromURL(url, true);
+	}
+
+	public static Element getRootElementFromURL(URL url, boolean addLineNumbers)
+		throws Exception {
+
 		String fileContent = FileUtil.read(url);
 		String filePath = url.getFile();
 
+		if (filePath.endsWith(".prose")) {
+			PoshiProseDefinition poshiProseDefinition =
+				new PoshiProseDefinition(
+					getFileNameFromFilePath(filePath), fileContent);
+
+			fileContent = Dom4JUtil.format(poshiProseDefinition.toElement());
+		}
+
 		if (!fileContent.contains("<definition") &&
-			filePath.endsWith(".testcase")) {
+			(filePath.endsWith(".macro") || filePath.endsWith(".testcase"))) {
 
 			PoshiNode<?, ?> poshiNode = PoshiNodeFactory.newPoshiNodeFromFile(
 				filePath);
@@ -379,7 +397,9 @@ public class PoshiRunnerGetterUtil {
 					cdata = true;
 				}
 
-				if (line.contains("<![CDATA[") && matcher.find()) {
+				if (line.contains("<![CDATA[") && matcher.find() &&
+					addLineNumbers) {
+
 					for (String reservedTag : _reservedTags) {
 						if (line.contains("<" + reservedTag)) {
 							line = StringUtil.replace(
@@ -397,10 +417,12 @@ public class PoshiRunnerGetterUtil {
 
 				for (String reservedTag : _reservedTags) {
 					if (line.contains("<" + reservedTag)) {
-						line = StringUtil.replace(
-							line, matcher.group(),
-							matcher.group() + " line-number=\"" + lineNumber +
-								"\"");
+						if (addLineNumbers) {
+							line = StringUtil.replace(
+								line, matcher.group(),
+								matcher.group() + " line-number=\"" +
+									lineNumber + "\"");
+						}
 
 						tagIsReservedTag = true;
 
@@ -430,6 +452,10 @@ public class PoshiRunnerGetterUtil {
 			}
 
 			sb.append(line);
+
+			if (cdata) {
+				sb.append("\n");
+			}
 
 			lineNumber++;
 		}
@@ -518,7 +544,7 @@ public class PoshiRunnerGetterUtil {
 	private static final Pattern _namespacedClassCommandNamePattern =
 		Pattern.compile(
 			"((?<namespace>\\w+)\\.)?(?<className>\\w+)(\\#(?<commandName>" +
-				"(\\w+(\\-\\w+)*|\\$\\{\\w+\\}|\\w+)*))?");
+				"(\\w+(\\-\\w+)*|\\$\\{\\w+\\}|\\w+|\\s*\\w+)*))?");
 	private static final Pattern _parameterPattern = Pattern.compile(
 		"('([^'\\\\]|\\\\.)*'|[^',\\s]+)");
 	private static final List<String> _reservedTags = Arrays.asList(
@@ -526,9 +552,9 @@ public class PoshiRunnerGetterUtil {
 			"and", "arg", "body", "case", "command", "condition", "contains",
 			"default", "definition", "description", "echo", "else", "elseif",
 			"equals", "execute", "fail", "for", "if", "head", "html", "isset",
-			"not", "off", "on", "or", "property", "return", "set-up", "table",
-			"take-screenshot", "task", "tbody", "td", "tear-down", "thead",
-			"then", "title", "toggle", "tr", "var", "while"
+			"not", "off", "on", "or", "property", "prose", "return", "set-up",
+			"table", "take-screenshot", "task", "tbody", "td", "tear-down",
+			"thead", "then", "title", "toggle", "tr", "var", "while"
 		});
 	private static final Pattern _tagPattern = Pattern.compile("<[a-z\\-]+");
 	private static final Pattern _variablePattern = Pattern.compile(

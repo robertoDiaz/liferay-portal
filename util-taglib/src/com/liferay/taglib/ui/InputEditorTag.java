@@ -120,7 +120,8 @@ public class InputEditorTag extends BaseValidatorTagSupport {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #setEditorName(String)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #setEditorName(String)}
 	 */
 	@Deprecated
 	public void setEditorImpl(String editorImpl) {
@@ -140,7 +141,8 @@ public class InputEditorTag extends BaseValidatorTagSupport {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #setContents(String)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #setContents(String)}
 	 */
 	@Deprecated
 	public void setInitMethod(String initMethod) {
@@ -222,13 +224,13 @@ public class InputEditorTag extends BaseValidatorTagSupport {
 		_inlineEdit = false;
 		_inlineEditSaveURL = null;
 		_name = "editor";
-		_onChangeMethod = null;
 		_onBlurMethod = null;
+		_onChangeMethod = null;
 		_onFocusMethod = null;
 		_onInitMethod = null;
 		_placeholder = null;
-		_resizable = true;
 		_required = false;
+		_resizable = true;
 		_showSource = true;
 		_skipEditorLoading = false;
 		_toolbarSet = _TOOLBAR_SET_DEFAULT;
