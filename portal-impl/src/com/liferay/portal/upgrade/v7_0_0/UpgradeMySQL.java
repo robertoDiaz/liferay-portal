@@ -14,14 +14,18 @@
 
 package com.liferay.portal.upgrade.v7_0_0;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -42,6 +46,7 @@ public class UpgradeMySQL extends UpgradeProcess {
 			(db.getDBType() == DBType.MYSQL)) {
 
 			upgradeDatetimePrecision();
+			upgradeTableEngine();
 		}
 	}
 
@@ -98,6 +103,8 @@ public class UpgradeMySQL extends UpgradeProcess {
 		try (ResultSet rs = databaseMetaData.getColumns(
 				catalog, schemaPattern, tableName, null)) {
 
+			String modifyClause = StringPool.BLANK;
+
 			while (rs.next()) {
 				if (Types.TIMESTAMP != rs.getInt("DATA_TYPE")) {
 					continue;
@@ -112,24 +119,68 @@ public class UpgradeMySQL extends UpgradeProcess {
 					continue;
 				}
 
-				StringBundler sb = new StringBundler(5);
+				if (!modifyClause.equals(StringPool.BLANK)) {
+					modifyClause += StringPool.COMMA;
+				}
 
-				sb.append("ALTER TABLE ");
-				sb.append(tableName);
-				sb.append(" MODIFY ");
-				sb.append(columnName);
-				sb.append(" datetime(6)");
+				modifyClause +=
+					StringBundler.concat(
+						" MODIFY ", columnName, " datetime(6)");
+			}
 
-				String sql = sb.toString();
+			if (modifyClause.equals(StringPool.BLANK)) {
+				return;
+			}
+
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					StringBundler.concat(
+						"Updating columns for table ", tableName,
+						" to datetime(6)"));
+			}
+
+			statement.executeUpdate(
+				StringBundler.concat("ALTER TABLE ", tableName, modifyClause));
+		}
+	}
+
+	protected void upgradeTableEngine() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			Statement statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("show table status")) {
+
+			while (rs.next()) {
+				String tableName = rs.getString("Name");
+
+				if (!isPortal62TableName(tableName)) {
+					continue;
+				}
+
+				String comment = GetterUtil.getString(rs.getString("Comment"));
+
+				if (StringUtil.equalsIgnoreCase(comment, "VIEW")) {
+					continue;
+				}
+
+				String engine = GetterUtil.getString(rs.getString("Engine"));
+
+				if (StringUtil.equalsIgnoreCase(
+						engine, PropsValues.DATABASE_MYSQL_ENGINE)) {
+
+					continue;
+				}
 
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						StringBundler.concat(
-							"Updating table ", tableName, " column ",
-							columnName, " to datetime(6)"));
+							"Updating table ", tableName, " to use engine ",
+							PropsValues.DATABASE_MYSQL_ENGINE));
 				}
 
-				statement.executeUpdate(sql);
+				statement.executeUpdate(
+					StringBundler.concat(
+						"alter table ", tableName, " engine ",
+						PropsValues.DATABASE_MYSQL_ENGINE));
 			}
 		}
 	}

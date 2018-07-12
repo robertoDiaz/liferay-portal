@@ -164,7 +164,10 @@ public class DLFileEntryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
-			throw new FileNameException("Title is null");
+			throw new FileNameException(
+				StringBundler.concat(
+					"Cannot add file entry with file name ", sourceFileName,
+					" because title is null"));
 		}
 
 		// File entry
@@ -311,7 +314,7 @@ public class DLFileEntryLocalServiceImpl
 		boolean webDAVCheckInMode = GetterUtil.getBoolean(
 			serviceContext.getAttribute(DL.WEBDAV_CHECK_IN_MODE));
 
-		boolean manualCheckInRequired = dlFileEntry.getManualCheckInRequired();
+		boolean manualCheckInRequired = dlFileEntry.isManualCheckInRequired();
 
 		if (!webDAVCheckInMode && manualCheckInRequired) {
 			dlFileEntry.setManualCheckInRequired(false);
@@ -336,6 +339,7 @@ public class DLFileEntryLocalServiceImpl
 
 				dlFileEntry.setModifiedDate(
 					latestDLFileVersion.getModifiedDate());
+				dlFileEntry.setFileName(latestDLFileVersion.getFileName());
 				dlFileEntry.setExtension(latestDLFileVersion.getExtension());
 				dlFileEntry.setMimeType(latestDLFileVersion.getMimeType());
 				dlFileEntry.setSize(latestDLFileVersion.getSize());
@@ -344,6 +348,8 @@ public class DLFileEntryLocalServiceImpl
 
 				// File version
 
+				lastDLFileVersion.setFileName(
+					latestDLFileVersion.getFileName());
 				lastDLFileVersion.setExtension(
 					latestDLFileVersion.getExtension());
 				lastDLFileVersion.setMimeType(
@@ -482,7 +488,7 @@ public class DLFileEntryLocalServiceImpl
 		boolean manualCheckinRequired = GetterUtil.getBoolean(
 			serviceContext.getAttribute(DL.MANUAL_CHECK_IN_REQUIRED));
 
-		if (dlFileEntry.getManualCheckInRequired() ^ manualCheckinRequired) {
+		if (dlFileEntry.isManualCheckInRequired() ^ manualCheckinRequired) {
 			dlFileEntry.setManualCheckInRequired(manualCheckinRequired);
 
 			dlFileEntryPersistence.update(dlFileEntry);
@@ -550,6 +556,9 @@ public class DLFileEntryLocalServiceImpl
 				dlFileEntry.getName(), version,
 				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION);
 
+			Serializable validateDDMFormValues = serviceContext.getAttribute(
+				"validateDDMFormValues");
+
 			serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
 
 			if (fileEntryTypeId == oldDLFileVersion.getFileEntryTypeId()) {
@@ -559,7 +568,8 @@ public class DLFileEntryLocalServiceImpl
 					serviceContext);
 			}
 
-			serviceContext.setAttribute("validateDDMFormValues", Boolean.TRUE);
+			serviceContext.setAttribute(
+				"validateDDMFormValues", validateDDMFormValues);
 		}
 
 		return dlFileEntry;
@@ -860,12 +870,16 @@ public class DLFileEntryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(version)) {
-			throw new InvalidFileVersionException("Version is null");
+			throw new InvalidFileVersionException(
+				"Cannot delete version for file entry " + fileEntryId +
+					" because version is null");
 		}
 
 		if (version.equals(DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
 			throw new InvalidFileVersionException(
-				"Unable to delete a private working copy file version");
+				StringBundler.concat(
+					"Unable to delete a private working copy file version ",
+					version, " for file entry ", String.valueOf(fileEntryId)));
 		}
 
 		if (!hasFileEntryLock(userId, fileEntryId)) {
@@ -882,7 +896,9 @@ public class DLFileEntryLocalServiceImpl
 
 			if (!dlFileVersion.isApproved()) {
 				throw new InvalidFileVersionException(
-					"Cannot delete an unapproved file version");
+					StringBundler.concat(
+						"Cannot delete the unapproved file version ", version,
+						" for file entry ", String.valueOf(fileEntryId)));
 			}
 			else {
 				int count = dlFileVersionPersistence.countByF_S(
@@ -890,7 +906,10 @@ public class DLFileEntryLocalServiceImpl
 
 				if (count <= 1) {
 					throw new InvalidFileVersionException(
-						"Cannot delete the only approved file version");
+						StringBundler.concat(
+							"Cannot delete the only approved file version ",
+							version, " for file entry ",
+							String.valueOf(fileEntryId)));
 				}
 			}
 
@@ -1134,8 +1153,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
-	 *             boolean)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #getFile(long,
+	 *             String, boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -1148,8 +1167,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
-	 *             boolean, int)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #getFile(long,
+	 *             String, boolean, int)}
 	 */
 	@Deprecated
 	@Override
@@ -1189,8 +1208,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	 *             String)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #getFileAsStream(long, String)}
 	 */
 	@Deprecated
 	@Override
@@ -1202,8 +1221,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	 *             String, boolean)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #getFileAsStream(long, String, boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -1216,8 +1235,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	 *             String, boolean, int)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #getFileAsStream(long, String, boolean, int)}
 	 */
 	@Deprecated
 	@Override
@@ -1331,7 +1350,7 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1549,6 +1568,10 @@ public class DLFileEntryLocalServiceImpl
 		}
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public List<DLFileEntry> getMisversionedFileEntries() {
 		return dlFileEntryFinder.findByMisversioned();
@@ -1559,6 +1582,10 @@ public class DLFileEntryLocalServiceImpl
 		return dlFileEntryFinder.findByNoAssets();
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public List<DLFileEntry> getOrphanedFileEntries() {
 		return dlFileEntryFinder.findByOrphanedFileEntries();
@@ -1598,7 +1625,7 @@ public class DLFileEntryLocalServiceImpl
 			}
 			catch (PortalException pe) {
 				if (!(pe instanceof DuplicateFolderNameException) &&
-					 !(pe instanceof DuplicateFileEntryException)) {
+					!(pe instanceof DuplicateFileEntryException)) {
 
 					throw pe;
 				}
@@ -1697,8 +1724,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #isKeepFileVersionLabel(long,
-	 *             boolean, ServiceContext)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #isKeepFileVersionLabel(long, boolean, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -2004,7 +2031,6 @@ public class DLFileEntryLocalServiceImpl
 			Image largeImage = imageLocalService.getImage(largeImageId);
 
 			byte[] bytes = largeImage.getTextObj();
-			String contentType = largeImage.getType();
 
 			if (bytes != null) {
 				ImageBag imageBag = ImageToolUtil.read(bytes);
@@ -2026,11 +2052,16 @@ public class DLFileEntryLocalServiceImpl
 				imageLocalService.updateImage(
 					smallImageId,
 					ImageToolUtil.getBytes(
-						thumbnailRenderedImage, contentType));
+						thumbnailRenderedImage, largeImage.getType()));
 			}
 		}
 		catch (IOException ioe) {
-			throw new ImageSizeException(ioe);
+			throw new ImageSizeException(
+				StringBundler.concat(
+					"Unable to update small image with smallImageId ",
+					String.valueOf(smallImageId), ", largeImageId ",
+					String.valueOf(largeImageId)),
+				ioe);
 		}
 	}
 
@@ -2172,7 +2203,8 @@ public class DLFileEntryLocalServiceImpl
 			groupId, folderId, title);
 
 		if (dlFolder != null) {
-			throw new DuplicateFolderNameException(title);
+			throw new DuplicateFolderNameException(
+				"A folder already exists with name " + title);
 		}
 
 		DLFileEntry dlFileEntry = dlFileEntryPersistence.fetchByG_F_T(
@@ -2181,7 +2213,8 @@ public class DLFileEntryLocalServiceImpl
 		if ((dlFileEntry != null) &&
 			(dlFileEntry.getFileEntryId() != fileEntryId)) {
 
-			throw new DuplicateFileEntryException(title);
+			throw new DuplicateFileEntryException(
+				"A file entry already exists with title " + title);
 		}
 
 		dlFileEntry = dlFileEntryPersistence.fetchByG_F_FN(
@@ -2190,7 +2223,8 @@ public class DLFileEntryLocalServiceImpl
 		if ((dlFileEntry != null) &&
 			(dlFileEntry.getFileEntryId() != fileEntryId)) {
 
-			throw new DuplicateFileEntryException(title);
+			throw new DuplicateFileEntryException(
+				"A file entry already exists with file name " + title);
 		}
 	}
 
@@ -2826,7 +2860,7 @@ public class DLFileEntryLocalServiceImpl
 
 		DLValidatorUtil.validateFileName(title);
 
-		validateFileExtension(extension);
+		validateFileExtension(fileName, extension);
 
 		validateFile(groupId, folderId, fileEntryId, fileName, title);
 	}
@@ -2851,6 +2885,11 @@ public class DLFileEntryLocalServiceImpl
 				" for folder ", String.valueOf(folderId)));
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #validateFileExtension(String, String)}
+	 */
+	@Deprecated
 	protected void validateFileExtension(String extension)
 		throws PortalException {
 
@@ -2861,6 +2900,22 @@ public class DLFileEntryLocalServiceImpl
 			if (extension.length() > maxLength) {
 				throw new FileExtensionException(
 					extension + " exceeds max length of " + maxLength);
+			}
+		}
+	}
+
+	protected void validateFileExtension(String fileName, String extension)
+		throws PortalException {
+
+		if (Validator.isNotNull(extension)) {
+			int maxLength = ModelHintsUtil.getMaxLength(
+				DLFileEntry.class.getName(), "extension");
+
+			if (extension.length() > maxLength) {
+				throw new FileExtensionException(
+					StringBundler.concat(
+						extension, " of file ", fileName,
+						" exceeds max length of ", String.valueOf(maxLength)));
 			}
 		}
 	}

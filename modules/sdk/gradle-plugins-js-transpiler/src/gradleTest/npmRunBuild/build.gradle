@@ -7,7 +7,7 @@ apply plugin: "java"
 task runGradleTest
 
 dependencies {
-	jsCompile group: "com.liferay", name: "com.liferay.frontend.js.web", version: "1.0.20"
+	jsCompile group: "com.liferay", name: "com.liferay.frontend.js.web", version: "2.0.0"
 }
 
 npmRunBuild {
@@ -20,7 +20,7 @@ npmRunBuild {
 
 repositories {
 	maven {
-		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+		url "https://repository-cdn.liferay.com/nexus/content/groups/public"
 	}
 }
 

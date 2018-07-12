@@ -17,6 +17,8 @@ package com.liferay.source.formatter.checks;
 import com.liferay.source.formatter.SourceFormatterExcludes;
 import com.liferay.source.formatter.SourceFormatterMessage;
 
+import com.puppycrawl.tools.checkstyle.api.Configuration;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,8 +32,6 @@ public interface SourceCheck {
 	public Set<SourceFormatterMessage> getSourceFormatterMessages(
 		String fileName);
 
-	public void init() throws Exception;
-
 	public boolean isEnabled();
 
 	public boolean isModulesCheck();
@@ -42,7 +42,12 @@ public interface SourceCheck {
 
 	public void setBaseDirName(String baseDirName);
 
+	public void setCheckstyleConfiguration(
+		Configuration checkstyleConfiguration);
+
 	public void setEnabled(boolean enabled);
+
+	public void setFileExtensions(List<String> fileExtenstions);
 
 	public void setMaxLineLength(int maxLineLength);
 

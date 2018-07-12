@@ -21,14 +21,6 @@
 		</execute>
 	</set-up>
 
-	<command name="ViewDroolsInAppManagerAfterUpgrade6012" priority="5">
-		<property name="data.archive.type" value="data-archive-portal" />
-		<property name="osgi.modules.includes" value="calevent" />
-		<property name="portal.version" value="6.0.12" />
-
-		<execute macro="Upgrade#ViewDroolsAppManager" />
-	</command>
-
 	<command name="ViewDroolsInAppManagerAfterUpgrade612" priority="5">
 		<property name="data.archive.type" value="data-archive-portal" />
 		<property name="osgi.modules.includes" value="calevent" />
@@ -52,9 +44,9 @@
 		<execute macro="Upgrade#ViewDroolsAppManager" />
 	</command>
 
-	<command name="ViewDroolsInAppManagerAfterUpgrade623" priority="5">
+	<command name="ViewDroolsInAppManagerAfterUpgrade621021" priority="5">
 		<property name="data.archive.type" value="data-archive-portal" />
-		<property name="portal.version" value="6.2.3" />
+		<property name="portal.version" value="6.2.10.21" />
 
 		<execute macro="Upgrade#ViewDroolsAppManager" />
 	</command>

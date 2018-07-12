@@ -4,6 +4,8 @@
 	</command>
 
 	<command name="addLDAPServer">
+		<execute macro="PortalSettingsNavigator#gotoLDAP" />
+
 		<execute function="AssertClick" locator1="PortalSettingsAuthentication#AUTHENTICATION_LDAP_ADD_BUTTON" value1="Add" />
 
 		<execute function="Type" locator1="PortalSettingsAuthentication#LDAP_SERVER_SERVER_NAME" value1="${LDAPServerName}" />
@@ -189,6 +191,20 @@
 		<execute macro="PortletEntry#save" />
 	</command>
 
+	<command name="configureLDAPSetting">
+		<execute macro="PortalSettingsNavigator#gotoLDAP" />
+
+		<for list="${enableSettingList}" param="enableSetting">
+			<var name="enableSetting" value="PortalSettingsPortlet_${enableSetting}" />
+
+			<execute macro="FormFields#enableCheckbox">
+				<var name="fieldName" value="${enableSetting}" />
+			</execute>
+		</for>
+
+		<execute macro="PortletEntry#save" />
+	</command>
+
 	<command name="configureOpenSSO">
 		<execute function="Check" locator1="PortalSettingsAuthentication#AUTHENTICATION_OPEN_SSO_ENABLED_CHECKBOX" />
 		<execute function="Type" locator1="PortalSettingsAuthentication#AUTHENTICATION_OPEN_SSO_LOGIN_URL_FIELD" value1="${OpenSSOLoginURL}" />
@@ -218,7 +234,7 @@
 		<execute macro="PortalSettingsNavigator#gotoLDAP" />
 
 		<execute macro="FormFields#disableCheckbox">
-			<var name="fieldName" value="ldap--enabled" />
+			<var name="fieldName" value="PortalSettingsPortlet_enabled" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -226,7 +242,7 @@
 		<execute macro="PortalSettingsNavigator#gotoLDAP" />
 
 		<execute macro="FormFields#viewCheckboxNotChecked">
-			<var name="fieldName" value="ldap--enabled" />
+			<var name="fieldName" value="PortalSettingsPortlet_enabled" />
 		</execute>
 	</command>
 
@@ -416,6 +432,8 @@
 	</command>
 
 	<command name="editLDAPServer">
+		<execute macro="PortalSettingsNavigator#gotoLDAP" />
+
 		<var name="key_LDAPServerName" value="${LDAPServerName}" />
 
 		<execute function="Click" locator1="PortalSettingsAuthentication#LDAP_SERVERS_TABLE_EDIT" />
@@ -453,14 +471,18 @@
 		</execute>
 	</command>
 
-	<command name="enableLDAPSetting">
-		<execute macro="FormFields#enableCheckbox">
-			<var name="fieldName" value="ldap--enabled" />
-		</execute>
-
-		<execute function="Check" locator1="PortalSettingsAuthentication#AUTHENTICATION_LDAP_${enableCheckboxKey}_CHECKBOX" />
+	<command name="enableOpenIDConnectCP">
+		<execute function="Check" locator1="PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX" />
 
 		<execute macro="PortletEntry#save" />
+
+		<execute macro="Panel#expandPanel">
+			<var name="panel" value="Authentication" />
+		</execute>
+
+		<execute function="AssertClick" locator1="NavTab#OPENID_CONNECT" value1="OpenId Connect" />
+
+		<execute function="AssertChecked" locator1="PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX" />
 	</command>
 
 	<command name="enableOpenIDCP">
@@ -655,9 +677,11 @@
 	<command name="viewAuthenticationLDAPCP">
 		<execute macro="PortalSettingsNavigator#gotoLDAP" />
 
-		<for list="ldap--enabled,ldap--required,ldapImportEnabled,ldapExportEnabled,ldap--passwordPolicyEnabled" param="fieldName">
-			<execute function="AssertElementPresent" locator1="FormFields#CHECKBOX">
-				<var name="key_fieldName" value="${fieldName}" />
+		<for list="enabled,required,ldapImportEnabled,ldapExportEnabled,passwordPolicyEnabled" param="fieldName">
+			<var name="fieldName" value="PortalSettingsPortlet_${fieldName}" />
+
+			<execute macro="FormFields#viewCheckboxNotChecked">
+				<var name="fieldName" value="${fieldName}" />
 			</execute>
 		</for>
 
@@ -855,6 +879,18 @@
 		<execute function="AssertTextEquals" locator1="PortalSettingsEmailNotifications#EMAIL_NOTIFICATIONS_SENDER_NAME_FIELD" value1="Joe Bloggs" />
 		<execute function="AssertTextEquals" locator1="PortalSettingsEmailNotifications#EMAIL_NOTIFICATIONS_SENDER_ADDRESS_HEADER" value1="Address" />
 		<execute function="AssertTextEquals" locator1="PortalSettingsEmailNotifications#EMAIL_NOTIFICATIONS_SENDER_ADDRESS_FIELD" value1="test@liferay.com" />
+	</command>
+
+	<command name="viewEnabledLDAPSetting">
+		<execute macro="PortalSettingsNavigator#gotoLDAP" />
+
+		<for list="${enableSettingList}" param="enableSetting">
+			<var name="enableSetting" value="PortalSettingsPortlet_${enableSetting}" />
+
+			<execute macro="FormFields#viewCheckboxChecked">
+				<var name="fieldName" value="${enableSetting}" />
+			</execute>
+		</for>
 	</command>
 
 	<command name="viewReservedCredentialsScreenNamesCP">

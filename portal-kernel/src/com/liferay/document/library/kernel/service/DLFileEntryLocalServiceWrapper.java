@@ -522,8 +522,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
-	boolean)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link #getFile(long,
+	String, boolean)}
 	*/
 	@Deprecated
 	@Override
@@ -535,8 +535,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFile(long, String,
-	boolean, int)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link #getFile(long,
+	String, boolean, int)}
 	*/
 	@Deprecated
 	@Override
@@ -564,8 +564,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	String)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#getFileAsStream(long, String)}
 	*/
 	@Deprecated
 	@Override
@@ -577,8 +577,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	String, boolean)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#getFileAsStream(long, String, boolean)}
 	*/
 	@Deprecated
 	@Override
@@ -590,8 +590,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #getFileAsStream(long,
-	String, boolean, int)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#getFileAsStream(long, String, boolean, int)}
 	*/
 	@Deprecated
 	@Override
@@ -684,7 +684,7 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Wilberforce (7.0.x), with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -816,6 +816,10 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		return _dlFileEntryLocalService.getIndexableActionableDynamicQuery();
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), with no direct replacement
+	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.document.library.kernel.model.DLFileEntry> getMisversionedFileEntries() {
 		return _dlFileEntryLocalService.getMisversionedFileEntries();
@@ -826,6 +830,10 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		return _dlFileEntryLocalService.getNoAssetFileEntries();
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), with no direct replacement
+	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.document.library.kernel.model.DLFileEntry> getOrphanedFileEntries() {
 		return _dlFileEntryLocalService.getOrphanedFileEntries();
@@ -902,8 +910,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #isKeepFileVersionLabel(long,
-	boolean, ServiceContext)}
+	* @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	#isKeepFileVersionLabel(long, boolean, ServiceContext)}
 	*/
 	@Deprecated
 	@Override

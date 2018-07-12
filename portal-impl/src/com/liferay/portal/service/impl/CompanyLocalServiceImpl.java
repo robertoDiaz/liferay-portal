@@ -801,8 +801,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		SearchContext searchContext = createSearchContext(
 			companyId, userId, portletId, groupId, keywords, start, end);
 
-		addScopeFacet(searchContext);
-
 		try {
 			return facetedSearcher.search(searchContext);
 		}
@@ -958,9 +956,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param      size the company's account size (optionally
 	 *             <code>null</code>)
 	 * @return     the company with the primary key
-	 * @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
-	 *             String, String, boolean, byte[], String, String, String,
-	 *             String, String, String, String, String, String)}
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #updateCompany(long, String, String, String, boolean, byte[],
+	 *             String, String, String, String, String, String, String,
+	 *             String, String)}
 	 */
 	@Deprecated
 	@Override
@@ -1181,12 +1180,13 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			List<String> resetKeys = new ArrayList<>();
 
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
-				String key = entry.getKey();
 				String value = entry.getValue();
 
 				if (value.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
 					continue;
 				}
+
+				String key = entry.getKey();
 
 				String propsUtilValue = PropsUtil.get(key);
 
@@ -1279,6 +1279,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	protected void addAssetEntriesFacet(SearchContext searchContext) {
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
 	protected void addScopeFacet(SearchContext searchContext) {
 		Facet scopeFacet = new ScopeFacet(searchContext);
 

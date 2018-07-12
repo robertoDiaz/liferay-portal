@@ -415,6 +415,10 @@
 			<var name="key_menuItem" value="Add Child Site" />
 		</execute>
 
+		<execute macro="LexiconEntry#gotoEntry">
+			<var name="rowEntry" value="Blank Site" />
+		</execute>
+
 		<execute macro="PortletEntry#inputName">
 			<var name="name" value="Child SiteName2" />
 		</execute>
@@ -558,7 +562,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

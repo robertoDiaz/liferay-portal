@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.IOException;
+
 /**
  * @author Hugo Huijser
  */
@@ -27,19 +29,19 @@ public class PropertiesLongLinesCheck extends BaseFileCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws IOException {
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
 
-			int lineCount = 0;
+			int lineNumber = 0;
 
 			String line = null;
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
-				lineCount++;
+				lineNumber++;
 
-				_checkMaxLineLength(line, fileName, lineCount);
+				_checkMaxLineLength(line, fileName, lineNumber);
 			}
 		}
 
@@ -47,7 +49,7 @@ public class PropertiesLongLinesCheck extends BaseFileCheck {
 	}
 
 	private void _checkMaxLineLength(
-		String line, String fileName, int lineCount) {
+		String line, String fileName, int lineNumber) {
 
 		String trimmedLine = StringUtil.trimLeading(line);
 
@@ -75,7 +77,7 @@ public class PropertiesLongLinesCheck extends BaseFileCheck {
 		}
 
 		if ((z - y + x + 2) <= getMaxLineLength()) {
-			addMessage(fileName, "> " + getMaxLineLength(), lineCount);
+			addMessage(fileName, "> " + getMaxLineLength(), lineNumber);
 		}
 	}
 
