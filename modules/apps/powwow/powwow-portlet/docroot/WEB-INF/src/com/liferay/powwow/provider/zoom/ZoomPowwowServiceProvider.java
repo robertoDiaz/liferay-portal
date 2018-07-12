@@ -152,7 +152,7 @@ public class ZoomPowwowServiceProvider extends BasePowwowServiceProvider {
 			}
 		}
 		catch (Exception e) {
-			_log.error(e);
+			_log.error(e, e);
 		}
 
 		return false;
@@ -249,7 +249,7 @@ public class ZoomPowwowServiceProvider extends BasePowwowServiceProvider {
 		parameterMap.put("email", user.getEmailAddress());
 		parameterMap.put("first_name", user.getFirstName());
 		parameterMap.put("last_name", user.getLastName());
-		parameterMap.put("type", Integer.toString(_USER_TYPE_PRO));
+		parameterMap.put("type", String.valueOf(_USER_TYPE_PRO));
 
 		JSONObject responseJSONObject = execute(
 			powwowServer, "user", "custcreate", parameterMap);
@@ -591,7 +591,7 @@ public class ZoomPowwowServiceProvider extends BasePowwowServiceProvider {
 			}
 		}
 		catch (Exception e) {
-			_log.error(e);
+			_log.error(e, e);
 		}
 
 		return false;

@@ -35,10 +35,9 @@
 	</tear-down>
 
 	<command name="ConfigureAutofillRule" priority="5">
+		<description message="This is a use case for LPS-70446." />
 		<property name="portal.acceptance" value="false" />
 		<property name="test.name.skip.portal.instance" value="FormRules#ConfigureAutofillRule" />
-
-		<description message="This is a use case for LPS-70446." />
 
 		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
 
@@ -134,7 +133,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -187,8 +186,8 @@
 	</command>
 
 	<command name="ConfigureCalculateRule" priority="5">
-		<property name="portal.acceptance" value="false" />
 		<description message="This is a use case for LPS-71592." />
+		<property name="portal.acceptance" value="false" />
 
 		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
 
@@ -278,7 +277,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -314,10 +313,9 @@
 			<var name="fieldValue" value="10" />
 		</execute>
 
-		<execute macro="FormFields#viewTextField">
-			<var name="fieldLabel" value="Total" />
+		<execute macro="FormFields#viewTextValue">
 			<var name="fieldName" value="Total" />
-			<var name="fieldValue" value="50.0" />
+			<var name="fieldValue" value="50" />
 		</execute>
 	</command>
 
@@ -385,7 +383,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -521,7 +519,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -653,7 +651,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

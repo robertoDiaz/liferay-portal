@@ -28,7 +28,7 @@ import com.liferay.portal.test.rule.ExpectedLogs;
 import com.liferay.portal.test.rule.ExpectedType;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.verify.model.LayoutVerifiableModel;
+import com.liferay.portal.verify.model.AssetTagVerifiableModel;
 import com.liferay.portal.verify.test.BaseVerifyProcessTestCase;
 
 import java.lang.reflect.Method;
@@ -53,7 +53,7 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 
 	@Test
 	public void testVerifyModel() throws Exception {
-		_verifyUUID.doVerify(new LayoutVerifiableModel());
+		_verifyUUID.doVerify(new AssetTagVerifiableModel());
 	}
 
 	@ExpectedLogs(
@@ -164,7 +164,7 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 				PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD];
 
 		for (int i = 0; i < PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD;
-			i++) {
+				i++) {
 
 			verifiableUUIDModels[i] = new VerifiableUUIDModel() {
 

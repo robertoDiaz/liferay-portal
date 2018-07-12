@@ -39,10 +39,12 @@ import com.liferay.source.formatter.util.SourceFormatterUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,6 +59,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.dom4j.DocumentException;
 
 /**
  * @author Hugo Huijser
@@ -86,6 +90,9 @@ public class SourceFormatter {
 		};
 
 	public static void main(String[] args) throws Exception {
+
+		// SKIP
+
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
 		try {
@@ -101,6 +108,11 @@ public class SourceFormatter {
 				SourceFormatterArgs.BASE_DIR_NAME);
 
 			sourceFormatterArgs.setBaseDirName(baseDirName);
+
+			String checkName = ArgumentsUtil.getString(
+				arguments, "source.check.name", null);
+
+			sourceFormatterArgs.setCheckName(checkName);
 
 			boolean formatCurrentBranch = ArgumentsUtil.getBoolean(
 				arguments, "format.current.branch",
@@ -164,6 +176,13 @@ public class SourceFormatter {
 			boolean includeSubrepositories = ArgumentsUtil.getBoolean(
 				arguments, "include.subrepositories",
 				SourceFormatterArgs.INCLUDE_SUBREPOSITORIES);
+
+			List<String> recentChangesFileNames =
+				sourceFormatterArgs.getRecentChangesFileNames();
+
+			if (recentChangesFileNames != null) {
+				includeSubrepositories = true;
+			}
 
 			sourceFormatterArgs.setIncludeSubrepositories(
 				includeSubrepositories);
@@ -237,6 +256,9 @@ public class SourceFormatter {
 	}
 
 	public void format() throws Exception {
+
+		// SKIP
+
 		_printProgressStatusMessage("Scanning for files...");
 
 		_init();
@@ -251,6 +273,7 @@ public class SourceFormatter {
 
 		_sourceProcessors.add(new BNDSourceProcessor());
 		_sourceProcessors.add(new CodeownersSourceProcessor());
+		_sourceProcessors.add(new ConfigSourceProcessor());
 		_sourceProcessors.add(new CQLSourceProcessor());
 		_sourceProcessors.add(new CSSSourceProcessor());
 		_sourceProcessors.add(new DockerfileSourceProcessor());
@@ -268,8 +291,8 @@ public class SourceFormatter {
 		_sourceProcessors.add(new SHSourceProcessor());
 		_sourceProcessors.add(new SoySourceProcessor());
 		_sourceProcessors.add(new SQLSourceProcessor());
-		_sourceProcessors.add(new TSSourceProcessor());
 		_sourceProcessors.add(new TLDSourceProcessor());
+		_sourceProcessors.add(new TSSourceProcessor());
 		_sourceProcessors.add(new XMLSourceProcessor());
 		_sourceProcessors.add(new YMLSourceProcessor());
 
@@ -284,6 +307,9 @@ public class SourceFormatter {
 
 					@Override
 					public Void call() throws Exception {
+
+						// SKIP
+
 						_runSourceProcessor(sourceProcessor);
 
 						return null;
@@ -391,6 +417,77 @@ public class SourceFormatter {
 		return _sourceMismatchExceptions;
 	}
 
+	private void _addDependentFileNames() {
+		List<String> recentChangesFileNames =
+			_sourceFormatterArgs.getRecentChangesFileNames();
+
+		if (recentChangesFileNames == null) {
+			return;
+		}
+
+		Set<String> dependentFileNames = new HashSet<>();
+
+		for (String recentChangesFileName : recentChangesFileNames) {
+			if (!recentChangesFileName.endsWith("ServiceImpl.java")) {
+				continue;
+			}
+
+			String dirName = recentChangesFileName.substring(
+				0, recentChangesFileName.lastIndexOf(CharPool.SLASH));
+
+			while (true) {
+				String serviceFileName = dirName + "/service.xml";
+
+				File file = new File(
+					_sourceFormatterArgs.getBaseDirName() + serviceFileName);
+
+				if (file.exists()) {
+					dependentFileNames.add(serviceFileName);
+
+					break;
+				}
+
+				int pos = dirName.lastIndexOf(CharPool.SLASH);
+
+				if (pos == -1) {
+					break;
+				}
+
+				dirName = dirName.substring(0, pos);
+			}
+		}
+
+		_sourceFormatterArgs.addRecentChangesFileNames(dependentFileNames);
+	}
+
+	private void _excludeWorkingDirCheckoutPrivateApps() throws IOException {
+		if (!_isPortalSource()) {
+			return;
+		}
+
+		File file = new File(_getPortalDir(), "working.dir.properties");
+
+		if (!file.exists()) {
+			return;
+		}
+
+		Properties properties = _getProperties(file);
+
+		for (Object key : properties.keySet()) {
+			String s = (String)key;
+
+			if (s.matches("working.dir.checkout.private.apps.(\\w)+.dirs")) {
+				List<String> dirs = ListUtil.fromString(
+					properties.getProperty(s), StringPool.COMMA);
+
+				for (String dir : dirs) {
+					_sourceFormatterExcludes.addDefaultExcludeSyntaxPatterns(
+						_getExcludeSyntaxPatterns("**/" + dir + "/**"));
+				}
+			}
+		}
+	}
+
 	private List<String> _getCheckNames() {
 		List<String> checkNames = new ArrayList<>();
 
@@ -436,9 +533,7 @@ public class SourceFormatter {
 		return excludeSyntaxPatterns;
 	}
 
-	private List<String> _getPluginsInsideModulesDirectoryNames()
-		throws Exception {
-
+	private List<String> _getPluginsInsideModulesDirectoryNames() {
 		List<String> pluginsInsideModulesDirectoryNames = new ArrayList<>();
 
 		List<String> pluginBuildFileNames = SourceFormatterUtil.filterFileNames(
@@ -471,27 +566,46 @@ public class SourceFormatter {
 		return pluginsInsideModulesDirectoryNames;
 	}
 
-	private String _getProjectPathPrefix() throws Exception {
+	private File _getPortalDir() {
+		File portalImplDir = SourceFormatterUtil.getFile(
+			_sourceFormatterArgs.getBaseDirName(), "portal-impl",
+			ToolsUtil.PORTAL_MAX_DIR_LEVEL);
+
+		if (portalImplDir == null) {
+			return null;
+		}
+
+		return portalImplDir.getParentFile();
+	}
+
+	private String _getProjectPathPrefix() throws IOException {
 		if (!_subrepository) {
 			return null;
 		}
 
-		File file = SourceFormatterUtil.getFile(
-			_sourceFormatterArgs.getBaseDirName(), "gradle.properties",
-			ToolsUtil.PORTAL_MAX_DIR_LEVEL);
+		String fileName = "gradle.properties";
 
-		if (file == null) {
-			return null;
+		for (int i = 0; i < ToolsUtil.PORTAL_MAX_DIR_LEVEL; i++) {
+			File file = new File(
+				_sourceFormatterArgs.getBaseDirName() + fileName);
+
+			if (file.exists()) {
+				Properties properties = new Properties();
+
+				properties.load(new FileInputStream(file));
+
+				if (properties.containsKey("project.path.prefix")) {
+					return properties.getProperty("project.path.prefix");
+				}
+			}
+
+			fileName = "../" + fileName;
 		}
 
-		Properties properties = new Properties();
-
-		properties.load(new FileInputStream(file));
-
-		return properties.getProperty("project.path.prefix");
+		return null;
 	}
 
-	private Properties _getProperties(File file) throws Exception {
+	private Properties _getProperties(File file) throws IOException {
 		Properties properties = new Properties();
 
 		if (file.exists()) {
@@ -501,9 +615,11 @@ public class SourceFormatter {
 		return properties;
 	}
 
-	private void _init() throws Exception {
+	private void _init() throws DocumentException, IOException {
 		_sourceFormatterExcludes = new SourceFormatterExcludes(
 			SetUtil.fromArray(DEFAULT_EXCLUDE_SYNTAX_PATTERNS));
+
+		_excludeWorkingDirCheckoutPrivateApps();
 
 		// Find properties file in any parent directory
 
@@ -534,6 +650,8 @@ public class SourceFormatter {
 		for (String modulePropertiesFileName : modulePropertiesFileNames) {
 			_readProperties(new File(modulePropertiesFileName));
 		}
+
+		_addDependentFileNames();
 
 		_pluginsInsideModulesDirectoryNames =
 			_getPluginsInsideModulesDirectoryNames();
@@ -572,7 +690,7 @@ public class SourceFormatter {
 		return false;
 	}
 
-	private boolean _isSubrepository() throws Exception {
+	private boolean _isSubrepository() throws IOException {
 		if (_isPortalSource()) {
 			return false;
 		}
@@ -616,7 +734,7 @@ public class SourceFormatter {
 		System.out.print(message + "\r");
 	}
 
-	private void _readProperties(File propertiesFile) throws Exception {
+	private void _readProperties(File propertiesFile) throws IOException {
 		Properties properties = _getProperties(propertiesFile);
 
 		if (properties.isEmpty()) {
@@ -654,6 +772,8 @@ public class SourceFormatter {
 
 	private void _runSourceProcessor(SourceProcessor sourceProcessor)
 		throws Exception {
+
+		// SKIP
 
 		sourceProcessor.setAllFileNames(_allFileNames);
 		sourceProcessor.setPluginsInsideModulesDirectoryNames(

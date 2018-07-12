@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import com.liferay.portlet.social.model.impl.SocialActivityAchievementImpl;
@@ -42,6 +43,8 @@ import com.liferay.social.kernel.model.SocialActivityAchievement;
 import com.liferay.social.kernel.service.persistence.SocialActivityAchievementPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -2459,14 +2462,6 @@ public class SocialActivityAchievementPersistenceImpl
 					result = socialActivityAchievement;
 
 					cacheResult(socialActivityAchievement);
-
-					if ((socialActivityAchievement.getGroupId() != groupId) ||
-							(socialActivityAchievement.getUserId() != userId) ||
-							(socialActivityAchievement.getName() == null) ||
-							!socialActivityAchievement.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_N,
-							finderArgs, socialActivityAchievement);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3395,8 +3390,6 @@ public class SocialActivityAchievementPersistenceImpl
 	@Override
 	protected SocialActivityAchievement removeImpl(
 		SocialActivityAchievement socialActivityAchievement) {
-		socialActivityAchievement = toUnwrappedModel(socialActivityAchievement);
-
 		Session session = null;
 
 		try {
@@ -3428,9 +3421,23 @@ public class SocialActivityAchievementPersistenceImpl
 	@Override
 	public SocialActivityAchievement updateImpl(
 		SocialActivityAchievement socialActivityAchievement) {
-		socialActivityAchievement = toUnwrappedModel(socialActivityAchievement);
-
 		boolean isNew = socialActivityAchievement.isNew();
+
+		if (!(socialActivityAchievement instanceof SocialActivityAchievementModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(socialActivityAchievement.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(socialActivityAchievement);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in socialActivityAchievement proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SocialActivityAchievement implementation " +
+				socialActivityAchievement.getClass());
+		}
 
 		SocialActivityAchievementModelImpl socialActivityAchievementModelImpl = (SocialActivityAchievementModelImpl)socialActivityAchievement;
 
@@ -3630,28 +3637,6 @@ public class SocialActivityAchievementPersistenceImpl
 		socialActivityAchievement.resetOriginalValues();
 
 		return socialActivityAchievement;
-	}
-
-	protected SocialActivityAchievement toUnwrappedModel(
-		SocialActivityAchievement socialActivityAchievement) {
-		if (socialActivityAchievement instanceof SocialActivityAchievementImpl) {
-			return socialActivityAchievement;
-		}
-
-		SocialActivityAchievementImpl socialActivityAchievementImpl = new SocialActivityAchievementImpl();
-
-		socialActivityAchievementImpl.setNew(socialActivityAchievement.isNew());
-		socialActivityAchievementImpl.setPrimaryKey(socialActivityAchievement.getPrimaryKey());
-
-		socialActivityAchievementImpl.setActivityAchievementId(socialActivityAchievement.getActivityAchievementId());
-		socialActivityAchievementImpl.setGroupId(socialActivityAchievement.getGroupId());
-		socialActivityAchievementImpl.setCompanyId(socialActivityAchievement.getCompanyId());
-		socialActivityAchievementImpl.setUserId(socialActivityAchievement.getUserId());
-		socialActivityAchievementImpl.setCreateDate(socialActivityAchievement.getCreateDate());
-		socialActivityAchievementImpl.setName(socialActivityAchievement.getName());
-		socialActivityAchievementImpl.setFirstInGroup(socialActivityAchievement.isFirstInGroup());
-
-		return socialActivityAchievementImpl;
 	}
 
 	/**

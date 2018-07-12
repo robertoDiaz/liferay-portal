@@ -1132,10 +1132,6 @@ public class WebServerServlet extends HttpServlet {
 			}
 		}
 
-		if (contentLength == 0) {
-			return;
-		}
-
 		FlashMagicBytesUtil.Result flashMagicBytesUtilResult =
 			FlashMagicBytesUtil.check(inputStream);
 
@@ -1191,13 +1187,10 @@ public class WebServerServlet extends HttpServlet {
 		FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 			groupId, folderId, title);
 
-		String contentType = fileEntry.getMimeType();
-
-		response.setContentType(contentType);
-
-		InputStream inputStream = fileEntry.getContentStream();
-
-		ServletResponseUtil.write(response, inputStream, fileEntry.getSize());
+		ServletResponseUtil.sendFile(
+			null, response, title, fileEntry.getContentStream(),
+			fileEntry.getSize(), fileEntry.getMimeType(),
+			HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
 	}
 
 	protected void sendGroups(
