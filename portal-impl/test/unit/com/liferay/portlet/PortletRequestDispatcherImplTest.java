@@ -24,6 +24,10 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.model.impl.PortletAppImpl;
 import com.liferay.portal.model.impl.PortletImpl;
 import com.liferay.portal.util.PortalImpl;
+import com.liferay.portlet.internal.PortletContextImpl;
+import com.liferay.portlet.internal.PortletRequestDispatcherImpl;
+import com.liferay.portlet.internal.RenderRequestImpl;
+import com.liferay.portlet.internal.RenderResponseImpl;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 
@@ -198,11 +202,6 @@ public class PortletRequestDispatcherImplTest {
 		@Override
 		public Portlet getPortlet() {
 			return _portlet;
-		}
-
-		@Override
-		public boolean isPrivateRequestAttributes() {
-			return false;
 		}
 
 		private TestPortletRequest(String contextPath, Portlet portlet) {

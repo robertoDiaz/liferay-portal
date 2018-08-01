@@ -16,14 +16,15 @@ package com.liferay.portal.kernel.portlet;
 
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
+import javax.portlet.MimeResponse;
 import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Neil Griffin
  */
 public class PortletURLFactoryUtil {
 
@@ -33,6 +34,14 @@ public class PortletURLFactoryUtil {
 
 		return getPortletURLFactory().create(
 			request, portlet, layout, lifecycle);
+	}
+
+	public static LiferayPortletURL create(
+		HttpServletRequest request, Portlet portlet, Layout layout,
+		String lifecycle, MimeResponse.Copy copy) {
+
+		return getPortletURLFactory().create(
+			request, portlet, layout, lifecycle, copy);
 	}
 
 	public static LiferayPortletURL create(
@@ -80,6 +89,14 @@ public class PortletURLFactoryUtil {
 	}
 
 	public static LiferayPortletURL create(
+		PortletRequest portletRequest, Portlet portlet, long plid,
+		String lifecycle, MimeResponse.Copy copy) {
+
+		return getPortletURLFactory().create(
+			portletRequest, portlet, plid, lifecycle, copy);
+	}
+
+	public static LiferayPortletURL create(
 		PortletRequest portletRequest, String portletId, Layout layout,
 		String lifecycle) {
 
@@ -96,6 +113,14 @@ public class PortletURLFactoryUtil {
 	}
 
 	public static LiferayPortletURL create(
+		PortletRequest portletRequest, String portletId, long plid,
+		String lifecycle, MimeResponse.Copy copy) {
+
+		return getPortletURLFactory().create(
+			portletRequest, portletId, plid, lifecycle, copy);
+	}
+
+	public static LiferayPortletURL create(
 		PortletRequest portletRequest, String portletId, String lifecycle) {
 
 		return getPortletURLFactory().create(
@@ -103,15 +128,10 @@ public class PortletURLFactoryUtil {
 	}
 
 	public static PortletURLFactory getPortletURLFactory() {
-		PortalRuntimePermission.checkGetBeanProperty(
-			PortletURLFactoryUtil.class);
-
 		return _portletURLFactory;
 	}
 
 	public void setPortletURLFactory(PortletURLFactory portletURLFactory) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
 		_portletURLFactory = portletURLFactory;
 	}
 

@@ -106,7 +106,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -265,7 +265,7 @@
 		<property name="test.name.skip.portal.instance" value="RolesandpermissionsUsecase#GroupScopePermissionCheck" />
 
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -295,7 +295,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -338,7 +338,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -482,7 +482,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPrivatePage">
@@ -491,6 +491,7 @@
 
 		<execute macro="PermissionsInline#gotoSitepageCP">
 			<var name="pageName" value="Private Blogs Page" />
+			<var name="privacy" value="Private Pages" />
 		</execute>
 
 		<execute function="AssertElementNotPresent" locator1="Permissions#CONTENT_PERMISSIONS_ROLE_NAME">
@@ -516,6 +517,9 @@
 	</command>
 
 	<command name="RolesOrganizationSearch" priority="4">
+		<property name="osgi.module.configuration.file.names" value="com.liferay.portal.search.web.internal.configuration.SearchWebConfiguration.config" />
+		<property name="osgi.module.configurations" value="classicSearchPortletInFrontPage=&quot;true&quot;" />
+
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Users" />
 			<var name="panel" value="Control Panel" />
@@ -659,7 +663,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -706,11 +710,11 @@
 			<var name="siteName" value="Organization Name" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="ClassicSearch#search">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="ClassicSearch#viewSearchResultPG">
 			<var name="searchAssetTitle" value="Test Document" />
 			<var name="searchAssetType" value="Document" />
 		</execute>
@@ -739,11 +743,11 @@
 
 		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="There are no documents or media files in this folder." />
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="ClassicSearch#search">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchNoPG">
+		<execute macro="ClassicSearch#viewSearchNoPG">
 			<var name="searchAssetTitle" value="Test Document" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Test Document" />
@@ -766,11 +770,11 @@
 			<var name="dmDocumentTitle" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="ClassicSearch#search">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="ClassicSearch#viewSearchResultPG">
 			<var name="searchAssetTitle" value="Test Document" />
 			<var name="searchAssetType" value="Document" />
 		</execute>
@@ -795,7 +799,7 @@
 
 	<command name="RolesPermissionsDynamicDataLists" priority="4">
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -932,7 +936,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1130,7 +1134,7 @@
 
 		<var name="key_ddlDataDefinitionName" value="Employee Profile Data Definition" />
 
-		<execute function="AssertTextEquals" locator1="DDL#TOOLBAR_ADD" value1="Add Employee Profile Data Definition" />
+		<execute function="AssertElementPresent" locator1="DDL#TOOLBAR_ADD" />
 		<execute function="AssertElementPresent" locator1="DDL#RECORD_TABLE_ELLIPSIS_1" />
 
 		<execute macro="User#logoutPG" />
@@ -1157,7 +1161,7 @@
 
 	<command name="RolesSiteSearch" priority="4">
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -1272,7 +1276,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1316,11 +1320,11 @@
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="SearchPortlets#searchEmbedded">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="SearchResultPortlet#viewSearchResults">
 			<var name="searchAssetTitle" value="Test Document" />
 			<var name="searchAssetType" value="Document" />
 		</execute>
@@ -1348,13 +1352,11 @@
 
 		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="There are no documents or media files in this folder." />
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="SearchPortlets#searchEmbedded">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchNoPG">
-			<var name="searchAssetTitle" value="Test Document" />
-			<var name="searchNoResults" value="true" />
+		<execute macro="SearchResultPortlet#viewNoSearchResults">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
@@ -1374,11 +1376,11 @@
 			<var name="dmDocumentTitle" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="SearchPortlets#searchEmbedded">
 			<var name="searchTerm" value="Test Document" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="SearchResultPortlet#viewSearchResults">
 			<var name="searchAssetTitle" value="Test Document" />
 			<var name="searchAssetType" value="Document" />
 		</execute>
@@ -1648,7 +1650,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1996,7 +1998,7 @@
 
 	<command name="SiteRoleBookmarksInlinePermissions" priority="4">
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -2030,7 +2032,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2239,7 +2241,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2390,7 +2392,7 @@
 		<property name="osgi.app.includes" value="currency-converter" />
 
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -2533,7 +2535,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPrivatePage">
@@ -2605,7 +2607,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

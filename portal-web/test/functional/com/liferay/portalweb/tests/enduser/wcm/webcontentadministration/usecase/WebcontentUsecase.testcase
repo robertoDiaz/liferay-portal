@@ -53,7 +53,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -197,8 +197,8 @@
 			<var name="key_rowEntry" value="WC Template Name" />
 		</execute>
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Permissions">
-			<var name="key_menuItem" value="Permissions" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Permissions" />
 		</execute>
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
@@ -449,9 +449,10 @@
 		</execute>
 	</command>
 
-	<command ignore="true" name="AddAudioViaWebContent" priority="5">
+	<command name="AddAudioViaWebContent" priority="5">
 		<property name="custom.properties" value="editor.wysiwyg.portal-impl.portlet.ddm.text_html.ftl=ckeditor" />
-		<property name="portal.acceptance" value="pending" />
+		<property name="dummy.socket.proxy.disabled" value="true" />
+		<property name="portal.acceptance" value="false" />
 		<property name="test.name.skip.portal.instance" value="WebcontentUsecase#AddAudioViaWebContent" />
 		<property name="testray.component.names" value="Training,Web Content Administration" />
 
@@ -512,7 +513,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -543,6 +544,8 @@
 	</command>
 
 	<command name="AddCreatedStructureForImportedTemplate" priority="5">
+		<description message="This is a use case for LPS-82492." />
+
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -588,6 +591,8 @@
 			<var name="larFileName" value="content-display-templates.lar" />
 			<var name="uploadFrom" value="dependencies" />
 		</execute>
+
+		<execute function="Refresh" />
 
 		<execute macro="Navigator#gotoNavItem">
 			<var name="navItem" value="Templates" />
@@ -638,7 +643,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -746,7 +751,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -852,7 +857,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -917,6 +922,8 @@
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
+		<execute macro="Alert#viewSuccessMessage" />
+
 		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Blank Site Name" />
 		</execute>
@@ -933,7 +940,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -996,7 +1003,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1080,7 +1087,8 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="locale" value="ja-jp" />
+			<var name="locale" value="ja_JP" />
+			<var name="textIcon" value="日本語-日本" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1096,7 +1104,8 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="locale" value="en-us" />
+			<var name="locale" value="en_US" />
+			<var name="textIcon" value="English-United States" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1110,8 +1119,9 @@
 		<execute function="AssertTextNotPresent" locator1="WCD#WEB_CONTENT_CONTENT" value1="Space Program 大学生涯教育 地球から、宇宙の果てへ" />
 	</command>
 
-	<command ignore="true" name="AddVideoViaWebContent" priority="4">
+	<command name="AddVideoViaWebContent" priority="4">
 		<property name="custom.properties" value="editor.wysiwyg.portal-impl.portlet.ddm.text_html.ftl=ckeditor" />
+		<property name="dummy.socket.proxy.disabled" value="true" />
 		<property name="test.name.skip.portal.instance" value="WebcontentUsecase#AddVideoViaWebContent" />
 		<property name="testray.component.names" value="Web Content Administration" />
 
@@ -1170,7 +1180,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1201,6 +1211,8 @@
 	</command>
 
 	<command name="AddWebContentFromImportedStructureAndTemplate" priority="5">
+		<description message="This is a use case for LPS-82492." />
+
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -1223,6 +1235,8 @@
 			<var name="larFileName" value="frontPage-structures.lar" />
 			<var name="uploadFrom" value="dependencies" />
 		</execute>
+
+		<execute function="Refresh" />
 
 		<execute macro="Navigator#gotoNavItem">
 			<var name="navItem" value="Structures" />
@@ -1349,7 +1363,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1458,7 +1472,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1669,8 +1683,10 @@
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
+		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
+
 		<execute macro="AlloyEditor#addSourceContent">
-			<var name="content"><![CDATA[<p><span><a href="http://localhost:8080/web/guest/home/-/testportlet">text</a></span></p>]]></var>
+			<var name="content"><![CDATA[<p><span><a href="${portalURL}/web/guest/home/-/testportlet">text</a></span></p>]]></var>
 		</execute>
 
 		<execute macro="PortletEntry#publish" />
@@ -1880,7 +1896,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2087,7 +2103,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2416,7 +2432,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2649,7 +2665,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2772,7 +2788,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2794,7 +2810,7 @@
 		</execute>
 
 		<execute macro="GogoShell#getModuleID">
-			<return from="moduleID" name="moduleID" />
+			<return name="moduleID" />
 			<var name="moduleName" value="com.liferay.journal.content.web" />
 		</execute>
 
@@ -2842,6 +2858,7 @@
 	</command>
 
 	<command name="UseStructureAndTemplateFromParentSiteHierarchy" priority="4">
+		<property name="test.name.skip.portal.instance" value="WebcontentUsecase#UseStructureAndtemplateFromParentSiteHierarchy" />
 		<property name="testray.component.names" value="Web Content Administration" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -2852,7 +2869,7 @@
 
 		<execute macro="SystemSettings#gotoConfiguration">
 			<var name="configurationCategory" value="Web Content" />
-			<var name="configurationName" value="Web Content Administration" />
+			<var name="configurationName" value="Administration" />
 			<var name="configurationScope" value="System Scope" />
 		</execute>
 
@@ -3260,7 +3277,7 @@
 		<execute macro="ItemSelector#gotoItemSelectorViaSelectButton" />
 
 		<execute macro="ItemSelector#uploadFile">
-			<var name="navTab" value="Documents and Media" />
+			<var name="navTab" value="Web Content Images" />
 			<var name="uploadFileName" value="Document_3.png" />
 		</execute>
 
@@ -3285,7 +3302,7 @@
 		</execute>
 
 		<execute macro="PortletEntry#changeLocale">
-			<var name="fieldname" value="Title" />
+			<var name="fieldName" value="Title" />
 			<var name="locale" value="en-US" />
 		</execute>
 
@@ -3449,7 +3466,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3611,7 +3628,8 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="locale" value="fr-fr" />
+			<var name="locale" value="fr_FR" />
+			<var name="textIcon" value="français-France" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaWCD">
@@ -3644,7 +3662,8 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="locale" value="zh-cn" />
+			<var name="locale" value="zh-CN" />
+			<var name="textIcon" value="中文-中国" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaWCD">
@@ -3669,7 +3688,8 @@
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">
-			<var name="locale" value="en-us" />
+			<var name="locale" value="en_US" />
+			<var name="textIcon" value="English-United States" />
 		</execute>
 	</command>
 
@@ -3677,7 +3697,7 @@
 		<property name="testray.component.names" value="Related Assets,Web Content Administration" />
 
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -3811,7 +3831,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3876,7 +3896,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

@@ -22,16 +22,18 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.opensocial.model.OAuthToken;
 import com.liferay.opensocial.model.OAuthTokenModel;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -845,7 +847,7 @@ public class OAuthTokenModelImpl extends BaseModelImpl<OAuthToken>
 
 	private static final ClassLoader _classLoader = OAuthToken.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			OAuthToken.class
+			OAuthToken.class, ModelWrapper.class
 		};
 	private long _oAuthTokenId;
 	private long _companyId;

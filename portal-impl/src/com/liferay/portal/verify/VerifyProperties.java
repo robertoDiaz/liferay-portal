@@ -57,7 +57,16 @@ public class VerifyProperties extends VerifyProcess {
 
 		ClassLoader classLoader = VerifyProperties.class.getClassLoader();
 
-		return classLoader.getResourceAsStream(resourceName);
+		try {
+			return classLoader.getResourceAsStream(resourceName);
+		}
+		catch (RuntimeException re) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get resource " + resourceName, re);
+			}
+
+			return null;
+		}
 	}
 
 	protected Properties loadPortalProperties() {
@@ -1436,6 +1445,13 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.security.sso.opensso"
 		},
 
+		// Permissions
+
+		new String[] {
+			"permissions.inline.sql.check.enabled", "sqlCheckEnabled",
+			"com.liferay.portal.security.permission.impl"
+		},
+
 		// Polls
 
 		new String[] {
@@ -1804,8 +1820,9 @@ public class VerifyProperties extends VerifyProcess {
 		"organizations.indexer.enabled", "organizations.rootable",
 		"organizations.types", "portal.cache.manager.type.multi.vm",
 		"portal.cache.manager.type.single.vm", "portal.ctx",
-		"portal.security.manager.enable", "permissions.list.filter",
-		"permissions.thread.local.cache.max.size",
+		"portal.security.manager.enable",
+		"permissions.inline.sql.resource.block.query.threshold",
+		"permissions.list.filter", "permissions.thread.local.cache.max.size",
 		"permissions.user.check.algorithm", "persistence.provider",
 		"ratings.max.score", "ratings.min.score", "sandbox.deploy.dir",
 		"sandbox.deploy.enabled", "sandbox.deploy.interval",
@@ -1833,10 +1850,11 @@ public class VerifyProperties extends VerifyProcess {
 		"users.image.default.use.initials", "users.image.max.height",
 		"users.image.max.size", "users.image.max.width",
 		"vaadin.resources.path", "vaadin.theme", "vaadin.widgetset",
-		"webdav.storage.class", "webdav.storage.show.edit.url",
-		"webdav.storage.show.view.url", "webdav.storage.tokens",
-		"wiki.email.page.added.signature", "wiki.email.page.updated.signature",
-		"xss.allow", "ym.login", "ym.password"
+		"value.object.finder.blocking.cache", "webdav.storage.class",
+		"webdav.storage.show.edit.url", "webdav.storage.show.view.url",
+		"webdav.storage.tokens", "wiki.email.page.added.signature",
+		"wiki.email.page.updated.signature", "xss.allow", "ym.login",
+		"ym.password"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = {

@@ -25,10 +25,14 @@ import java.util.List;
 public class JavaClass extends BaseJavaTerm {
 
 	public JavaClass(
-		String name, String content, String accessModifier, boolean isAbstract,
-		boolean isStatic) {
+		String name, String content, String accessModifier, int lineNumber,
+		boolean isAbstract, boolean isStatic, boolean isInterface,
+		boolean anonymous) {
 
-		super(name, content, accessModifier, isAbstract, isStatic);
+		super(name, content, accessModifier, lineNumber, isAbstract, isStatic);
+
+		_isInterface = isInterface;
+		_anonymous = anonymous;
 	}
 
 	public void addChildJavaTerm(JavaTerm javaTerm) {
@@ -73,14 +77,24 @@ public class JavaClass extends BaseJavaTerm {
 		return _packageName;
 	}
 
+	public boolean isAnonymous() {
+		return _anonymous;
+	}
+
+	public boolean isInterface() {
+		return _isInterface;
+	}
+
 	public void setPackageName(String packageName) {
 		_packageName = packageName;
 	}
 
+	private final boolean _anonymous;
 	private final List<JavaTerm> _childJavaTerms = new ArrayList<>();
 	private List<String> _extendedClassNames = new ArrayList<>();
 	private List<String> _implementedClassNames = new ArrayList<>();
 	private List<String> _imports = new ArrayList<>();
+	private final boolean _isInterface;
 	private String _packageName;
 
 }

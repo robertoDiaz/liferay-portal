@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -39,8 +41,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.PasswordPolicyPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -50,6 +52,7 @@ import com.liferay.portal.model.impl.PasswordPolicyModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -3060,12 +3063,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 					result = passwordPolicy;
 
 					cacheResult(passwordPolicy);
-
-					if ((passwordPolicy.getCompanyId() != companyId) ||
-							(passwordPolicy.isDefaultPolicy() != defaultPolicy)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_DP,
-							finderArgs, passwordPolicy);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3297,13 +3294,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 					result = passwordPolicy;
 
 					cacheResult(passwordPolicy);
-
-					if ((passwordPolicy.getCompanyId() != companyId) ||
-							(passwordPolicy.getName() == null) ||
-							!passwordPolicy.getName().equals(name)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_C_N,
-							finderArgs, passwordPolicy);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3671,8 +3661,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 	@Override
 	protected PasswordPolicy removeImpl(PasswordPolicy passwordPolicy) {
-		passwordPolicy = toUnwrappedModel(passwordPolicy);
-
 		Session session = null;
 
 		try {
@@ -3703,9 +3691,23 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 	@Override
 	public PasswordPolicy updateImpl(PasswordPolicy passwordPolicy) {
-		passwordPolicy = toUnwrappedModel(passwordPolicy);
-
 		boolean isNew = passwordPolicy.isNew();
+
+		if (!(passwordPolicy instanceof PasswordPolicyModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(passwordPolicy.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(passwordPolicy);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in passwordPolicy proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom PasswordPolicy implementation " +
+				passwordPolicy.getClass());
+		}
 
 		PasswordPolicyModelImpl passwordPolicyModelImpl = (PasswordPolicyModelImpl)passwordPolicy;
 
@@ -3859,55 +3861,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		passwordPolicy.resetOriginalValues();
 
 		return passwordPolicy;
-	}
-
-	protected PasswordPolicy toUnwrappedModel(PasswordPolicy passwordPolicy) {
-		if (passwordPolicy instanceof PasswordPolicyImpl) {
-			return passwordPolicy;
-		}
-
-		PasswordPolicyImpl passwordPolicyImpl = new PasswordPolicyImpl();
-
-		passwordPolicyImpl.setNew(passwordPolicy.isNew());
-		passwordPolicyImpl.setPrimaryKey(passwordPolicy.getPrimaryKey());
-
-		passwordPolicyImpl.setMvccVersion(passwordPolicy.getMvccVersion());
-		passwordPolicyImpl.setUuid(passwordPolicy.getUuid());
-		passwordPolicyImpl.setPasswordPolicyId(passwordPolicy.getPasswordPolicyId());
-		passwordPolicyImpl.setCompanyId(passwordPolicy.getCompanyId());
-		passwordPolicyImpl.setUserId(passwordPolicy.getUserId());
-		passwordPolicyImpl.setUserName(passwordPolicy.getUserName());
-		passwordPolicyImpl.setCreateDate(passwordPolicy.getCreateDate());
-		passwordPolicyImpl.setModifiedDate(passwordPolicy.getModifiedDate());
-		passwordPolicyImpl.setDefaultPolicy(passwordPolicy.isDefaultPolicy());
-		passwordPolicyImpl.setName(passwordPolicy.getName());
-		passwordPolicyImpl.setDescription(passwordPolicy.getDescription());
-		passwordPolicyImpl.setChangeable(passwordPolicy.isChangeable());
-		passwordPolicyImpl.setChangeRequired(passwordPolicy.isChangeRequired());
-		passwordPolicyImpl.setMinAge(passwordPolicy.getMinAge());
-		passwordPolicyImpl.setCheckSyntax(passwordPolicy.isCheckSyntax());
-		passwordPolicyImpl.setAllowDictionaryWords(passwordPolicy.isAllowDictionaryWords());
-		passwordPolicyImpl.setMinAlphanumeric(passwordPolicy.getMinAlphanumeric());
-		passwordPolicyImpl.setMinLength(passwordPolicy.getMinLength());
-		passwordPolicyImpl.setMinLowerCase(passwordPolicy.getMinLowerCase());
-		passwordPolicyImpl.setMinNumbers(passwordPolicy.getMinNumbers());
-		passwordPolicyImpl.setMinSymbols(passwordPolicy.getMinSymbols());
-		passwordPolicyImpl.setMinUpperCase(passwordPolicy.getMinUpperCase());
-		passwordPolicyImpl.setRegex(passwordPolicy.getRegex());
-		passwordPolicyImpl.setHistory(passwordPolicy.isHistory());
-		passwordPolicyImpl.setHistoryCount(passwordPolicy.getHistoryCount());
-		passwordPolicyImpl.setExpireable(passwordPolicy.isExpireable());
-		passwordPolicyImpl.setMaxAge(passwordPolicy.getMaxAge());
-		passwordPolicyImpl.setWarningTime(passwordPolicy.getWarningTime());
-		passwordPolicyImpl.setGraceLimit(passwordPolicy.getGraceLimit());
-		passwordPolicyImpl.setLockout(passwordPolicy.isLockout());
-		passwordPolicyImpl.setMaxFailure(passwordPolicy.getMaxFailure());
-		passwordPolicyImpl.setLockoutDuration(passwordPolicy.getLockoutDuration());
-		passwordPolicyImpl.setRequireUnlock(passwordPolicy.isRequireUnlock());
-		passwordPolicyImpl.setResetFailureCount(passwordPolicy.getResetFailureCount());
-		passwordPolicyImpl.setResetTicketMaxAge(passwordPolicy.getResetTicketMaxAge());
-
-		return passwordPolicyImpl;
 	}
 
 	/**

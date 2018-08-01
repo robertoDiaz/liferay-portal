@@ -22,13 +22,15 @@ import com.liferay.adaptive.media.image.model.AMImageEntryModel;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -685,7 +687,7 @@ public class AMImageEntryModelImpl extends BaseModelImpl<AMImageEntry>
 
 	private static final ClassLoader _classLoader = AMImageEntry.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			AMImageEntry.class
+			AMImageEntry.class, ModelWrapper.class
 		};
 	private String _uuid;
 	private String _originalUuid;

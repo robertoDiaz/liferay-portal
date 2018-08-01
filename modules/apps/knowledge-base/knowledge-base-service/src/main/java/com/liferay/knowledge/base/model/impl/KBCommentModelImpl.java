@@ -25,10 +25,13 @@ import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.model.KBCommentModel;
 import com.liferay.knowledge.base.model.KBCommentSoap;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -37,7 +40,6 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -953,7 +955,7 @@ public class KBCommentModelImpl extends BaseModelImpl<KBComment>
 
 	private static final ClassLoader _classLoader = KBComment.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			KBComment.class
+			KBComment.class, ModelWrapper.class
 		};
 	private String _uuid;
 	private String _originalUuid;

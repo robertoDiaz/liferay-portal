@@ -20,6 +20,8 @@ import com.liferay.expando.kernel.exception.NoSuchRowException;
 import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -36,8 +38,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import com.liferay.portlet.expando.model.impl.ExpandoRowImpl;
 import com.liferay.portlet.expando.model.impl.ExpandoRowModelImpl;
@@ -45,6 +47,7 @@ import com.liferay.portlet.expando.model.impl.ExpandoRowModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -1212,12 +1215,6 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 					result = expandoRow;
 
 					cacheResult(expandoRow);
-
-					if ((expandoRow.getTableId() != tableId) ||
-							(expandoRow.getClassPK() != classPK)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_T_C,
-							finderArgs, expandoRow);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1525,8 +1522,6 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 
 	@Override
 	protected ExpandoRow removeImpl(ExpandoRow expandoRow) {
-		expandoRow = toUnwrappedModel(expandoRow);
-
 		Session session = null;
 
 		try {
@@ -1557,9 +1552,23 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 
 	@Override
 	public ExpandoRow updateImpl(ExpandoRow expandoRow) {
-		expandoRow = toUnwrappedModel(expandoRow);
-
 		boolean isNew = expandoRow.isNew();
+
+		if (!(expandoRow instanceof ExpandoRowModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(expandoRow.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(expandoRow);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in expandoRow proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom ExpandoRow implementation " +
+				expandoRow.getClass());
+		}
 
 		ExpandoRowModelImpl expandoRowModelImpl = (ExpandoRowModelImpl)expandoRow;
 
@@ -1653,25 +1662,6 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 		expandoRow.resetOriginalValues();
 
 		return expandoRow;
-	}
-
-	protected ExpandoRow toUnwrappedModel(ExpandoRow expandoRow) {
-		if (expandoRow instanceof ExpandoRowImpl) {
-			return expandoRow;
-		}
-
-		ExpandoRowImpl expandoRowImpl = new ExpandoRowImpl();
-
-		expandoRowImpl.setNew(expandoRow.isNew());
-		expandoRowImpl.setPrimaryKey(expandoRow.getPrimaryKey());
-
-		expandoRowImpl.setRowId(expandoRow.getRowId());
-		expandoRowImpl.setCompanyId(expandoRow.getCompanyId());
-		expandoRowImpl.setModifiedDate(expandoRow.getModifiedDate());
-		expandoRowImpl.setTableId(expandoRow.getTableId());
-		expandoRowImpl.setClassPK(expandoRow.getClassPK());
-
-		return expandoRowImpl;
 	}
 
 	/**

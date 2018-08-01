@@ -19,15 +19,17 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.ServiceComponent;
 import com.liferay.portal.kernel.model.ServiceComponentModel;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -496,7 +498,7 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 
 	private static final ClassLoader _classLoader = ServiceComponent.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			ServiceComponent.class
+			ServiceComponent.class, ModelWrapper.class
 		};
 	private long _mvccVersion;
 	private long _serviceComponentId;
