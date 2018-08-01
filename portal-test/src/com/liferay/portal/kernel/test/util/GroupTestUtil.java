@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.test.util;
 
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactory;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.service.StagingLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
@@ -162,6 +162,10 @@ public class GroupTestUtil {
 			friendlyURL, site, active, serviceContext);
 	}
 
+	public static Group deleteGroup(Group group) throws Exception {
+		return GroupLocalServiceUtil.deleteGroup(group);
+	}
+
 	public static void enableLocalStaging(Group group) throws Exception {
 		enableLocalStaging(group, TestPropsValues.getUserId());
 	}
@@ -179,7 +183,8 @@ public class GroupTestUtil {
 		Map<String, Serializable> attributes = serviceContext.getAttributes();
 
 		attributes.putAll(
-			ExportImportConfigurationParameterMapFactory.buildParameterMap());
+			ExportImportConfigurationParameterMapFactoryUtil.
+				buildParameterMap());
 
 		attributes.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,

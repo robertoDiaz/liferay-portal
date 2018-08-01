@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jndi.JNDIUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -85,7 +84,6 @@ import org.apache.tomcat.jdbc.pool.jmx.ConnectionPool;
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
-@DoPrivileged
 public class DataSourceFactoryImpl implements DataSourceFactory {
 
 	@Override
@@ -211,7 +209,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			}
 		}
 
-		return _pacl.getDataSource(dataSource);
+		return dataSource;
 	}
 
 	@Override
@@ -231,6 +229,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 		return initDataSource(properties);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public interface PACL {
 
 		public DataSource getDataSource(DataSource dataSource);
@@ -363,7 +365,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			String key = (String)entry.getKey();
-			String value = (String)entry.getValue();
 
 			// Map org.apache.commons.dbcp.BasicDataSource to Hikari CP
 
@@ -398,7 +399,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			// Set HikariCP property
 
 			try {
-				BeanUtil.setProperty(hikariDataSource, key, value);
+				BeanUtil.setProperty(
+					hikariDataSource, key, (String)entry.getValue());
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
@@ -421,7 +423,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			String key = (String)entry.getKey();
-			String value = (String)entry.getValue();
 
 			// Ignore Liferay property
 
@@ -444,7 +445,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			// Set Tomcat JDBC property
 
 			try {
-				BeanUtil.setProperty(poolProperties, key, value);
+				BeanUtil.setProperty(
+					poolProperties, key, (String)entry.getValue());
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
@@ -712,8 +714,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DataSourceFactoryImpl.class);
 
-	private static final PACL _pacl = new NoPACL();
-
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
 
 	private static class MBeanServerServiceTrackerCustomizer
@@ -779,15 +779,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 		private final org.apache.tomcat.jdbc.pool.DataSource _dataSource;
 		private final ObjectName _objectName;
-
-	}
-
-	private static class NoPACL implements PACL {
-
-		@Override
-		public DataSource getDataSource(DataSource dataSource) {
-			return dataSource;
-		}
 
 	}
 

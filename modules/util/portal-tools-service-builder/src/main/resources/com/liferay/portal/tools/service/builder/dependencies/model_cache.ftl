@@ -6,12 +6,13 @@ import ${apiPackagePath}.model.${entity.name};
 	import ${apiPackagePath}.service.persistence.${entity.name}PK;
 </#if>
 
+import ${serviceBuilder.getCompatProperty("StringBundler")};
+
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -139,7 +140,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 						${entity.varName}Impl.set${entityColumn.methodName}(new Date(${entityColumn.name}));
 					}
 				<#else>
-					<#if stringUtil.equals(entityColumn.type, "String")>
+					<#if stringUtil.equals(entityColumn.type, "String") && entityColumn.isConvertNull()>
 						if (${entityColumn.name} == null) {
 							${entity.varName}Impl.set${entityColumn.methodName}("");
 						}

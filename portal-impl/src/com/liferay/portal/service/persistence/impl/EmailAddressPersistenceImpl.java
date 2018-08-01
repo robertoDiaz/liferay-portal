@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -37,8 +39,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.EmailAddressPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.EmailAddressImpl;
@@ -47,6 +49,7 @@ import com.liferay.portal.model.impl.EmailAddressModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -4163,8 +4166,6 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 	@Override
 	protected EmailAddress removeImpl(EmailAddress emailAddress) {
-		emailAddress = toUnwrappedModel(emailAddress);
-
 		Session session = null;
 
 		try {
@@ -4195,9 +4196,23 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 	@Override
 	public EmailAddress updateImpl(EmailAddress emailAddress) {
-		emailAddress = toUnwrappedModel(emailAddress);
-
 		boolean isNew = emailAddress.isNew();
+
+		if (!(emailAddress instanceof EmailAddressModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(emailAddress.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(emailAddress);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in emailAddress proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom EmailAddress implementation " +
+				emailAddress.getClass());
+		}
 
 		EmailAddressModelImpl emailAddressModelImpl = (EmailAddressModelImpl)emailAddress;
 
@@ -4469,33 +4484,6 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 		emailAddress.resetOriginalValues();
 
 		return emailAddress;
-	}
-
-	protected EmailAddress toUnwrappedModel(EmailAddress emailAddress) {
-		if (emailAddress instanceof EmailAddressImpl) {
-			return emailAddress;
-		}
-
-		EmailAddressImpl emailAddressImpl = new EmailAddressImpl();
-
-		emailAddressImpl.setNew(emailAddress.isNew());
-		emailAddressImpl.setPrimaryKey(emailAddress.getPrimaryKey());
-
-		emailAddressImpl.setMvccVersion(emailAddress.getMvccVersion());
-		emailAddressImpl.setUuid(emailAddress.getUuid());
-		emailAddressImpl.setEmailAddressId(emailAddress.getEmailAddressId());
-		emailAddressImpl.setCompanyId(emailAddress.getCompanyId());
-		emailAddressImpl.setUserId(emailAddress.getUserId());
-		emailAddressImpl.setUserName(emailAddress.getUserName());
-		emailAddressImpl.setCreateDate(emailAddress.getCreateDate());
-		emailAddressImpl.setModifiedDate(emailAddress.getModifiedDate());
-		emailAddressImpl.setClassNameId(emailAddress.getClassNameId());
-		emailAddressImpl.setClassPK(emailAddress.getClassPK());
-		emailAddressImpl.setAddress(emailAddress.getAddress());
-		emailAddressImpl.setTypeId(emailAddress.getTypeId());
-		emailAddressImpl.setPrimary(emailAddress.isPrimary());
-
-		return emailAddressImpl;
 	}
 
 	/**

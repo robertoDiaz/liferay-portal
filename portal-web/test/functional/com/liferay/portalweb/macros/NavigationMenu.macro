@@ -4,8 +4,8 @@
 			<var name="portletName" value="Navigation Menu" />
 		</execute>
 
-		<execute function="Click" locator1="MenuItem#ANY_MENU_ITEM">
-			<var name="key_menuItem" value="Add Page" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Add Page" />
 		</execute>
 	</command>
 
@@ -16,6 +16,6 @@
 
 		<execute macro="PortletEntry#save" />
 
-		<execute function="SelectFrame" value1="relative=top" />
+		<execute macro="IFrame#closeFrame" />
 	</command>
 </definition>

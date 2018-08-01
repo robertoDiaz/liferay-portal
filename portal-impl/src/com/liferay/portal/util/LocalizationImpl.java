@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
@@ -41,6 +40,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.language.LanguageResources;
+
+import java.io.Serializable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,7 +73,6 @@ import org.apache.commons.collections.map.ReferenceMap;
  * @author Brian Wing Shun Chan
  * @author Connor McKay
  */
-@DoPrivileged
 public class LocalizationImpl implements Localization {
 
 	@Override
@@ -113,6 +113,16 @@ public class LocalizationImpl implements Localization {
 		String className, long classPK, Locale contentDefaultLocale,
 		Locale[] contentAvailableLocales) {
 
+		return getDefaultImportLocale(
+			className, (Serializable)classPK, contentDefaultLocale,
+			contentAvailableLocales);
+	}
+
+	@Override
+	public Locale getDefaultImportLocale(
+		String className, Serializable primaryKey, Locale contentDefaultLocale,
+		Locale[] contentAvailableLocales) {
+
 		if (LanguageUtil.isAvailableLocale(contentDefaultLocale)) {
 			return contentDefaultLocale;
 		}
@@ -137,7 +147,7 @@ public class LocalizationImpl implements Localization {
 			sb.append(" is missing for ");
 			sb.append(className);
 			sb.append(" with primary key ");
-			sb.append(classPK);
+			sb.append(primaryKey);
 			sb.append(". Setting default language to ");
 			sb.append(LocaleUtil.toLanguageId(defaultLocale));
 			sb.append(".");
@@ -231,9 +241,6 @@ public class LocalizationImpl implements Localization {
 			return value;
 		}
 
-		String systemDefaultLanguageId = LocaleUtil.toLanguageId(
-			LocaleUtil.getSiteDefault());
-
 		String priorityLanguageId = null;
 
 		Locale requestedLocale = LocaleUtil.fromLanguageId(requestedLanguageId);
@@ -242,10 +249,10 @@ public class LocalizationImpl implements Localization {
 			LanguageUtil.isDuplicateLanguageCode(
 				requestedLocale.getLanguage())) {
 
-			Locale priorityLocale = LanguageUtil.getLocale(
-				requestedLocale.getLanguage());
-
 			if (!requestedLanguageId.equals(priorityLanguageId)) {
+				Locale priorityLocale = LanguageUtil.getLocale(
+					requestedLocale.getLanguage());
+
 				priorityLanguageId = LocaleUtil.toLanguageId(priorityLocale);
 			}
 		}
@@ -279,7 +286,8 @@ public class LocalizationImpl implements Localization {
 					null, _DEFAULT_LOCALE);
 
 				if (Validator.isNull(defaultLanguageId)) {
-					defaultLanguageId = systemDefaultLanguageId;
+					defaultLanguageId = LocaleUtil.toLanguageId(
+						LocaleUtil.getSiteDefault());
 				}
 			}
 
@@ -654,7 +662,7 @@ public class LocalizationImpl implements Localization {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce (7.0.x)
 	 */
 	@Deprecated
 	@Override
@@ -840,11 +848,20 @@ public class LocalizationImpl implements Localization {
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-
 		XMLStreamWriter xmlStreamWriter = null;
 
+		ClassLoader portalClassLoader = ClassLoaderUtil.getPortalClassLoader();
+
+		ClassLoader contextClassLoader =
+			ClassLoaderUtil.getContextClassLoader();
+
 		try {
+			if (contextClassLoader != portalClassLoader) {
+				ClassLoaderUtil.setContextClassLoader(portalClassLoader);
+			}
+
+			XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+
 			xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(
 				unsyncStringWriter);
 
@@ -852,8 +869,18 @@ public class LocalizationImpl implements Localization {
 
 			xmlStreamWriter.writeStartElement(_ROOT);
 
-			xmlStreamWriter.writeAttribute(
-				_AVAILABLE_LOCALES, StringUtil.merge(map.keySet()));
+			StringBundler sb = new StringBundler(2 * map.size() - 1);
+
+			sb.append(defaultLanguageId);
+
+			for (String languageId : map.keySet()) {
+				if (!defaultLanguageId.equals(languageId)) {
+					sb.append(StringPool.COMMA);
+					sb.append(languageId);
+				}
+			}
+
+			xmlStreamWriter.writeAttribute(_AVAILABLE_LOCALES, sb.toString());
 			xmlStreamWriter.writeAttribute(_DEFAULT_LOCALE, defaultLanguageId);
 
 			for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -879,6 +906,10 @@ public class LocalizationImpl implements Localization {
 			_log.error(ioe, ioe);
 		}
 		finally {
+			if (contextClassLoader != portalClassLoader) {
+				ClassLoaderUtil.setContextClassLoader(contextClassLoader);
+			}
+
 			if (xmlStreamWriter != null) {
 				try {
 					xmlStreamWriter.close();
@@ -921,9 +952,6 @@ public class LocalizationImpl implements Localization {
 
 		xml = _sanitizeXML(xml);
 
-		String systemDefaultLanguageId = LocaleUtil.toLanguageId(
-			LocaleUtil.getSiteDefault());
-
 		XMLStreamReader xmlStreamReader = null;
 		XMLStreamWriter xmlStreamWriter = null;
 
@@ -957,7 +985,8 @@ public class LocalizationImpl implements Localization {
 					null, _DEFAULT_LOCALE);
 
 				if (Validator.isNull(defaultLanguageId)) {
-					defaultLanguageId = systemDefaultLanguageId;
+					defaultLanguageId = LocaleUtil.toLanguageId(
+						LocaleUtil.getSiteDefault());
 				}
 			}
 
@@ -994,6 +1023,7 @@ public class LocalizationImpl implements Localization {
 				xmlStreamWriter.writeEndDocument();
 
 				xmlStreamWriter.close();
+
 				xmlStreamWriter = null;
 
 				xml = unsyncStringWriter.toString();
@@ -1068,7 +1098,30 @@ public class LocalizationImpl implements Localization {
 		Map<Locale, String> localizationMap, String xml, String key,
 		String defaultLanguageId) {
 
-		for (Locale locale : LanguageUtil.getAvailableLocales()) {
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
+
+		if (Validator.isBlank(xml)) {
+			Map<String, String> map = new HashMap<>();
+
+			for (Map.Entry<Locale, String> entry : localizationMap.entrySet()) {
+				Locale locale = entry.getKey();
+				String value = entry.getValue();
+
+				if (availableLocales.contains(locale) &&
+					Validator.isNotNull(value)) {
+
+					map.put(LocaleUtil.toLanguageId(locale), value);
+				}
+			}
+
+			if (map.isEmpty()) {
+				return StringPool.BLANK;
+			}
+
+			return getXml(map, defaultLanguageId, key);
+		}
+
+		for (Locale locale : availableLocales) {
 			String value = localizationMap.get(locale);
 
 			String languageId = LocaleUtil.toLanguageId(locale);
@@ -1213,6 +1266,7 @@ public class LocalizationImpl implements Localization {
 			xmlStreamWriter.writeEndDocument();
 
 			xmlStreamWriter.close();
+
 			xmlStreamWriter = null;
 
 			xml = unsyncStringWriter.toString();

@@ -25,9 +25,11 @@ import com.liferay.source.formatter.checkstyle.util.AlloyMVCCheckstyleUtil;
 import com.liferay.source.formatter.checkstyle.util.CheckstyleUtil;
 import com.liferay.source.formatter.util.SourceFormatterUtil;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.nio.file.Files;
 
@@ -52,6 +54,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		List<String> fileNames = getFileNames(excludes, getIncludes());
 
+		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
+
 		if (fileNames.isEmpty() ||
 			(!sourceFormatterArgs.isFormatCurrentBranch() &&
 			 !sourceFormatterArgs.isFormatLatestAuthor() &&
@@ -71,7 +75,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		if (deletedContentsMap.isEmpty()) {
 			return JSPSourceUtil.addIncludedAndReferencedFileNames(
-				fileNames, new HashSet<String>(), contentsMap, false);
+				fileNames, new HashSet<String>(), contentsMap, true);
 		}
 
 		contentsMap.putAll(deletedContentsMap);
@@ -103,6 +107,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		// added to the list. Here we make sure we do not format files that
 		// should be excluded.
 
+		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
+
 		if (sourceFormatterArgs.isFormatCurrentBranch() ||
 			sourceFormatterArgs.isFormatLatestAuthor() ||
 			sourceFormatterArgs.isFormatLocalChanges()) {
@@ -124,7 +130,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 	}
 
 	@Override
-	protected void postFormat() throws Exception {
+	protected void postFormat() throws CheckstyleException, IOException {
 		_processCheckstyle();
 
 		for (SourceFormatterMessage sourceFormatterMessage :
@@ -138,10 +144,25 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
+	@Override
+	protected void preFormat() throws CheckstyleException {
+		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
+
+		_checkstyleLogger = new AlloyMVCCheckstyleLogger(
+			new UnsyncByteArrayOutputStream(), true,
+			sourceFormatterArgs.getBaseDirName());
+		_checkstyleConfiguration = CheckstyleUtil.getConfiguration(
+			"checkstyle-alloy-mvc.xml", getPropertiesMap(),
+			sourceFormatterArgs);
+
+		setCheckstyleConfiguration(_checkstyleConfiguration);
+	}
+
 	private Map<String, String> _getDeletedContentsMap(String[] excludes)
 		throws Exception {
 
 		List<String> fileNames = Collections.emptyList();
+		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
 
 		if (sourceFormatterArgs.isFormatCurrentBranch()) {
 			fileNames = GitUtil.getCurrentBranchFileNames(
@@ -197,23 +218,14 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		return contentsMap;
 	}
 
-	private void _processCheckstyle() throws Exception {
+	private void _processCheckstyle() throws CheckstyleException, IOException {
 		if (_ungeneratedFiles.isEmpty()) {
 			return;
 		}
 
-		if (_configuration == null) {
-			_checkstyleLogger = new AlloyMVCCheckstyleLogger(
-				new UnsyncByteArrayOutputStream(), true,
-				sourceFormatterArgs.getBaseDirName());
-			_configuration = CheckstyleUtil.getConfiguration(
-				"checkstyle-alloy-mvc.xml", getPropertiesMap(),
-				sourceFormatterArgs);
-		}
-
 		_sourceFormatterMessages.addAll(
 			processCheckstyle(
-				_configuration, _checkstyleLogger,
+				_checkstyleConfiguration, _checkstyleLogger,
 				_ungeneratedFiles.toArray(new File[_ungeneratedFiles.size()])));
 
 		for (File ungeneratedFile : _ungeneratedFiles) {
@@ -225,7 +237,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 	private synchronized void _processCheckstyle(
 			String absolutePath, String content)
-		throws Exception {
+		throws CheckstyleException, IOException {
 
 		File file = AlloyMVCCheckstyleUtil.getJavaFile(absolutePath, content);
 
@@ -241,8 +253,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 	private static final String[] _INCLUDES =
 		{"**/*.jsp", "**/*.jspf", "**/*.tag", "**/*.tpl", "**/*.vm"};
 
+	private Configuration _checkstyleConfiguration;
 	private AlloyMVCCheckstyleLogger _checkstyleLogger;
-	private Configuration _configuration;
 	private final Set<SourceFormatterMessage> _sourceFormatterMessages =
 		new TreeSet<>();
 	private final List<File> _ungeneratedFiles = new ArrayList<>();

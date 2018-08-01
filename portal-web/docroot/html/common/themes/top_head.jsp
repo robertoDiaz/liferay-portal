@@ -28,7 +28,7 @@
 if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 	String completeURL = PortalUtil.getCurrentCompleteURL(request);
 
-	String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout);
+	String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, false, false);
 %>
 
 	<link data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" rel="canonical" />
@@ -163,7 +163,7 @@ if (markupHeaders != null) {
 	}
 }
 
-StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
+com.liferay.petra.string.StringBundler pageTopSB = OutputTag.getDataSB(request, WebKeys.PAGE_TOP);
 %>
 
 <c:if test="<%= pageTopSB != null %>">
@@ -172,6 +172,34 @@ StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
 	pageTopSB.writeTo(out);
 	%>
 
+</c:if>
+
+<%
+boolean portletHubRequired = false;
+
+for (Portlet portlet : portlets) {
+	List<PortletDependency> portletDependencies = portlet.getPortletDependencies();
+
+	for (PortletDependency portletDependency : portletDependencies) {
+		if (Objects.equals(portletDependency.getName(), "PortletHub") && Objects.equals(portletDependency.getScope(), "javax.portlet")) {
+			portletHubRequired = true;
+
+			break;
+		}
+	}
+}
+%>
+
+<c:if test="<%= portletHubRequired %>">
+	<script type="text/javascript">
+		var portlet = portlet || {};
+
+		portlet.impl = portlet.impl || {};
+
+		portlet.impl.getInitData = function() {
+			return <%= RenderStateUtil.generateJSON(request, themeDisplay) %>;
+		}
+	</script>
 </c:if>
 
 <%-- Theme CSS --%>

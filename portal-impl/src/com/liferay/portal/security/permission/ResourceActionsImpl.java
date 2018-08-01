@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
@@ -83,7 +82,6 @@ import org.apache.struts.util.RequestUtils;
  * @author Daeyoung Song
  * @author Raymond Augé
  */
-@DoPrivileged
 public class ResourceActionsImpl implements ResourceActions {
 
 	public ResourceActionsImpl() {
@@ -174,7 +172,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce (7.0.x)
 	 */
 	@Deprecated
 	@Override
@@ -191,7 +189,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce (7.0.x)
 	 */
 	@Deprecated
 	@Override
@@ -647,7 +645,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of Wilberforce (7.0.x)
 	 */
 	@Deprecated
 	@Override
@@ -889,7 +887,7 @@ public class ResourceActionsImpl implements ResourceActions {
 						actions.add(ActionKeys.PREFERENCES);
 					}
 					else if (StringUtil.equalsIgnoreCase(
-								actionId, "edit_guest")) {
+								 actionId, "edit_guest")) {
 
 						actions.add(ActionKeys.GUEST_PREFERENCES);
 					}
@@ -1090,12 +1088,18 @@ public class ResourceActionsImpl implements ResourceActions {
 
 			_read(servletContextName, classLoader, file, portletNames);
 
-			String extFile = StringUtil.replace(file, ".xml", "-ext.xml");
+			String extFileName = StringUtil.replace(file, ".xml", "-ext.xml");
 
-			_read(servletContextName, classLoader, extFile, portletNames);
+			_read(servletContextName, classLoader, extFileName, portletNames);
 		}
 
 		_read(servletContextName, document, portletNames);
+
+		if (source.endsWith(".xml") && !source.endsWith("-ext.xml")) {
+			String extFileName = StringUtil.replace(source, ".xml", "-ext.xml");
+
+			_read(servletContextName, classLoader, extFileName, portletNames);
+		}
 	}
 
 	private void _read(

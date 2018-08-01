@@ -19,17 +19,19 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetModel;
 import com.liferay.portal.kernel.model.LayoutSetSoap;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -935,7 +937,7 @@ public class LayoutSetModelImpl extends BaseModelImpl<LayoutSet>
 
 	private static final ClassLoader _classLoader = LayoutSet.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			LayoutSet.class
+			LayoutSet.class, ModelWrapper.class
 		};
 	private long _mvccVersion;
 	private long _layoutSetId;

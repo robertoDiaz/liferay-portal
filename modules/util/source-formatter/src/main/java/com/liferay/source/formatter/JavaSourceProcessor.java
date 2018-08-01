@@ -20,9 +20,11 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.source.formatter.checkstyle.util.CheckstyleLogger;
 import com.liferay.source.formatter.checkstyle.util.CheckstyleUtil;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +38,7 @@ import java.util.TreeSet;
 public class JavaSourceProcessor extends BaseSourceProcessor {
 
 	@Override
-	protected List<String> doGetFileNames() throws Exception {
+	protected List<String> doGetFileNames() throws IOException {
 		String[] includes = getIncludes();
 
 		if (ArrayUtil.isEmpty(includes)) {
@@ -45,7 +47,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 		Collection<String> fileNames = null;
 
-		if (portalSource || subrepository) {
+		if (isPortalSource() || isSubrepository()) {
 			fileNames = _getPortalJavaFiles(includes);
 		}
 		else {
@@ -73,7 +75,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	}
 
 	@Override
-	protected void postFormat() throws Exception {
+	protected void postFormat() throws CheckstyleException {
 		_processCheckstyle(
 			_ungeneratedFiles.toArray(new File[_ungeneratedFiles.size()]));
 
@@ -88,6 +90,19 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 			printError(fileName, sourceFormatterMessage.toString());
 		}
+	}
+
+	@Override
+	protected void preFormat() throws CheckstyleException {
+		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
+
+		_checkstyleLogger = new CheckstyleLogger(
+			new UnsyncByteArrayOutputStream(), true,
+			sourceFormatterArgs.getBaseDirName());
+		_checkstyleConfiguration = CheckstyleUtil.getConfiguration(
+			"checkstyle.xml", getPropertiesMap(), sourceFormatterArgs);
+
+		setCheckstyleConfiguration(_checkstyleConfiguration);
 	}
 
 	private String[] _getPluginExcludes(String pluginDirectoryName) {
@@ -119,7 +134,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	}
 
 	private Collection<String> _getPluginJavaFiles(String[] includes)
-		throws Exception {
+		throws IOException {
 
 		Collection<String> fileNames = new TreeSet<>();
 
@@ -131,7 +146,7 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	}
 
 	private Collection<String> _getPortalJavaFiles(String[] includes)
-		throws Exception {
+		throws IOException {
 
 		Collection<String> fileNames = new TreeSet<>();
 
@@ -142,17 +157,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			"**/portal-web/test/**/*Test.java", "**/test/*-generated/**"
 		};
 
-		if (subrepository) {
+		for (String directoryName : getPluginsInsideModulesDirectoryNames()) {
 			excludes = ArrayUtil.append(
-				excludes, _getPluginExcludes(StringPool.BLANK));
-		}
-		else {
-			for (String directoryName :
-					getPluginsInsideModulesDirectoryNames()) {
-
-				excludes = ArrayUtil.append(
-					excludes, _getPluginExcludes("**" + directoryName));
-			}
+				excludes, _getPluginExcludes("**" + directoryName));
 		}
 
 		fileNames.addAll(getFileNames(excludes, includes));
@@ -185,7 +192,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return fileNames;
 	}
 
-	private synchronized void _processCheckstyle(File file) throws Exception {
+	private synchronized void _processCheckstyle(File file)
+		throws CheckstyleException {
+
 		_ungeneratedFiles.add(file);
 
 		if (_ungeneratedFiles.size() == CheckstyleUtil.BATCH_SIZE) {
@@ -196,27 +205,20 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
-	private void _processCheckstyle(File[] files) throws Exception {
+	private void _processCheckstyle(File[] files) throws CheckstyleException {
 		if (ArrayUtil.isEmpty(files)) {
 			return;
 		}
 
-		if (_configuration == null) {
-			_checkstyleLogger = new CheckstyleLogger(
-				new UnsyncByteArrayOutputStream(), true,
-				sourceFormatterArgs.getBaseDirName());
-			_configuration = CheckstyleUtil.getConfiguration(
-				"checkstyle.xml", getPropertiesMap(), sourceFormatterArgs);
-		}
-
 		_sourceFormatterMessages.addAll(
-			processCheckstyle(_configuration, _checkstyleLogger, files));
+			processCheckstyle(
+				_checkstyleConfiguration, _checkstyleLogger, files));
 	}
 
 	private static final String[] _INCLUDES = {"**/*.java"};
 
+	private Configuration _checkstyleConfiguration;
 	private CheckstyleLogger _checkstyleLogger;
-	private Configuration _configuration;
 	private final Set<SourceFormatterMessage> _sourceFormatterMessages =
 		new TreeSet<>();
 	private final List<File> _ungeneratedFiles = new ArrayList<>();

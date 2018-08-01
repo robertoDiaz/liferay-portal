@@ -47,8 +47,8 @@
 	</command>
 
 	<command name="deleteCP">
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
@@ -67,16 +67,16 @@
 	<command name="editCP">
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 
 		<execute function="AssertTextEquals" locator1="Wiki#NODE_TABLE_WIKI_NAME" value1="${wikiNodeName}" />
 
 		<execute function="Click" locator1="Wiki#NODE_TABLE_ACTIONS_DROPDOWN" />
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Edit">
-			<var name="key_menuItem" value="Edit" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Edit" />
 		</execute>
 
 		<execute macro="PortletEntry#inputName">
@@ -121,8 +121,8 @@
 	<command name="viewCP">
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
 
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="list" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="table" />
 		</execute>
 
 		<execute function="AssertTextEquals" locator1="Wiki#NODE_TABLE_WIKI_NAME" value1="${wikiNodeName}" />

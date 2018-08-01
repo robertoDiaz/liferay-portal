@@ -20,6 +20,8 @@ import com.liferay.asset.kernel.exception.NoSuchLinkException;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -36,8 +38,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import com.liferay.portlet.asset.model.impl.AssetLinkImpl;
 import com.liferay.portlet.asset.model.impl.AssetLinkModelImpl;
@@ -45,6 +47,7 @@ import com.liferay.portlet.asset.model.impl.AssetLinkModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -2851,13 +2854,6 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 					result = assetLink;
 
 					cacheResult(assetLink);
-
-					if ((assetLink.getEntryId1() != entryId1) ||
-							(assetLink.getEntryId2() != entryId2) ||
-							(assetLink.getType() != type)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_E_E_T,
-							finderArgs, assetLink);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3175,8 +3171,6 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 
 	@Override
 	protected AssetLink removeImpl(AssetLink assetLink) {
-		assetLink = toUnwrappedModel(assetLink);
-
 		Session session = null;
 
 		try {
@@ -3207,9 +3201,23 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 
 	@Override
 	public AssetLink updateImpl(AssetLink assetLink) {
-		assetLink = toUnwrappedModel(assetLink);
-
 		boolean isNew = assetLink.isNew();
+
+		if (!(assetLink instanceof AssetLinkModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(assetLink.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(assetLink);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in assetLink proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom AssetLink implementation " +
+				assetLink.getClass());
+		}
 
 		AssetLinkModelImpl assetLinkModelImpl = (AssetLinkModelImpl)assetLink;
 
@@ -3393,29 +3401,6 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 		assetLink.resetOriginalValues();
 
 		return assetLink;
-	}
-
-	protected AssetLink toUnwrappedModel(AssetLink assetLink) {
-		if (assetLink instanceof AssetLinkImpl) {
-			return assetLink;
-		}
-
-		AssetLinkImpl assetLinkImpl = new AssetLinkImpl();
-
-		assetLinkImpl.setNew(assetLink.isNew());
-		assetLinkImpl.setPrimaryKey(assetLink.getPrimaryKey());
-
-		assetLinkImpl.setLinkId(assetLink.getLinkId());
-		assetLinkImpl.setCompanyId(assetLink.getCompanyId());
-		assetLinkImpl.setUserId(assetLink.getUserId());
-		assetLinkImpl.setUserName(assetLink.getUserName());
-		assetLinkImpl.setCreateDate(assetLink.getCreateDate());
-		assetLinkImpl.setEntryId1(assetLink.getEntryId1());
-		assetLinkImpl.setEntryId2(assetLink.getEntryId2());
-		assetLinkImpl.setType(assetLink.getType());
-		assetLinkImpl.setWeight(assetLink.getWeight());
-
-		return assetLinkImpl;
 	}
 
 	/**

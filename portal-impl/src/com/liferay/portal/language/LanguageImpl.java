@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -65,6 +64,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -103,7 +104,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author Andrius Vitkauskas
  * @author Eduardo Lundgren
  */
-@DoPrivileged
 public class LanguageImpl implements Language, Serializable {
 
 	public void afterPropertiesSet() {
@@ -979,7 +979,7 @@ public class LanguageImpl implements Language, Serializable {
 		Map<String, Locale> groupLanguageIdLocalesMap =
 			_getGroupLanguageIdLocalesMap(groupId);
 
-		return new HashSet<>(groupLanguageIdLocalesMap.values());
+		return new LinkedHashSet<>(groupLanguageIdLocalesMap.values());
 	}
 
 	@Override
@@ -999,6 +999,13 @@ public class LanguageImpl implements Language, Serializable {
 		Locale locale = PortalUtil.getLocale(portletRequest);
 
 		return getBCP47LanguageId(locale);
+	}
+
+	@Override
+	public Set<Locale> getCompanyAvailableLocales(long companyId) {
+		CompanyLocalesBag companyLocalesBag = _getCompanyLocalesBag(companyId);
+
+		return companyLocalesBag.getAvailableLocales();
 	}
 
 	/**
@@ -1181,14 +1188,15 @@ public class LanguageImpl implements Language, Serializable {
 		String value = null;
 
 		try {
-			int pos = description.indexOf(CharPool.SPACE);
+			String[] parts = description.split(StringPool.SPACE, 2);
 
-			String x = description.substring(0, pos);
+			String unit = StringUtil.toLowerCase(parts[1]);
 
-			value = x.concat(StringPool.SPACE).concat(
-				get(
-					request,
-					StringUtil.toLowerCase(description.substring(pos + 1))));
+			if (unit.equals("second")) {
+				unit += "[time]";
+			}
+
+			value = format(request, "x-" + unit, parts[0]);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -1322,14 +1330,15 @@ public class LanguageImpl implements Language, Serializable {
 		String value = null;
 
 		try {
-			int pos = description.indexOf(CharPool.SPACE);
+			String[] parts = description.split(StringPool.SPACE, 2);
 
-			String x = description.substring(0, pos);
+			String unit = StringUtil.toLowerCase(parts[1]);
 
-			value = x.concat(StringPool.SPACE).concat(
-				get(
-					locale,
-					StringUtil.toLowerCase(description.substring(pos + 1))));
+			if (unit.equals("second")) {
+				unit += "[time]";
+			}
+
+			value = format(locale, "x-" + unit, parts[0]);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -1633,7 +1642,8 @@ public class LanguageImpl implements Language, Serializable {
 		}
 
 		HashMap<String, Locale> groupLanguageCodeLocalesMap = new HashMap<>();
-		HashMap<String, Locale> groupLanguageIdLocalesMap = new HashMap<>();
+		HashMap<String, Locale> groupLanguageIdLocalesMap =
+			new LinkedHashMap<>();
 
 		for (String languageId : languageIds) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -1966,7 +1976,7 @@ public class LanguageImpl implements Language, Serializable {
 			}
 
 			_availableLocales = Collections.unmodifiableSet(
-				new HashSet<>(_languageIdLocalesMap.values()));
+				new LinkedHashSet<>(_languageIdLocalesMap.values()));
 
 			Set<Locale> supportedLocalesSet = new HashSet<>(
 				_languageIdLocalesMap.values());
@@ -1982,7 +1992,7 @@ public class LanguageImpl implements Language, Serializable {
 		private final Map<String, Locale> _languageCodeLocalesMap =
 			new HashMap<>();
 		private final Map<String, Locale> _languageIdLocalesMap =
-			new HashMap<>();
+			new LinkedHashMap<>();
 		private final Set<Locale> _localesBetaSet = new HashSet<>();
 		private final Set<Locale> _supportedLocalesSet;
 

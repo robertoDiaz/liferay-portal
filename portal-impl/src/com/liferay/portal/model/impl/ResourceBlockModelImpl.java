@@ -19,9 +19,12 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.ResourceBlock;
 import com.liferay.portal.kernel.model.ResourceBlockModel;
 import com.liferay.portal.kernel.model.ResourceBlockSoap;
@@ -29,7 +32,6 @@ import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -51,7 +53,7 @@ import java.util.Map;
  * @see ResourceBlockImpl
  * @see ResourceBlock
  * @see ResourceBlockModel
- * @deprecated As of 7.0.0, with no direct replacement
+ * @deprecated As of Judson (7.1.x), with no direct replacement
  * @generated
  */
 @Deprecated
@@ -597,7 +599,7 @@ public class ResourceBlockModelImpl extends BaseModelImpl<ResourceBlock>
 
 	private static final ClassLoader _classLoader = ResourceBlock.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			ResourceBlock.class
+			ResourceBlock.class, ModelWrapper.class
 		};
 	private long _mvccVersion;
 	private long _resourceBlockId;

@@ -23,12 +23,15 @@ import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.model.ExportImportConfigurationModel;
 import com.liferay.exportimport.kernel.model.ExportImportConfigurationSoap;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ContainerModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
@@ -37,7 +40,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -697,7 +699,7 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson (7.1.x), with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -1195,7 +1197,7 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 
 	private static final ClassLoader _classLoader = ExportImportConfiguration.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			ExportImportConfiguration.class
+			ExportImportConfiguration.class, ModelWrapper.class
 		};
 	private long _mvccVersion;
 	private long _exportImportConfigurationId;

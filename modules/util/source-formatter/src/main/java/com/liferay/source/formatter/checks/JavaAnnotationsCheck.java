@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -37,7 +39,7 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws IOException {
 
 		return _formatAnnotations(fileName, content);
 	}
@@ -68,7 +70,7 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 
 		addMessage(
 			fileName, sb.toString(), "meta_annotations.markdown",
-			getLineCount(content, content.indexOf(matcher.group())));
+			getLineNumber(content, content.indexOf(matcher.group())));
 	}
 
 	private void _checkMetaAnnotationKeys(
@@ -265,7 +267,7 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 	}
 
 	private String _formatAnnotations(String fileName, String content)
-		throws Exception {
+		throws IOException {
 
 		List<String> annotationsBlocks = _getAnnotationsBlocks(content);
 
@@ -285,7 +287,7 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 	private String _formatAnnotations(
 			String fileName, String content, String annotationsBlock,
 			String indent, boolean sortAnnotations)
-		throws Exception {
+		throws IOException {
 
 		List<String> annotations = _splitAnnotations(annotationsBlock, indent);
 
@@ -335,11 +337,11 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 		Matcher matcher = _modifierPattern.matcher(content);
 
 		while (matcher.find()) {
-			int lineCount = getLineCount(content, matcher.end());
+			int lineNumber = getLineNumber(content, matcher.end());
 
 			String annotationsBlock = StringPool.BLANK;
 
-			for (int i = lineCount - 1;; i--) {
+			for (int i = lineNumber - 1;; i--) {
 				String line = getLine(content, i);
 
 				if (Validator.isNull(line) ||
@@ -375,7 +377,7 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 
 	private List<String> _splitAnnotations(
 			String annotationsBlock, String indent)
-		throws Exception {
+		throws IOException {
 
 		List<String> annotations = new ArrayList<>();
 
@@ -467,7 +469,11 @@ public class JavaAnnotationsCheck extends BaseFileCheck {
 		private String _getPropertyName(String property) {
 			int x = property.indexOf(StringPool.EQUAL);
 
-			return property.substring(0, x);
+			if (x != -1) {
+				return property.substring(0, x);
+			}
+
+			return property;
 		}
 
 		private final String _parameterName;

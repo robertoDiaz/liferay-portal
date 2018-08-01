@@ -21,6 +21,8 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.persistence.DLFileEntryTypePersistence;
 import com.liferay.document.library.kernel.service.persistence.DLFolderPersistence;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -45,8 +47,8 @@ import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -57,6 +59,7 @@ import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryTypeModelImpl;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -791,13 +794,6 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 					result = dlFileEntryType;
 
 					cacheResult(dlFileEntryType);
-
-					if ((dlFileEntryType.getUuid() == null) ||
-							!dlFileEntryType.getUuid().equals(uuid) ||
-							(dlFileEntryType.getGroupId() != groupId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-							finderArgs, dlFileEntryType);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2964,14 +2960,6 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 					result = dlFileEntryType;
 
 					cacheResult(dlFileEntryType);
-
-					if ((dlFileEntryType.getGroupId() != groupId) ||
-							(dlFileEntryType.getFileEntryTypeKey() == null) ||
-							!dlFileEntryType.getFileEntryTypeKey()
-												.equals(fileEntryTypeKey)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_G_F,
-							finderArgs, dlFileEntryType);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3341,8 +3329,6 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 
 	@Override
 	protected DLFileEntryType removeImpl(DLFileEntryType dlFileEntryType) {
-		dlFileEntryType = toUnwrappedModel(dlFileEntryType);
-
 		dlFileEntryTypeToDLFolderTableMapper.deleteLeftPrimaryKeyTableMappings(dlFileEntryType.getPrimaryKey());
 
 		Session session = null;
@@ -3375,9 +3361,23 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 
 	@Override
 	public DLFileEntryType updateImpl(DLFileEntryType dlFileEntryType) {
-		dlFileEntryType = toUnwrappedModel(dlFileEntryType);
-
 		boolean isNew = dlFileEntryType.isNew();
+
+		if (!(dlFileEntryType instanceof DLFileEntryTypeModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(dlFileEntryType.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(dlFileEntryType);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in dlFileEntryType proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom DLFileEntryType implementation " +
+				dlFileEntryType.getClass());
+		}
 
 		DLFileEntryTypeModelImpl dlFileEntryTypeModelImpl = (DLFileEntryTypeModelImpl)dlFileEntryType;
 
@@ -3531,32 +3531,6 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 		dlFileEntryType.resetOriginalValues();
 
 		return dlFileEntryType;
-	}
-
-	protected DLFileEntryType toUnwrappedModel(DLFileEntryType dlFileEntryType) {
-		if (dlFileEntryType instanceof DLFileEntryTypeImpl) {
-			return dlFileEntryType;
-		}
-
-		DLFileEntryTypeImpl dlFileEntryTypeImpl = new DLFileEntryTypeImpl();
-
-		dlFileEntryTypeImpl.setNew(dlFileEntryType.isNew());
-		dlFileEntryTypeImpl.setPrimaryKey(dlFileEntryType.getPrimaryKey());
-
-		dlFileEntryTypeImpl.setUuid(dlFileEntryType.getUuid());
-		dlFileEntryTypeImpl.setFileEntryTypeId(dlFileEntryType.getFileEntryTypeId());
-		dlFileEntryTypeImpl.setGroupId(dlFileEntryType.getGroupId());
-		dlFileEntryTypeImpl.setCompanyId(dlFileEntryType.getCompanyId());
-		dlFileEntryTypeImpl.setUserId(dlFileEntryType.getUserId());
-		dlFileEntryTypeImpl.setUserName(dlFileEntryType.getUserName());
-		dlFileEntryTypeImpl.setCreateDate(dlFileEntryType.getCreateDate());
-		dlFileEntryTypeImpl.setModifiedDate(dlFileEntryType.getModifiedDate());
-		dlFileEntryTypeImpl.setFileEntryTypeKey(dlFileEntryType.getFileEntryTypeKey());
-		dlFileEntryTypeImpl.setName(dlFileEntryType.getName());
-		dlFileEntryTypeImpl.setDescription(dlFileEntryType.getDescription());
-		dlFileEntryTypeImpl.setLastPublishDate(dlFileEntryType.getLastPublishDate());
-
-		return dlFileEntryTypeImpl;
 	}
 
 	/**

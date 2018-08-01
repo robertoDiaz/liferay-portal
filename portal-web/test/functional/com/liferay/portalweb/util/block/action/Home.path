@@ -422,7 +422,7 @@
 <!--PAGE_CUSTOMIZATION-->
 <tr>
 	<td>PAGE_CUSTOMIZATION_MESSAGE_INFO</td>
-	<td>//li[contains(@class,'control-menu') and contains(@class,'nav-item')]/p[contains(.,'You can customize this page')]</td>
+	<td>//li[contains(@class,'control-menu') and contains(@class,'nav-item')]/span[contains(.,'You can customize this page')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -597,7 +597,7 @@
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_PORTLET_TITLE</td>
-	<td>//*[@data-qa-id='headerTitle' and contains(.,'${key_portletTitle}')]</td>
+	<td>//*[@class='header-title' and contains(.,'${key_portletTitle}')] | //*[@data-qa-id='headerTitle' and contains(.,'${key_portletTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -627,23 +627,23 @@
 </tr>
 <!--SITE_LOCALIZATION-->
 <tr>
-	<td>PORTAL_LOCALIZATION_CONFIRMATION_MESSAGE</td>
-	<td>//div[@id='portalMessageContainer']/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PORTAL_LOCALIZATION_PREFERRED_MESSAGE</td>
-	<td>//div[@id='portalMessageContainer']/a[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PORTAL_LOCALIZATION_MESSAGE_INFO</td>
-	<td>//div[@id='portalMessageContainer']</td>
+	<td>PORTAL_LOCALIZATION_DEFAULT_LANGUAGE_MESSAGE</td>
+	<td>//div[@id='portalMessageContainer']//div[1]/a[contains(.,'${key_pageLocale}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PORTAL_LOCALIZATION_IGNORE_BUTTON</td>
-	<td>//div[@id='portalMessageContainer']/button[@id='ignoreUserLocaleOptions']</td>
+	<td>//div[@id='portalMessageContainer']//button[@id='ignoreUserLocaleOptions']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTAL_LOCALIZATION_PREFERRED_LANGUAGE_MESSAGE</td>
+	<td>//div[@id='portalMessageContainer']//div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTAL_LOCALIZATION_TRANSLATION_LANGUAGE_MESSAGE</td>
+	<td>//div[@id='portalMessageContainer']/div/div/div</td>
 	<td></td>
 </tr>
 </tbody>

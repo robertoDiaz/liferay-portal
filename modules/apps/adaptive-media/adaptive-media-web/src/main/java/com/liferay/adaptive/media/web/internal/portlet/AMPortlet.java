@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.mvc-command-names-default-views=/adaptive_media/view",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.name=" + AMPortletKeys.ADAPTIVE_MEDIA,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator",
@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 public class AMPortlet extends MVCPortlet {
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.adaptive.media.web)(release.schema.version=1.0.1))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.adaptive.media.web)(release.schema.version=1.0.2))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Map OpenStreetMap
-Bundle-SymbolicName: com.liferay.map.openstreetmap
-Bundle-Version: 3.0.0
-Web-ContextPath: /map-openstreetmap

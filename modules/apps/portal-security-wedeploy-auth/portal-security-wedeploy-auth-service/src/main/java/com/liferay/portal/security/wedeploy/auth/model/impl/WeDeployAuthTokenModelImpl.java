@@ -19,16 +19,18 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthToken;
 import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthTokenModel;
 
@@ -631,7 +633,7 @@ public class WeDeployAuthTokenModelImpl extends BaseModelImpl<WeDeployAuthToken>
 
 	private static final ClassLoader _classLoader = WeDeployAuthToken.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			WeDeployAuthToken.class
+			WeDeployAuthToken.class, ModelWrapper.class
 		};
 	private long _weDeployAuthTokenId;
 	private long _companyId;

@@ -1,4 +1,10 @@
 <definition>
+	<command name="gotoContact">
+		<execute macro="Navigator#gotoNavUnderline">
+			<var name="navUnderline" value="Contact" />
+		</execute>
+	</command>
+
 	<command name="gotoDisplaySettings">
 		<execute macro="UserNavigator#gotoPreferences" />
 
@@ -48,11 +54,11 @@
 		</execute>
 	</command>
 
-	<command name="gotoProfileAndPrivateArea">
+	<command name="gotoProfileAndDashboard">
 		<execute macro="UserNavigator#gotoGeneral" />
 
 		<execute macro="Navigator#gotoNavNested">
-			<var name="navNested" value="Profile and Private Area" />
+			<var name="navNested" value="Profile and Dashboard" />
 		</execute>
 	</command>
 

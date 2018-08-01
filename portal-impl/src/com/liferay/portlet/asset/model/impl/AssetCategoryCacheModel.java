@@ -18,9 +18,10 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -65,10 +66,12 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
+		sb.append(", externalReferenceCode=");
+		sb.append(externalReferenceCode);
 		sb.append(", categoryId=");
 		sb.append(categoryId);
 		sb.append(", groupId=");
@@ -113,6 +116,13 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 		}
 		else {
 			assetCategoryImpl.setUuid(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			assetCategoryImpl.setExternalReferenceCode("");
+		}
+		else {
+			assetCategoryImpl.setExternalReferenceCode(externalReferenceCode);
 		}
 
 		assetCategoryImpl.setCategoryId(categoryId);
@@ -183,6 +193,7 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		uuid = objectInput.readUTF();
+		externalReferenceCode = objectInput.readUTF();
 
 		categoryId = objectInput.readLong();
 
@@ -216,6 +227,13 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 		}
 		else {
 			objectOutput.writeUTF(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(categoryId);
@@ -268,6 +286,7 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	}
 
 	public String uuid;
+	public String externalReferenceCode;
 	public long categoryId;
 	public long groupId;
 	public long companyId;

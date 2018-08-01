@@ -16,6 +16,8 @@ package com.liferay.powwow.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -34,8 +36,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import com.liferay.powwow.exception.NoSuchServerException;
 import com.liferay.powwow.model.PowwowServer;
@@ -46,6 +48,7 @@ import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -850,8 +853,6 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 	@Override
 	protected PowwowServer removeImpl(PowwowServer powwowServer) {
-		powwowServer = toUnwrappedModel(powwowServer);
-
 		Session session = null;
 
 		try {
@@ -882,9 +883,23 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 	@Override
 	public PowwowServer updateImpl(PowwowServer powwowServer) {
-		powwowServer = toUnwrappedModel(powwowServer);
-
 		boolean isNew = powwowServer.isNew();
+
+		if (!(powwowServer instanceof PowwowServerModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(powwowServer.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(powwowServer);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in powwowServer proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom PowwowServer implementation " +
+				powwowServer.getClass());
+		}
 
 		PowwowServerModelImpl powwowServerModelImpl = (PowwowServerModelImpl)powwowServer;
 
@@ -982,32 +997,6 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 		powwowServer.resetOriginalValues();
 
 		return powwowServer;
-	}
-
-	protected PowwowServer toUnwrappedModel(PowwowServer powwowServer) {
-		if (powwowServer instanceof PowwowServerImpl) {
-			return powwowServer;
-		}
-
-		PowwowServerImpl powwowServerImpl = new PowwowServerImpl();
-
-		powwowServerImpl.setNew(powwowServer.isNew());
-		powwowServerImpl.setPrimaryKey(powwowServer.getPrimaryKey());
-
-		powwowServerImpl.setPowwowServerId(powwowServer.getPowwowServerId());
-		powwowServerImpl.setCompanyId(powwowServer.getCompanyId());
-		powwowServerImpl.setUserId(powwowServer.getUserId());
-		powwowServerImpl.setUserName(powwowServer.getUserName());
-		powwowServerImpl.setCreateDate(powwowServer.getCreateDate());
-		powwowServerImpl.setModifiedDate(powwowServer.getModifiedDate());
-		powwowServerImpl.setName(powwowServer.getName());
-		powwowServerImpl.setProviderType(powwowServer.getProviderType());
-		powwowServerImpl.setUrl(powwowServer.getUrl());
-		powwowServerImpl.setApiKey(powwowServer.getApiKey());
-		powwowServerImpl.setSecret(powwowServer.getSecret());
-		powwowServerImpl.setActive(powwowServer.isActive());
-
-		return powwowServerImpl;
 	}
 
 	/**
