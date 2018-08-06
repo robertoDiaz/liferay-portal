@@ -14,6 +14,7 @@
 
 package com.liferay.portal.osgi.web.servlet.context.helper.internal;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -174,24 +175,12 @@ public class ServletContextHelperRegistrationImpl
 		_servletContextHelperServiceRegistration.setProperties(properties);
 	}
 
-	protected String createContextSelectFilterString() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append('(');
-		sb.append(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME);
-		sb.append('=');
-		sb.append(_servletContextName);
-		sb.append(')');
-
-		return sb.toString();
-	}
-
 	protected ServiceRegistration<?> createDefaultServlet() {
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			createContextSelectFilterString());
+			_servletContextName);
 
 		String prefix = "/META-INF/resources";
 
@@ -228,7 +217,7 @@ public class ServletContextHelperRegistrationImpl
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			createContextSelectFilterString());
+			_servletContextName);
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
 			JspServletWrapper.class.getName());
@@ -249,7 +238,7 @@ public class ServletContextHelperRegistrationImpl
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			createContextSelectFilterString());
+			_servletContextName);
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
 			PortletServlet.class.getName());
@@ -298,7 +287,7 @@ public class ServletContextHelperRegistrationImpl
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			createContextSelectFilterString());
+			_servletContextName);
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_LISTENER,
 			Boolean.TRUE.toString());
@@ -309,7 +298,8 @@ public class ServletContextHelperRegistrationImpl
 	}
 
 	protected String getContextPath() {
-		Dictionary<String, String> headers = _bundle.getHeaders();
+		Dictionary<String, String> headers = _bundle.getHeaders(
+			StringPool.BLANK);
 
 		String contextPath = headers.get("Web-ContextPath");
 
@@ -321,7 +311,8 @@ public class ServletContextHelperRegistrationImpl
 	}
 
 	protected String getServletContextName(String contextPath) {
-		Dictionary<String, String> headers = _bundle.getHeaders();
+		Dictionary<String, String> headers = _bundle.getHeaders(
+			StringPool.BLANK);
 
 		String header = headers.get("Web-ContextName");
 
@@ -339,7 +330,8 @@ public class ServletContextHelperRegistrationImpl
 			return GetterUtil.getBoolean(rtlRequired);
 		}
 
-		Dictionary<String, String> headers = _bundle.getHeaders();
+		Dictionary<String, String> headers = _bundle.getHeaders(
+			StringPool.BLANK);
 
 		rtlRequired = headers.get("Liferay-RTL-Support-Required");
 

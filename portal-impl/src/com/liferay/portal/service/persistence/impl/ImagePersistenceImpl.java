@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -36,7 +38,6 @@ import com.liferay.portal.kernel.service.persistence.ImagePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.impl.ImageImpl;
 import com.liferay.portal.model.impl.ImageModelImpl;
 
@@ -735,8 +736,6 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 
 	@Override
 	protected Image removeImpl(Image image) {
-		image = toUnwrappedModel(image);
-
 		Session session = null;
 
 		try {
@@ -767,8 +766,6 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 
 	@Override
 	public Image updateImpl(Image image) {
-		image = toUnwrappedModel(image);
-
 		boolean isNew = image.isNew();
 
 		Session session = null;
@@ -810,28 +807,6 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 		image.resetOriginalValues();
 
 		return image;
-	}
-
-	protected Image toUnwrappedModel(Image image) {
-		if (image instanceof ImageImpl) {
-			return image;
-		}
-
-		ImageImpl imageImpl = new ImageImpl();
-
-		imageImpl.setNew(image.isNew());
-		imageImpl.setPrimaryKey(image.getPrimaryKey());
-
-		imageImpl.setMvccVersion(image.getMvccVersion());
-		imageImpl.setImageId(image.getImageId());
-		imageImpl.setCompanyId(image.getCompanyId());
-		imageImpl.setModifiedDate(image.getModifiedDate());
-		imageImpl.setType(image.getType());
-		imageImpl.setHeight(image.getHeight());
-		imageImpl.setWidth(image.getWidth());
-		imageImpl.setSize(image.getSize());
-
-		return imageImpl;
 	}
 
 	/**

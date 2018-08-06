@@ -93,10 +93,15 @@ public class CacheFilter extends BasePortalFilter {
 	}
 
 	protected String getCacheKey(HttpServletRequest request) {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
-		// Url
+		// Method
 
+		sb.append(request.getMethod());
+
+		// URL
+
+		sb.append(StringPool.POUND);
 		sb.append(request.getRequestURL());
 
 		String queryString = request.getQueryString();
@@ -204,8 +209,8 @@ public class CacheFilter extends BasePortalFilter {
 				privateLayout = true;
 			}
 			else if (servletPath.startsWith(
-						PropsValues.
-							LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING)) {
+						 PropsValues.
+							 LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING)) {
 
 				privateLayout = false;
 			}
@@ -239,7 +244,7 @@ public class CacheFilter extends BasePortalFilter {
 				return plid;
 			}
 			catch (Exception e) {
-				_log.warn(e);
+				_log.warn(e, e);
 
 				return 0;
 			}

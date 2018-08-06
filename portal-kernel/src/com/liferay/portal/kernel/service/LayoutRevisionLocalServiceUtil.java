@@ -232,7 +232,7 @@ public class LayoutRevisionLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson (7.1.x), with no direct replacement
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.LayoutRevision fetchLayoutRevision(
@@ -292,7 +292,7 @@ public class LayoutRevisionLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson (7.1.x), with no direct replacement
 	*/
 	@Deprecated
 	public static com.liferay.portal.kernel.model.LayoutRevision getLayoutRevision(
@@ -335,6 +335,11 @@ public class LayoutRevisionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.kernel.model.LayoutRevision> getLayoutRevisions(
+		long layoutSetBranchId, boolean head, int status) {
+		return getService().getLayoutRevisions(layoutSetBranchId, head, status);
+	}
+
+	public static java.util.List<com.liferay.portal.kernel.model.LayoutRevision> getLayoutRevisions(
 		long layoutSetBranchId, int status) {
 		return getService().getLayoutRevisions(layoutSetBranchId, status);
 	}
@@ -369,6 +374,11 @@ public class LayoutRevisionLocalServiceUtil {
 		return getService()
 				   .getLayoutRevisions(layoutSetBranchId, layoutBranchId, plid,
 			start, end, orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.portal.kernel.model.LayoutRevision> getLayoutRevisionsByStatus(
+		int status) {
+		return getService().getLayoutRevisionsByStatus(status);
 	}
 
 	/**

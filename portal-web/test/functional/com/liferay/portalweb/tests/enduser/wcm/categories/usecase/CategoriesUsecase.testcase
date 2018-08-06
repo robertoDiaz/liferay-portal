@@ -136,7 +136,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -194,12 +194,11 @@
 			<var name="pageName" value="Category Page Name" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
-			<var name="localizationIDName" value="Suchen" />
+		<execute macro="SearchPortlets#searchEmbedded">
 			<var name="searchTerm" value="Kategorienamen" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="SearchResultPortlet#viewSearchResults">
 			<var name="searchAssetTitle" value="Web Content Title" />
 			<var name="searchAssetType" value="Webcontent" />
 		</execute>
@@ -221,7 +220,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -296,9 +295,9 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_CATEGORIES_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX" />
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CATEGORIES_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Access in Site Administration" />
-			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 			<var name="permissionNavigationValue" value="Categories" />
 			<var name="roleTitle" value="Category Role Name" />
 			<var name="roleType" value="Site" />
@@ -311,9 +310,9 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES_ADD_CATEGORY_CHECKBOX" />
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES_ADD_CATEGORY_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Add Category" />
-			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 			<var name="permissionNavigationValue" value="Categories" />
 			<var name="roleTitle" value="Category Role Name" />
 			<var name="roleType" value="Site" />
@@ -326,9 +325,9 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES_ADD_VOCABULARY_CHECKBOX" />
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES_ADD_VOCABULARY_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Add Vocabulary" />
-			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 			<var name="permissionNavigationValue" value="Categories" />
 			<var name="roleTitle" value="Category Role Name" />
 			<var name="roleType" value="Site" />
@@ -341,9 +340,9 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_VOCABULARY_VIEW_CHECKBOX" />
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_VOCABULARY_VIEW_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="View" />
-			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 			<var name="permissionNavigationValue" value="Categories" />
 			<var name="roleTitle" value="Category Role Name" />
 			<var name="roleType" value="Site" />
@@ -356,9 +355,9 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_ADD_CATEGORY_CHECKBOX" />
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_ADD_CATEGORY_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Add Category" />
-			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 			<var name="permissionNavigationValue" value="Categories" />
 			<var name="roleTitle" value="Category Role Name" />
 			<var name="roleType" value="Site" />
@@ -450,20 +449,11 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
 			<var name="pageName" value="Test Page Name" />
-		</execute>
-
-		<execute macro="SitePages#gotoPageMenuItem">
-			<var name="menuItem" value="Configure" />
-			<var name="pageName" value="Test Page Name" />
-		</execute>
-
-		<execute macro="Navigator#gotoNavTab">
-			<var name="navTab" value="SEO" />
 		</execute>
 
 		<execute macro="AssetCategorization#addCategory">
@@ -611,9 +601,7 @@
 			<var name="portlet" value="Web Content" />
 		</execute>
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Structures" />
-		</execute>
+		<execute macro="NavItem#gotoStructures" />
 
 		<execute macro="WebContentStructures#addCP">
 			<var name="structureName" value="WC Structure Name" />
@@ -761,7 +749,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -851,6 +839,7 @@
 	</command>
 
 	<command name="AddWCWithOptionalVocabularyAssetType" priority="3">
+		<property name="portal.release" value="false" />
 		<property name="testray.component.names" value="Categories,Web Content Administration" />
 
 		<execute macro="Navigator#openURL" />
@@ -1317,7 +1306,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1466,7 +1455,9 @@
 
 		<execute macro="LAR#exportSuccess" />
 
-		<execute macro="LexiconEntry#changeDisplayStyle">
+		<execute function="Refresh" />
+
+		<execute macro="LexiconEntry#changeExportDisplayStyle">
 			<var name="displayStyle" value="table" />
 		</execute>
 
@@ -1823,7 +1814,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1860,11 +1851,11 @@
 			<var name="pageName" value="Search Page" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
+		<execute macro="SearchPortlets#searchEmbedded">
 			<var name="searchTerm" value="Edited" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchResultPG">
+		<execute macro="SearchResultPortlet#viewSearchResults">
 			<var name="searchAssetTitle" value="DM Document Title" />
 			<var name="searchAssetType" value="Document" />
 		</execute>
@@ -2153,7 +2144,7 @@
 		<property name="testray.component.names" value="Categories,Site Administration,Web Content Administration" />
 
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="parentSiteName" />
+			<return name="parentSiteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 

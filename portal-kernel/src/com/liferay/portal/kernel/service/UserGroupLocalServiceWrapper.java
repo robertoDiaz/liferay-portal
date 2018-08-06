@@ -90,8 +90,8 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	* @param name the user group's name
 	* @param description the user group's description
 	* @return the user group
-	* @deprecated As of 6.2.0, replaced by {@link #addUserGroup(long, long,
-	String, String, ServiceContext)}
+	* @deprecated As of Newton (6.2.x), replaced by {@link #addUserGroup(long,
+	long, String, String, ServiceContext)}
 	*/
 	@Deprecated
 	@Override
@@ -184,7 +184,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	*
 	* @param userGroupId the primary key of the user group
 	* @param userId the primary key of the user
-	* @deprecated As of 6.2.0
+	* @deprecated As of Paton (6.1.x)
 	*/
 	@Deprecated
 	@Override
@@ -199,7 +199,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	*
 	* @param userGroupId the primary key of the user group
 	* @param userIds the primary keys of the users
-	* @deprecated As of 6.1.0
+	* @deprecated As of Newton (6.2.x)
 	*/
 	@Deprecated
 	@Override
@@ -213,7 +213,7 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	*
 	* @param userGroupIds the primary keys of the user groups
 	* @param userId the primary key of the user
-	* @deprecated As of 6.1.0
+	* @deprecated As of Newton (6.2.x)
 	*/
 	@Deprecated
 	@Override
@@ -438,6 +438,20 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	public com.liferay.portal.kernel.model.UserGroup fetchUserGroup(
 		long companyId, String name) {
 		return _userGroupLocalService.fetchUserGroup(companyId, name);
+	}
+
+	/**
+	* Returns the user group with the matching external reference code and company.
+	*
+	* @param companyId the primary key of the company
+	* @param externalReferenceCode the user group's external reference code
+	* @return the matching user group, or <code>null</code> if a matching user group could not be found
+	*/
+	@Override
+	public com.liferay.portal.kernel.model.UserGroup fetchUserGroupByReferenceCode(
+		long companyId, String externalReferenceCode) {
+		return _userGroupLocalService.fetchUserGroupByReferenceCode(companyId,
+			externalReferenceCode);
 	}
 
 	/**
@@ -988,8 +1002,8 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	* @param name the user group's name
 	* @param description the user group's description
 	* @return the user group
-	* @deprecated As of 6.2.0, replaced by {@link #updateUserGroup(long, long,
-	String, String, ServiceContext)}
+	* @deprecated As of Newton (6.2.x), replaced by {@link
+	#updateUserGroup(long, long, String, String, ServiceContext)}
 	*/
 	@Deprecated
 	@Override

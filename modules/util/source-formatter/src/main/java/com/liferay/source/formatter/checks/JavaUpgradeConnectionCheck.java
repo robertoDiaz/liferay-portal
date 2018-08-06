@@ -27,6 +27,7 @@ import com.liferay.source.formatter.parser.JavaTerm;
 import com.liferay.source.formatter.util.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -50,11 +51,6 @@ import java.util.regex.Pattern;
 public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 
 	@Override
-	public void init() throws Exception {
-		_upgradeAbsolutePaths.addAll(_getUpgradeAbsolutePaths());
-	}
-
-	@Override
 	public boolean isPortalCheck() {
 		return true;
 	}
@@ -63,7 +59,7 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 	protected String doProcess(
 			String fileName, String absolutePath, JavaTerm javaTerm,
 			String fileContent)
-		throws Exception {
+		throws IOException {
 
 		if (absolutePath.contains("/test/")) {
 			return javaTerm.getContent();
@@ -114,14 +110,14 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 					fileName,
 					"Use existing connection field instead of " +
 						"DataAccess.getConnection",
-					getLineCount(fileContent, x));
+					getLineNumber(fileContent, x));
 			}
 		}
 	}
 
 	private boolean _extendsPortalKernelUpgradeProcess(
 			String absolutePath, String fileContent)
-		throws Exception {
+		throws IOException {
 
 		String upgradeAbsolutePath = absolutePath;
 		String upgradeContent = fileContent;
@@ -180,7 +176,7 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 					}
 				}
 
-				for (String s : _upgradeAbsolutePaths) {
+				for (String s : _getUpgradeAbsolutePaths()) {
 					if (s.endsWith(relativePath + ".java")) {
 						upgradeAbsolutePath = s;
 
@@ -199,11 +195,17 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 		return false;
 	}
 
-	private List<String> _getUpgradeAbsolutePaths() throws Exception {
+	private List<String> _getUpgradeAbsolutePaths() throws IOException {
+		if (_upgradeAbsolutePaths != null) {
+			return _upgradeAbsolutePaths;
+		}
+
 		File portalDir = getPortalDir();
 
 		if (portalDir == null) {
-			return Collections.emptyList();
+			_upgradeAbsolutePaths = Collections.emptyList();
+
+			return _upgradeAbsolutePaths;
 		}
 
 		final List<String> upgradeAbsolutePaths = new ArrayList<>();
@@ -243,10 +245,12 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 
 			});
 
-		return upgradeAbsolutePaths;
+		_upgradeAbsolutePaths = upgradeAbsolutePaths;
+
+		return _upgradeAbsolutePaths;
 	}
 
-	private String _getUpgradeContent(String absolutePath) throws Exception {
+	private String _getUpgradeContent(String absolutePath) throws IOException {
 		if (_upgradeContentsMap.containsKey(absolutePath)) {
 			return _upgradeContentsMap.get(absolutePath);
 		}
@@ -271,7 +275,7 @@ public class JavaUpgradeConnectionCheck extends BaseJavaTermCheck {
 	private static final Pattern _extendedClassPattern = Pattern.compile(
 		"\\sextends\\s+([\\w\\.]+)\\W");
 
-	private final List<String> _upgradeAbsolutePaths = new ArrayList<>();
+	private List<String> _upgradeAbsolutePaths;
 	private final Map<String, String> _upgradeContentsMap = new HashMap<>();
 
 }

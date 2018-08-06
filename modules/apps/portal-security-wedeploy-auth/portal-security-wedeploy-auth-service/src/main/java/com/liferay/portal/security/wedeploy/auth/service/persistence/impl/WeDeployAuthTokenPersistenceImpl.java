@@ -16,6 +16,8 @@ package com.liferay.portal.security.wedeploy.auth.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,8 +33,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.wedeploy.auth.exception.NoSuchTokenException;
 import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthToken;
@@ -44,6 +46,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -241,13 +244,6 @@ public class WeDeployAuthTokenPersistenceImpl extends BasePersistenceImpl<WeDepl
 					result = weDeployAuthToken;
 
 					cacheResult(weDeployAuthToken);
-
-					if ((weDeployAuthToken.getToken() == null) ||
-							!weDeployAuthToken.getToken().equals(token) ||
-							(weDeployAuthToken.getType() != type)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_T_T,
-							finderArgs, weDeployAuthToken);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -541,15 +537,6 @@ public class WeDeployAuthTokenPersistenceImpl extends BasePersistenceImpl<WeDepl
 					result = weDeployAuthToken;
 
 					cacheResult(weDeployAuthToken);
-
-					if ((weDeployAuthToken.getClientId() == null) ||
-							!weDeployAuthToken.getClientId().equals(clientId) ||
-							(weDeployAuthToken.getToken() == null) ||
-							!weDeployAuthToken.getToken().equals(token) ||
-							(weDeployAuthToken.getType() != type)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_CI_T_T,
-							finderArgs, weDeployAuthToken);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -944,8 +931,6 @@ public class WeDeployAuthTokenPersistenceImpl extends BasePersistenceImpl<WeDepl
 
 	@Override
 	protected WeDeployAuthToken removeImpl(WeDeployAuthToken weDeployAuthToken) {
-		weDeployAuthToken = toUnwrappedModel(weDeployAuthToken);
-
 		Session session = null;
 
 		try {
@@ -976,9 +961,23 @@ public class WeDeployAuthTokenPersistenceImpl extends BasePersistenceImpl<WeDepl
 
 	@Override
 	public WeDeployAuthToken updateImpl(WeDeployAuthToken weDeployAuthToken) {
-		weDeployAuthToken = toUnwrappedModel(weDeployAuthToken);
-
 		boolean isNew = weDeployAuthToken.isNew();
+
+		if (!(weDeployAuthToken instanceof WeDeployAuthTokenModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(weDeployAuthToken.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(weDeployAuthToken);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in weDeployAuthToken proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom WeDeployAuthToken implementation " +
+				weDeployAuthToken.getClass());
+		}
 
 		WeDeployAuthTokenModelImpl weDeployAuthTokenModelImpl = (WeDeployAuthTokenModelImpl)weDeployAuthToken;
 
@@ -1049,30 +1048,6 @@ public class WeDeployAuthTokenPersistenceImpl extends BasePersistenceImpl<WeDepl
 		weDeployAuthToken.resetOriginalValues();
 
 		return weDeployAuthToken;
-	}
-
-	protected WeDeployAuthToken toUnwrappedModel(
-		WeDeployAuthToken weDeployAuthToken) {
-		if (weDeployAuthToken instanceof WeDeployAuthTokenImpl) {
-			return weDeployAuthToken;
-		}
-
-		WeDeployAuthTokenImpl weDeployAuthTokenImpl = new WeDeployAuthTokenImpl();
-
-		weDeployAuthTokenImpl.setNew(weDeployAuthToken.isNew());
-		weDeployAuthTokenImpl.setPrimaryKey(weDeployAuthToken.getPrimaryKey());
-
-		weDeployAuthTokenImpl.setWeDeployAuthTokenId(weDeployAuthToken.getWeDeployAuthTokenId());
-		weDeployAuthTokenImpl.setCompanyId(weDeployAuthToken.getCompanyId());
-		weDeployAuthTokenImpl.setUserId(weDeployAuthToken.getUserId());
-		weDeployAuthTokenImpl.setUserName(weDeployAuthToken.getUserName());
-		weDeployAuthTokenImpl.setCreateDate(weDeployAuthToken.getCreateDate());
-		weDeployAuthTokenImpl.setModifiedDate(weDeployAuthToken.getModifiedDate());
-		weDeployAuthTokenImpl.setClientId(weDeployAuthToken.getClientId());
-		weDeployAuthTokenImpl.setToken(weDeployAuthToken.getToken());
-		weDeployAuthTokenImpl.setType(weDeployAuthToken.getType());
-
-		return weDeployAuthTokenImpl;
 	}
 
 	/**

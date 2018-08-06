@@ -16,6 +16,8 @@ package com.liferay.portlet.ratings.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -35,8 +37,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -51,6 +53,7 @@ import com.liferay.ratings.kernel.service.persistence.RatingsEntryPersistence;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2157,13 +2160,6 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 					result = ratingsEntry;
 
 					cacheResult(ratingsEntry);
-
-					if ((ratingsEntry.getUserId() != userId) ||
-							(ratingsEntry.getClassNameId() != classNameId) ||
-							(ratingsEntry.getClassPK() != classPK)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_C_C,
-							finderArgs, ratingsEntry);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -3158,8 +3154,6 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 
 	@Override
 	protected RatingsEntry removeImpl(RatingsEntry ratingsEntry) {
-		ratingsEntry = toUnwrappedModel(ratingsEntry);
-
 		Session session = null;
 
 		try {
@@ -3190,9 +3184,23 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 
 	@Override
 	public RatingsEntry updateImpl(RatingsEntry ratingsEntry) {
-		ratingsEntry = toUnwrappedModel(ratingsEntry);
-
 		boolean isNew = ratingsEntry.isNew();
+
+		if (!(ratingsEntry instanceof RatingsEntryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(ratingsEntry.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(ratingsEntry);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in ratingsEntry proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom RatingsEntry implementation " +
+				ratingsEntry.getClass());
+		}
 
 		RatingsEntryModelImpl ratingsEntryModelImpl = (RatingsEntryModelImpl)ratingsEntry;
 
@@ -3418,30 +3426,6 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 		ratingsEntry.resetOriginalValues();
 
 		return ratingsEntry;
-	}
-
-	protected RatingsEntry toUnwrappedModel(RatingsEntry ratingsEntry) {
-		if (ratingsEntry instanceof RatingsEntryImpl) {
-			return ratingsEntry;
-		}
-
-		RatingsEntryImpl ratingsEntryImpl = new RatingsEntryImpl();
-
-		ratingsEntryImpl.setNew(ratingsEntry.isNew());
-		ratingsEntryImpl.setPrimaryKey(ratingsEntry.getPrimaryKey());
-
-		ratingsEntryImpl.setUuid(ratingsEntry.getUuid());
-		ratingsEntryImpl.setEntryId(ratingsEntry.getEntryId());
-		ratingsEntryImpl.setCompanyId(ratingsEntry.getCompanyId());
-		ratingsEntryImpl.setUserId(ratingsEntry.getUserId());
-		ratingsEntryImpl.setUserName(ratingsEntry.getUserName());
-		ratingsEntryImpl.setCreateDate(ratingsEntry.getCreateDate());
-		ratingsEntryImpl.setModifiedDate(ratingsEntry.getModifiedDate());
-		ratingsEntryImpl.setClassNameId(ratingsEntry.getClassNameId());
-		ratingsEntryImpl.setClassPK(ratingsEntry.getClassPK());
-		ratingsEntryImpl.setScore(ratingsEntry.getScore());
-
-		return ratingsEntryImpl;
 	}
 
 	/**

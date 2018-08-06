@@ -16,13 +16,13 @@ package com.liferay.portal.language;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
-import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil.Synchronizer;
+import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
+import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
+import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.language.LanguageWrapper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -40,6 +39,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -65,6 +66,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -103,28 +106,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Andrius Vitkauskas
  * @author Eduardo Lundgren
  */
-@DoPrivileged
 public class LanguageImpl implements Language, Serializable {
-
-	public void afterPropertiesSet() {
-		_companyLocalesPortalCache = MultiVMPoolUtil.getPortalCache(
-			_COMPANY_LOCALES_PORTAL_CACHE_NAME);
-
-		PortalCacheMapSynchronizeUtil.synchronize(
-			_companyLocalesPortalCache, _companyLocalesBags,
-			_removeSynchronizer);
-
-		_groupLocalesPortalCache = MultiVMPoolUtil.getPortalCache(
-			_GROUP_LOCALES_PORTAL_CACHE_NAME);
-
-		PortalCacheMapSynchronizeUtil.synchronize(
-			_groupLocalesPortalCache, _groupLanguageCodeLocalesMapMap,
-			_removeSynchronizer);
-
-		PortalCacheMapSynchronizeUtil.synchronize(
-			_groupLocalesPortalCache, _groupLanguageIdLocalesMap,
-			_removeSynchronizer);
-	}
 
 	/**
 	 * Returns the translated pattern using the current request's locale or, if
@@ -979,7 +961,7 @@ public class LanguageImpl implements Language, Serializable {
 		Map<String, Locale> groupLanguageIdLocalesMap =
 			_getGroupLanguageIdLocalesMap(groupId);
 
-		return new HashSet<>(groupLanguageIdLocalesMap.values());
+		return new LinkedHashSet<>(groupLanguageIdLocalesMap.values());
 	}
 
 	@Override
@@ -999,6 +981,13 @@ public class LanguageImpl implements Language, Serializable {
 		Locale locale = PortalUtil.getLocale(portletRequest);
 
 		return getBCP47LanguageId(locale);
+	}
+
+	@Override
+	public Set<Locale> getCompanyAvailableLocales(long companyId) {
+		CompanyLocalesBag companyLocalesBag = _getCompanyLocalesBag(companyId);
+
+		return companyLocalesBag.getAvailableLocales();
 	}
 
 	/**
@@ -1181,14 +1170,15 @@ public class LanguageImpl implements Language, Serializable {
 		String value = null;
 
 		try {
-			int pos = description.indexOf(CharPool.SPACE);
+			String[] parts = description.split(StringPool.SPACE, 2);
 
-			String x = description.substring(0, pos);
+			String unit = StringUtil.toLowerCase(parts[1]);
 
-			value = x.concat(StringPool.SPACE).concat(
-				get(
-					request,
-					StringUtil.toLowerCase(description.substring(pos + 1))));
+			if (unit.equals("second")) {
+				unit += "[time]";
+			}
+
+			value = format(request, "x-" + unit, parts[0]);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -1322,14 +1312,15 @@ public class LanguageImpl implements Language, Serializable {
 		String value = null;
 
 		try {
-			int pos = description.indexOf(CharPool.SPACE);
+			String[] parts = description.split(StringPool.SPACE, 2);
 
-			String x = description.substring(0, pos);
+			String unit = StringUtil.toLowerCase(parts[1]);
 
-			value = x.concat(StringPool.SPACE).concat(
-				get(
-					locale,
-					StringUtil.toLowerCase(description.substring(pos + 1))));
+			if (unit.equals("second")) {
+				unit += "[time]";
+			}
+
+			value = format(locale, "x-" + unit, parts[0]);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -1562,12 +1553,19 @@ public class LanguageImpl implements Language, Serializable {
 
 	@Override
 	public void resetAvailableGroupLocales(long groupId) {
-		_resetAvailableGroupLocales(groupId);
+		_groupLanguageCodeLocalesMapMap.remove(groupId);
+		_groupLanguageIdLocalesMap.remove(groupId);
+
+		_sendClearCacheClusterMessage(
+			_resetAvailableGroupLocalesMethodKey, groupId);
 	}
 
 	@Override
 	public void resetAvailableLocales(long companyId) {
-		_resetAvailableLocales(companyId);
+		_companyLocalesBags.remove(companyId);
+
+		_sendClearCacheClusterMessage(
+			_resetAvailableLocalesMethodKey, companyId);
 	}
 
 	@Override
@@ -1611,6 +1609,23 @@ public class LanguageImpl implements Language, Serializable {
 		return companyLocalesBag;
 	}
 
+	private static void _sendClearCacheClusterMessage(
+		MethodKey methodKey, long argument) {
+
+		if (!ClusterExecutorUtil.isEnabled() ||
+			!ClusterInvokeThreadLocal.isEnabled()) {
+
+			return;
+		}
+
+		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
+			new MethodHandler(methodKey, argument), true);
+
+		clusterRequest.setFireAndForget(true);
+
+		ClusterExecutorUtil.execute(clusterRequest);
+	}
+
 	private ObjectValuePair<HashMap<String, Locale>, HashMap<String, Locale>>
 		_createGroupLocales(long groupId) {
 
@@ -1633,7 +1648,8 @@ public class LanguageImpl implements Language, Serializable {
 		}
 
 		HashMap<String, Locale> groupLanguageCodeLocalesMap = new HashMap<>();
-		HashMap<String, Locale> groupLanguageIdLocalesMap = new HashMap<>();
+		HashMap<String, Locale> groupLanguageIdLocalesMap =
+			new LinkedHashMap<>();
 
 		for (String languageId : languageIds) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -1842,41 +1858,17 @@ public class LanguageImpl implements Language, Serializable {
 		return locale;
 	}
 
-	private void _resetAvailableGroupLocales(long groupId) {
-		_groupLocalesPortalCache.remove(groupId);
-	}
-
-	private void _resetAvailableLocales(long companyId) {
-		_companyLocalesPortalCache.remove(companyId);
-	}
-
-	private static final String _COMPANY_LOCALES_PORTAL_CACHE_NAME =
-		LanguageImpl.class.getName() + "._companyLocalesPortalCache";
-
-	private static final String _GROUP_LOCALES_PORTAL_CACHE_NAME =
-		LanguageImpl.class.getName() + "._groupLocalesPortalCache";
-
 	private static final Log _log = LogFactoryUtil.getLog(LanguageImpl.class);
 
 	private static final Map<Long, CompanyLocalesBag> _companyLocalesBags =
 		new ConcurrentHashMap<>();
-	private static PortalCache<Long, Serializable> _companyLocalesPortalCache;
-	private static PortalCache<Long, Serializable> _groupLocalesPortalCache;
 	private static final Pattern _pattern = Pattern.compile(
 		"Liferay\\.Language\\.get\\([\"']([^)]+)[\"']\\)");
-
-	private static final Synchronizer<Long, Serializable> _removeSynchronizer =
-		new Synchronizer<Long, Serializable>() {
-
-			@Override
-			public void onSynchronize(
-				Map<? extends Long, ? extends Serializable> map, Long key,
-				Serializable value, int timeToLive) {
-
-				map.remove(key);
-			}
-
-		};
+	private static final MethodKey _resetAvailableGroupLocalesMethodKey =
+		new MethodKey(
+			LanguageUtil.class, "resetAvailableGroupLocales", long.class);
+	private static final MethodKey _resetAvailableLocalesMethodKey =
+		new MethodKey(LanguageUtil.class, "resetAvailableLocales", long.class);
 
 	private final Map<Long, HashMap<String, Locale>>
 		_groupLanguageCodeLocalesMapMap = new ConcurrentHashMap<>();
@@ -1966,7 +1958,7 @@ public class LanguageImpl implements Language, Serializable {
 			}
 
 			_availableLocales = Collections.unmodifiableSet(
-				new HashSet<>(_languageIdLocalesMap.values()));
+				new LinkedHashSet<>(_languageIdLocalesMap.values()));
 
 			Set<Locale> supportedLocalesSet = new HashSet<>(
 				_languageIdLocalesMap.values());
@@ -1982,7 +1974,7 @@ public class LanguageImpl implements Language, Serializable {
 		private final Map<String, Locale> _languageCodeLocalesMap =
 			new HashMap<>();
 		private final Map<String, Locale> _languageIdLocalesMap =
-			new HashMap<>();
+			new LinkedHashMap<>();
 		private final Set<Locale> _localesBetaSet = new HashSet<>();
 		private final Set<Locale> _supportedLocalesSet;
 

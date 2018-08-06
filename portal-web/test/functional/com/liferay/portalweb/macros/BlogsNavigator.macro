@@ -6,9 +6,9 @@
 				<execute function="Click" locator1="Blogs#ADD_BLOGS_ENTRY" />
 			</then>
 			<else>
-				<var name="key_text" value="New Blog Entry" />
+				<var name="key_text" value="New Entry" />
 
-				<execute function="AssertClick" locator1="Button#ANY" value1="New Blog Entry" />
+				<execute function="AssertClick" locator1="Button#ANY" value1="New Entry" />
 			</else>
 		</if>
 
@@ -89,8 +89,8 @@
 	</command>
 
 	<command name="gotoEditCP">
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -99,8 +99,8 @@
 
 		<execute function="Click" locator1="Blogs#DESCRIPTIVE_VIEW_ENTRY_OPTIONS_DROPDOWN" />
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Edit">
-			<var name="key_menuItem" value="Edit" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Edit" />
 		</execute>
 
 		<execute function="AssertElementPresent" locator1="Icon#BACK" />
@@ -132,8 +132,8 @@
 	</command>
 
 	<command name="gotoEntryCP">
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -189,8 +189,8 @@
 	</command>
 
 	<command name="moveToRecycleBinCP">
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="descriptive" />
+		<execute macro="LexiconEntry#changeDisplayStyle">
+			<var name="displayStyle" value="list" />
 		</execute>
 
 		<var name="key_entryTitle" value="${entryTitle}" />
@@ -210,7 +210,9 @@
 		<execute function="AssertTextEquals" locator1="Blogs#ENTRY_TABLE_TITLE" value1="${entryTitle}" />
 		<execute function="AssertTextEquals" locator1="Blogs#ENTRY_TABLE_STATUS" value1="Draft" />
 
-		<execute function="Click" locator1="Blogs#ENTRY_TABLE_ACTIONS" />
+		<execute macro="LexiconEntry#openEntryMenu">
+			<var name="rowEntry" value="${entryTitle}" />
+		</execute>
 
 		<execute macro="PortletEntry#clickMoveToRecycleBin" />
 

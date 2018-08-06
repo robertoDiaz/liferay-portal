@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -35,11 +37,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.UserNotificationDeliveryPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.model.impl.UserNotificationDeliveryImpl;
 import com.liferay.portal.model.impl.UserNotificationDeliveryModelImpl;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -787,17 +791,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 					result = userNotificationDelivery;
 
 					cacheResult(userNotificationDelivery);
-
-					if ((userNotificationDelivery.getUserId() != userId) ||
-							(userNotificationDelivery.getPortletId() == null) ||
-							!userNotificationDelivery.getPortletId()
-														 .equals(portletId) ||
-							(userNotificationDelivery.getClassNameId() != classNameId) ||
-							(userNotificationDelivery.getNotificationType() != notificationType) ||
-							(userNotificationDelivery.getDeliveryType() != deliveryType)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
-							finderArgs, userNotificationDelivery);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -1156,8 +1149,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	protected UserNotificationDelivery removeImpl(
 		UserNotificationDelivery userNotificationDelivery) {
-		userNotificationDelivery = toUnwrappedModel(userNotificationDelivery);
-
 		Session session = null;
 
 		try {
@@ -1189,9 +1180,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery updateImpl(
 		UserNotificationDelivery userNotificationDelivery) {
-		userNotificationDelivery = toUnwrappedModel(userNotificationDelivery);
-
 		boolean isNew = userNotificationDelivery.isNew();
+
+		if (!(userNotificationDelivery instanceof UserNotificationDeliveryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(userNotificationDelivery.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(userNotificationDelivery);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in userNotificationDelivery proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom UserNotificationDelivery implementation " +
+				userNotificationDelivery.getClass());
+		}
 
 		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl = (UserNotificationDeliveryModelImpl)userNotificationDelivery;
 
@@ -1268,30 +1273,6 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		userNotificationDelivery.resetOriginalValues();
 
 		return userNotificationDelivery;
-	}
-
-	protected UserNotificationDelivery toUnwrappedModel(
-		UserNotificationDelivery userNotificationDelivery) {
-		if (userNotificationDelivery instanceof UserNotificationDeliveryImpl) {
-			return userNotificationDelivery;
-		}
-
-		UserNotificationDeliveryImpl userNotificationDeliveryImpl = new UserNotificationDeliveryImpl();
-
-		userNotificationDeliveryImpl.setNew(userNotificationDelivery.isNew());
-		userNotificationDeliveryImpl.setPrimaryKey(userNotificationDelivery.getPrimaryKey());
-
-		userNotificationDeliveryImpl.setMvccVersion(userNotificationDelivery.getMvccVersion());
-		userNotificationDeliveryImpl.setUserNotificationDeliveryId(userNotificationDelivery.getUserNotificationDeliveryId());
-		userNotificationDeliveryImpl.setCompanyId(userNotificationDelivery.getCompanyId());
-		userNotificationDeliveryImpl.setUserId(userNotificationDelivery.getUserId());
-		userNotificationDeliveryImpl.setPortletId(userNotificationDelivery.getPortletId());
-		userNotificationDeliveryImpl.setClassNameId(userNotificationDelivery.getClassNameId());
-		userNotificationDeliveryImpl.setNotificationType(userNotificationDelivery.getNotificationType());
-		userNotificationDeliveryImpl.setDeliveryType(userNotificationDelivery.getDeliveryType());
-		userNotificationDeliveryImpl.setDeliver(userNotificationDelivery.isDeliver());
-
-		return userNotificationDeliveryImpl;
 	}
 
 	/**

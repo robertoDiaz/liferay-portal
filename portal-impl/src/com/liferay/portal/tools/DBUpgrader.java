@@ -14,6 +14,8 @@
 
 package com.liferay.portal.tools;
 
+import aQute.bnd.version.Version;
+
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -102,6 +104,9 @@ public class DBUpgrader {
 			StartupHelperUtil.printPatchLevel();
 
 			upgrade();
+
+			_checkClassNamesAndResourceActions();
+
 			verify();
 
 			_registerModuleServiceLifecycle("database.initialized");
@@ -139,10 +144,10 @@ public class DBUpgrader {
 
 		checkRequiredBuildNumber(ReleaseInfo.RELEASE_6_1_0_BUILD_NUMBER);
 
-		if (PortalUpgradeProcess.isInLatestSchemaVersion(
-				DataAccess.getConnection())) {
-
-			return;
+		try (Connection connection = DataAccess.getConnection()) {
+			if (PortalUpgradeProcess.isInLatestSchemaVersion(connection)) {
+				return;
+			}
 		}
 
 		// Upgrade
@@ -161,6 +166,8 @@ public class DBUpgrader {
 		}
 
 		try {
+			buildNumber = _getBuildNumberForMissedUpgradeProcesses(buildNumber);
+
 			StartupHelperUtil.upgradeProcess(buildNumber);
 		}
 		catch (Exception e) {
@@ -188,22 +195,6 @@ public class DBUpgrader {
 
 			_updateCompanyKey();
 		}
-
-		// Check class names
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Check class names");
-		}
-
-		ClassNameLocalServiceUtil.checkClassNames();
-
-		// Check resource actions
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Check resource actions");
-		}
-
-		ResourceActionLocalServiceUtil.checkResourceActions();
 
 		// Clear the caches only if the upgrade process was run
 
@@ -314,6 +305,20 @@ public class DBUpgrader {
 		serviceRegistrar.registerService(Release.class, release, properties);
 	}
 
+	private static void _checkClassNamesAndResourceActions() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Check class names");
+		}
+
+		ClassNameLocalServiceUtil.checkClassNames();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Check resource actions");
+		}
+
+		ResourceActionLocalServiceUtil.checkResourceActions();
+	}
+
 	private static void _checkPermissionAlgorithm() throws Exception {
 		long count = _getResourceCodesCount();
 
@@ -348,6 +353,23 @@ public class DBUpgrader {
 		sb.append("database.");
 
 		throw new IllegalStateException(sb.toString());
+	}
+
+	private static int _getBuildNumberForMissedUpgradeProcesses(int buildNumber)
+		throws Exception {
+
+		if (buildNumber == ReleaseInfo.RELEASE_7_0_10_BUILD_NUMBER) {
+			try (Connection connection = DataAccess.getConnection()) {
+				Version schemaVersion =
+					PortalUpgradeProcess.getCurrentSchemaVersion(connection);
+
+				if (!schemaVersion.equals(_VERSION_7010)) {
+					return ReleaseInfo.RELEASE_7_0_1_BUILD_NUMBER;
+				}
+			}
+		}
+
+		return buildNumber;
 	}
 
 	private static int _getReleaseState() throws Exception {
@@ -449,6 +471,8 @@ public class DBUpgrader {
 			DataAccess.cleanUp(con, ps);
 		}
 	}
+
+	private static final Version _VERSION_7010 = new Version("0.0.6");
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);
 

@@ -22,16 +22,18 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.mail.reader.model.Attachment;
 import com.liferay.mail.reader.model.AttachmentModel;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -571,7 +573,7 @@ public class AttachmentModelImpl extends BaseModelImpl<Attachment>
 
 	private static final ClassLoader _classLoader = Attachment.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			Attachment.class
+			Attachment.class, ModelWrapper.class
 		};
 	private long _attachmentId;
 	private long _companyId;

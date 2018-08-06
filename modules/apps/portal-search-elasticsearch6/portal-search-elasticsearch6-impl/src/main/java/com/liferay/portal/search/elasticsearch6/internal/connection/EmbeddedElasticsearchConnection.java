@@ -86,7 +86,7 @@ public class EmbeddedElasticsearchConnection
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
-						"Unable to preload ", String.valueOf(ByteBufUtil.class),
+						"Unable to preload ", ByteBufUtil.class,
 						" to prevent Netty shutdown concurrent class loading ",
 						"interruption issue"),
 					cnfe);
@@ -246,10 +246,6 @@ public class EmbeddedElasticsearchConnection
 		settingsBuilder.put("transport.type", "netty4");
 	}
 
-	protected void configurePACLTestRule() {
-		settingsBuilder.put("node.max_local_storage_nodes", "2");
-	}
-
 	protected void configurePaths() {
 		String liferayHome = props.get(PropsKeys.LIFERAY_HOME);
 
@@ -298,8 +294,6 @@ public class EmbeddedElasticsearchConnection
 		}
 
 		settingsBuilder.put("monitor.jvm.gc.enabled", StringPool.FALSE);
-
-		configurePACLTestRule();
 	}
 
 	@Override
@@ -345,7 +339,7 @@ public class EmbeddedElasticsearchConnection
 				StringBundler.concat(
 					"Finished starting ",
 					elasticsearchConfiguration.clusterName(), " in ",
-					String.valueOf(stopWatch.getTime()), " ms"));
+					stopWatch.getTime(), " ms"));
 		}
 
 		return client;
@@ -460,8 +454,8 @@ public class EmbeddedElasticsearchConnection
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						StringBundler.concat(
-							"Discarded ", String.valueOf(runnable), " on ",
-							String.valueOf(threadPoolExecutor)));
+							"Discarded ", runnable, " on ",
+							threadPoolExecutor));
 				}
 			}
 

@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -35,11 +37,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.model.impl.BrowserTrackerImpl;
 import com.liferay.portal.model.impl.BrowserTrackerModelImpl;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -196,11 +200,6 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 					result = browserTracker;
 
 					cacheResult(browserTracker);
-
-					if ((browserTracker.getUserId() != userId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_USERID,
-							finderArgs, browserTracker);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -479,8 +478,6 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 
 	@Override
 	protected BrowserTracker removeImpl(BrowserTracker browserTracker) {
-		browserTracker = toUnwrappedModel(browserTracker);
-
 		Session session = null;
 
 		try {
@@ -511,9 +508,23 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 
 	@Override
 	public BrowserTracker updateImpl(BrowserTracker browserTracker) {
-		browserTracker = toUnwrappedModel(browserTracker);
-
 		boolean isNew = browserTracker.isNew();
+
+		if (!(browserTracker instanceof BrowserTrackerModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(browserTracker.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(browserTracker);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in browserTracker proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom BrowserTracker implementation " +
+				browserTracker.getClass());
+		}
 
 		BrowserTrackerModelImpl browserTrackerModelImpl = (BrowserTrackerModelImpl)browserTracker;
 
@@ -560,25 +571,6 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 		browserTracker.resetOriginalValues();
 
 		return browserTracker;
-	}
-
-	protected BrowserTracker toUnwrappedModel(BrowserTracker browserTracker) {
-		if (browserTracker instanceof BrowserTrackerImpl) {
-			return browserTracker;
-		}
-
-		BrowserTrackerImpl browserTrackerImpl = new BrowserTrackerImpl();
-
-		browserTrackerImpl.setNew(browserTracker.isNew());
-		browserTrackerImpl.setPrimaryKey(browserTracker.getPrimaryKey());
-
-		browserTrackerImpl.setMvccVersion(browserTracker.getMvccVersion());
-		browserTrackerImpl.setBrowserTrackerId(browserTracker.getBrowserTrackerId());
-		browserTrackerImpl.setCompanyId(browserTracker.getCompanyId());
-		browserTrackerImpl.setUserId(browserTracker.getUserId());
-		browserTrackerImpl.setBrowserKey(browserTracker.getBrowserKey());
-
-		return browserTrackerImpl;
 	}
 
 	/**
