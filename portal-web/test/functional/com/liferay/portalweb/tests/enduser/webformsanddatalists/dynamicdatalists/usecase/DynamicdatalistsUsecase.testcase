@@ -10,7 +10,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -81,7 +81,7 @@
 
 		<execute macro="Alert#viewRequestFailedToComplete" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="Please enter a valid definition." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_1" value1="Please enter a valid definition." />
 	</command>
 
 	<command name="AddListWithXSSWorkflowDefinition" priority="4">
@@ -190,7 +190,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -383,7 +383,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -441,7 +441,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -499,7 +499,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -572,7 +572,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -698,7 +698,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -726,9 +726,7 @@
 			<var name="pageName" value="DDL Page" />
 		</execute>
 
-		<execute macro="DDLRecord#addViaDDLDisplayPG">
-			<var name="ddlListName" value="Dynamic Data List 2" />
-		</execute>
+		<execute macro="DDLRecord#addViaDDLDisplayPG" />
 
 		<execute macro="DDLRecord#addRepeatableField">
 			<var name="fieldName" value="Text" />
@@ -827,8 +825,8 @@
 			<var name="ddlRecordFieldData" value="Content, Content 2" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
-			<var name="localizedLanguage" value="Catalan (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#populateTranslationFieldText">
@@ -860,6 +858,10 @@
 			<var name="fieldName" value="Text" />
 		</execute>
 
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
+		</execute>
+
 		<execute macro="PortletEntry#publish" />
 
 		<execute macro="Navigator#openURL" />
@@ -875,8 +877,8 @@
 			<var name="ddlRecordFieldData" value="Content, Content 2, Content 3" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="Catalan (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#viewTextFieldRepeated">
@@ -1021,7 +1023,7 @@
 	<command name="AddSelectFieldWithTranslationAndViewInSpreadsheetView" priority="4">
 		<description message="This is a use case for LPS-68216." />
 
-		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
+		<var method="PropsUtil#get('portal.url')" name="portalURL" />
 
 		<execute macro="Navigator#openURL" />
 
@@ -1046,10 +1048,10 @@
 			<var name="fieldFieldLabel" value="SelectENG" />
 			<var name="fieldName" value="Select" />
 			<var name="fieldOptionsNames" value="ENGOption1" />
-			<var name="fieldOptionsValue" value="value 1" />
+			<var name="fieldOptionsValues" value="Value 1" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
+		<execute macro="Form#addTranslation">
 			<var name="localizedLanguage" value="Japanese (Japan)" />
 		</execute>
 
@@ -1064,6 +1066,7 @@
 			<var name="fieldFieldLabel" value="SelectJA" />
 			<var name="fieldName" value="Select" />
 			<var name="fieldOptionsNames" value="JAOption1" />
+			<var name="fieldOptionsValues" value="Value 1" />
 		</execute>
 
 		<execute macro="DDLDataDefinition#save" />
@@ -1112,7 +1115,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1310,7 +1313,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1367,7 +1370,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1461,8 +1464,8 @@
 		</execute>
 
 		<execute function="Click#waitForMenuToggleJSClick" locator1="DDMSelectStructure#DDM_STRUCTURE_ELLIPSIS_1" />
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Manage Templates">
-			<var name="key_menuItem" value="Manage Templates" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Manage Templates" />
 		</execute>
 
 		<execute function="Click" locator1="Icon#ANGLE_LEFT_BACK" />
@@ -1471,7 +1474,7 @@
 
 		<execute function="Click" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK" value1="Data Definition Title" />
 
-		<execute function="AssertTextEquals" locator1="Portlet#HEADER" value1="Data Definition Title" />
+		<execute function="AssertTextEquals" locator1="Portlet#HEADER" value1="Edit Data Definition Title" />
 
 		<execute function="AssertTextEquals" locator1="TextInput#NAME" value1="Data Definition Title" />
 
@@ -1531,7 +1534,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1589,7 +1592,7 @@
 		<execute function="Pause" locator1="1000" />
 
 		<execute macro="Navigator#getCurrentURL">
-			<return from="currentURL" name="adminViewURL" />
+			<return name="adminViewURL" />
 			<var name="adminViewURL" value="${adminViewURL}" />
 		</execute>
 
@@ -1602,7 +1605,7 @@
 		<execute function="Pause" locator1="1000" />
 
 		<execute macro="Navigator#getCurrentURL">
-			<return from="currentURL" name="adminEditURL" />
+			<return name="adminEditURL" />
 			<var name="adminEditURL" value="${adminEditURL}" />
 		</execute>
 
@@ -1636,8 +1639,8 @@
 			<var name="url" value="${adminEditURL}" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="Catalan (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="Portlet#viewCannotPublish" />
@@ -1692,7 +1695,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1762,7 +1765,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -1829,7 +1832,7 @@
 
 	<command name="AssertUserCannotDeleteEntryAfterPermissionRemoved" priority="4">
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -1881,7 +1884,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2012,7 +2015,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2388,8 +2391,8 @@
 			<var name="ddlListName" value="List Name" />
 		</execute>
 
-		<execute macro="DDLRecord#viewDefaultLanguage">
-			<var name="defaultLanguage" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#viewLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2410,8 +2413,8 @@
 			<var name="ddlRecordFieldData" value="Text Spanish" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="English (United States)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="en-US" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2437,16 +2440,17 @@
 			<var name="ddlRecordFieldData" value="Text English" />
 		</execute>
 
-		<execute macro="DDLRecord#removeTranslation">
-			<var name="localizedLanguage" value="English (United States)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="en-US" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
-			<var name="localizedLanguage" value="Hebrew (Israel)" />
+		<execute macro="DDLRecord#populateFieldText">
+			<var name="ddlRecordFieldData" value="" />
+			<var name="fieldName" value="Text" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="Hebrew (Israel)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="iw-IL" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2457,7 +2461,7 @@
 		<execute macro="PortletEntry#publish" />
 
 		<execute macro="DDLRecord#viewFieldCP">
-			<var name="ddlRecordFieldData" value="Text Spanish" />
+			<var name="ddlRecordFieldData" value="" />
 			<var name="fieldFieldLabel" value="Text" />
 		</execute>
 
@@ -2466,7 +2470,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -2499,8 +2503,8 @@
 			<var name="ddlDataDefinitionName" value="Data Definition" />
 		</execute>
 
-		<execute macro="DDLRecord#viewDefaultLanguage">
-			<var name="defaultLanguage" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#viewLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2508,8 +2512,8 @@
 			<var name="fieldName" value="Text" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="English (United States)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="en-US" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2531,16 +2535,17 @@
 
 		<execute macro="DDLRecord#editPG" />
 
-		<execute macro="DDLRecord#removeTranslation">
-			<var name="localizedLanguage" value="English (United States)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="en-US" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
-			<var name="localizedLanguage" value="Hebrew (Israel)" />
+		<execute macro="DDLRecord#populateFieldText">
+			<var name="ddlRecordFieldData" value="remove" />
+			<var name="fieldName" value="Text" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="Hebrew (Israel)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="iw-IL" />
 		</execute>
 
 		<execute macro="DDLRecord#populateFieldText">
@@ -2552,7 +2557,7 @@
 
 		<execute macro="DDLRecord#viewViaDDLDisplayPG">
 			<var name="ddlListName" value="List Name Display" />
-			<var name="ddlRecordFieldData" value="Text Spanish" />
+			<var name="ddlRecordFieldData" value="remove" />
 			<var name="fieldFieldLabel" value="Text" />
 		</execute>
 	</command>
@@ -2923,8 +2928,8 @@
 			<var name="ddlRecordFieldData" value="Content, Content 2, Content 3" />
 		</execute>
 
-		<execute macro="DDLRecord#addTranslation">
-			<var name="localizedLanguage" value="Catalan (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#populateTranslationFieldText">
@@ -2967,8 +2972,8 @@
 			<var name="ddlRecordFieldData" value="Content, Content 3" />
 		</execute>
 
-		<execute macro="DDLRecord#editTranslation">
-			<var name="localizedLanguage" value="Catalan (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="DDLRecord#viewTextFieldRepeated">
@@ -2985,7 +2990,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<for list="P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12" param="pageName">
@@ -3188,7 +3193,7 @@
 		</execute>
 
 		<execute macro="TestCase#getSiteName">
-			<return from="siteName" name="siteName" />
+			<return name="siteName" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
 
@@ -3409,7 +3414,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">
@@ -3531,7 +3536,7 @@
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Site Pages" />
+			<var name="portlet" value="Pages" />
 		</execute>
 
 		<execute macro="SitePages#addPublicPage">

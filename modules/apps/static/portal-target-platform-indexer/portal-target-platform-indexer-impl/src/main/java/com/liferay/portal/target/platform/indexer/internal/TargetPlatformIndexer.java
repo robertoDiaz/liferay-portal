@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import java.net.URLEncoder;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -157,6 +159,23 @@ public class TargetPlatformIndexer implements Indexer {
 		return new String(chars);
 	}
 
+	private static String _filterJavaSEVesions(String versions) {
+		StringBuilder sb = new StringBuilder(versions.length());
+
+		for (String version : versions.split(",")) {
+			if (version.compareTo(_MAX_SUPPORTED_JAVA_SE_VERSION) <= 0) {
+				sb.append(version);
+				sb.append(",");
+			}
+		}
+
+		if (sb.length() != 0) {
+			sb.setLength(sb.length() - 1);
+		}
+
+		return sb.toString();
+	}
+
 	private void _addBundle(Path tempPath, Path jarPath, Set<File> jarFiles)
 		throws IOException {
 
@@ -164,7 +183,8 @@ public class TargetPlatformIndexer implements Indexer {
 			return;
 		}
 
-		Path tempJarPath = tempPath.resolve(jarPath.getFileName());
+		Path tempJarPath = tempPath.resolve(
+			URLEncoder.encode(String.valueOf(jarPath.getFileName()), "UTF-8"));
 
 		Files.copy(
 			jarPath, tempJarPath, StandardCopyOption.COPY_ATTRIBUTES,
@@ -308,12 +328,17 @@ public class TargetPlatformIndexer implements Indexer {
 				String parameterString = parameter.toString();
 
 				if (parameterString.startsWith("osgi.ee;osgi.ee=")) {
-					if (parameterString.startsWith("osgi.ee;osgi.ee=JavaSE")) {
-						sb.append(_PARAMETER_STRING_JDK_VERSION);
-						sb.append(",");
-					}
+					Attrs attrs = parameter.get("osgi.ee");
 
-					continue;
+					String osgiEE = attrs.get("osgi.ee");
+
+					if (osgiEE.startsWith("JavaSE")) {
+						String versions = attrs.get("version");
+
+						attrs.put("version", _filterJavaSEVesions(versions));
+
+						parameterString = parameter.toString();
+					}
 				}
 				else if (parameterString.startsWith("eclipse.platform;")) {
 					parameterString = _PARAMETER_STRING_OS_VERSION;
@@ -382,9 +407,7 @@ public class TargetPlatformIndexer implements Indexer {
 		'e', 'f'
 	};
 
-	private static final String _PARAMETER_STRING_JDK_VERSION =
-		"osgi.ee;osgi.ee=JavaSE;version:List<Version>=\"1.0.0,1.1.0,1.2.0," +
-			"1.3.0,1.4.0,1.5.0,1.6.0,1.7.0,1.8.0\"";
+	private static final String _MAX_SUPPORTED_JAVA_SE_VERSION = "1.8.0";
 
 	private static final String _PARAMETER_STRING_OS_VERSION =
 		"eclipse.platform;osgi.os=linux;osgi.arch=x86_64;osgi.ws=gtk;osgi.nl=" +

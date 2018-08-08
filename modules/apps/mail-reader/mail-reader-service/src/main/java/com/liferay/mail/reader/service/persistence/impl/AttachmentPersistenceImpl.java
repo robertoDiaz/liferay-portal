@@ -22,6 +22,8 @@ import com.liferay.mail.reader.model.impl.AttachmentImpl;
 import com.liferay.mail.reader.model.impl.AttachmentModelImpl;
 import com.liferay.mail.reader.service.persistence.AttachmentPersistence;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,13 +37,14 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -761,8 +764,6 @@ public class AttachmentPersistenceImpl extends BasePersistenceImpl<Attachment>
 
 	@Override
 	protected Attachment removeImpl(Attachment attachment) {
-		attachment = toUnwrappedModel(attachment);
-
 		Session session = null;
 
 		try {
@@ -793,9 +794,23 @@ public class AttachmentPersistenceImpl extends BasePersistenceImpl<Attachment>
 
 	@Override
 	public Attachment updateImpl(Attachment attachment) {
-		attachment = toUnwrappedModel(attachment);
-
 		boolean isNew = attachment.isNew();
+
+		if (!(attachment instanceof AttachmentModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(attachment.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(attachment);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in attachment proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom Attachment implementation " +
+				attachment.getClass());
+		}
 
 		AttachmentModelImpl attachmentModelImpl = (AttachmentModelImpl)attachment;
 
@@ -863,29 +878,6 @@ public class AttachmentPersistenceImpl extends BasePersistenceImpl<Attachment>
 		attachment.resetOriginalValues();
 
 		return attachment;
-	}
-
-	protected Attachment toUnwrappedModel(Attachment attachment) {
-		if (attachment instanceof AttachmentImpl) {
-			return attachment;
-		}
-
-		AttachmentImpl attachmentImpl = new AttachmentImpl();
-
-		attachmentImpl.setNew(attachment.isNew());
-		attachmentImpl.setPrimaryKey(attachment.getPrimaryKey());
-
-		attachmentImpl.setAttachmentId(attachment.getAttachmentId());
-		attachmentImpl.setCompanyId(attachment.getCompanyId());
-		attachmentImpl.setUserId(attachment.getUserId());
-		attachmentImpl.setAccountId(attachment.getAccountId());
-		attachmentImpl.setFolderId(attachment.getFolderId());
-		attachmentImpl.setMessageId(attachment.getMessageId());
-		attachmentImpl.setContentPath(attachment.getContentPath());
-		attachmentImpl.setFileName(attachment.getFileName());
-		attachmentImpl.setSize(attachment.getSize());
-
-		return attachmentImpl;
 	}
 
 	/**

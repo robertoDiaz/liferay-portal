@@ -22,6 +22,8 @@ import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.counter.model.impl.CounterImpl;
 import com.liferay.counter.model.impl.CounterModelImpl;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -35,7 +37,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
@@ -229,8 +230,6 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 
 	@Override
 	protected Counter removeImpl(Counter counter) {
-		counter = toUnwrappedModel(counter);
-
 		Session session = null;
 
 		try {
@@ -261,8 +260,6 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 
 	@Override
 	public Counter updateImpl(Counter counter) {
-		counter = toUnwrappedModel(counter);
-
 		boolean isNew = counter.isNew();
 
 		Session session = null;
@@ -300,22 +297,6 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 		counter.resetOriginalValues();
 
 		return counter;
-	}
-
-	protected Counter toUnwrappedModel(Counter counter) {
-		if (counter instanceof CounterImpl) {
-			return counter;
-		}
-
-		CounterImpl counterImpl = new CounterImpl();
-
-		counterImpl.setNew(counter.isNew());
-		counterImpl.setPrimaryKey(counter.getPrimaryKey());
-
-		counterImpl.setName(counter.getName());
-		counterImpl.setCurrentId(counter.getCurrentId());
-
-		return counterImpl;
 	}
 
 	/**

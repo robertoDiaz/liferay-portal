@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StringBundler;
 
+import java.io.IOException;
+
 /**
  * @author Hugo Huijser
  */
@@ -27,7 +29,7 @@ public class PropertiesWhitespaceCheck extends WhitespaceCheck {
 	@Override
 	protected String doProcess(
 			String fileName, String absolutePath, String content)
-		throws Exception {
+		throws IOException {
 
 		StringBundler sb = new StringBundler();
 
@@ -37,10 +39,10 @@ public class PropertiesWhitespaceCheck extends WhitespaceCheck {
 			String line = null;
 			String previousLine = StringPool.BLANK;
 
-			int lineCount = 0;
+			int lineNumber = 0;
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
-				lineCount++;
+				lineNumber++;
 
 				if (line.startsWith(StringPool.TAB)) {
 					line = line.replace(StringPool.TAB, StringPool.FOUR_SPACES);
@@ -77,7 +79,7 @@ public class PropertiesWhitespaceCheck extends WhitespaceCheck {
 					sb2.append(expectedLeadingSpaceCount);
 					sb2.append("' spaces are expected");
 
-					addMessage(fileName, sb2.toString(), lineCount);
+					addMessage(fileName, sb2.toString(), lineNumber);
 				}
 
 				previousLine = line;

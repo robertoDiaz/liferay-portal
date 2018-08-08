@@ -18,7 +18,7 @@ import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class AppendCheck extends StringConcatenationCheck {
 		for (int i = 0; i < methodCallASTList.size(); i++) {
 			DetailAST methodCallAST = methodCallASTList.get(i);
 
-			String variableName = _getVariableName(methodCallAST);
+			String variableName = DetailASTUtil.getVariableName(methodCallAST);
 
 			String variableTypeName = DetailASTUtil.getVariableTypeName(
 				methodCallAST, variableName, false);
@@ -73,7 +73,9 @@ public class AppendCheck extends StringConcatenationCheck {
 
 			DetailAST previousMethodCallAST = methodCallASTList.get(i - 1);
 
-			if (!variableName.equals(_getVariableName(previousMethodCallAST))) {
+			if (!variableName.equals(
+					DetailASTUtil.getVariableName(previousMethodCallAST))) {
+
 				continue;
 			}
 
@@ -138,7 +140,7 @@ public class AppendCheck extends StringConcatenationCheck {
 
 		String previousLine = getLine(previousMethodCallAST.getLineNo() - 1);
 
-		int previousLineLength = CommonUtils.lengthExpandedTabs(
+		int previousLineLength = CommonUtil.lengthExpandedTabs(
 			previousLine, previousLine.length(), getTabWidth());
 
 		if ((previousLineLength + literalStringValue.length()) <=
@@ -199,22 +201,6 @@ public class AppendCheck extends StringConcatenationCheck {
 		}
 
 		return exprAST.getFirstChild();
-	}
-
-	private String _getVariableName(DetailAST methodCallAST) {
-		DetailAST dotAST = methodCallAST.findFirstToken(TokenTypes.DOT);
-
-		if (dotAST == null) {
-			return null;
-		}
-
-		DetailAST nameAST = dotAST.findFirstToken(TokenTypes.IDENT);
-
-		if (nameAST == null) {
-			return null;
-		}
-
-		return nameAST.getText();
 	}
 
 	private boolean _hasIncorrectLineBreaks(DetailAST methodCallAST) {

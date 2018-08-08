@@ -63,8 +63,9 @@ public class AnnouncementsEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #addEntry(long, long, long,
-	String, String, String, String, Date, Date, int, boolean)}
+	* @deprecated As of Judson (7.1.x), replaced by {@link #addEntry(long,
+	long, long, String, String, String, String, Date, Date, int,
+	boolean)}
 	*/
 	@Deprecated
 	public static com.liferay.announcements.kernel.model.AnnouncementsEntry addEntry(
@@ -127,6 +128,12 @@ public class AnnouncementsEntryLocalServiceUtil {
 	public static void deleteEntries(long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteEntries(classNameId, classPK);
+	}
+
+	public static void deleteEntries(long companyId, long classNameId,
+		long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteEntries(companyId, classNameId, classPK);
 	}
 
 	public static void deleteEntry(
@@ -324,9 +331,22 @@ public class AnnouncementsEntryLocalServiceUtil {
 			alert, flagValue, start, end);
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link #getEntries(long,
+	long, long, boolean, int, int)}
+	*/
+	@Deprecated
 	public static java.util.List<com.liferay.announcements.kernel.model.AnnouncementsEntry> getEntries(
 		long classNameId, long classPK, boolean alert, int start, int end) {
 		return getService().getEntries(classNameId, classPK, alert, start, end);
+	}
+
+	public static java.util.List<com.liferay.announcements.kernel.model.AnnouncementsEntry> getEntries(
+		long companyId, long classNameId, long classPK, boolean alert,
+		int start, int end) {
+		return getService()
+				   .getEntries(companyId, classNameId, classPK, alert, start,
+			end);
 	}
 
 	public static java.util.List<com.liferay.announcements.kernel.model.AnnouncementsEntry> getEntries(
@@ -364,9 +384,20 @@ public class AnnouncementsEntryLocalServiceUtil {
 			alert, flagValue);
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link
+	#getEntriesCount(long, long, long, boolean)}
+	*/
+	@Deprecated
 	public static int getEntriesCount(long classNameId, long classPK,
 		boolean alert) {
 		return getService().getEntriesCount(classNameId, classPK, alert);
+	}
+
+	public static int getEntriesCount(long companyId, long classNameId,
+		long classPK, boolean alert) {
+		return getService()
+				   .getEntriesCount(companyId, classNameId, classPK, alert);
 	}
 
 	public static int getEntriesCount(long userId, long classNameId,
@@ -441,8 +472,8 @@ public class AnnouncementsEntryLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, String,
-	String, String, String, Date, Date, int)}
+	* @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
+	String, String, String, String, Date, Date, int)}
 	*/
 	@Deprecated
 	public static com.liferay.announcements.kernel.model.AnnouncementsEntry updateEntry(

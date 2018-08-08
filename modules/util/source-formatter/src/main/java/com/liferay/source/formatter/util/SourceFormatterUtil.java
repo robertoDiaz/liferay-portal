@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.ExcludeSyntax;
 import com.liferay.source.formatter.ExcludeSyntaxPattern;
@@ -29,8 +28,6 @@ import com.liferay.source.formatter.checks.util.SourceUtil;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.net.URL;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -159,7 +156,7 @@ public class SourceFormatterUtil {
 			String[] excludes, String[] includes,
 			SourceFormatterExcludes sourceFormatterExcludes,
 			boolean includeSubrepositories)
-		throws Exception {
+		throws IOException {
 
 		if (ArrayUtil.isEmpty(includes)) {
 			return new ArrayList<>();
@@ -219,23 +216,6 @@ public class SourceFormatterUtil {
 		return getAttributeNames(null, checkName, propertiesMap);
 	}
 
-	public static String getContent(
-			String baseDirName, String fileName, int level)
-		throws Exception {
-
-		File file = getFile(baseDirName, fileName, level);
-
-		if (file != null) {
-			String content = FileUtil.read(file);
-
-			if (Validator.isNotNull(content)) {
-				return content;
-			}
-		}
-
-		return StringPool.BLANK;
-	}
-
 	public static File getFile(String baseDirName, String fileName, int level) {
 		for (int i = 0; i < level; i++) {
 			File file = new File(baseDirName + fileName);
@@ -248,34 +228,6 @@ public class SourceFormatterUtil {
 		}
 
 		return null;
-	}
-
-	public static String getPortalContent(
-			String baseDirName, String portalBranchName, String fileName)
-		throws Exception {
-
-		String content = getContent(
-			baseDirName, fileName, ToolsUtil.PORTAL_MAX_DIR_LEVEL);
-
-		if (Validator.isNotNull(content)) {
-			return content;
-		}
-
-		if (Validator.isNull(portalBranchName)) {
-			return null;
-		}
-
-		try {
-			URL url = new URL(
-				StringBundler.concat(
-					_GIT_LIFERAY_PORTAL_URL, portalBranchName, StringPool.SLASH,
-					fileName));
-
-			return StringUtil.read(url.openStream());
-		}
-		catch (Exception e) {
-			return null;
-		}
 	}
 
 	public static String getPropertyValue(
@@ -333,11 +285,19 @@ public class SourceFormatterUtil {
 		return getPropertyValue(attributeName, null, checkName, propertiesMap);
 	}
 
+	public static String getSimpleName(String name) {
+		int pos = name.lastIndexOf(CharPool.PERIOD);
+
+		if (pos != -1) {
+			return name.substring(pos + 1);
+		}
+
+		return name;
+	}
+
 	public static List<File> getSuppressionsFiles(
-			String baseDirName, List<String> allFileNames,
-			SourceFormatterExcludes sourceFormatterExcludes,
-			String... fileNames)
-		throws Exception {
+		String baseDirName, List<String> allFileNames,
+		SourceFormatterExcludes sourceFormatterExcludes, String... fileNames) {
 
 		List<File> suppressionsFiles = new ArrayList<>();
 
@@ -392,7 +352,7 @@ public class SourceFormatterUtil {
 			String baseDirName, String[] excludes, String[] includes,
 			SourceFormatterExcludes sourceFormatterExcludes,
 			boolean includeSubrepositories)
-		throws Exception {
+		throws IOException {
 
 		if (ArrayUtil.isEmpty(includes)) {
 			return new ArrayList<>();
@@ -447,7 +407,7 @@ public class SourceFormatterUtil {
 	private static List<String> _filterRecentChangesFileNames(
 			String baseDirName, List<String> recentChangesFileNames,
 			PathMatchers pathMatchers)
-		throws Exception {
+		throws IOException {
 
 		List<String> fileNames = new ArrayList<>();
 
@@ -599,7 +559,7 @@ public class SourceFormatterUtil {
 	private static List<String> _scanForFiles(
 			final String baseDirName, final PathMatchers pathMatchers,
 			final boolean includeSubrepositories)
-		throws Exception {
+		throws IOException {
 
 		final List<String> fileNames = new ArrayList<>();
 
@@ -631,7 +591,7 @@ public class SourceFormatterUtil {
 									String content = FileUtil.read(
 										gitRepoPath.toFile());
 
-									if (content.contains("mode = pull")) {
+									if (content.contains("autopull = true")) {
 										return FileVisitResult.SKIP_SUBTREE;
 									}
 								}
@@ -726,9 +686,6 @@ public class SourceFormatterUtil {
 
 		return fileNames;
 	}
-
-	private static final String _GIT_LIFERAY_PORTAL_URL =
-		"https://raw.githubusercontent.com/liferay/liferay-portal/";
 
 	private static class PathMatchers {
 

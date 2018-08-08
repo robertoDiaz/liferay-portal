@@ -58,8 +58,9 @@ public class AnnouncementsEntryLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #addEntry(long, long, long,
-	String, String, String, String, Date, Date, int, boolean)}
+	* @deprecated As of Judson (7.1.x), replaced by {@link #addEntry(long,
+	long, long, String, String, String, String, Date, Date, int,
+	boolean)}
 	*/
 	@Deprecated
 	@Override
@@ -128,6 +129,13 @@ public class AnnouncementsEntryLocalServiceWrapper
 	public void deleteEntries(long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_announcementsEntryLocalService.deleteEntries(classNameId, classPK);
+	}
+
+	@Override
+	public void deleteEntries(long companyId, long classNameId, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_announcementsEntryLocalService.deleteEntries(companyId, classNameId,
+			classPK);
 	}
 
 	@Override
@@ -345,11 +353,24 @@ public class AnnouncementsEntryLocalServiceWrapper
 			alert, flagValue, start, end);
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link #getEntries(long,
+	long, long, boolean, int, int)}
+	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.announcements.kernel.model.AnnouncementsEntry> getEntries(
 		long classNameId, long classPK, boolean alert, int start, int end) {
 		return _announcementsEntryLocalService.getEntries(classNameId, classPK,
 			alert, start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.announcements.kernel.model.AnnouncementsEntry> getEntries(
+		long companyId, long classNameId, long classPK, boolean alert,
+		int start, int end) {
+		return _announcementsEntryLocalService.getEntries(companyId,
+			classNameId, classPK, alert, start, end);
 	}
 
 	@Override
@@ -389,10 +410,22 @@ public class AnnouncementsEntryLocalServiceWrapper
 			alert, flagValue);
 	}
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link
+	#getEntriesCount(long, long, long, boolean)}
+	*/
+	@Deprecated
 	@Override
 	public int getEntriesCount(long classNameId, long classPK, boolean alert) {
 		return _announcementsEntryLocalService.getEntriesCount(classNameId,
 			classPK, alert);
+	}
+
+	@Override
+	public int getEntriesCount(long companyId, long classNameId, long classPK,
+		boolean alert) {
+		return _announcementsEntryLocalService.getEntriesCount(companyId,
+			classNameId, classPK, alert);
 	}
 
 	@Override
@@ -474,8 +507,8 @@ public class AnnouncementsEntryLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, String,
-	String, String, String, Date, Date, int)}
+	* @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
+	String, String, String, String, Date, Date, int)}
 	*/
 	@Deprecated
 	@Override

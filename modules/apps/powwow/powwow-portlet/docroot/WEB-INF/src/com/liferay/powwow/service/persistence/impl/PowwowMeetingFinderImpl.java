@@ -14,6 +14,7 @@
 
 package com.liferay.powwow.service.persistence.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.powwow.model.PowwowMeeting;
@@ -159,8 +159,8 @@ public class PowwowMeetingFinderImpl
 		sb.append("AND PowwowMeeting.status IN ");
 		sb.append(StringPool.OPEN_PARENTHESIS);
 
-		for (int i = 0; i < statuses.length; i++) {
-			sb.append(statuses[i]);
+		for (int status : statuses) {
+			sb.append(status);
 			sb.append(StringPool.COMMA_AND_SPACE);
 		}
 

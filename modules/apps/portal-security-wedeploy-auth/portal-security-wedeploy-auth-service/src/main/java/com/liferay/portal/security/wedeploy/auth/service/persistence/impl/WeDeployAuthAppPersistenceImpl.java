@@ -16,6 +16,8 @@ package com.liferay.portal.security.wedeploy.auth.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,7 +33,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.wedeploy.auth.exception.NoSuchAppException;
 import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp;
@@ -41,6 +43,8 @@ import com.liferay.portal.security.wedeploy.auth.service.persistence.WeDeployAut
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -252,14 +256,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 					result = weDeployAuthApp;
 
 					cacheResult(weDeployAuthApp);
-
-					if ((weDeployAuthApp.getRedirectURI() == null) ||
-							!weDeployAuthApp.getRedirectURI().equals(redirectURI) ||
-							(weDeployAuthApp.getClientId() == null) ||
-							!weDeployAuthApp.getClientId().equals(clientId)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_RU_CI,
-							finderArgs, weDeployAuthApp);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -550,15 +546,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 					result = weDeployAuthApp;
 
 					cacheResult(weDeployAuthApp);
-
-					if ((weDeployAuthApp.getClientId() == null) ||
-							!weDeployAuthApp.getClientId().equals(clientId) ||
-							(weDeployAuthApp.getClientSecret() == null) ||
-							!weDeployAuthApp.getClientSecret()
-												.equals(clientSecret)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_CI_CS,
-							finderArgs, weDeployAuthApp);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -922,8 +909,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 	@Override
 	protected WeDeployAuthApp removeImpl(WeDeployAuthApp weDeployAuthApp) {
-		weDeployAuthApp = toUnwrappedModel(weDeployAuthApp);
-
 		Session session = null;
 
 		try {
@@ -954,9 +939,23 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 	@Override
 	public WeDeployAuthApp updateImpl(WeDeployAuthApp weDeployAuthApp) {
-		weDeployAuthApp = toUnwrappedModel(weDeployAuthApp);
-
 		boolean isNew = weDeployAuthApp.isNew();
+
+		if (!(weDeployAuthApp instanceof WeDeployAuthAppModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(weDeployAuthApp.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(weDeployAuthApp);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in weDeployAuthApp proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom WeDeployAuthApp implementation " +
+				weDeployAuthApp.getClass());
+		}
 
 		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl = (WeDeployAuthAppModelImpl)weDeployAuthApp;
 
@@ -1026,30 +1025,6 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		weDeployAuthApp.resetOriginalValues();
 
 		return weDeployAuthApp;
-	}
-
-	protected WeDeployAuthApp toUnwrappedModel(WeDeployAuthApp weDeployAuthApp) {
-		if (weDeployAuthApp instanceof WeDeployAuthAppImpl) {
-			return weDeployAuthApp;
-		}
-
-		WeDeployAuthAppImpl weDeployAuthAppImpl = new WeDeployAuthAppImpl();
-
-		weDeployAuthAppImpl.setNew(weDeployAuthApp.isNew());
-		weDeployAuthAppImpl.setPrimaryKey(weDeployAuthApp.getPrimaryKey());
-
-		weDeployAuthAppImpl.setWeDeployAuthAppId(weDeployAuthApp.getWeDeployAuthAppId());
-		weDeployAuthAppImpl.setCompanyId(weDeployAuthApp.getCompanyId());
-		weDeployAuthAppImpl.setUserId(weDeployAuthApp.getUserId());
-		weDeployAuthAppImpl.setUserName(weDeployAuthApp.getUserName());
-		weDeployAuthAppImpl.setCreateDate(weDeployAuthApp.getCreateDate());
-		weDeployAuthAppImpl.setModifiedDate(weDeployAuthApp.getModifiedDate());
-		weDeployAuthAppImpl.setName(weDeployAuthApp.getName());
-		weDeployAuthAppImpl.setRedirectURI(weDeployAuthApp.getRedirectURI());
-		weDeployAuthAppImpl.setClientId(weDeployAuthApp.getClientId());
-		weDeployAuthAppImpl.setClientSecret(weDeployAuthApp.getClientSecret());
-
-		return weDeployAuthAppImpl;
 	}
 
 	/**

@@ -49,6 +49,7 @@ import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBDiscussionLocalService;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.cal.DayAndPosition;
 import com.liferay.portal.kernel.cal.TZSRecurrence;
 import com.liferay.portal.kernel.dao.db.DBInspector;
@@ -78,7 +79,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -218,8 +218,8 @@ public class CalEventImporter {
 				calendarBookingId);
 
 		calendarBooking.setUuid(uuid);
-		calendarBooking.setCompanyId(companyId);
 		calendarBooking.setGroupId(groupId);
+		calendarBooking.setCompanyId(companyId);
 		calendarBooking.setUserId(userId);
 		calendarBooking.setUserName(userName);
 		calendarBooking.setCreateDate(createDate);
@@ -1154,7 +1154,7 @@ public class CalEventImporter {
 			mbMessage.getRootMessageId(), mbMessage.getParentMessageId(),
 			mbMessage.getSubject(), mbMessage.getBody(), mbMessage.getFormat(),
 			mbMessage.isAnonymous(), mbMessage.getPriority(),
-			mbMessage.getAllowPingbacks(), mbMessage.isAnswer(),
+			mbMessage.isAllowPingbacks(), mbMessage.isAnswer(),
 			mbMessage.getStatus(), mbMessage.getStatusByUserId(),
 			mbMessage.getStatusByUserName(), mbMessage.getStatusDate(),
 			mbMessageIds);

@@ -60,7 +60,7 @@ public class PortletSetupUtil {
 			css = null;
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(e);
+				_log.warn(e, e);
 			}
 		}
 
@@ -97,10 +97,10 @@ public class PortletSetupUtil {
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String languageId = LocaleUtil.toLanguageId(locale);
 
-			String title = portletSetup.getValue(
-				"portletSetupTitle_" + languageId, null);
-
 			if (Validator.isNotNull(languageId)) {
+				String title = portletSetup.getValue(
+					"portletSetupTitle_" + languageId, null);
+
 				titlesJSONObject.put(languageId, title);
 			}
 		}

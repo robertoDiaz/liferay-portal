@@ -35,7 +35,12 @@ import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.service.base.OAuth2ApplicationLocalServiceBaseImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.ImageTypeException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageToolUtil;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
@@ -44,11 +49,15 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.awt.image.RenderedImage;
+
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URI;
@@ -107,10 +116,10 @@ public class OAuth2ApplicationLocalServiceImpl
 			oAuth2ApplicationPersistence.create(oAuth2ApplicationId);
 
 		oAuth2Application.setCompanyId(companyId);
-		oAuth2Application.setCreateDate(new Date());
-		oAuth2Application.setModifiedDate(new Date());
 		oAuth2Application.setUserId(userId);
 		oAuth2Application.setUserName(userName);
+		oAuth2Application.setCreateDate(new Date());
+		oAuth2Application.setModifiedDate(new Date());
 		oAuth2Application.setAllowedGrantTypesList(allowedGrantTypesList);
 		oAuth2Application.setClientId(clientId);
 		oAuth2Application.setClientProfile(clientProfile);
@@ -123,7 +132,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
 
-		if ((scopeAliasesList != null) && !scopeAliasesList.isEmpty()) {
+		if (ListUtil.isNotEmpty(scopeAliasesList)) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				oAuth2ApplicationScopeAliasesLocalService.
 					addOAuth2ApplicationScopeAliases(
@@ -212,6 +221,19 @@ public class OAuth2ApplicationLocalServiceImpl
 
 		long oldIconFileEntryId = oAuth2Application.getIconFileEntryId();
 
+		if (inputStream == null) {
+			if (oldIconFileEntryId > 0) {
+				PortletFileRepositoryUtil.deletePortletFileEntry(
+					oldIconFileEntryId);
+
+				oAuth2Application.setIconFileEntryId(-1);
+
+				oAuth2Application = updateOAuth2Application(oAuth2Application);
+			}
+
+			return oAuth2Application;
+		}
+
 		Group group = groupLocalService.getCompanyGroup(
 			oAuth2Application.getCompanyId());
 
@@ -229,15 +251,39 @@ public class OAuth2ApplicationLocalServiceImpl
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "icons",
 			serviceContext);
 
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		try {
+			ImageBag imageBag = ImageToolUtil.read(inputStream);
+
+			RenderedImage renderedImage = imageBag.getRenderedImage();
+
+			if (renderedImage == null) {
+				throw new ImageTypeException("Unable to read icon");
+			}
+
+			renderedImage = ImageToolUtil.scale(renderedImage, 160, 160);
+
+			ImageToolUtil.write(
+				renderedImage, imageBag.getType(), unsyncByteArrayOutputStream);
+		}
+		catch (IOException ioe) {
+			throw new PortalException(ioe);
+		}
+
 		String fileName = PortletFileRepositoryUtil.getUniqueFileName(
 			group.getGroupId(), folder.getFolderId(),
 			oAuth2Application.getClientId());
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
 			group.getGroupId(), oAuth2Application.getUserId(),
-			OAuth2Application.class.getName(), oAuth2ApplicationId,
+			OAuth2Application.class.getName(),
+			oAuth2Application.getOAuth2ApplicationId(),
 			OAuth2ProviderConstants.SERVICE_NAME, folder.getFolderId(),
-			inputStream, fileName, null, false);
+			new UnsyncByteArrayInputStream(
+				unsyncByteArrayOutputStream.toByteArray()),
+			fileName, null, false);
 
 		oAuth2Application.setIconFileEntryId(fileEntry.getFileEntryId());
 
@@ -305,26 +351,42 @@ public class OAuth2ApplicationLocalServiceImpl
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
-		if ((scopeAliasesList == null) || scopeAliasesList.isEmpty()) {
+		if (ListUtil.isEmpty(scopeAliasesList)) {
+			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
+				return oAuth2Application;
+			}
+
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(0);
 
 			return oAuth2ApplicationPersistence.update(oAuth2Application);
 		}
 
-		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
-			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-				oAuth2ApplicationScopeAliasesLocalService.
-					fetchOAuth2ApplicationScopeAliases(
-						oAuth2ApplicationId, scopeAliasesList);
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			oAuth2ApplicationScopeAliasesLocalService.
+				fetchOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationId, scopeAliasesList);
 
-			if (oAuth2ApplicationScopeAliases == null) {
-				oAuth2ApplicationScopeAliases =
-					oAuth2ApplicationScopeAliasesLocalService.
-						addOAuth2ApplicationScopeAliases(
-							oAuth2Application.getCompanyId(), userId, userName,
-							oAuth2ApplicationId, scopeAliasesList);
-			}
+		if (oAuth2ApplicationScopeAliases != null) {
+			oAuth2ApplicationScopeAliases.setUserId(userId);
+			oAuth2ApplicationScopeAliases.setUserName(userName);
+
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					updateOAuth2ApplicationScopeAliases(
+						oAuth2ApplicationScopeAliases);
+		}
+		else {
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					addOAuth2ApplicationScopeAliases(
+						oAuth2Application.getCompanyId(), userId, userName,
+						oAuth2ApplicationId, scopeAliasesList);
+		}
+
+		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() !=
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId()) {
 
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
@@ -333,37 +395,9 @@ public class OAuth2ApplicationLocalServiceImpl
 
 			return oAuth2ApplicationPersistence.update(oAuth2Application);
 		}
-
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			oAuth2ApplicationScopeAliasesLocalService.
-				getOAuth2ApplicationScopeAliases(
-					oAuth2Application.getOAuth2ApplicationScopeAliasesId());
-
-		List<String> actualScopeAliasesList =
-			oAuth2ApplicationScopeAliases.getScopeAliasesList();
-
-		if (actualScopeAliasesList.equals(scopeAliasesList)) {
+		else {
 			return oAuth2Application;
 		}
-
-		oAuth2ApplicationScopeAliases =
-			oAuth2ApplicationScopeAliasesLocalService.
-				fetchOAuth2ApplicationScopeAliases(
-					oAuth2ApplicationId, scopeAliasesList);
-
-		if (oAuth2ApplicationScopeAliases == null) {
-			oAuth2ApplicationScopeAliases =
-				oAuth2ApplicationScopeAliasesLocalService.
-					addOAuth2ApplicationScopeAliases(
-						oAuth2Application.getCompanyId(), userId, userName,
-						oAuth2ApplicationId, scopeAliasesList);
-		}
-
-		oAuth2Application.setModifiedDate(new Date());
-		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
-
-		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
 	protected void validate(

@@ -16,6 +16,8 @@ package com.liferay.sync.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -30,8 +32,8 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -44,6 +46,7 @@ import com.liferay.sync.service.persistence.SyncDLObjectPersistence;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -4237,13 +4240,6 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 					result = syncDLObject;
 
 					cacheResult(syncDLObject);
-
-					if ((syncDLObject.getType() == null) ||
-							!syncDLObject.getType().equals(type) ||
-							(syncDLObject.getTypePK() != typePK)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_T_T,
-							finderArgs, syncDLObject);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -6502,8 +6498,6 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 
 	@Override
 	protected SyncDLObject removeImpl(SyncDLObject syncDLObject) {
-		syncDLObject = toUnwrappedModel(syncDLObject);
-
 		Session session = null;
 
 		try {
@@ -6534,9 +6528,23 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 
 	@Override
 	public SyncDLObject updateImpl(SyncDLObject syncDLObject) {
-		syncDLObject = toUnwrappedModel(syncDLObject);
-
 		boolean isNew = syncDLObject.isNew();
+
+		if (!(syncDLObject instanceof SyncDLObjectModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(syncDLObject.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(syncDLObject);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in syncDLObject proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom SyncDLObject implementation " +
+				syncDLObject.getClass());
+		}
 
 		SyncDLObjectModelImpl syncDLObjectModelImpl = (SyncDLObjectModelImpl)syncDLObject;
 
@@ -6708,48 +6716,6 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 		syncDLObject.resetOriginalValues();
 
 		return syncDLObject;
-	}
-
-	protected SyncDLObject toUnwrappedModel(SyncDLObject syncDLObject) {
-		if (syncDLObject instanceof SyncDLObjectImpl) {
-			return syncDLObject;
-		}
-
-		SyncDLObjectImpl syncDLObjectImpl = new SyncDLObjectImpl();
-
-		syncDLObjectImpl.setNew(syncDLObject.isNew());
-		syncDLObjectImpl.setPrimaryKey(syncDLObject.getPrimaryKey());
-
-		syncDLObjectImpl.setSyncDLObjectId(syncDLObject.getSyncDLObjectId());
-		syncDLObjectImpl.setCompanyId(syncDLObject.getCompanyId());
-		syncDLObjectImpl.setUserId(syncDLObject.getUserId());
-		syncDLObjectImpl.setUserName(syncDLObject.getUserName());
-		syncDLObjectImpl.setCreateTime(syncDLObject.getCreateTime());
-		syncDLObjectImpl.setModifiedTime(syncDLObject.getModifiedTime());
-		syncDLObjectImpl.setRepositoryId(syncDLObject.getRepositoryId());
-		syncDLObjectImpl.setParentFolderId(syncDLObject.getParentFolderId());
-		syncDLObjectImpl.setTreePath(syncDLObject.getTreePath());
-		syncDLObjectImpl.setName(syncDLObject.getName());
-		syncDLObjectImpl.setExtension(syncDLObject.getExtension());
-		syncDLObjectImpl.setMimeType(syncDLObject.getMimeType());
-		syncDLObjectImpl.setDescription(syncDLObject.getDescription());
-		syncDLObjectImpl.setChangeLog(syncDLObject.getChangeLog());
-		syncDLObjectImpl.setExtraSettings(syncDLObject.getExtraSettings());
-		syncDLObjectImpl.setVersion(syncDLObject.getVersion());
-		syncDLObjectImpl.setVersionId(syncDLObject.getVersionId());
-		syncDLObjectImpl.setSize(syncDLObject.getSize());
-		syncDLObjectImpl.setChecksum(syncDLObject.getChecksum());
-		syncDLObjectImpl.setEvent(syncDLObject.getEvent());
-		syncDLObjectImpl.setLanTokenKey(syncDLObject.getLanTokenKey());
-		syncDLObjectImpl.setLastPermissionChangeDate(syncDLObject.getLastPermissionChangeDate());
-		syncDLObjectImpl.setLockExpirationDate(syncDLObject.getLockExpirationDate());
-		syncDLObjectImpl.setLockUserId(syncDLObject.getLockUserId());
-		syncDLObjectImpl.setLockUserName(syncDLObject.getLockUserName());
-		syncDLObjectImpl.setType(syncDLObject.getType());
-		syncDLObjectImpl.setTypePK(syncDLObject.getTypePK());
-		syncDLObjectImpl.setTypeUuid(syncDLObject.getTypeUuid());
-
-		return syncDLObjectImpl;
 	}
 
 	/**

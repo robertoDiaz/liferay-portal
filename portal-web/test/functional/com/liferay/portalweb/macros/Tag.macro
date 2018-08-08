@@ -2,6 +2,8 @@
 	<command name="_addCP">
 		<execute macro="LexiconEntry#gotoAdd" />
 
+		<execute function="AssertElementPresent" locator1="TextInput#NAME" />
+
 		<execute macro="PortletEntry#inputName">
 			<var name="name" value="${tagName}" />
 		</execute>
@@ -80,7 +82,8 @@
 				</execute>
 			</then>
 			<else>
-				<execute function="Click" locator1="Icon#MERGE" />
+				<execute function="Click" locator1="Icon#TOOLBAR_ELLIPSIS" />
+				<execute function="Click" locator1="Button#MERGE" />
 			</else>
 		</if>
 	</command>

@@ -590,9 +590,9 @@
 					</then>
 				</elseif>
 				<elseif>
-					<contains string="${permissionDefinitionKey}" substring="SITE_ADMIN_CONTENT_CATEGORIES" />
+					<contains string="${permissionDefinitionKey}" substring="SITE_ADMIN_CATEGORIES" />
 					<then>
-						<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_CATEGORIES" />
+						<var name="permissionNavigationKey" value="SITE_ADMIN_CATEGORIES" />
 						<var name="permissionNavigationValue" value="Categories" />
 					</then>
 				</elseif>
@@ -649,7 +649,7 @@
 					<contains string="${permissionDefinitionKey}" substring="SITE_ADMIN_PAGES_SITE_PAGES" />
 					<then>
 						<var name="permissionNavigationKey" value="SITE_ADMIN_PAGES_SITE_PAGES" />
-						<var name="permissionNavigationValue" value="Site Pages" />
+						<var name="permissionNavigationValue" value="Pages" />
 					</then>
 				</elseif>
 				<elseif>
@@ -1048,8 +1048,8 @@
 			<then>
 				<execute function="Click" locator1="ListGroupItem#ITEM_ACTIONS_DEFAULT" />
 
-				<execute function="AssertClickNoError" locator1="MenuItem#ANY_MENU_ITEM" value1="Delete">
-					<var name="key_menuItem" value="Delete" />
+				<execute macro="MenuItem#clickNoError">
+					<var name="menuItem" value="Delete" />
 				</execute>
 
 				<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
@@ -1353,7 +1353,7 @@
 				<contains string="${permissionDefinitionKey}" substring="SITE_ADMIN_PAGES_SITE_PAGES" />
 				<then>
 					<var name="permissionNavigationKey" value="SITE_ADMIN_PAGES_SITE_PAGES" />
-					<var name="permissionNavigationValue" value="Site Pages" />
+					<var name="permissionNavigationValue" value="Pages" />
 				</then>
 			</elseif>
 			<elseif>

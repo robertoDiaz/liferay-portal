@@ -1,60 +1,6 @@
 <?xml version="1.0"?>
 
 <custom-sql>
-	<sql id="com.liferay.portal.kernel.security.permission.InlineSQLHelper.filterByResourceBlockId">
-		<![CDATA[
-			WHERE
-				resourceBlockId IN ([$USER_RESOURCE_BLOCK_ID$])
-		]]>
-	</sql>
-	<sql id="com.liferay.portal.kernel.security.permission.InlineSQLHelper.filterByResourceBlockIdOwner">
-		<![CDATA[
-			WHERE
-				(resourceBlockId IN ([$USER_RESOURCE_BLOCK_ID$])) OR
-				(
-					([$USER_ID_FIELD$] = [$USER_ID$]) AND
-					(resourceBlockId IN ([$OWNER_RESOURCE_BLOCK_ID$]))
-				)
-		]]>
-	</sql>
-	<sql id="com.liferay.portal.kernel.security.permission.InlineSQLHelper.findByResourceBlockId">
-		<![CDATA[
-			SELECT
-				resourceBlock.resourceBlockId
-			FROM
-				ResourceBlock resourceBlock
-			WHERE
-				resourceBlock.resourceBlockId IN
-					(
-						SELECT
-							resourceBlockPermission.resourceBlockId
-						FROM
-							ResourceBlockPermission resourceBlockPermission
-						WHERE
-							resourceBlockPermission.roleId IN ([$ROLE_ID$])
-					) AND
-				(resourceBlock.companyId = [$COMPANY_ID$]) AND
-				(resourceBlock.groupId = [$GROUP_ID$]) AND
-				(resourceBlock.name = '[$RESOURCE_BLOCK_NAME$]')
-		]]>
-	</sql>
-	<sql id="com.liferay.portal.kernel.security.permission.InlineSQLHelper.findByResourcePermission">
-		<![CDATA[
-			SELECT
-				DISTINCT ResourcePermission.primKeyId
-			FROM
-				ResourcePermission
-			WHERE
-				(ResourcePermission.companyId = [$COMPANY_ID$]) AND
-				(ResourcePermission.name = '[$CLASS_NAME$]') AND
-				(ResourcePermission.scope = [$RESOURCE_SCOPE_INDIVIDUAL$]) AND
-				(ResourcePermission.viewActionId = [$TRUE$]) AND
-				(
-					[$ROLE_IDS_OR_OWNER_ID$]
-					[$GROUP_ADMIN_RESOURCE_PERMISSION$]
-				)
-		]]>
-	</sql>
 	<sql id="com.liferay.portal.kernel.service.persistence.GroupFinder.countByLayouts">
 		<![CDATA[
 			SELECT
@@ -106,8 +52,8 @@
 				(Group_.parentGroupId [$PARENT_GROUP_ID_COMPARATOR$] ?) AND
 				(Group_.liveGroupId = 0) AND
 				(Group_.groupKey != 'Control Panel') AND
-				(lower(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-				(lower(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
+				(LOWER(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+				(LOWER(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
 				(Group_.type_ != 4)
 		]]>
 	</sql>
@@ -255,7 +201,7 @@
 			WHERE
 				(Group_.companyId = ?) AND
 				(Group_.liveGroupId = 0) AND
-				(lower(Group_.groupKey) = ?) AND
+				(LOWER(Group_.groupKey) = ?) AND
 				(Group_.type_ != 4)
 		]]>
 	</sql>
@@ -267,7 +213,7 @@
 				Group_
 			WHERE
 				(Group_.liveGroupId != ?) AND
-				(CAST_CLOB_TEXT(Group_.typeSettings) like ?) AND
+				(CAST_CLOB_TEXT(Group_.typeSettings) LIKE ?) AND
 				(Group_.site = ?) AND
 				(Group_.remoteStagingGroupCount > ?)
 		]]>
@@ -285,8 +231,8 @@
 				(Group_.parentGroupId [$PARENT_GROUP_ID_COMPARATOR$] ?) AND
 				(Group_.liveGroupId = 0) AND
 				(Group_.groupKey != 'Control Panel') AND
-				(lower(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-				(lower(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
+				(LOWER(Group_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+				(LOWER(Group_.description) LIKE ? [$AND_OR_NULL_CHECK$]) AND
 				(Group_.type_ != 4)
 		]]>
 	</sql>
@@ -567,11 +513,11 @@
 				(Organization_.companyId = ?) AND
 				(Organization_.parentOrganizationId [$PARENT_ORGANIZATION_ID_COMPARATOR$] ?) AND
 				(
-					(lower(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 					(
-						(lower(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
 					) [$AND_OR_CONNECTOR$]
 					(
 						(Organization_.regionId = ?) OR
@@ -581,8 +527,8 @@
 						(Organization_.countryId = ?) OR
 						(Address.countryId = ?)
 					) [$AND_OR_CONNECTOR$]
-					(lower(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 		]]>
 	</sql>
@@ -604,11 +550,11 @@
 				(Organization_.parentOrganizationId [$PARENT_ORGANIZATION_ID_COMPARATOR$] ?) AND
 				(Organization_.type_ = ?) AND
 				(
-					(lower(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 					(
-						(lower(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
 					) [$AND_OR_CONNECTOR$]
 					(
 						(Organization_.regionId = ?) OR
@@ -618,8 +564,8 @@
 						(Organization_.countryId = ?) OR
 						(Address.countryId = ?)
 					) [$AND_OR_CONNECTOR$]
-					(lower(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 		]]>
 	</sql>
@@ -655,7 +601,7 @@
 	<sql id="com.liferay.portal.kernel.service.persistence.OrganizationFinder.findO_ByGroupId">
 		<![CDATA[
 			SELECT
-				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId as orgParentId, Organization_.type_ as orgType
+				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId AS orgParentId, Organization_.type_ AS orgType
 			FROM
 				Organization_
 			INNER JOIN
@@ -693,7 +639,7 @@
 	<sql id="com.liferay.portal.kernel.service.persistence.OrganizationFinder.findO_ByC_PO_N_S_C_Z_R_C">
 		<![CDATA[
 			SELECT
-				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId as orgParentId, Organization_.type_ as orgType
+				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId AS orgParentId, Organization_.type_ AS orgType
 			FROM
 				Organization_
 			LEFT JOIN
@@ -707,11 +653,11 @@
 				(Organization_.companyId = ?) AND
 				(Organization_.parentOrganizationId [$PARENT_ORGANIZATION_ID_COMPARATOR$] ?) AND
 				(
-					(lower(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 					(
-						(lower(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
 					) [$AND_OR_CONNECTOR$]
 					(
 						(Organization_.regionId = ?) OR
@@ -721,15 +667,15 @@
 						(Organization_.countryId = ?) OR
 						(Address.countryId = ?)
 					) [$AND_OR_CONNECTOR$]
-					(lower(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.kernel.service.persistence.OrganizationFinder.findO_ByC_PO_N_L_S_C_Z_R_C">
 		<![CDATA[
 			SELECT
-				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId as orgParentId, Organization_.type_ as orgType
+				DISTINCT Organization_.organizationId AS orgId, Organization_.name AS orgName, Organization_.parentOrganizationId AS orgParentId, Organization_.type_ AS orgType
 			FROM
 				Organization_
 			LEFT JOIN
@@ -744,11 +690,11 @@
 				(Organization_.parentOrganizationId [$PARENT_ORGANIZATION_ID_COMPARATOR$] ?) AND
 				(Organization_.type_ = ?) AND
 				(
-					(lower(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Organization_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 					(
-						(lower(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
-						(lower(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Address.street1) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street2) LIKE ? [$AND_OR_NULL_CHECK$]) OR
+						(LOWER(Address.street3) LIKE ? [$AND_OR_NULL_CHECK$])
 					) [$AND_OR_CONNECTOR$]
 					(
 						(Organization_.regionId = ?) OR
@@ -758,8 +704,8 @@
 						(Organization_.countryId = ?) OR
 						(Address.countryId = ?)
 					) [$AND_OR_CONNECTOR$]
-					(lower(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Address.city) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Address.zip) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 		]]>
 	</sql>
@@ -837,7 +783,7 @@
 			WHERE
 				(PasswordPolicy.companyId = ?) AND
 				(
-					(lower(PasswordPolicy.name) LIKE ?) OR
+					(LOWER(PasswordPolicy.name) LIKE ?) OR
 					(? IS NULL)
 				)
 		]]>
@@ -851,7 +797,7 @@
 			WHERE
 				(PasswordPolicy.companyId = ?) AND
 				(
-					(lower(PasswordPolicy.name) LIKE ?) OR
+					(LOWER(PasswordPolicy.name) LIKE ?) OR
 					(? IS NULL)
 				)
 		]]>
@@ -1034,8 +980,8 @@
 				(Role_.companyId = ?) AND
 				(
 					(
-						(lower(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-						(lower(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+						(LOWER(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
 					)
 					[$EXCLUDED_NAMES$]
 					[$TYPE$]
@@ -1053,8 +999,8 @@
 								WHERE
 									(groupId = ?) AND
 									(
-										(lower(Team.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-										(lower(Team.description) LIKE ? [$AND_OR_NULL_CHECK$])
+										(LOWER(Team.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+										(LOWER(Team.description) LIKE ? [$AND_OR_NULL_CHECK$])
 									)
 							)
 					)
@@ -1201,8 +1147,8 @@
 				(Role_.companyId = ?) AND
 				(Role_.classNameId = [$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.ROLE$]) AND
 				(
-					(lower(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 				[$TYPE$]
 		]]>
@@ -1217,8 +1163,8 @@
 				(Role_.companyId = ?) AND
 				(
 					(
-						(lower(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-						(lower(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
+						(LOWER(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+						(LOWER(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
 					)
 					[$EXCLUDED_NAMES$]
 					[$TYPE$]
@@ -1236,8 +1182,8 @@
 								WHERE
 									(groupId = ?) AND
 									(
-										(lower(Team.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-										(lower(Team.description) LIKE ? [$AND_OR_NULL_CHECK$])
+										(LOWER(Team.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+										(LOWER(Team.description) LIKE ? [$AND_OR_NULL_CHECK$])
 									)
 							)
 					)
@@ -1355,7 +1301,7 @@
 				Role_
 			WHERE
 				(Role_.companyId = ?) AND
-				(lower(Role_.name) = ?)
+				(LOWER(Role_.name) = ?)
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.kernel.service.persistence.RoleFinder.findByU_G">
@@ -1416,8 +1362,8 @@
 				(Role_.companyId = ?) AND
 				(Role_.classNameId = [$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.ROLE$]) AND
 				(
-					(lower(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(Role_.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(Role_.description) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 				[$TYPE$]
 			ORDER BY
@@ -1503,11 +1449,11 @@
 				[$WHERE$]
 				(Team.groupId = ?) AND
 				(
-					(lower(Team.name) LIKE ?) OR
+					(LOWER(Team.name) LIKE ?) OR
 					(? IS NULL)
 				) AND
 				(
-					(lower(Team.description) LIKE ?) OR
+					(LOWER(Team.description) LIKE ?) OR
 					(? IS NULL)
 				)
 		]]>
@@ -1555,11 +1501,11 @@
 				[$WHERE$]
 				(Team.groupId = ?) AND
 				(
-					(lower(Team.name) LIKE ?) OR
+					(LOWER(Team.name) LIKE ?) OR
 					(? IS NULL)
 				) AND
 				(
-					(lower(Team.description) LIKE ?) OR
+					(LOWER(Team.description) LIKE ?) OR
 					(? IS NULL)
 				)
 			ORDER BY
@@ -1762,11 +1708,11 @@
 				(User_.companyId = ?) AND
 				(User_.defaultUser = ?) AND
 				(
-					(lower(User_.firstName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(User_.middleName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(User_.lastName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(User_.screenName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(User_.emailAddress) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(User_.firstName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(User_.middleName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(User_.lastName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(User_.screenName) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(User_.emailAddress) LIKE ? [$AND_OR_NULL_CHECK$])
 				) AND
 				(User_.status = ?)
 		]]>
@@ -1960,8 +1906,8 @@
 				[$WHERE$]
 				(UserGroup.companyId = ?) AND
 				(
-					(lower(UserGroup.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(UserGroup.description) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(UserGroup.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(UserGroup.description) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 		]]>
 	</sql>
@@ -1976,8 +1922,8 @@
 				[$WHERE$]
 				(UserGroup.companyId = ?) AND
 				(
-					(lower(UserGroup.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-					(lower(UserGroup.description) LIKE ? [$AND_OR_NULL_CHECK$])
+					(LOWER(UserGroup.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
+					(LOWER(UserGroup.description) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
 			ORDER BY
 				UserGroup.name ASC

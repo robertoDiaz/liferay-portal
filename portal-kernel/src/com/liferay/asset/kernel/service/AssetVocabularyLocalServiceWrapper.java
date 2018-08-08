@@ -252,6 +252,20 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	/**
+	* Returns the asset vocabulary with the matching external reference code and company.
+	*
+	* @param companyId the primary key of the company
+	* @param externalReferenceCode the asset vocabulary's external reference code
+	* @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	*/
+	@Override
+	public com.liferay.asset.kernel.model.AssetVocabulary fetchAssetVocabularyByReferenceCode(
+		long companyId, String externalReferenceCode) {
+		return _assetVocabularyLocalService.fetchAssetVocabularyByReferenceCode(companyId,
+			externalReferenceCode);
+	}
+
+	/**
 	* Returns the asset vocabulary matching the UUID and group.
 	*
 	* @param uuid the asset vocabulary's UUID
@@ -267,8 +281,7 @@ public class AssetVocabularyLocalServiceWrapper
 
 	@Override
 	public com.liferay.asset.kernel.model.AssetVocabulary fetchGroupVocabulary(
-		long groupId, String name)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long groupId, String name) {
 		return _assetVocabularyLocalService.fetchGroupVocabulary(groupId, name);
 	}
 

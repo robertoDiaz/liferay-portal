@@ -22,14 +22,17 @@ import com.liferay.oauth2.provider.service.base.OAuth2ApplicationScopeAliasesLoc
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
@@ -95,10 +98,25 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		long oAuth2ApplicationId, List<String> scopeAliasesList) {
 
 		String scopeAliases = StringUtil.merge(
-			scopeAliasesList, StringPool.SPACE);
+			ListUtil.sort(
+				ListUtil.filter(scopeAliasesList, Validator::isNotNull)),
+			StringPool.SPACE);
 
-		return oAuth2ApplicationScopeAliasesPersistence.fetchByO_S(
-			oAuth2ApplicationId, scopeAliases);
+		List<OAuth2ApplicationScopeAliases> oAuth2ApplicationScopeAliasesList =
+			oAuth2ApplicationScopeAliasesPersistence.findByO_S(
+				oAuth2ApplicationId, scopeAliases.hashCode());
+
+		for (OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases :
+				oAuth2ApplicationScopeAliasesList) {
+
+			if (scopeAliases.equals(
+					oAuth2ApplicationScopeAliases.getScopeAliases())) {
+
+				return oAuth2ApplicationScopeAliases;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -111,6 +129,27 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 		return oAuth2ApplicationScopeAliasesPersistence.
 			findByOAuth2ApplicationId(
 				oAuth2ApplicationId, start, end, orderByComparator);
+	}
+
+	@Override
+	public OAuth2ApplicationScopeAliases updateOAuth2ApplicationScopeAliases(
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
+
+		if (_hasUpToDateScopeGrants(oAuth2ApplicationScopeAliases)) {
+			return oAuth2ApplicationScopeAliases;
+		}
+
+		try {
+			return addOAuth2ApplicationScopeAliases(
+				oAuth2ApplicationScopeAliases.getCompanyId(),
+				oAuth2ApplicationScopeAliases.getUserId(),
+				oAuth2ApplicationScopeAliases.getUserName(),
+				oAuth2ApplicationScopeAliases.getOAuth2ApplicationId(),
+				oAuth2ApplicationScopeAliases.getScopeAliasesList());
+		}
+		catch (PortalException pe) {
+			throw new IllegalArgumentException(pe);
+		}
 	}
 
 	protected void createScopeGrants(
@@ -133,6 +172,59 @@ public class OAuth2ApplicationScopeAliasesLocalServiceImpl
 				liferayOAuth2Scope.getApplicationName(),
 				bundle.getSymbolicName(), liferayOAuth2Scope.getScope());
 		}
+	}
+
+	private boolean _hasUpToDateScopeGrants(
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
+
+		List<String> scopeAliasesList =
+			oAuth2ApplicationScopeAliases.getScopeAliasesList();
+
+		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes = new HashSet<>();
+
+		for (String scopeAlias : scopeAliasesList) {
+			liferayOAuth2Scopes.addAll(
+				_scopeLocator.getLiferayOAuth2Scopes(
+					oAuth2ApplicationScopeAliases.getCompanyId(), scopeAlias));
+		}
+
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		if (liferayOAuth2Scopes.size() != oAuth2ScopeGrants.size()) {
+			return false;
+		}
+
+		for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
+			boolean found = liferayOAuth2Scopes.removeIf(
+				liferayOAuth2Scope -> {
+					Bundle bundle = liferayOAuth2Scope.getBundle();
+
+					if (Objects.equals(
+							liferayOAuth2Scope.getApplicationName(),
+							oAuth2ScopeGrant.getApplicationName()) &&
+						Objects.equals(
+							bundle.getSymbolicName(),
+							oAuth2ScopeGrant.getBundleSymbolicName()) &&
+						Objects.equals(
+							liferayOAuth2Scope.getScope(),
+							oAuth2ScopeGrant.getScope())) {
+
+						return true;
+					}
+
+					return false;
+				});
+
+			if (!found) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@ServiceReference(type = ScopeLocator.class)

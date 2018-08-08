@@ -16,6 +16,8 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -35,11 +37,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.RecentLayoutRevisionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.model.impl.RecentLayoutRevisionImpl;
 import com.liferay.portal.model.impl.RecentLayoutRevisionModelImpl;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -1771,13 +1775,6 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 					result = recentLayoutRevision;
 
 					cacheResult(recentLayoutRevision);
-
-					if ((recentLayoutRevision.getUserId() != userId) ||
-							(recentLayoutRevision.getLayoutSetBranchId() != layoutSetBranchId) ||
-							(recentLayoutRevision.getPlid() != plid)) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_U_L_P,
-							finderArgs, recentLayoutRevision);
-					}
 				}
 			}
 			catch (Exception e) {
@@ -2091,8 +2088,6 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 	@Override
 	protected RecentLayoutRevision removeImpl(
 		RecentLayoutRevision recentLayoutRevision) {
-		recentLayoutRevision = toUnwrappedModel(recentLayoutRevision);
-
 		Session session = null;
 
 		try {
@@ -2124,9 +2119,23 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 	@Override
 	public RecentLayoutRevision updateImpl(
 		RecentLayoutRevision recentLayoutRevision) {
-		recentLayoutRevision = toUnwrappedModel(recentLayoutRevision);
-
 		boolean isNew = recentLayoutRevision.isNew();
+
+		if (!(recentLayoutRevision instanceof RecentLayoutRevisionModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(recentLayoutRevision.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(recentLayoutRevision);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in recentLayoutRevision proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom RecentLayoutRevision implementation " +
+				recentLayoutRevision.getClass());
+		}
 
 		RecentLayoutRevisionModelImpl recentLayoutRevisionModelImpl = (RecentLayoutRevisionModelImpl)recentLayoutRevision;
 
@@ -2252,29 +2261,6 @@ public class RecentLayoutRevisionPersistenceImpl extends BasePersistenceImpl<Rec
 		recentLayoutRevision.resetOriginalValues();
 
 		return recentLayoutRevision;
-	}
-
-	protected RecentLayoutRevision toUnwrappedModel(
-		RecentLayoutRevision recentLayoutRevision) {
-		if (recentLayoutRevision instanceof RecentLayoutRevisionImpl) {
-			return recentLayoutRevision;
-		}
-
-		RecentLayoutRevisionImpl recentLayoutRevisionImpl = new RecentLayoutRevisionImpl();
-
-		recentLayoutRevisionImpl.setNew(recentLayoutRevision.isNew());
-		recentLayoutRevisionImpl.setPrimaryKey(recentLayoutRevision.getPrimaryKey());
-
-		recentLayoutRevisionImpl.setMvccVersion(recentLayoutRevision.getMvccVersion());
-		recentLayoutRevisionImpl.setRecentLayoutRevisionId(recentLayoutRevision.getRecentLayoutRevisionId());
-		recentLayoutRevisionImpl.setGroupId(recentLayoutRevision.getGroupId());
-		recentLayoutRevisionImpl.setCompanyId(recentLayoutRevision.getCompanyId());
-		recentLayoutRevisionImpl.setUserId(recentLayoutRevision.getUserId());
-		recentLayoutRevisionImpl.setLayoutRevisionId(recentLayoutRevision.getLayoutRevisionId());
-		recentLayoutRevisionImpl.setLayoutSetBranchId(recentLayoutRevision.getLayoutSetBranchId());
-		recentLayoutRevisionImpl.setPlid(recentLayoutRevision.getPlid());
-
-		return recentLayoutRevisionImpl;
 	}
 
 	/**
