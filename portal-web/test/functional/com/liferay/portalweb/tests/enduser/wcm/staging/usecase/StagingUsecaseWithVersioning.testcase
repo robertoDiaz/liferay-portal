@@ -50,7 +50,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -899,7 +899,6 @@
 
 		<execute macro="Site#changeSiteLogo">
 			<var name="logoFile" value="Document_2.png" />
-			<var name="pageName" value="Staging Test Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoStagedSitePage">
