@@ -62,3 +62,58 @@
 		paginate="<%= paginate %>"
 	/>
 </liferay-ui:search-container>
+
+<%
+Date expirationDate = new Date(System.currentTimeMillis() + GetterUtil.getInteger(PropsUtil.get(PropsKeys.SESSION_TIMEOUT)) * Time.MINUTE);
+
+Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, expirationDate, new ServiceContext());
+%>
+
+<aui:script use="liferay-search-container">
+	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />pageAttachments');
+
+	searchContainer.get('contentBox').delegate(
+		'click',
+		function(event) {
+			var A = AUI();
+
+			var link = event.currentTarget;
+
+			var tr = link.ancestor('tr');
+
+			var deleteURL = Liferay.PortletURL.createActionURL();
+
+			var actionName = '/wiki/edit_page_attachment';
+
+			var cmd = '<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>';
+
+			var userId = <%= user.getUserId() %>;
+
+			var params = {
+				cmd: cmd,
+				nodeId: <%= wikiPage.getNodeId() %>,
+				title: '<%= wikiPage.getTitle() %>',
+				fileName: link.getAttribute('data-fileName'),
+				ticketKey: '<%= ticket.getKey() %>'
+			};
+
+			deleteURL.setDoAsUserId(userId);
+			deleteURL.setName(actionName);
+			deleteURL.setParameters(params);
+			deleteURL.setPortletId('com_liferay_wiki_web_portlet_WikiAdminPortlet');
+
+			A.io.request(
+				deleteURL.toString(),
+					{
+						on: {
+							success: function() {
+								searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
+								searchContainer.updateDataStore();
+							}
+						}
+					}
+			);
+		},
+		'.delete-attachment'
+	);
+</aui:script>

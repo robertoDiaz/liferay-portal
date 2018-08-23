@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.vocabulary.apio.architect.identifier.VocabularyIdentifier;
 
 import java.util.List;
 
@@ -125,9 +126,11 @@ public class BlogPostingNestedCollectionResource
 			"image", MediaObjectIdentifier.class,
 			BlogsEntry::getCoverImageFileEntryId
 		).addRelatedCollection(
-			"comments", CommentIdentifier.class
+			"category", CategoryIdentifier.class
 		).addRelatedCollection(
-			"categories", CategoryIdentifier.class
+			"comment", CommentIdentifier.class
+		).addRelatedCollection(
+			"vocabularyAssignment", VocabularyIdentifier.class
 		).addString(
 			"alternativeHeadline", BlogsEntry::getSubtitle
 		).addString(
@@ -137,7 +140,7 @@ public class BlogPostingNestedCollectionResource
 		).addString(
 			"description", BlogsEntry::getDescription
 		).addString(
-			"fileFormat", blogsEntry -> "text/html"
+			"encodingFormat", blogsEntry -> "text/html"
 		).addString(
 			"friendlyUrlPath", BlogsEntry::getUrlTitle
 		).addString(
