@@ -24,6 +24,10 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 FileEntry attachmentsFileEntry = (FileEntry)row.getObject();
 
 WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFileEntryId());
+
+Date expirationDate = new Date(System.currentTimeMillis() + GetterUtil.getInteger(PropsUtil.get(PropsKeys.SESSION_TIMEOUT)) * Time.MINUTE);
+
+Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, expirationDate, new ServiceContext());
 %>
 
 <liferay-ui:icon-menu
@@ -32,14 +36,6 @@ WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFile
 	markupView="lexicon"
 	message="<%= StringPool.BLANK %>"
 >
-
-<liferay-util:buffer
-	var="removeAttachmentIcon"
->
-	<liferay-ui:icon
-		iconCssClass="icon-remove" label=""
-	/>
-</liferay-util:buffer>
 
 	<c:choose>
 		<c:when test="<%= viewTrashAttachments %>">
@@ -74,7 +70,12 @@ WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFile
 		</c:when>
 		<c:otherwise>
 			<c:if test="<%= WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.DELETE) %>">
-				<a class="delete-attachment" data-fileName="<%= attachmentsFileEntry.getTitle() %>" data-rowId="<%= attachmentsFileEntry.getFileEntryId() %>" href="javascript:;"><%= trashHelper.isTrashEnabled(scopeGroupId) ? LanguageUtil.get(resourceBundle, "move-to-recycle-bin") : removeAttachmentIcon %></a>
+				<div class="delete-attachment" data-cmd="<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" data-nodeId="<%= String.valueOf(wikiPage.getNodeId()) %>" data-nodeId="<%= String.valueOf(wikiPage.getNodeId()) %>" data-title="<%= wikiPage.getTitle() %>" data-fileName="<%= attachmentsFileEntry.getTitle() %>" data-ticketKey="<%= ticket.getKey() %>" data-rowId="<%= attachmentsFileEntry.getFileEntryId() %>">
+					<liferay-ui:icon-delete
+						trash="<%= trashHelper.isTrashEnabled(scopeGroupId) %>"
+						url="javascript:;"
+					/>
+				</div>
 			</c:if>
 		</c:otherwise>
 	</c:choose>
