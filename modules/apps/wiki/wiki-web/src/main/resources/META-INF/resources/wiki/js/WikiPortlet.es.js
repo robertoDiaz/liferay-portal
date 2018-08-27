@@ -46,6 +46,65 @@ class WikiPortlet extends PortletBase {
 				this.saveDraft_(e);
 			}));
 		}
+
+		const A = new AUI();
+
+		A.use(
+			'liferay-search-container',
+			A => {
+				Liferay.componentReady('#pageAttachments').then(
+					() => {
+						var searchContainer = Liferay.SearchContainer.get('#pageAttachments');
+
+						this.eventHandler_.add(searchContainer.get('contentBox').delegate(
+							'click',
+							function(event) {
+								var link = event.currentTarget;
+
+								var cmd = link.getAttribute('data-cmd');
+								var nodeId = link.getAttribute('data-nodeId');
+								var title = link.getAttribute('data-title');
+								var fileName = link.getAttribute('data-cmd');
+								var ticketKey = link.getAttribute('data-ticketKey');
+
+								var tr = link.ancestor('tr');
+
+								var deleteURL = Liferay.PortletURL.createActionURL();
+
+								var actionName = '/wiki/edit_page_attachment';
+
+								var params = {
+									cmd: cmd,
+									nodeId: nodeId,
+									title: 'title',
+									fileName: fileName,
+									ticketKey: ticketKey
+								};
+
+								deleteURL.setName(actionName);
+								deleteURL.setParameters(params);
+								deleteURL.setPortletId('com_liferay_wiki_web_portlet_WikiAdminPortlet');
+
+								A.io.request(
+										deleteURL.toString(),
+										{
+											on: {
+												success: function() {
+													searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
+													searchContainer.updateDataStore();
+												}
+											}
+										}
+								);
+							},
+							'.delete-attachment'
+						));
+
+						this._attachmentsSearchContainer = searchContainer;
+					}
+				);
+			}
+		);
 	}
 
 	/**

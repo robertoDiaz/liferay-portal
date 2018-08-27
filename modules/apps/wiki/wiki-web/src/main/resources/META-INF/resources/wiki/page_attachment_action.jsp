@@ -24,6 +24,10 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 FileEntry attachmentsFileEntry = (FileEntry)row.getObject();
 
 WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFileEntryId());
+
+Date expirationDate = new Date(System.currentTimeMillis() + GetterUtil.getInteger(PropsUtil.get(PropsKeys.SESSION_TIMEOUT)) * Time.MINUTE);
+
+Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, expirationDate, new ServiceContext());
 %>
 
 <liferay-ui:icon-menu
@@ -32,6 +36,7 @@ WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFile
 	markupView="lexicon"
 	message="<%= StringPool.BLANK %>"
 >
+
 	<c:choose>
 		<c:when test="<%= viewTrashAttachments %>">
 			<c:if test="<%= WikiNodePermission.contains(permissionChecker, wikiPage.getNodeId(), ActionKeys.ADD_ATTACHMENT) %>">
@@ -65,18 +70,12 @@ WikiPage wikiPage = WikiPageAttachmentsUtil.getPage(attachmentsFileEntry.getFile
 		</c:when>
 		<c:otherwise>
 			<c:if test="<%= WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.DELETE) %>">
-				<portlet:actionURL name="/wiki/edit_page_attachment" var="deleteURL">
-					<portlet:param name="<%= Constants.CMD %>" value="<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-					<portlet:param name="nodeId" value="<%= String.valueOf(wikiPage.getNodeId()) %>" />
-					<portlet:param name="title" value="<%= wikiPage.getTitle() %>" />
-					<portlet:param name="fileName" value="<%= HtmlUtil.unescape(attachmentsFileEntry.getTitle()) %>" />
-				</portlet:actionURL>
-
-				<liferay-ui:icon-delete
-					trash="<%= trashHelper.isTrashEnabled(scopeGroupId) %>"
-					url="<%= deleteURL %>"
-				/>
+				<div class="delete-attachment" data-cmd="<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" data-nodeId="<%= String.valueOf(wikiPage.getNodeId()) %>" data-nodeId="<%= String.valueOf(wikiPage.getNodeId()) %>" data-title="<%= wikiPage.getTitle() %>" data-fileName="<%= attachmentsFileEntry.getTitle() %>" data-ticketKey="<%= ticket.getKey() %>" data-rowId="<%= attachmentsFileEntry.getFileEntryId() %>">
+					<liferay-ui:icon-delete
+						trash="<%= trashHelper.isTrashEnabled(scopeGroupId) %>"
+						url="javascript:;"
+					/>
+				</div>
 			</c:if>
 		</c:otherwise>
 	</c:choose>

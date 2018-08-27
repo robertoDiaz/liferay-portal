@@ -186,6 +186,10 @@ public class FriendlyURLServlet extends HttpServlet {
 
 			Layout layout = layoutFriendlyURLSeparatorComposite.getLayout();
 
+			if (!group.isActive() && !layout.isTypeControlPanel()) {
+				throw new NoSuchLayoutException();
+			}
+
 			request.setAttribute(WebKeys.LAYOUT, layout);
 
 			String layoutFriendlyURLSeparatorCompositeFriendlyURL =
