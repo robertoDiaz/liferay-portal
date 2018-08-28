@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.structure.apio.architect.identifier.ContentStructureIdentifier;
 import com.liferay.structured.content.apio.architect.identifier.StructuredContentIdentifier;
 import com.liferay.structured.content.apio.architect.util.StructuredContentUtil;
@@ -63,6 +64,7 @@ import com.liferay.structured.content.apio.internal.architect.form.StructuredCon
 import com.liferay.structured.content.apio.internal.model.JournalArticleWrapper;
 import com.liferay.structured.content.apio.internal.model.RenderedJournalArticle;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -80,9 +82,9 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true)
 public class StructuredContentNestedCollectionResource
-	implements
-		NestedCollectionResource<JournalArticleWrapper, Long,
-			StructuredContentIdentifier, Long, ContentSpaceIdentifier> {
+	implements NestedCollectionResource
+		<JournalArticleWrapper, Long, StructuredContentIdentifier, Long,
+			ContentSpaceIdentifier> {
 
 	@Override
 	public NestedCollectionRoutes<JournalArticleWrapper, Long, Long>
@@ -194,9 +196,13 @@ public class StructuredContentNestedCollectionResource
 				"name", DDMFormFieldValue::getName
 			).build()
 		).addRelatedCollection(
-			"categories", CategoryIdentifier.class
+			"category", CategoryIdentifier.class
 		).addRelatedCollection(
-			"comments", CommentIdentifier.class
+			"comment", CommentIdentifier.class
+		).addStringList(
+			"availableLanguages",
+			journalArticle -> Arrays.asList(
+				journalArticle.getAvailableLanguageIds())
 		).addStringList(
 			"keywords", this::_getJournalArticleAssetTags
 		).build();
@@ -391,12 +397,15 @@ public class StructuredContentNestedCollectionResource
 	}
 
 	private PageItems<JournalArticleWrapper> _getPageItems(
-		Pagination pagination, long contentSpaceId, ThemeDisplay themeDisplay) {
+			Pagination pagination, long contentSpaceId,
+			ThemeDisplay themeDisplay)
+		throws PortalException {
 
 		List<JournalArticleWrapper> journalArticleWrappers = Stream.of(
-			_journalArticleService.getArticles(
-				contentSpaceId, 0, pagination.getStartPosition(),
-				pagination.getEndPosition(), null)
+			_journalArticleService.getGroupArticles(
+				contentSpaceId, 0, 0, WorkflowConstants.STATUS_APPROVED,
+				pagination.getStartPosition(), pagination.getEndPosition(),
+				null)
 		).flatMap(
 			List::stream
 		).map(
@@ -405,7 +414,8 @@ public class StructuredContentNestedCollectionResource
 		).collect(
 			Collectors.toList()
 		);
-		int count = _journalArticleService.getArticlesCount(contentSpaceId, 0);
+		int count = _journalArticleService.getGroupArticlesCount(
+			contentSpaceId, 0, 0, WorkflowConstants.STATUS_APPROVED);
 
 		return new PageItems<>(journalArticleWrappers, count);
 	}
