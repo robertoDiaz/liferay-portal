@@ -1701,7 +1701,14 @@ public class PortalImpl implements Portal {
 		Group controlPanelDisplayGroup = getControlPanelDisplayGroup(
 			group.getCompanyId(), scopeGroupId, 0, ppid);
 
-		return getSiteAdminURL(controlPanelDisplayGroup, ppid, params);
+		Company company = CompanyLocalServiceUtil.getCompany(
+			controlPanelDisplayGroup.getCompanyId());
+
+		return _getSiteAdminURL(
+			getPortalURL(
+				company.getVirtualHostname(), getPortalServerPort(false),
+				false),
+			controlPanelDisplayGroup, ppid, params);
 	}
 
 	@Override
@@ -3620,11 +3627,15 @@ public class PortalImpl implements Portal {
 		HttpServletRequest request, Layout layout, Locale locale,
 		Locale originalLocale) {
 
-		String contextPath = getPathContext();
+		String requestURI = request.getRequestURI();
 
 		HttpServletRequest originalRequest = getOriginalServletRequest(request);
 
-		String requestURI = originalRequest.getRequestURI();
+		if (originalRequest.getPathInfo() == null) {
+			requestURI = originalRequest.getRequestURI();
+		}
+
+		String contextPath = getPathContext();
 
 		if (Validator.isNotNull(contextPath) &&
 			requestURI.contains(contextPath)) {

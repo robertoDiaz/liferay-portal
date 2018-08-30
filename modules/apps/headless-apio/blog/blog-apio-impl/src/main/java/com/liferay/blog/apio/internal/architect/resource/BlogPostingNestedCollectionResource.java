@@ -61,8 +61,9 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true)
 public class BlogPostingNestedCollectionResource
-	implements NestedCollectionResource<BlogsEntry, Long, BlogPostingIdentifier,
-		Long, ContentSpaceIdentifier> {
+	implements NestedCollectionResource
+		<BlogsEntry, Long, BlogPostingIdentifier, Long,
+			ContentSpaceIdentifier> {
 
 	@Override
 	public NestedCollectionRoutes<BlogsEntry, Long, Long> collectionRoutes(
@@ -111,11 +112,9 @@ public class BlogPostingNestedCollectionResource
 		).addDate(
 			"dateCreated", BlogsEntry::getCreateDate
 		).addDate(
-			"dateDisplayed", BlogsEntry::getDisplayDate
-		).addDate(
 			"dateModified", BlogsEntry::getModifiedDate
 		).addDate(
-			"datePublished", BlogsEntry::getLastPublishDate
+			"datePublished", BlogsEntry::getDisplayDate
 		).addLinkedModel(
 			"aggregateRating", AggregateRatingIdentifier.class,
 			ClassNameClassPK::create
@@ -125,9 +124,9 @@ public class BlogPostingNestedCollectionResource
 			"image", MediaObjectIdentifier.class,
 			BlogsEntry::getCoverImageFileEntryId
 		).addRelatedCollection(
-			"comments", CommentIdentifier.class
+			"category", CategoryIdentifier.class
 		).addRelatedCollection(
-			"categories", CategoryIdentifier.class
+			"comment", CommentIdentifier.class
 		).addString(
 			"alternativeHeadline", BlogsEntry::getSubtitle
 		).addString(
@@ -137,7 +136,7 @@ public class BlogPostingNestedCollectionResource
 		).addString(
 			"description", BlogsEntry::getDescription
 		).addString(
-			"fileFormat", blogsEntry -> "text/html"
+			"encodingFormat", blogsEntry -> "text/html"
 		).addString(
 			"friendlyUrlPath", BlogsEntry::getUrlTitle
 		).addString(
