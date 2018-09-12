@@ -21,14 +21,13 @@ import com.liferay.apio.architect.resource.NestedCollectionResource;
 import com.liferay.apio.architect.routes.ItemRoutes;
 import com.liferay.apio.architect.routes.NestedCollectionRoutes;
 import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
-import com.liferay.dynamic.data.lists.model.DDLRecordSet;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.forms.apio.architect.identifier.StructureIdentifier;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.forms.apio.internal.helper.FormStructureRepresentorBuilderHelper;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.service.ClassNameService;
-import com.liferay.structure.apio.architect.util.StructureRepresentorBuilderHelper;
 
 import java.util.List;
 
@@ -45,15 +44,17 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component
 public class FormStructureNestedCollectionResource
-	implements
-		NestedCollectionResource<DDMStructure, Long, StructureIdentifier,
-			Long, ContentSpaceIdentifier> {
+	implements NestedCollectionResource
+		<DDMStructure, Long, StructureIdentifier, Long,
+		 ContentSpaceIdentifier> {
 
 	@Override
 	public NestedCollectionRoutes<DDMStructure, Long, Long> collectionRoutes(
 		NestedCollectionRoutes.Builder<DDMStructure, Long, Long> builder) {
 
-		return builder.addGetter(this::_getPageItems).build();
+		return builder.addGetter(
+			this::_getPageItems
+		).build();
 	}
 
 	@Override
@@ -65,7 +66,9 @@ public class FormStructureNestedCollectionResource
 	public ItemRoutes<DDMStructure, Long> itemRoutes(
 		ItemRoutes.Builder<DDMStructure, Long> builder) {
 
-		return builder.addGetter(this::_getItem).build();
+		return builder.addGetter(
+			_ddmStructureLocalService::getStructure
+		).build();
 	}
 
 	@Override
@@ -73,26 +76,17 @@ public class FormStructureNestedCollectionResource
 		Representor.Builder<DDMStructure, Long> builder) {
 
 		Representor.FirstStep<DDMStructure> ddmStructureFirstStep =
-			_structureRepresentorBuilderHelper.buildDDMStructureFirstStep(
+			_formStructureRepresentorBuilderHelper.buildDDMStructureFirstStep(
 				builder);
 
-		Representor.FirstStep<DDMStructure> bidirectionalModelStep =
-			ddmStructureFirstStep.addBidirectionalModel(
-				"contentSpace", "formStructures", ContentSpaceIdentifier.class,
-				DDMStructure::getGroupId);
-
-		return bidirectionalModelStep.build();
-	}
-
-	private DDMStructure _getItem(Long structureId) throws PortalException {
-		return _ddmStructureLocalService.getStructure(structureId);
+		return ddmStructureFirstStep.build();
 	}
 
 	private PageItems<DDMStructure> _getPageItems(
 		Pagination pagination, Long groupId) {
 
 		ClassName className = _classNameService.fetchClassName(
-			DDLRecordSet.class.getName());
+			DDMFormInstance.class.getName());
 
 		List<DDMStructure> ddmStructures =
 			_ddmStructureLocalService.getStructures(
@@ -112,7 +106,7 @@ public class FormStructureNestedCollectionResource
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
-	private StructureRepresentorBuilderHelper
-		_structureRepresentorBuilderHelper;
+	private FormStructureRepresentorBuilderHelper
+		_formStructureRepresentorBuilderHelper;
 
 }

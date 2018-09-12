@@ -397,6 +397,17 @@ public class PortletExportControllerImpl implements PortletExportController {
 			"private-layout",
 			String.valueOf(portletDataContext.isPrivateLayout()));
 
+		StringBundler pathSB = new StringBundler(4);
+
+		pathSB.append(ExportImportPathUtil.getPortletPath(portletDataContext));
+		pathSB.append(StringPool.SLASH);
+		pathSB.append(plid);
+		pathSB.append("/portlet.xml");
+
+		String path = pathSB.toString();
+
+		portletElement.addAttribute("self-path", path);
+
 		// Data
 
 		if (exportPortletData) {
@@ -582,15 +593,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		}
 
 		// Zip
-
-		StringBundler pathSB = new StringBundler(4);
-
-		pathSB.append(ExportImportPathUtil.getPortletPath(portletDataContext));
-		pathSB.append(StringPool.SLASH);
-		pathSB.append(plid);
-		pathSB.append("/portlet.xml");
-
-		String path = pathSB.toString();
 
 		Element element = parentElement.addElement("portlet");
 
@@ -1402,7 +1404,10 @@ public class PortletExportControllerImpl implements PortletExportController {
 			portletDataContext, portlet);
 
 		return portletOptional.map(
-			Portlet::getPortletDataHandlerInstance).orElse(null);
+			Portlet::getPortletDataHandlerInstance
+		).orElse(
+			null
+		);
 	}
 
 	private Optional<Portlet> _replacePortlet(

@@ -20,8 +20,6 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -103,9 +101,8 @@ public class DLFolderAssetRenderer
 
 			return "/document_library/asset/folder_" + template + ".jsp";
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	@Override
@@ -243,9 +240,6 @@ public class DLFolderAssetRenderer
 
 		return true;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFolderAssetRenderer.class);
 
 	private final Folder _folder;
 	private final TrashHelper _trashHelper;
