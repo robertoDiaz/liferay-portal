@@ -20,7 +20,7 @@ import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 import java.util.List;
 
@@ -64,8 +64,8 @@ public class PlusStatementCheck extends StringConcatenationCheck {
 
 		if (firstChildAST.getLineNo() == lastChildAST.getLineNo()) {
 			log(
-				firstChildAST.getLineNo(), MSG_COMBINE_LITERAL_STRINGS,
-				literalString1, literalString2);
+				firstChildAST, MSG_COMBINE_LITERAL_STRINGS, literalString1,
+				literalString2);
 
 			return;
 		}
@@ -84,15 +84,15 @@ public class PlusStatementCheck extends StringConcatenationCheck {
 			return;
 		}
 
-		int lineLength1 = CommonUtils.lengthExpandedTabs(
+		int lineLength1 = CommonUtil.lengthExpandedTabs(
 			line1, line1.length(), getTabWidth());
 
 		String trimmedLine2 = StringUtil.trim(line2);
 
 		if ((lineLength1 + trimmedLine2.length() - 4) <= maxLineLength) {
 			log(
-				lastChildAST.getLineNo(), MSG_COMBINE_LITERAL_STRINGS,
-				literalString1, literalString2);
+				lastChildAST, MSG_COMBINE_LITERAL_STRINGS, literalString1,
+				literalString2);
 
 			return;
 		}
@@ -103,8 +103,8 @@ public class PlusStatementCheck extends StringConcatenationCheck {
 			((lineLength1 + literalString2.length()) <= maxLineLength)) {
 
 			log(
-				detailAST.getLineNo(), MSG_COMBINE_LITERAL_STRINGS,
-				literalString1, literalString2);
+				detailAST, MSG_COMBINE_LITERAL_STRINGS, literalString1,
+				literalString2);
 
 			return;
 		}
@@ -114,7 +114,7 @@ public class PlusStatementCheck extends StringConcatenationCheck {
 
 		if (pos != -1) {
 			log(
-				lastChildAST.getLineNo(), MSG_MOVE_LITERAL_STRING,
+				lastChildAST, MSG_MOVE_LITERAL_STRING,
 				literalString2.substring(0, pos + 1));
 		}
 	}

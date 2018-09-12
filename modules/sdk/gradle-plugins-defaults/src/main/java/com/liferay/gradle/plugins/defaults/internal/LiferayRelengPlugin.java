@@ -29,6 +29,7 @@ import com.liferay.gradle.plugins.defaults.internal.util.FileUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GitUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GradlePluginsDefaultsUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GradleUtil;
+import com.liferay.gradle.plugins.defaults.internal.util.spec.SkipIfMatchesIgnoreProjectRegexTaskSpec;
 import com.liferay.gradle.plugins.defaults.tasks.MergeFilesTask;
 import com.liferay.gradle.plugins.defaults.tasks.ReplaceRegexTask;
 import com.liferay.gradle.plugins.defaults.tasks.WriteArtifactPublishCommandsTask;
@@ -39,7 +40,6 @@ import com.liferay.gradle.util.Validator;
 import groovy.lang.Closure;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.lang.reflect.Method;
 
@@ -47,8 +47,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.gradle.StartParameter;
 import org.gradle.api.Action;
@@ -56,7 +54,6 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.UncheckedIOException;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ProjectDependency;
@@ -335,6 +332,8 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 
 			});
 
+		task.onlyIf(_skipIfMatchesIgnoreProjectRegexTaskSpec);
+
 		task.setDescription(
 			"Prints the project directory if this project contains " +
 				"dependencies to other projects.");
@@ -551,9 +550,6 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 					}
 
 				});
-
-			_configureTaskEnabledIfDependenciesArePublished(
-				writeArtifactPublishCommandsTask);
 		}
 
 		GradleUtil.withPlugin(
@@ -682,32 +678,6 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 			new File(destinationDir, "liferay-releng.changelog"));
 	}
 
-	private void _configureTaskEnabledIfDependenciesArePublished(Task task) {
-		task.onlyIf(
-			new Spec<Task>() {
-
-				@Override
-				public boolean isSatisfiedBy(Task task) {
-					try {
-						Project project = task.getProject();
-
-						if (FileUtil.contains(
-								project.getBuildFile(),
-								"version: \"default\"")) {
-
-							return false;
-						}
-
-						return true;
-					}
-					catch (IOException ioe) {
-						throw new UncheckedIOException(ioe);
-					}
-				}
-
-			});
-	}
-
 	private void _configureTaskEnabledIfRelease(Task task) {
 		task.onlyIf(
 			new Spec<Task>() {
@@ -765,36 +735,6 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 
 				@Override
 				public boolean isSatisfiedBy(Task task) {
-					String ignoreProjectRegex =
-						GradleUtil.getTaskPrefixedProperty(
-							task, "ignore.project.regex");
-
-					if (Validator.isNull(ignoreProjectRegex)) {
-						return true;
-					}
-
-					Project project = task.getProject();
-
-					String projectName = project.getName();
-
-					Pattern pattern = Pattern.compile(ignoreProjectRegex);
-
-					Matcher matcher = pattern.matcher(projectName);
-
-					if (!matcher.find()) {
-						return true;
-					}
-
-					return false;
-				}
-
-			});
-
-		task.onlyIf(
-			new Spec<Task>() {
-
-				@Override
-				public boolean isSatisfiedBy(Task task) {
 					File relengIgnoreDir = GradleUtil.getRootDir(
 						task.getProject(), RELENG_IGNORE_FILE_NAME);
 
@@ -830,6 +770,8 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 				}
 
 			});
+
+		task.onlyIf(_skipIfMatchesIgnoreProjectRegexTaskSpec);
 	}
 
 	private void _configureTaskPrintStaleArtifactForOSGi(Task task) {
@@ -961,6 +903,8 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 	}
 
 	private boolean _hasProjectDependencies(Project project) {
+		Logger logger = project.getLogger();
+
 		for (Configuration configuration : project.getConfigurations()) {
 			String name = configuration.getName();
 
@@ -976,9 +920,19 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 					return true;
 				}
 
+				if (!name.startsWith("compile")) {
+					continue;
+				}
+
 				String version = dependency.getVersion();
 
 				if ((version != null) && version.equals("default")) {
+					if (logger.isQuietEnabled()) {
+						logger.quiet(
+							"{} has version \"default\" in {}.", project,
+							dependency);
+					}
+
 					return true;
 				}
 			}
@@ -1058,5 +1012,8 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 		"liferay.releng.supported";
 
 	private static final String _RELENG_DIR_NAME = ".releng";
+
+	private static final Spec<Task> _skipIfMatchesIgnoreProjectRegexTaskSpec =
+		new SkipIfMatchesIgnoreProjectRegexTaskSpec();
 
 }
