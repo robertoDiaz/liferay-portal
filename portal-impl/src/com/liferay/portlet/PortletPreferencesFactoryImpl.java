@@ -451,15 +451,15 @@ public class PortletPreferencesFactoryImpl
 			plid = PortletKeys.PREFS_PLID_SHARED;
 		}
 		else if (settingsScope.equals(
-					 PortletPreferencesFactoryConstants.SETTINGS_SCOPE_GROUP)) {
+					PortletPreferencesFactoryConstants.SETTINGS_SCOPE_GROUP)) {
 
 			ownerId = siteGroupId;
 			ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
 			plid = PortletKeys.PREFS_PLID_SHARED;
 		}
 		else if (settingsScope.equals(
-					 PortletPreferencesFactoryConstants.
-						 SETTINGS_SCOPE_PORTLET_INSTANCE)) {
+					PortletPreferencesFactoryConstants.
+						SETTINGS_SCOPE_PORTLET_INSTANCE)) {
 
 			ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
 			ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
@@ -817,10 +817,7 @@ public class PortletPreferencesFactoryImpl
 
 		String cacheKey = _encodeCacheKey(xml);
 
-		PortalCache<String, Map<String, Preference>> preferencesMapPortalCache =
-			PortalCacheHolder._preferencesMapPortalCache;
-
-		Map<String, Preference> preferencesMap = preferencesMapPortalCache.get(
+		Map<String, Preference> preferencesMap = _preferencesMapPortalCache.get(
 			cacheKey);
 
 		if (preferencesMap != null) {
@@ -829,7 +826,7 @@ public class PortletPreferencesFactoryImpl
 
 		preferencesMap = createPreferencesMap(xml);
 
-		preferencesMapPortalCache.put(cacheKey, preferencesMap);
+		_preferencesMapPortalCache.put(cacheKey, preferencesMap);
 
 		return preferencesMap;
 	}
@@ -914,7 +911,7 @@ public class PortletPreferencesFactoryImpl
 					}
 				}
 				else if (layout.isPortletEmbedded(
-							 portletId, layout.getGroupId())) {
+							portletId, layout.getGroupId())) {
 
 					ownerId = layout.getGroupId();
 					plid = PortletKeys.PREFS_PLID_SHARED;
@@ -960,13 +957,8 @@ public class PortletPreferencesFactoryImpl
 		PortletPreferencesFactoryImpl.class);
 
 	private Map<String, Preference> _defaultPreferencesMap;
-
-	private static class PortalCacheHolder {
-
-		private static final PortalCache<String, Map<String, Preference>>
-			_preferencesMapPortalCache = SingleVMPoolUtil.getPortalCache(
-				PortletPreferencesFactoryImpl.class.getName());
-
-	}
+	private final PortalCache<String, Map<String, Preference>>
+		_preferencesMapPortalCache = SingleVMPoolUtil.getPortalCache(
+			PortletPreferencesFactoryImpl.class.getName());
 
 }

@@ -20,7 +20,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -95,7 +95,7 @@
 		</execute>
 	</command>
 
-	<command ignore="true" name="AddNavigationMenuEntriesNestItems" priority="5">
+	<command name="AddNavigationMenuEntriesNestItems" priority="5">
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
@@ -156,7 +156,7 @@
 		</execute>
 	</command>
 
-	<command ignore="true" name="AddNavigationMenuEntriesSortViewOrder" priority="5">
+	<command name="AddNavigationMenuEntriesSortViewOrder" priority="5">
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
@@ -260,7 +260,7 @@
 		</execute>
 	</command>
 
-	<command ignore="true" name="AddSubmenuNavigationMenu" priority="5">
+	<command name="AddSubmenuNavigationMenu" priority="5">
 		<description message="This is a use case for LPS-75061" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -565,7 +565,7 @@
 			<var name="siteName" value="Test Site Name" />
 		</execute>
 
-		<var method="TestPropsUtil#get('portal.url')" name="portalURL" />
+		<var method="PropsUtil#get('portal.url')" name="portalURL" />
 
 		<execute function="AssertLocation" value1="${portalURL}/web/test-site-name/site-page-name-2" />
 	</command>

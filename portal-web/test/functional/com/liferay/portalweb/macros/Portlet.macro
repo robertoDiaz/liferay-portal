@@ -1,6 +1,6 @@
 <definition>
 	<command name="_clickAddPortlet">
-		<var method="TestPropsUtil#get('browser.type')" name="browserType" />
+		<var method="PropsUtil#get('browser.type')" name="browserType" />
 
 		<if>
 			<equals arg1="${browserType}" arg2="safari" />
@@ -262,7 +262,7 @@
 			<var name="menuItem" value="Remove" />
 		</execute>
 
-		<execute function="Confirm" value1="Are you sure you want to remove this component?" />
+		<execute function="AssertConfirm" value1="Are you sure you want to remove this component?" />
 	</command>
 
 	<command name="dragAndDropPortletToColumnPG" summary="Drag and drop the '${portletName}' portlet from column ${columnNumberFrom} to column ${columnNumberTo}">

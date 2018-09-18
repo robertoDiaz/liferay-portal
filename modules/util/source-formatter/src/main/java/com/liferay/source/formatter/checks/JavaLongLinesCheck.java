@@ -177,7 +177,11 @@ public class JavaLongLinesCheck extends BaseFileCheck {
 		x = line.indexOf(CharPool.PERIOD);
 
 		if ((x != -1) && !ToolsUtil.isInsideQuotes(line, x)) {
-			return x + 1;
+			String linePart = StringUtil.trim(line.substring(0, x));
+
+			if (!linePart.contains(StringPool.SPACE)) {
+				return x + 1;
+			}
 		}
 
 		return -1;
@@ -225,7 +229,7 @@ public class JavaLongLinesCheck extends BaseFileCheck {
 							"\n", firstLine, "\n", secondLine, "\n"));
 				}
 				else if (Validator.isNotNull(
-							 getLine(content, lineNumber + 1))) {
+							getLine(content, lineNumber + 1))) {
 
 					return StringUtil.replace(
 						content, "\n" + line + "\n",

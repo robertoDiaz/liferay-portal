@@ -28,7 +28,8 @@ public class UndecaFunctionTest {
 
 	@Test
 	public void testOnInvokingAndThenShouldExecuteBothFunctions() {
-		UndecaFunction<String, String, String, String, String, String, String,
+		UndecaFunction
+			<String, String, String, String, String, String, String,
 			String, String, String, String, String> firstFunction = (
 				string1, string2, string3, string4, string5, string6,
 				string7, string8, string9, string10, string11) ->
@@ -48,10 +49,11 @@ public class UndecaFunctionTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
-		UndecaFunction<String, String, String, String, String, String, String,
+		UndecaFunction
+			<String, String, String, String, String, String, String,
 			String, String, String, String, String> firstFunction = (
-				string1, string2, string3, string4, string5, string6, string7,
-				string8, string9, string10, string11) ->
+				string1, string2, string3, string4, string5,
+				string6, string7, string8, string9, string10, string11) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9 + string10 + string11;
 

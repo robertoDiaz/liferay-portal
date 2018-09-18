@@ -28,7 +28,8 @@ public class ThrowableEnneaFunctionTest {
 	public void testOnInvokingAndThenShouldExecuteBothFunctions()
 		throws Exception {
 
-		ThrowableEnneaFunction<String, String, String, String, String, String,
+		ThrowableEnneaFunction
+			<String, String, String, String, String, String,
 			String, String, String, String> throwableEnneaFunction = (
 				string1, string2, string3, string4, string5, string6,
 				string7, string8, string9) ->
@@ -49,7 +50,8 @@ public class ThrowableEnneaFunctionTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
-		ThrowableEnneaFunction<String, String, String, String, String, String,
+		ThrowableEnneaFunction
+			<String, String, String, String, String, String,
 			String, String, String, String> throwableEnneaFunction = (
 				string1, string2, string3, string4, string5, string6,
 				string7, string8, string9) ->

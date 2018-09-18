@@ -1005,56 +1005,13 @@ release was successful.</echo>
 		</if>
 	</target>
 
-	<target name="generate-hypersonic-data">
-		<property location="dist/hypersonic.tmp" name="tmp.hypersonic.dir" />
+	<target name="generate-startup-files">
 
-		<property location="${tmp.hypersonic.dir}/tomcat-${app.server.tomcat.version}/bin" name="tmp.app.server.tomcat.bin.dir" />
+		<!--
+		Remove this target the reference to this target is removed from the
+		release tool
+		-->
 
-		<copy
-			todir="${tmp.hypersonic.dir}"
-		>
-			<fileset
-				dir="${liferay.home}"
-			/>
-		</copy>
-
-		<chmod
-			perm="744"
-		>
-			<fileset
-				dir="${tmp.app.server.tomcat.bin.dir}"
-				includes="*.sh"
-			/>
-		</chmod>
-
-		<parallel>
-			<exec dir="${tmp.app.server.tomcat.bin.dir}" executable="sh">
-				<arg value="catalina.sh" />
-				<arg value="run" />
-			</exec>
-
-			<sequential>
-				<waitfor>
-					<http url="http://localhost:8080" />
-				</waitfor>
-
-				<sleep seconds="5" />
-
-				<exec dir="${tmp.app.server.tomcat.bin.dir}" executable="sh">
-					<arg value="shutdown.sh" />
-				</exec>
-			</sequential>
-		</parallel>
-
-		<copy
-			todir="dist/hypersonic"
-		>
-			<fileset
-				dir="${tmp.hypersonic.dir}/data/hypersonic"
-			/>
-		</copy>
-
-		<delete dir="${tmp.hypersonic.dir}" />
 	</target>
 
 	<target name="prepare-generated-files">
@@ -1986,6 +1943,19 @@ wrapper.java.additional.11="-Dfile.encoding=UTF-8"]]></replacevalue>
 	</target>
 
 	<target name="unzip-tomcat">
+		<for list="${app.server.tomcat.legacy.versions}" param="app.server.tomcat.legacy.version">
+			<sequential>
+				<var name="app.server.tomcat.legacy.dir" value="${app.server.parent.dir}/tomcat-@{app.server.tomcat.legacy.version}" />
+
+				<if>
+					<available file="${app.server.tomcat.legacy.dir}" type="dir" />
+					<then>
+						<delete dir="${app.server.tomcat.legacy.dir}" />
+					</then>
+				</if>
+			</sequential>
+		</for>
+
 		<delete dir="${app.server.tomcat.dir}" />
 
 		<if>
@@ -2030,7 +2000,10 @@ wrapper.java.additional.11="-Dfile.encoding=UTF-8"]]></replacevalue>
 
 		<echo append="true" file="${app.server.tomcat.dir}/conf/logging.properties">
 			<![CDATA[
-org.apache.catalina.startup.ClassLoaderFactory.level=SEVERE]]>
+org.apache.catalina.startup.Catalina.level=INFO
+org.apache.catalina.startup.ClassLoaderFactory.level=SEVERE
+org.apache.catalina.startup.VersionLoggerListener.level=INFO
+org.apache.level=WARNING]]>
 		</echo>
 
 		<replace
@@ -2040,10 +2013,26 @@ org.apache.catalina.startup.ClassLoaderFactory.level=SEVERE]]>
 			<replacevalue><![CDATA[redirectPort="8443" URIEncoding="UTF-8" />]]></replacevalue>
 		</replace>
 
-		<!--<replace file="${app.server.tomcat.dir}/conf/server.xml">
-			<replacetoken><![CDATA[xmlValidation="false" xmlNamespaceAware="false">]]></replacetoken>
-			<replacevalue><![CDATA[xmlValidation="false" deployXML="false" xmlNamespaceAware="false">]]></replacevalue>
-		</replace>-->
+		<replace
+			file="${app.server.tomcat.dir}/conf/server.xml"
+		>
+			<replacetoken><![CDATA[<Valve className="org.apache.catalina.valves.AccessLogValve"]]></replacetoken>
+			<replacevalue><![CDATA[<!-- <Valve className="org.apache.catalina.valves.AccessLogValve"]]></replacevalue>
+		</replace>
+
+		<replace
+			file="${app.server.tomcat.dir}/conf/server.xml"
+		>
+			<replacetoken><![CDATA[pattern="%h %l %u %t &quot;%r&quot; %s %b" />]]></replacetoken>
+			<replacevalue><![CDATA[pattern="%h %l %u %t &quot;%r&quot; %s %b" /> -->]]></replacevalue>
+		</replace>
+
+		<replace
+			file="${app.server.tomcat.dir}/conf/web.xml"
+		>
+			<replacetoken><![CDATA[<web-app]]></replacetoken>
+			<replacevalue><![CDATA[<web-app metadata-complete="true"]]></replacevalue>
+		</replace>
 
 		<replace
 			file="${app.server.tomcat.dir}/conf/web.xml"
@@ -3418,7 +3407,23 @@ plugins.includes=</echo>
 	</target>
 
 	<target name="zip-executable">
-		<delete failonerror="false" file="dist/${zip.executable.file}-${lp.version}.zip" />
+		<delete failonerror="false" file="dist/${zip.executable.file}-${lp.version}.7z" />
+
+		<exec dir="${project.dir}" executable="git" outputproperty="githash.rev.parse">
+			<arg line="rev-parse HEAD" />
+		</exec>
+
+		<echo>Recording ${zip.executable.dir}/.githash with ${githash.rev.parse}.</echo>
+
+		<echo file="${zip.executable.dir}/.githash">${githash.rev.parse}</echo>
+
+		<local name="tstamp.value" />
+
+		<tstamp>
+			<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
+		</tstamp>
+
+		<mkdir dir="dist/${tstamp.value}" />
 
 		<antelope:stringutil property="zip.executable.dir.beginindex" string="${zip.executable.dir}">
 			<lastindexof string="/" />
@@ -3436,67 +3441,69 @@ plugins.includes=</echo>
 			<substring beginindex="${zip.executable.dir.beginindex}" />
 		</antelope:stringutil>
 
-		<mkdir dir="dist" />
-
 		<if>
 			<available file="${zip.executable.dir}/../data" />
 			<then>
-				<zip
-					destfile="dist/${zip.executable.file}-${lp.version}.zip"
+				<copy
+					preservelastmodified="true"
+					todir="dist/${tstamp.value}/liferay-portal-${lp.version}/${zip.executable.dir.name}"
 				>
-					<zipfileset
+					<fileset
 						dir="${zip.executable.dir}"
-						excludes="**/*.sh"
-						prefix="liferay-portal-${lp.version}/${zip.executable.dir.name}"
 					/>
-					<zipfileset
+				</copy>
+
+				<copy
+					preservelastmodified="true"
+					todir="dist/${tstamp.value}/liferay-portal-${lp.version}"
+				>
+					<fileset
 						dir="${zip.executable.dir}"
-						filemode="744"
-						includes="**/*.sh"
-						prefix="liferay-portal-${lp.version}/${zip.executable.dir.name}"
+						includes=".githash"
 					/>
-					<zipfileset
+					<fileset
 						dir="${zip.executable.dir}/.."
 						includes=".liferay-home"
-						prefix="liferay-portal-${lp.version}"
 					/>
-					<zipfileset
-						dir="${zip.executable.dir}/../data"
-						prefix="liferay-portal-${lp.version}/data"
-					/>
-					<zipfileset
+					<fileset
 						dir="tools/zip_tmpl"
-						prefix="liferay-portal-${lp.version}"
 					/>
-				</zip>
+				</copy>
+
+				<copy
+					preservelastmodified="true"
+					todir="dist/${tstamp.value}/liferay-portal-${lp.version}/data"
+				>
+					<fileset
+						dir="${zip.executable.dir}/../data"
+					/>
+				</copy>
 
 				<if>
 					<available file="${zip.executable.dir}/../deploy" />
 					<then>
-						<zip
-							destfile="dist/${zip.executable.file}-${lp.version}.zip"
-							update="true"
+						<copy
+							preservelastmodified="true"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/deploy"
 						>
-							<zipfileset
+							<fileset
 								dir="${zip.executable.dir}/../deploy"
-								prefix="liferay-portal-${lp.version}/deploy"
 							/>
-						</zip>
+						</copy>
 					</then>
 				</if>
 
 				<if>
 					<available file="${zip.executable.dir}/../osgi" />
 					<then>
-						<zip
-							destfile="dist/${zip.executable.file}-${lp.version}.zip"
-							update="true"
+						<copy
+							preservelastmodified="true"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/osgi"
 						>
-							<zipfileset
+							<fileset
 								dir="${zip.executable.dir}/../osgi"
-								prefix="liferay-portal-${lp.version}/osgi"
 							/>
-						</zip>
+						</copy>
 					</then>
 				</if>
 
@@ -3540,54 +3547,100 @@ plugins.includes=</echo>
 							value="../${zip.executable.dir.name}"
 						/>
 
-						<zip
-							destfile="dist/${zip.executable.file}-${lp.version}.zip"
-							update="yes"
+						<copy
+							preservelastmodified="true"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/patching-tool"
 						>
-							<zipfileset
+							<fileset
 								dir="${zip.executable.dir}/../patching-tool"
-								excludes="**/*.sh"
-								prefix="liferay-portal-${lp.version}/patching-tool"
 							/>
-							<zipfileset
-								dir="${zip.executable.dir}/../patching-tool"
-								filemode="744"
-								includes="**/*.sh"
-								prefix="liferay-portal-${lp.version}/patching-tool"
-							/>
-						</zip>
+						</copy>
 					</then>
 				</if>
 
 				<if>
 					<available file="${zip.executable.dir}/../tools" />
 					<then>
-						<zip
-							destfile="dist/${zip.executable.file}-${lp.version}.zip"
-							update="true"
+						<copy
+							preservelastmodified="true"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/tools"
 						>
-							<zipfileset
+							<fileset
 								dir="${zip.executable.dir}/../tools"
-								prefix="liferay-portal-${lp.version}/tools"
 							/>
-						</zip>
+						</copy>
 					</then>
 				</if>
 
 				<if>
 					<available file="${zip.executable.dir}/../work" />
 					<then>
-						<zip
-							destfile="dist/${zip.executable.file}-${lp.version}.zip"
-							update="true"
+						<copy
+							preservelastmodified="true"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/work"
 						>
-							<zipfileset
+							<fileset
 								dir="${zip.executable.dir}/../work"
-								prefix="liferay-portal-${lp.version}/work"
 							/>
-						</zip>
+						</copy>
 					</then>
 				</if>
+
+				<chmod
+					perm="744"
+				>
+					<fileset
+						dir="dist/${tstamp.value}"
+						includes="**/*.sh"
+					/>
+				</chmod>
+
+				<if>
+					<equals arg1="${zip.executable.file}" arg2="liferay-portal-tomcat" />
+					<then>
+						<move
+							file="dist/${tstamp.value}/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}"
+							preservelastmodified="true"
+							tofile="dist/${tstamp.value}/liferay-portal-${lp.version}/tomcat"
+						/>
+
+						<parallel>
+							<exec dir="dist/${tstamp.value}/liferay-portal-${lp.version}/tomcat/bin" executable="sh">
+								<arg value="catalina.sh" />
+								<arg value="run" />
+								<env key="LIFERAY_CLEAN_OSGI_STATE" value="true" />
+							</exec>
+
+							<sequential>
+								<waitfor>
+									<http url="http://localhost:8080" />
+								</waitfor>
+
+								<sleep seconds="5" />
+
+								<exec dir="dist/${tstamp.value}/liferay-portal-${lp.version}/tomcat/bin" executable="sh">
+									<arg value="shutdown.sh" />
+								</exec>
+
+								<sleep seconds="20" />
+
+								<delete dir="dist/${tstamp.value}/liferay-portal-${lp.version}">
+									<patternset
+										includes="**/logs/**"
+									/>
+								</delete>
+							</sequential>
+						</parallel>
+					</then>
+				</if>
+
+				<execute dir="dist/${tstamp.value}">
+					<![CDATA[
+						7z a -md1024m ${project.dir}/dist/${zip.executable.file}-${lp.version}.7z liferay-portal-${lp.version}
+					]]>
+				</execute>
+
+				<delete dir="dist/${tstamp.value}" />
 			</then>
 			<else>
 
@@ -3611,21 +3664,6 @@ plugins.includes=</echo>
 					/>
 				</zip>
 			</else>
-		</if>
-
-		<if>
-			<available file="dist/hypersonic" />
-			<then>
-				<zip
-					destfile="dist/${zip.executable.file}-${lp.version}.zip"
-					update="true"
-				>
-					<zipfileset
-						dir="dist/hypersonic"
-						prefix="liferay-portal-${lp.version}/${zip.executable.dir.name}/data"
-					/>
-				</zip>
-			</then>
 		</if>
 	</target>
 

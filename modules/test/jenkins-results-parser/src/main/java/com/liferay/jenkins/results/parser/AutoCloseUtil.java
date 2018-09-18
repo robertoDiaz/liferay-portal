@@ -113,13 +113,31 @@ public class AutoCloseUtil {
 			sb.append("close out certain pull requests see this ");
 			sb.append("<a href=\"https://in.liferay.com/web/global.");
 			sb.append("engineering/wiki/-/wiki/Quality+Assurance+Main/Test");
-			sb.append("+Batch+Automatic+Close+List\">article</a>.</p>");
-			sb.append("<p auto-close=\"false\"><strong><em>*This pull will ");
-			sb.append("no longer automatically close if this comment is ");
-			sb.append("available. If you believe this is a mistake please ");
-			sb.append("reopen this pull by entering the following command ");
-			sb.append("as a comment.</em></strong></p><pre>ci&#58;reopen");
-			sb.append("</pre><hr /><h3>Critical Failure Details:</h3>");
+			sb.append("+Batch+Automatic+Close+List\">article</a>.</p><p");
+
+			boolean sourceFormatBuild =
+				topLevelBuild instanceof SourceFormatBuild;
+
+			if (sourceFormatBuild) {
+				sb.append("><strong><em>*");
+			}
+			else {
+				sb.append(" auto-close=\"false\"><strong><em>*This pull will ");
+				sb.append("no longer automatically close if this comment is ");
+				sb.append("available. ");
+			}
+
+			sb.append("If you believe this is a mistake please reopen this ");
+			sb.append("pull by entering the following command as a comment.");
+			sb.append("</em></strong><pre>ci&#58;reopen</pre></p>");
+
+			if (sourceFormatBuild) {
+				sb.append("<strong><em>*The reopened pull request may ");
+				sb.append("be automatically closed again if other critical ");
+				sb.append("batches or tests fail.</em></strong>");
+			}
+
+			sb.append("<hr /><h3>Critical Failure Details:</h3>");
 
 			for (Build failedDownstreamBuild : failedDownstreamBuilds) {
 				try {
@@ -196,14 +214,14 @@ public class AutoCloseUtil {
 				continue;
 			}
 
-			String subrepositoryPackageNames =
+			String gitSubrepositoryPackageNames =
 				JenkinsResultsParserUtil.getProperty(
 					localLiferayJenkinsEEBuildProperties,
 					"subrepository.package.names");
 
-			if (subrepositoryPackageNames != null) {
-				for (String subrepositoryPackageName :
-						subrepositoryPackageNames.split(",")) {
+			if (gitSubrepositoryPackageNames != null) {
+				for (String gitSubrepositoryPackageName :
+						gitSubrepositoryPackageNames.split(",")) {
 
 					if (!jenkinsJobFailureURLs.isEmpty()) {
 						break;
@@ -225,7 +243,7 @@ public class AutoCloseUtil {
 
 						String packageName = testResult.getPackageName();
 
-						if (subrepositoryPackageName.equals(packageName)) {
+						if (gitSubrepositoryPackageName.equals(packageName)) {
 							failedDownstreamBuild = downstreamBuild;
 
 							StringBuilder sb = new StringBuilder();
@@ -308,9 +326,9 @@ public class AutoCloseUtil {
 
 		String propertyNameTemplate = JenkinsResultsParserUtil.combine(
 			"test.batch.names.auto.close[",
-			pullRequest.getGitHubRemoteRepositoryName(), "?]");
+			pullRequest.getGitHubRemoteGitRepositoryName(), "?]");
 
-		String repositoryBranchAutoClosePropertyName =
+		String gitRepositoryBranchAutoClosePropertyName =
 			propertyNameTemplate.replace(
 				"?", "-" + pullRequest.getUpstreamBranchName());
 
@@ -319,15 +337,15 @@ public class AutoCloseUtil {
 
 		String testBatchNamesAutoClose = JenkinsResultsParserUtil.getProperty(
 			localLiferayJenkinsEEBuildProperties,
-			repositoryBranchAutoClosePropertyName);
+			gitRepositoryBranchAutoClosePropertyName);
 
 		if (testBatchNamesAutoClose == null) {
-			String repositoryAutoClosePropertyName =
+			String gitRepositoryAutoClosePropertyName =
 				propertyNameTemplate.replace("?", "");
 
 			testBatchNamesAutoClose = JenkinsResultsParserUtil.getProperty(
 				localLiferayJenkinsEEBuildProperties,
-				repositoryAutoClosePropertyName);
+				gitRepositoryAutoClosePropertyName);
 		}
 
 		if (testBatchNamesAutoClose != null) {
@@ -343,8 +361,8 @@ public class AutoCloseUtil {
 	}
 
 	public static boolean isAutoCloseBranch(PullRequest pullRequest) {
-		String gitHubRemoteRepositoryName =
-			pullRequest.getGitHubRemoteRepositoryName();
+		String gitHubRemoteGitRepositoryName =
+			pullRequest.getGitHubRemoteGitRepositoryName();
 
 		Properties localLiferayJenkinsEEBuildProperties =
 			JenkinsResultsParserUtil.getLocalLiferayJenkinsEEBuildProperties();
@@ -352,7 +370,7 @@ public class AutoCloseUtil {
 		String testBranchNamesAutoClose = JenkinsResultsParserUtil.getProperty(
 			localLiferayJenkinsEEBuildProperties,
 			JenkinsResultsParserUtil.combine(
-				"test.branch.names.auto.close[", gitHubRemoteRepositoryName,
+				"test.branch.names.auto.close[", gitHubRemoteGitRepositoryName,
 				"]"));
 
 		if (testBranchNamesAutoClose == null) {
@@ -378,7 +396,7 @@ public class AutoCloseUtil {
 				localLiferayJenkinsEEBuildProperties,
 				JenkinsResultsParserUtil.combine(
 					"test.branch.names.critical.test[",
-					pullRequest.getGitHubRemoteRepositoryName(), "]"));
+					pullRequest.getGitHubRemoteGitRepositoryName(), "]"));
 
 		if ((criticalTestBranchesString == null) ||
 			criticalTestBranchesString.isEmpty()) {

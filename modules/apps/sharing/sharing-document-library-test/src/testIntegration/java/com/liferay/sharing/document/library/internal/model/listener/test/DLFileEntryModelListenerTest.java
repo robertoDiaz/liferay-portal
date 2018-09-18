@@ -16,6 +16,7 @@ package com.liferay.sharing.document.library.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLTrashService;
@@ -26,13 +27,13 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -95,6 +96,12 @@ public class DLFileEntryModelListenerTest {
 
 		_classNameId = _classNameLocalService.getClassNameId(
 			DLFileEntry.class.getName());
+
+		_folder = _dlAppLocalService.addFolder(
+			_user.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			StringUtil.randomString(), StringUtil.randomString(),
+			serviceContext);
 	}
 
 	@Test
@@ -107,10 +114,10 @@ public class DLFileEntryModelListenerTest {
 
 		_sharingEntryLocalService.addSharingEntry(
 			_user.getUserId(), _groupUser.getUserId(), _classNameId,
-			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(),
+			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(), true,
 			Arrays.asList(
-				SharingEntryActionKey.VIEW, SharingEntryActionKey.UPDATE),
-			serviceContext);
+				SharingEntryActionKey.UPDATE, SharingEntryActionKey.VIEW),
+			null, serviceContext);
 
 		List<SharingEntry> toUserSharingEntries =
 			_sharingEntryLocalService.getToUserSharingEntries(
@@ -139,20 +146,21 @@ public class DLFileEntryModelListenerTest {
 
 		_sharingEntryLocalService.addSharingEntry(
 			_user.getUserId(), _groupUser.getUserId(), _classNameId,
-			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(),
+			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(), true,
 			Arrays.asList(
-				SharingEntryActionKey.VIEW, SharingEntryActionKey.UPDATE),
-			serviceContext);
+				SharingEntryActionKey.UPDATE, SharingEntryActionKey.VIEW),
+			null, serviceContext);
 
-		long classNameId = RandomTestUtil.randomLong();
-		long classPK = RandomTestUtil.randomLong();
+		long classNameId = _classNameLocalService.getClassNameId(
+			DLFolder.class.getName());
+		long classPK = _folder.getFolderId();
 
 		SharingEntry sharingEntry = _sharingEntryLocalService.addSharingEntry(
 			_user.getUserId(), _groupUser.getUserId(), classNameId, classPK,
-			_fileEntry.getGroupId(),
+			_fileEntry.getGroupId(), true,
 			Arrays.asList(
-				SharingEntryActionKey.VIEW, SharingEntryActionKey.UPDATE),
-			serviceContext);
+				SharingEntryActionKey.UPDATE, SharingEntryActionKey.VIEW),
+			null, serviceContext);
 
 		List<SharingEntry> toUserSharingEntries =
 			_sharingEntryLocalService.getToUserSharingEntries(
@@ -182,10 +190,10 @@ public class DLFileEntryModelListenerTest {
 
 		_sharingEntryLocalService.addSharingEntry(
 			_user.getUserId(), _groupUser.getUserId(), _classNameId,
-			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(),
+			_fileEntry.getFileEntryId(), _fileEntry.getGroupId(), true,
 			Arrays.asList(
-				SharingEntryActionKey.VIEW, SharingEntryActionKey.UPDATE),
-			serviceContext);
+				SharingEntryActionKey.UPDATE, SharingEntryActionKey.VIEW),
+			null, serviceContext);
 
 		List<SharingEntry> toUserSharingEntries =
 			_sharingEntryLocalService.getToUserSharingEntries(
@@ -219,6 +227,7 @@ public class DLFileEntryModelListenerTest {
 	private DLTrashService _dlTrashService;
 
 	private FileEntry _fileEntry;
+	private Folder _folder;
 	private Group _group;
 	private User _groupUser;
 

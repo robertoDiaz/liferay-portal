@@ -15,11 +15,12 @@
 package com.liferay.structured.content.apio.internal.architect.form;
 
 import com.liferay.apio.architect.form.Form;
-import com.liferay.apio.architect.form.Form.Builder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.structure.apio.architect.identifier.ContentStructureIdentifier;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class StructuredContentCreatorForm {
 	 * @review
 	 */
 	public static Form<StructuredContentCreatorForm> buildForm(
-		Builder<StructuredContentCreatorForm> formBuilder) {
+		Form.Builder<StructuredContentCreatorForm> formBuilder) {
 
 		return formBuilder.title(
 			__ -> "The structured content creator form"
@@ -53,20 +54,24 @@ public class StructuredContentCreatorForm {
 			__ -> "This form can be used to create a structured content"
 		).constructor(
 			StructuredContentCreatorForm::new
+		).addOptionalString(
+			"template", StructuredContentCreatorForm::setTemplate
+		).addOptionalString(
+			"text", StructuredContentCreatorForm::setText
 		).addOptionalStringList(
-			"keywords", StructuredContentCreatorForm::_setKeywords
+			"keywords", StructuredContentCreatorForm::setKeywords
 		).addRequiredDate(
-			"displayDate", StructuredContentCreatorForm::_setDisplayDate
+			"displayDate", StructuredContentCreatorForm::setDisplayDate
+		).addRequiredLinkedModel(
+			"structure", ContentStructureIdentifier.class,
+			StructuredContentCreatorForm::setStructureId
+		).addOptionalNestedModelList(
+			"values", StructuredContentValuesForm::buildValuesForm,
+			StructuredContentCreatorForm::setStructuredContentValuesForms
 		).addRequiredString(
-			"description", StructuredContentCreatorForm::_setDescription
+			"description", StructuredContentCreatorForm::setDescription
 		).addRequiredString(
-			"structure", StructuredContentCreatorForm::_setStructure
-		).addRequiredString(
-			"template", StructuredContentCreatorForm::_setTemplate
-		).addRequiredString(
-			"text", StructuredContentCreatorForm::_setText
-		).addRequiredString(
-			"title", StructuredContentCreatorForm::_setTitle
+			"title", StructuredContentCreatorForm::setTitle
 		).build();
 	}
 
@@ -161,8 +166,8 @@ public class StructuredContentCreatorForm {
 	 * @return the structured content's structure ID
 	 * @review
 	 */
-	public String getStructure() {
-		return _structure;
+	public Long getStructureId() {
+		return _structureId;
 	}
 
 	/**
@@ -199,11 +204,15 @@ public class StructuredContentCreatorForm {
 		return titleMap;
 	}
 
-	private void _setDescription(String description) {
+	public List<StructuredContentValuesForm> getValues() {
+		return _structuredContentValuesForms;
+	}
+
+	public void setDescription(String description) {
 		_description = description;
 	}
 
-	private void _setDisplayDate(Date displayDate) {
+	public void setDisplayDate(Date displayDate) {
 		Calendar calendar = Calendar.getInstance();
 
 		calendar.setTime(displayDate);
@@ -215,23 +224,29 @@ public class StructuredContentCreatorForm {
 		_displayDateMinute = calendar.get(Calendar.MINUTE);
 	}
 
-	private void _setKeywords(List<String> keywords) {
+	public void setKeywords(List<String> keywords) {
 		_keywords = keywords;
 	}
 
-	private void _setStructure(String structure) {
-		_structure = structure;
+	public void setStructuredContentValuesForms(
+		List<StructuredContentValuesForm> structuredContentValuesForms) {
+
+		_structuredContentValuesForms = structuredContentValuesForms;
 	}
 
-	private void _setTemplate(String template) {
+	public void setStructureId(Long structureId) {
+		_structureId = structureId;
+	}
+
+	public void setTemplate(String template) {
 		_template = template;
 	}
 
-	private void _setText(String text) {
+	public void setText(String text) {
 		_text = text;
 	}
 
-	private void _setTitle(String title) {
+	public void setTitle(String title) {
 		_title = title;
 	}
 
@@ -242,7 +257,9 @@ public class StructuredContentCreatorForm {
 	private Integer _displayDateMonth;
 	private Integer _displayDateYear;
 	private List<String> _keywords;
-	private String _structure;
+	private List<StructuredContentValuesForm> _structuredContentValuesForms =
+		new ArrayList<>();
+	private Long _structureId;
 	private String _template;
 	private String _text;
 	private String _title;

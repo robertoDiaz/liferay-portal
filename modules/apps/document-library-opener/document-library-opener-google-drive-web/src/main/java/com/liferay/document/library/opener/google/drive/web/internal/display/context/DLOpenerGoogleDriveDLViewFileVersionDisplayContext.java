@@ -18,9 +18,12 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.display.context.BaseDLViewFileVersionDisplayContext;
 import com.liferay.document.library.display.context.DLUIItemKeys;
 import com.liferay.document.library.display.context.DLViewFileVersionDisplayContext;
+import com.liferay.document.library.opener.constants.DLOpenerFileEntryReferenceConstants;
 import com.liferay.document.library.opener.google.drive.DLOpenerGoogleDriveManager;
 import com.liferay.document.library.opener.google.drive.constants.DLOpenerGoogleDriveMimeTypes;
 import com.liferay.document.library.opener.google.drive.web.internal.constants.DLOpenerGoogleDriveWebConstants;
+import com.liferay.document.library.opener.model.DLOpenerFileEntryReference;
+import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -30,10 +33,12 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptMenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.JavaScriptUIItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -59,11 +64,15 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 		DLViewFileVersionDisplayContext parentDLDisplayContext,
 		HttpServletRequest request, HttpServletResponse response,
 		FileVersion fileVersion, ResourceBundle resourceBundle,
+		DLOpenerFileEntryReferenceLocalService
+			dlOpenerFileEntryReferenceLocalService,
 		DLOpenerGoogleDriveManager dlOpenerGoogleDriveManager) {
 
 		super(_UUID, parentDLDisplayContext, request, response, fileVersion);
 
 		_resourceBundle = resourceBundle;
+		_dlOpenerFileEntryReferenceLocalService =
+			dlOpenerFileEntryReferenceLocalService;
 		_dlOpenerGoogleDriveManager = dlOpenerGoogleDriveManager;
 	}
 
@@ -95,28 +104,33 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 	}
 
 	private MenuItem _createCheckoutInGoogleDocsMenuItem() {
-		URLMenuItem menuItem = new URLMenuItem();
+		JavaScriptMenuItem javaScriptMenuItem = new JavaScriptMenuItem();
 
-		menuItem.setLabel(
+		javaScriptMenuItem.setLabel(
 			LanguageUtil.get(_resourceBundle, "checkout-to-google-docs"));
-		menuItem.setMethod(HttpMethods.POST);
-		menuItem.setURL(
-			_getActionURL(
-				DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_CHECKOUT));
+		javaScriptMenuItem.setOnClick(
+			StringBundler.concat(
+				_getNamespace(), "redirectNotification('",
+				_getActionURL(
+					DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_CHECKOUT),
+				"')"));
 
-		return menuItem;
+		return javaScriptMenuItem;
 	}
 
 	private MenuItem _createEditInGoogleDocsMenuItem() {
-		URLMenuItem menuItem = new URLMenuItem();
+		JavaScriptMenuItem javaScriptMenuItem = new JavaScriptMenuItem();
 
-		menuItem.setLabel(
+		javaScriptMenuItem.setLabel(
 			LanguageUtil.get(_resourceBundle, "edit-in-google-docs"));
-		menuItem.setMethod(HttpMethods.POST);
-		menuItem.setURL(
-			_getActionURL(DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_EDIT));
+		javaScriptMenuItem.setOnClick(
+			StringBundler.concat(
+				_getNamespace(), "redirectNotification('",
+				_getActionURL(
+					DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_EDIT),
+				"')"));
 
-		return menuItem;
+		return javaScriptMenuItem;
 	}
 
 	private String _getActionURL(String cmd) {
@@ -126,7 +140,7 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 
 		liferayPortletURL.setParameter(
 			ActionRequest.ACTION_NAME, "/document_library/edit_in_google_docs");
-		liferayPortletURL.setParameter("cmd", cmd);
+		liferayPortletURL.setParameter(Constants.CMD, cmd);
 		liferayPortletURL.setParameter(
 			"fileEntryId", String.valueOf(fileVersion.getFileEntryId()));
 
@@ -159,8 +173,23 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 		return false;
 	}
 
+	private boolean _isCheckingInNewFile() throws PortalException {
+		DLOpenerFileEntryReference dlOpenerFileEntryReference =
+			_dlOpenerFileEntryReferenceLocalService.
+				getDLOpenerFileEntryReference(fileVersion.getFileEntry());
+
+		if (dlOpenerFileEntryReference.getType() ==
+				DLOpenerFileEntryReferenceConstants.TYPE_NEW) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void _updateCancelCheckoutAndCheckinMenuItems(
-		Collection<MenuItem> menuItems) {
+			Collection<MenuItem> menuItems)
+		throws PortalException {
 
 		for (MenuItem menuItem : menuItems) {
 			if (DLUIItemKeys.CHECKIN.equals(menuItem.getKey())) {
@@ -168,13 +197,24 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 					JavaScriptUIItem javaScriptUIItem =
 						(JavaScriptUIItem)menuItem;
 
-					javaScriptUIItem.setOnClick(
-						StringBundler.concat(
-							_getNamespace(), "showVersionDetailsDialog('",
-							_getActionURL(
-								DLOpenerGoogleDriveWebConstants.
-									GOOGLE_DRIVE_CHECKIN),
-							"');"));
+					if (_isCheckingInNewFile()) {
+						javaScriptUIItem.setOnClick(
+							StringBundler.concat(
+								"window.location.href = '",
+								_getActionURL(
+									DLOpenerGoogleDriveWebConstants.
+										GOOGLE_DRIVE_CHECKIN),
+								"'"));
+					}
+					else {
+						javaScriptUIItem.setOnClick(
+							StringBundler.concat(
+								_getNamespace(), "showVersionDetailsDialog('",
+								_getActionURL(
+									DLOpenerGoogleDriveWebConstants.
+										GOOGLE_DRIVE_CHECKIN),
+								"');"));
+					}
 				}
 			}
 			else if (DLUIItemKeys.CANCEL_CHECKOUT.equals(menuItem.getKey())) {
@@ -194,6 +234,8 @@ public class DLOpenerGoogleDriveDLViewFileVersionDisplayContext
 	private static final UUID _UUID = UUID.fromString(
 		"c3a385d0-7551-11e8-9798-186590d14d8f");
 
+	private final DLOpenerFileEntryReferenceLocalService
+		_dlOpenerFileEntryReferenceLocalService;
 	private final DLOpenerGoogleDriveManager _dlOpenerGoogleDriveManager;
 	private final ResourceBundle _resourceBundle;
 

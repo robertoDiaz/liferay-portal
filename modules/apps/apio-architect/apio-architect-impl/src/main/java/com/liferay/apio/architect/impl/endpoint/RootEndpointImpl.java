@@ -20,7 +20,10 @@ import com.liferay.apio.architect.documentation.APIDescription;
 import com.liferay.apio.architect.documentation.APITitle;
 import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.impl.documentation.Documentation;
+import com.liferay.apio.architect.impl.entrypoint.CustomOperationsEndpoint;
 import com.liferay.apio.architect.impl.entrypoint.EntryPoint;
+import com.liferay.apio.architect.impl.url.ApplicationURL;
+import com.liferay.apio.architect.impl.wiring.osgi.manager.documentation.contributor.CustomDocumentationManager;
 import com.liferay.apio.architect.impl.wiring.osgi.manager.provider.ProviderManager;
 import com.liferay.apio.architect.impl.wiring.osgi.manager.representable.RepresentableManager;
 import com.liferay.apio.architect.impl.wiring.osgi.manager.router.CollectionRouterManager;
@@ -57,10 +60,12 @@ public class RootEndpointImpl implements RootEndpoint {
 		_documentation = new Documentation(
 			() -> _provide(APITitle.class),
 			() -> _provide(APIDescription.class),
+			() -> _provide(ApplicationURL.class),
 			() -> _representableManager.getRepresentors(),
 			() -> _collectionRouterManager.getCollectionRoutes(),
 			() -> _itemRouterManager.getItemRoutes(),
-			() -> _nestedCollectionRouterManager.getNestedCollectionRoutes());
+			() -> _nestedCollectionRouterManager.getNestedCollectionRoutes(),
+			() -> _customDocumentationManager.getCustomDocumentation());
 	}
 
 	@Override
@@ -84,6 +89,15 @@ public class RootEndpointImpl implements RootEndpoint {
 	public BinaryEndpoint binaryEndpoint() {
 		return new BinaryEndpoint(
 			this::_getRepresentorOrFail, this::_getSingleModelTry);
+	}
+
+	@Override
+	public CustomOperationsEndpoint customOperationsEndpoint(String name) {
+		return new CustomOperationsEndpoint<>(
+			name, _httpServletRequest,
+			() -> _collectionRouterManager.getCollectionRoutesOptional(name),
+			() -> _itemRouterManager.getItemRoutesOptional(name),
+			_pathIdentifierMapperManager::mapToIdentifierOrFail);
 	}
 
 	@Override
@@ -170,6 +184,9 @@ public class RootEndpointImpl implements RootEndpoint {
 
 	@Reference
 	private CollectionRouterManager _collectionRouterManager;
+
+	@Reference
+	private CustomDocumentationManager _customDocumentationManager;
 
 	private Documentation _documentation;
 

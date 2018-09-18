@@ -33,7 +33,7 @@
 		<execute function="Pause" locator1="3000" />
 
 		<execute macro="LexiconEntry#openEntryMenu">
-			<var name="rowEntry" value="${resourceName}" />
+			<var name="rowEntry" value="${customFieldName}" />
 		</execute>
 
 		<execute macro="MenuItem#click">
@@ -76,7 +76,7 @@
 							<var name="menuItem" value="Delete" />
 						</execute>
 
-						<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+						<execute function="AssertConfirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
 
 						<execute macro="Alert#viewSuccessMessage" />
 					</then>

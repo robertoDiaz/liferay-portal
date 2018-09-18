@@ -71,6 +71,9 @@ public class SourceFormatter {
 		DEFAULT_EXCLUDE_SYNTAX_PATTERNS = {
 			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/.git/**"),
 			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/.gradle/**"),
+			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/.idea/**"),
+			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/.m2/**"),
+			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/.settings/**"),
 			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/bin/**"),
 			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/build/**"),
 			new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/classes/**"),
@@ -273,6 +276,7 @@ public class SourceFormatter {
 		_sourceProcessors.add(new CQLSourceProcessor());
 		_sourceProcessors.add(new CSSSourceProcessor());
 		_sourceProcessors.add(new DockerfileSourceProcessor());
+		_sourceProcessors.add(new DTDSourceProcessor());
 		_sourceProcessors.add(new LFRBuildSourceProcessor());
 		_sourceProcessors.add(new FTLSourceProcessor());
 		_sourceProcessors.add(new GradleSourceProcessor());
@@ -695,7 +699,7 @@ public class SourceFormatter {
 		File baseDir = new File(baseDirAbsolutePath);
 
 		for (int i = 0; i < _SUBREPOSITORY_MAX_DIR_LEVEL; i++) {
-			if (!baseDir.exists()) {
+			if ((baseDir == null) || !baseDir.exists()) {
 				return false;
 			}
 
@@ -848,7 +852,7 @@ public class SourceFormatter {
 						}
 					}
 					else if (progressStatus.equals(
-								 ProgressStatus.CHECK_FILE_COMPLETED)) {
+								ProgressStatus.CHECK_FILE_COMPLETED)) {
 
 						processedChecksFileCount++;
 
@@ -865,7 +869,7 @@ public class SourceFormatter {
 							totalChecksFileCount);
 					}
 					else if (progressStatus.equals(
-								 ProgressStatus.SOURCE_FORMAT_COMPLETED)) {
+								ProgressStatus.SOURCE_FORMAT_COMPLETED)) {
 
 						if (_maxStatusMessageLength == -1) {
 							break;

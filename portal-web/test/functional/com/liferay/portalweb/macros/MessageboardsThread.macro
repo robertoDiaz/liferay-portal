@@ -306,8 +306,8 @@
 	</command>
 
 	<command name="banUser">
-		<execute macro="LexiconEntry#openEntryMenu">
-			<var name="rowEntry" value="${threadReplyBody}" />
+		<execute function="Click#waitForMenuToggleJSClick" locator1="MessageBoards#THREAD_REPLY_ACTIONS">
+			<var name="key_threadReplyBody" value="${threadReplyBody}" />
 		</execute>
 
 		<execute macro="MenuItem#click">
@@ -456,7 +456,7 @@
 				<then>
 					<execute function="AssertClickNoError" locator1="Button#PREVIEW" value1="Preview" />
 
-					<execute function="Confirm" value1="In order to preview your changes, the message will be saved as a draft and other users may not be able to see it. Are you sure you want to do this?" />
+					<execute function="AssertConfirm" value1="In order to preview your changes, the message will be saved as a draft and other users may not be able to see it. Are you sure you want to do this?" />
 
 					<var name="key_threadSubject" value="${threadSubject}" />
 					<var name="key_userName" value="${userName}" />
@@ -583,8 +583,8 @@
 	</command>
 
 	<command name="markAsAnswerPG">
-		<execute macro="LexiconEntry#openEntryMenu">
-			<var name="rowEntry" value="${threadReplyBody}" />
+		<execute function="Click#waitForMenuToggleJSClick" locator1="MessageBoards#THREAD_REPLY_ACTIONS">
+			<var name="key_threadReplyBody" value="${threadReplyBody}" />
 		</execute>
 
 		<execute macro="MenuItem#click">
@@ -1023,6 +1023,22 @@
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
 
+	<command name="unlockPG">
+		<var name="key_threadSubject" value="${threadSubject}" />
+
+		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_LIST_THREAD" value1="${threadSubject}" />
+
+		<execute function="Click" locator1="MessageBoards#THREAD_LIST_THREAD" value1="${threadSubject}" />
+
+		<execute function="Click" locator1="Icon#BODY_VERTICAL_ELLIPSIS" />
+
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Unlock" />
+		</execute>
+
+		<execute macro="Alert#viewSuccessMessage" />
+	</command>
+
 	<command name="viewAnonymousPostingCheckboxCP">
 		<execute macro="LexiconEntry#gotoAdd" />
 
@@ -1129,7 +1145,7 @@
 
 		<execute macro="Alert#viewRequestFailedToComplete" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="You do not have the required permissions." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR" value1="You do not have the required permissions." />
 		<execute function="AssertTextNotPresent" value1="${threadSubject}" />
 		<execute function="AssertElementNotPresent" locator1="MessageBoards#THREAD_LIST_THREAD" />
 		<execute function="AssertElementNotPresent" locator1="MessageBoards#THREAD_TABLE_STARTED_BY" />

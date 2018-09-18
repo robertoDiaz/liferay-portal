@@ -130,19 +130,17 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 			if (Validator.isNull(groupName)) {
 				return "activity-message-boards-thread-move-to-trash";
 			}
-			else {
-				return "activity-message-boards-thread-move-to-trash-in";
-			}
+
+			return "activity-message-boards-thread-move-to-trash-in";
 		}
 		else if (activityType ==
-					 SocialActivityConstants.TYPE_RESTORE_FROM_TRASH) {
+					SocialActivityConstants.TYPE_RESTORE_FROM_TRASH) {
 
 			if (Validator.isNull(groupName)) {
 				return "activity-message-boards-thread-restore-from-trash";
 			}
-			else {
-				return "activity-message-boards-thread-restore-from-trash-in";
-			}
+
+			return "activity-message-boards-thread-restore-from-trash-in";
 		}
 
 		return null;

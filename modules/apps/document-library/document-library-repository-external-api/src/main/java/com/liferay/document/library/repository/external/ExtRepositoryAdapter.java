@@ -335,9 +335,8 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 
 			return getFileEntries(folderId, start, end, obc);
 		}
-		else {
-			return Collections.emptyList();
-		}
+
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -1423,7 +1422,7 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 			}
 		}
 		else if (extRepositoryObjectAdapterType ==
-					 ExtRepositoryObjectAdapterType.FOLDER) {
+					ExtRepositoryObjectAdapterType.FOLDER) {
 
 			if (!(extRepositoryObjectAdapter instanceof
 					ExtRepositoryFolderAdapter)) {
@@ -1434,7 +1433,7 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 			}
 		}
 		else if (extRepositoryObjectAdapterType !=
-					 ExtRepositoryObjectAdapterType.OBJECT) {
+					ExtRepositoryObjectAdapterType.OBJECT) {
 
 			throw new IllegalArgumentException(
 				"Unsupported repository object type " +

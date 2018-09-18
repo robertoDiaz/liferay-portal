@@ -119,6 +119,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 					Map<String, Object> rowData = new HashMap<String, Object>();
 
+					rowData.put("actions", String.join(StringPool.COMMA, dlAdminManagementToolbarDisplayContext.getAvailableActionDropdownItems(fileEntry)));
 					rowData.put("draggable", draggable);
 					rowData.put("title", fileEntry.getTitle());
 
@@ -183,6 +184,30 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 								%>
 
 								<c:choose>
+									<c:when test="<%= dlViewFileVersionDisplayContext.hasCustomThumbnail() %>">
+										<liferay-util:buffer
+											var="customThumbnailHtml"
+										>
+
+											<%
+											dlViewFileVersionDisplayContext.renderCustomThumbnail(request, PipingServletResponse.createPipingServletResponse(pageContext));
+											%>
+
+										</liferay-util:buffer>
+
+										<liferay-frontend:html-vertical-card
+											actionJsp="/document_library/file_entry_action.jsp"
+											actionJspServletContext="<%= application %>"
+											cssClass="entry-display-style"
+											html="<%= customThumbnailHtml %>"
+											resultRow="<%= row %>"
+											rowChecker="<%= entriesChecker %>"
+											title="<%= latestFileVersion.getTitle() %>"
+											url="<%= (rowURL != null) ? rowURL.toString() : null %>"
+										>
+											<%@ include file="/document_library/file_entry_vertical_card.jspf" %>
+										</liferay-frontend:html-vertical-card>
+									</c:when>
 									<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 										<liferay-frontend:icon-vertical-card
 											actionJsp="/document_library/file_entry_action.jsp"
@@ -341,6 +366,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 					rowData.put("draggable", draggable);
 
+					rowData.put("actions", String.join(StringPool.COMMA, dlAdminManagementToolbarDisplayContext.getAvailableActionDropdownItems(curFolder)));
 					rowData.put("folder", true);
 					rowData.put("folder-id", curFolder.getFolderId());
 					rowData.put("title", curFolder.getName());

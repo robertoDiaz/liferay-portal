@@ -26,7 +26,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -162,7 +162,7 @@
 			<var name="button" value="Submit" />
 		</execute>
 
-		<execute function="Confirm" value1="Form submitted" />
+		<execute function="AssertConfirm" value1="Form submitted" />
 
 		<execute macro="IFrame#selectTopFrame" />
 	</command>
