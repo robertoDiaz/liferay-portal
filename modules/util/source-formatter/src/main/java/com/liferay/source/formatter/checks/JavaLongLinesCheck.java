@@ -51,6 +51,7 @@ public class JavaLongLinesCheck extends BaseFileCheck {
 				lineNumber++;
 
 				if (line.startsWith("import ") || line.startsWith("package ") ||
+					line.startsWith(StringPool.SPACE) ||
 					line.matches("\\s*\\*.*") ||
 					(fileName.endsWith("Table.java") &&
 					 (line.contains("final String TABLE_") ||
@@ -482,9 +483,9 @@ public class JavaLongLinesCheck extends BaseFileCheck {
 
 	private static final String _LINE_LENGTH_EXCLUDES = "line.length.excludes";
 
-	private final Pattern _annotationPattern1 = Pattern.compile(
+	private static final Pattern _annotationPattern1 = Pattern.compile(
 		"\n\t*@(.+)\\(\n");
-	private final Pattern _annotationPattern2 = Pattern.compile(
+	private static final Pattern _annotationPattern2 = Pattern.compile(
 		"^(@\\w+\\().*\\)");
 
 }
