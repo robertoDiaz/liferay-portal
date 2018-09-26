@@ -333,9 +333,7 @@ if (siteGroup.isStaged() && !siteGroup.isStagedRemotely() && !siteGroup.isStaged
 
 // Portlet decorate
 
-boolean tilesPortletDecorate = GetterUtil.getBoolean(TilesAttributeUtil.getTilesAttribute(pageContext, "portlet_decorate"), true);
-
-boolean portletDecorate = tilesPortletDecorate;
+boolean portletDecorate = true;
 
 Boolean portletDecorateObj = (Boolean)request.getAttribute(WebKeys.PORTLET_DECORATE);
 
@@ -829,8 +827,8 @@ if (group.isControlPanel()) {
 
 // Make sure the Tiles context is reset for the next portlet
 
-if ((invokerPortlet != null) && (invokerPortlet.isStrutsPortlet() || invokerPortlet.isStrutsBridgePortlet())) {
-	request.removeAttribute(ComponentConstants.COMPONENT_CONTEXT);
+if ((invokerPortlet != null) && invokerPortlet.isStrutsPortlet()) {
+	request.removeAttribute(PortalTilesPlugin.DEFINITION);
 }
 %>
 
@@ -882,8 +880,8 @@ if (portlet.isActive() && portlet.isInclude() && portlet.isReady() && supportsMi
 
 // Make sure the Tiles context is reset for the next portlet
 
-if ((invokerPortlet != null) && (invokerPortlet.isStrutsPortlet() || invokerPortlet.isStrutsBridgePortlet())) {
-	request.removeAttribute(ComponentConstants.COMPONENT_CONTEXT);
+if ((invokerPortlet != null) && invokerPortlet.isStrutsPortlet()) {
+	request.removeAttribute(PortalTilesPlugin.DEFINITION);
 }
 
 String portalProductMenuApplicationTypePortletId = PortletProviderUtil.getPortletId(PortalProductMenuApplicationType.ProductMenu.CLASS_NAME, PortletProvider.Action.VIEW);
@@ -977,7 +975,7 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 		if (portletException) {
 			ActionMapping actionMapping = portletReqProcessor.processMapping(request, response, (String)portlet.getInitParams().get("view-action"));
 
-			ComponentDefinition definition = null;
+			Definition definition = null;
 
 			if (actionMapping != null) {
 
@@ -1004,7 +1002,9 @@ Boolean renderPortletBoundary = GetterUtil.getBoolean(request.getAttribute(WebKe
 					}
 				}
 
-				definition = TilesUtil.getDefinition(definitionName, request, application);
+				Map<String, Definition> definitions = (Map<String, Definition>)application.getAttribute(PortalTilesPlugin.DEFINITIONS);
+
+				definition = definitions.get(definitionName);
 			}
 
 			String templatePath = StrutsUtil.TEXT_HTML_DIR + "/common/themes/portlet.jsp";

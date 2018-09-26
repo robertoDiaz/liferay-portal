@@ -6629,9 +6629,7 @@ public class PortalImpl implements Portal {
 		InvokerPortlet invokerPortlet = PortletInstanceFactoryUtil.create(
 			portlet, servletContext);
 
-		if (invokerPortlet.isStrutsBridgePortlet() ||
-			invokerPortlet.isStrutsPortlet()) {
-
+		if (invokerPortlet.isStrutsPortlet()) {
 			return false;
 		}
 
@@ -8968,6 +8966,9 @@ public class PortalImpl implements Portal {
 
 	private static final Log _log = LogFactoryUtil.getLog(PortalImpl.class);
 
+	private static final Pattern _bannedResourceIdPattern = Pattern.compile(
+		PropsValues.PORTLET_RESOURCE_ID_BANNED_PATHS_REGEXP,
+		Pattern.CASE_INSENSITIVE);
 	private static final Map<Long, String> _cdnHostHttpMap =
 		new ConcurrentHashMap<>();
 	private static final Map<Long, String> _cdnHostHttpsMap =
@@ -8988,9 +8989,6 @@ public class PortalImpl implements Portal {
 	private final String[] _allSystemSiteRoles;
 	private final List<AlwaysAllowDoAsUser> _alwaysAllowDoAsUsers =
 		new ArrayList<>();
-	private final Pattern _bannedResourceIdPattern = Pattern.compile(
-		PropsValues.PORTLET_RESOURCE_ID_BANNED_PATHS_REGEXP,
-		Pattern.CASE_INSENSITIVE);
 	private final Set<String> _computerAddresses = new HashSet<>();
 	private final String _computerName;
 	private String[] _customSqlKeys;
