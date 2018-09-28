@@ -26,9 +26,14 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -133,12 +138,12 @@ public class MediaWikiImporter implements WikiImporter {
 
 			List<String> specialNamespaces = readSpecialNamespaces(rootElement);
 
+			processImages(userId, node, imagesInputStream);
+
 			processSpecialPages(userId, node, rootElement, specialNamespaces);
 			processRegularPages(
 				userId, node, rootElement, specialNamespaces, usersMap,
 				imagesInputStream, options);
-
-			processImages(userId, node, imagesInputStream);
 
 			moveFrontPage(userId, node, options);
 		}
@@ -216,6 +221,8 @@ public class MediaWikiImporter implements WikiImporter {
 			}
 			else {
 				content = translateMediaWikiToCreole(content, strictImportMode);
+				content = translateMediaLinks(node, content);
+
 				format = FORMAT_CREOLE;
 			}
 
@@ -711,6 +718,13 @@ public class MediaWikiImporter implements WikiImporter {
 	}
 
 	@Reference(unbind = "-")
+	protected void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setUserLocalService(UserLocalService userLocalService) {
 		_userLocalService = userLocalService;
 	}
@@ -741,6 +755,84 @@ public class MediaWikiImporter implements WikiImporter {
 		WikiPageTitleValidator wikiPageTitleValidator) {
 
 		_wikiPageTitleValidator = wikiPageTitleValidator;
+	}
+
+	protected String translateMediaLinks(WikiNode node, String content) {
+		try {
+			ThemeDisplay themeDisplay = new ThemeDisplay();
+
+			Company company = _companyLocalService.getCompany(
+				node.getCompanyId());
+
+			String portalURL = company.getPortalURL(node.getGroupId());
+
+			themeDisplay.setPortalURL(portalURL);
+
+			WikiPage sharedImagesPage = _wikiPageLocalService.getPage(
+				node.getNodeId(), SHARED_IMAGES_TITLE);
+
+			long sharedImagesPageAttachmentsFolderId =
+				sharedImagesPage.getAttachmentsFolderId();
+
+			Matcher matcher = _mediaLinkPattern.matcher(content);
+
+			StringBuffer sb = new StringBuffer(content);
+
+			FileEntry attachmentFileEntry = null;
+
+			String attachmentFileEntryURL = null;
+
+			String fileName = null;
+
+			String linkLabel = null;
+
+			String linkTag = null;
+
+			String mediaLinkTag = null;
+
+			int offset = 0;
+			int originalLength = 0;
+
+			while (matcher.find()) {
+				mediaLinkTag = sb.substring(
+					matcher.start(0) + offset, matcher.end(0) + offset);
+
+				originalLength = mediaLinkTag.length();
+
+				fileName = matcher.group(2);
+
+				attachmentFileEntry =
+					PortletFileRepositoryUtil.getPortletFileEntry(
+						node.getGroupId(), sharedImagesPageAttachmentsFolderId,
+						fileName);
+
+				attachmentFileEntryURL =
+					PortletFileRepositoryUtil.getPortletFileEntryURL(
+						themeDisplay, attachmentFileEntry, StringPool.BLANK);
+
+				linkLabel = matcher.group(3);
+
+				if (linkLabel == null) {
+					linkLabel = StringPool.PIPE + fileName;
+				}
+
+				linkTag = StringBundler.concat(
+					"[[", attachmentFileEntryURL, linkLabel, "]]");
+
+				sb.replace(
+					matcher.start(0) + offset,
+					matcher.start(0) + originalLength + offset, linkTag);
+
+				offset += linkTag.length() - originalLength;
+			}
+
+			content = sb.toString();
+		}
+		catch (PortalException pe) {
+			_log.error(pe, pe);
+		}
+
+		return content;
 	}
 
 	protected String translateMediaWikiImagePaths(String content) {
@@ -791,6 +883,8 @@ public class MediaWikiImporter implements WikiImporter {
 		"\\[\\[[Cc]ategory:([^\\]]*)\\]\\][\\n]*");
 	private static final Pattern _imagesPattern = Pattern.compile(
 		"(\\[\\[Image|File)(:)([^\\]]*)(\\]\\])", Pattern.DOTALL);
+	private static final Pattern _mediaLinkPattern = Pattern.compile(
+		"\\[\\[(Media:)([^\\]\\|]*)(\\|[^\\]]*)?\\]\\]", Pattern.DOTALL);
 	private static final Pattern _parentPattern = Pattern.compile(
 		"\\{{2}OtherTopics\\|([^\\}]*)\\}{2}");
 	private static final Pattern _redirectPattern = Pattern.compile(
@@ -799,6 +893,7 @@ public class MediaWikiImporter implements WikiImporter {
 		new String[] {"archive", "temp", "thumb"});
 
 	private AssetTagLocalService _assetTagLocalService;
+	private CompanyLocalService _companyLocalService;
 	private final MediaWikiToCreoleTranslator _translator =
 		new MediaWikiToCreoleTranslator();
 	private UserLocalService _userLocalService;

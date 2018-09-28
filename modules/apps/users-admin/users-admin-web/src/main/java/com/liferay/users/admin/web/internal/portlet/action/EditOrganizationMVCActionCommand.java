@@ -17,14 +17,10 @@ package com.liferay.users.admin.web.internal.portlet.action;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.portal.kernel.exception.AddressCityException;
-import com.liferay.portal.kernel.exception.AddressStreetException;
-import com.liferay.portal.kernel.exception.AddressZipException;
 import com.liferay.portal.kernel.exception.DuplicateOrganizationException;
 import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.exception.NoSuchListTypeException;
 import com.liferay.portal.kernel.exception.NoSuchOrganizationException;
-import com.liferay.portal.kernel.exception.NoSuchRegionException;
 import com.liferay.portal.kernel.exception.OrganizationNameException;
 import com.liferay.portal.kernel.exception.OrganizationParentException;
 import com.liferay.portal.kernel.exception.RequiredOrganizationException;
@@ -40,16 +36,15 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.AddressService;
 import com.liferay.portal.kernel.service.EmailAddressService;
+import com.liferay.portal.kernel.service.OrgLaborService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PhoneService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.WebsiteService;
-import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -57,10 +52,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
-import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -140,13 +132,9 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
-			else if (e instanceof AddressCityException ||
-					 e instanceof AddressStreetException ||
-					 e instanceof AddressZipException ||
-					 e instanceof DuplicateOrganizationException ||
+			else if (e instanceof DuplicateOrganizationException ||
 					 e instanceof NoSuchCountryException ||
 					 e instanceof NoSuchListTypeException ||
-					 e instanceof NoSuchRegionException ||
 					 e instanceof OrganizationNameException ||
 					 e instanceof OrganizationParentException ||
 					 e instanceof RequiredOrganizationException) {
@@ -207,9 +195,6 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 	protected Organization updateOrganization(ActionRequest actionRequest)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long organizationId = ParamUtil.getLong(
 			actionRequest, "organizationId");
 
@@ -234,10 +219,6 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 			logoBytes = FileUtil.getBytes(fileEntry.getContentStream());
 		}
 
-		boolean site = ParamUtil.getBoolean(actionRequest, "site");
-		List<Address> addresses = UsersAdminUtil.getAddresses(actionRequest);
-		List<OrgLabor> orgLabors = UsersAdminUtil.getOrgLabors(actionRequest);
-
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Organization.class.getName(), actionRequest);
 
@@ -249,7 +230,8 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			organization = _organizationService.addOrganization(
 				parentOrganizationId, name, type, regionId, countryId, statusId,
-				comments, site, addresses, Collections.emptyList(), orgLabors,
+				comments, false, Collections.emptyList(),
+				Collections.emptyList(), Collections.emptyList(),
 				Collections.emptyList(), Collections.emptyList(),
 				serviceContext);
 		}
@@ -257,9 +239,19 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			// Update organization
 
+			organization = _organizationService.getOrganization(organizationId);
+
+			Group organizationGroup = organization.getGroup();
+
+			boolean site = organizationGroup.isSite();
+
+			List<Address> addresses = _addressService.getAddresses(
+				Organization.class.getName(), organizationId);
 			List<EmailAddress> emailAddresses =
 				_emailAddressService.getEmailAddresses(
 					Organization.class.getName(), organizationId);
+			List<OrgLabor> orgLabors = _orgLaborService.getOrgLabors(
+				organizationId);
 			List<Phone> phones = _phoneService.getPhones(
 				Organization.class.getName(), organizationId);
 			List<Website> websites = _websiteService.getWebsites(
@@ -272,34 +264,11 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 				serviceContext);
 		}
 
-		// Layout set prototypes
-
-		long publicLayoutSetPrototypeId = ParamUtil.getLong(
-			actionRequest, "publicLayoutSetPrototypeId");
-		long privateLayoutSetPrototypeId = ParamUtil.getLong(
-			actionRequest, "privateLayoutSetPrototypeId");
-		boolean publicLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
-			actionRequest, "publicLayoutSetPrototypeLinkEnabled",
-			publicLayoutSetPrototypeId > 0);
-		boolean privateLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
-			actionRequest, "privateLayoutSetPrototypeLinkEnabled",
-			privateLayoutSetPrototypeId > 0);
-
-		Group organizationGroup = organization.getGroup();
-
-		if (GroupPermissionUtil.contains(
-				themeDisplay.getPermissionChecker(), organizationGroup,
-				ActionKeys.UPDATE)) {
-
-			SitesUtil.updateLayoutSetPrototypesLinks(
-				organizationGroup, publicLayoutSetPrototypeId,
-				privateLayoutSetPrototypeId,
-				publicLayoutSetPrototypeLinkEnabled,
-				privateLayoutSetPrototypeLinkEnabled);
-		}
-
 		return organization;
 	}
+
+	@Reference
+	private AddressService _addressService;
 
 	private DLAppLocalService _dlAppLocalService;
 
@@ -310,6 +279,9 @@ public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 	private Http _http;
 
 	private OrganizationService _organizationService;
+
+	@Reference
+	private OrgLaborService _orgLaborService;
 
 	@Reference
 	private PhoneService _phoneService;

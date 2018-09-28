@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
@@ -56,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
-		"mvc.command.name=/users_admin/organization/update_contact_information"
+		"mvc.command.name=/users_admin/update_organization_contact_information"
 	},
 	service = MVCActionCommand.class
 )
@@ -87,12 +86,8 @@ public class UpdateOrganizationContactInformationMVCActionCommand
 
 				SessionErrors.add(actionRequest, e.getClass(), e);
 
-				String redirect = _portal.escapeRedirect(
-					ParamUtil.getString(actionRequest, "redirect"));
-
-				if (Validator.isNotNull(redirect)) {
-					sendRedirect(actionRequest, actionResponse, redirect);
-				}
+				actionResponse.setRenderParameter(
+					"mvcPath", "/edit_organization.jsp");
 			}
 			else {
 				throw e;

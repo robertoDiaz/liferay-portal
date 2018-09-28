@@ -14,20 +14,27 @@
 
 package com.liferay.structured.content.apio.internal.architect.filter;
 
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
+
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.search.BooleanClause;
-import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.generic.TermQueryImpl;
-import com.liferay.portal.kernel.search.generic.TermRangeQueryImpl;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.filter.RangeTermFilter;
+import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.structured.content.apio.architect.entity.EntityField;
+import com.liferay.structured.content.apio.architect.filter.InvalidFilterException;
 import com.liferay.structured.content.apio.architect.filter.expression.BinaryExpression;
 import com.liferay.structured.content.apio.architect.filter.expression.ExpressionVisitor;
 import com.liferay.structured.content.apio.architect.filter.expression.LiteralExpression;
 import com.liferay.structured.content.apio.architect.filter.expression.MemberExpression;
 
+import java.text.Format;
+import java.text.ParseException;
+import java.text.ParsePosition;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,23 +47,24 @@ import java.util.Optional;
 public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 
 	public ExpressionVisitorImpl(
-		Locale locale,
+		Format format, Locale locale,
 		StructuredContentSingleEntitySchemaBasedEdmProvider
 			structuredContentSingleEntitySchemaBasedEdmProvider) {
 
+		_format = format;
 		_locale = locale;
 		_structuredContentSingleEntitySchemaBasedEdmProvider =
 			structuredContentSingleEntitySchemaBasedEdmProvider;
 	}
 
 	@Override
-	public BooleanClause<Query> visitBinaryExpressionOperation(
+	public Filter visitBinaryExpressionOperation(
 		BinaryExpression.Operation operation, Object left, Object right) {
 
-		Optional<BooleanClause<Query>> booleanClauseOptional =
-			_getBooleanClause(operation, (EntityField)left, right, _locale);
+		Optional<Filter> filterOptional = _getFilterOptional(
+			operation, left, right, _locale);
 
-		return booleanClauseOptional.orElseThrow(
+		return filterOptional.orElseThrow(
 			() -> new UnsupportedOperationException(
 				"Unsupported method visitBinaryExpressionOperation with " +
 					"operation " + operation));
@@ -65,9 +73,15 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 	@Override
 	public Object visitLiteralExpression(LiteralExpression literalExpression) {
 		if (Objects.equals(
-				LiteralExpression.Type.STRING, literalExpression.getType())) {
+				LiteralExpression.Type.DATE, literalExpression.getType())) {
 
-			return _normalizeLiteral(literalExpression.getText());
+			return _normalizeDateLiteral(literalExpression.getText());
+		}
+		else if (Objects.equals(
+					LiteralExpression.Type.STRING,
+					literalExpression.getType())) {
+
+			return _normalizeStringLiteral(literalExpression.getText());
 		}
 
 		return literalExpression.getText();
@@ -84,54 +98,104 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 		return entityFieldsMap.get(resourcePath.get(0));
 	}
 
-	private Optional<BooleanClause<Query>> _getBooleanClause(
-		BinaryExpression.Operation operation, EntityField entityField,
-		Object fieldValue, Locale locale) {
+	private Filter _getANDFilter(Filter leftFilter, Filter rightFilter) {
+		BooleanFilter booleanFilter = new BooleanFilter();
 
-		Query query = null;
+		booleanFilter.add(leftFilter, BooleanClauseOccur.MUST);
+		booleanFilter.add(rightFilter, BooleanClauseOccur.MUST);
 
-		if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
-			query = _getEQQuery(entityField, fieldValue, locale);
+		return booleanFilter;
+	}
+
+	private Filter _getEQFilter(
+		EntityField entityField, Object fieldValue, Locale locale) {
+
+		return new TermFilter(
+			entityField.getFilterableName(locale), String.valueOf(fieldValue));
+	}
+
+	private Optional<Filter> _getFilterOptional(
+		BinaryExpression.Operation operation, Object left, Object right,
+		Locale locale) {
+
+		Filter filter = null;
+
+		if (Objects.equals(BinaryExpression.Operation.AND, operation)) {
+			filter = _getANDFilter((Filter)left, (Filter)right);
+		}
+		else if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
+			filter = _getEQFilter((EntityField)left, right, locale);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.GE, operation)) {
-			query = _getGEQuery(entityField, fieldValue, locale);
+			filter = _getGEFilter((EntityField)left, right, locale);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.LE, operation)) {
-			query = _getLEQuery(entityField, fieldValue, locale);
+			filter = _getLEFilter((EntityField)left, right, locale);
+		}
+		else if (Objects.equals(BinaryExpression.Operation.OR, operation)) {
+			filter = _getORFilter((Filter)left, (Filter)right);
 		}
 		else {
 			return Optional.empty();
 		}
 
-		return Optional.of(
-			BooleanClauseFactoryUtil.create(
-				query, BooleanClauseOccur.MUST.getName()));
+		return Optional.of(filter);
 	}
 
-	private Query _getEQQuery(
+	private Filter _getGEFilter(
 		EntityField entityField, Object fieldValue, Locale locale) {
 
-		return new TermQueryImpl(
-			entityField.getSortableName(locale), String.valueOf(fieldValue));
+		if (Objects.equals(entityField.getType(), EntityField.Type.DATE) ||
+			Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
+
+			return new RangeTermFilter(
+				entityField.getFilterableName(locale), true, true,
+				String.valueOf(fieldValue), null);
+		}
+
+		throw new UnsupportedOperationException(
+			"Unsupported method _getGEQuery with entity field type " +
+				entityField.getType());
 	}
 
-	private Query _getGEQuery(
+	private Filter _getLEFilter(
 		EntityField entityField, Object fieldValue, Locale locale) {
 
-		return new TermRangeQueryImpl(
-			entityField.getSortableName(locale), String.valueOf(fieldValue),
-			null, true, true);
+		if (Objects.equals(entityField.getType(), EntityField.Type.DATE) ||
+			Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
+
+			return new RangeTermFilter(
+				entityField.getFilterableName(locale), false, true, null,
+				String.valueOf(fieldValue));
+		}
+
+		throw new UnsupportedOperationException(
+			"Unsupported method _getGEQuery with entity field type " +
+				entityField.getType());
 	}
 
-	private Query _getLEQuery(
-		EntityField entityField, Object fieldValue, Locale locale) {
+	private Filter _getORFilter(Filter leftFilter, Filter rightFilter) {
+		BooleanFilter booleanFilter = new BooleanFilter();
 
-		return new TermRangeQueryImpl(
-			entityField.getSortableName(locale), null,
-			String.valueOf(fieldValue), false, true);
+		booleanFilter.add(leftFilter, BooleanClauseOccur.SHOULD);
+		booleanFilter.add(rightFilter, BooleanClauseOccur.SHOULD);
+
+		return booleanFilter;
 	}
 
-	private Object _normalizeLiteral(String literal) {
+	private Object _normalizeDateLiteral(String literal) {
+		try {
+			Date date = ISO8601Utils.parse(literal, new ParsePosition(0));
+
+			return _format.format(date);
+		}
+		catch (ParseException pe) {
+			throw new InvalidFilterException(
+				"Invalid date format, use ISO 8601: " + pe.getMessage());
+		}
+	}
+
+	private Object _normalizeStringLiteral(String literal) {
 		literal = StringUtil.toLowerCase(literal);
 
 		literal = StringUtil.unquote(literal);
@@ -140,6 +204,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 			literal, StringPool.DOUBLE_APOSTROPHE, StringPool.APOSTROPHE);
 	}
 
+	private final Format _format;
 	private final Locale _locale;
 	private final StructuredContentSingleEntitySchemaBasedEdmProvider
 		_structuredContentSingleEntitySchemaBasedEdmProvider;
