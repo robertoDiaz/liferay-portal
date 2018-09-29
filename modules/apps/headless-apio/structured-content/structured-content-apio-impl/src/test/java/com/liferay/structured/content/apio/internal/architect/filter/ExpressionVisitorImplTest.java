@@ -16,17 +16,19 @@ package com.liferay.structured.content.apio.internal.architect.filter;
 
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.QueryTerm;
-import com.liferay.portal.kernel.search.TermRangeQuery;
-import com.liferay.portal.kernel.search.generic.TermQueryImpl;
-import com.liferay.portal.kernel.search.generic.TermRangeQueryImpl;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.filter.RangeTermFilter;
+import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.structured.content.apio.architect.entity.EntityField;
 import com.liferay.structured.content.apio.architect.filter.expression.BinaryExpression;
 import com.liferay.structured.content.apio.architect.filter.expression.LiteralExpression;
 import com.liferay.structured.content.apio.internal.architect.filter.expression.LiteralExpressionImpl;
 
+import java.text.SimpleDateFormat;
+
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,6 +42,41 @@ import org.junit.Test;
  */
 public class ExpressionVisitorImplTest {
 
+	@Test
+	public void testVisitBinaryExpressionOperationWithAndOperation() {
+		TermFilter leftTermFilter = new TermFilter("title", "title1");
+
+		TermFilter rightTermFilter = new TermFilter("title", "title2");
+
+		BooleanFilter booleanFilter =
+			(BooleanFilter)_expressionVisitorImpl.
+				visitBinaryExpressionOperation(
+					BinaryExpression.Operation.AND, leftTermFilter,
+					rightTermFilter);
+
+		Assert.assertTrue(booleanFilter.hasClauses());
+
+		List<BooleanClause<Filter>> booleanClauses =
+			booleanFilter.getMustBooleanClauses();
+
+		Assert.assertEquals(
+			booleanClauses.toString(), 2, booleanClauses.size());
+
+		BooleanClause<Filter> queryBooleanClause1 = booleanClauses.get(0);
+
+		Assert.assertEquals(leftTermFilter, queryBooleanClause1.getClause());
+		Assert.assertEquals(
+			BooleanClauseOccur.MUST,
+			queryBooleanClause1.getBooleanClauseOccur());
+
+		BooleanClause<Filter> queryBooleanClause2 = booleanClauses.get(1);
+
+		Assert.assertEquals(rightTermFilter, queryBooleanClause2.getClause());
+		Assert.assertEquals(
+			BooleanClauseOccur.MUST,
+			queryBooleanClause2.getBooleanClauseOccur());
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVisitBinaryExpressionOperationWithEqualOperation() {
@@ -51,20 +88,12 @@ public class ExpressionVisitorImplTest {
 
 		String value = "title1";
 
-		BooleanClause<Query> queryBooleanClause =
-			_expressionVisitorImpl.visitBinaryExpressionOperation(
+		TermFilter termFilter =
+			(TermFilter)_expressionVisitorImpl.visitBinaryExpressionOperation(
 				BinaryExpression.Operation.EQ, entityField, value);
 
-		Assert.assertEquals(
-			BooleanClauseOccur.MUST,
-			queryBooleanClause.getBooleanClauseOccur());
-
-		TermQueryImpl termQuery = (TermQueryImpl)queryBooleanClause.getClause();
-
-		QueryTerm queryTerm = termQuery.getQueryTerm();
-
-		Assert.assertEquals(entityField.getName(), queryTerm.getField());
-		Assert.assertEquals(value, queryTerm.getValue());
+		Assert.assertEquals(entityField.getName(), termFilter.getField());
+		Assert.assertEquals(value, termFilter.getValue());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,20 +107,14 @@ public class ExpressionVisitorImplTest {
 
 		String value = "title1";
 
-		BooleanClause<Query> queryBooleanClause =
-			_expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.GE, entityField, value);
+		RangeTermFilter rangeTermFilter =
+			(RangeTermFilter)_expressionVisitorImpl.
+				visitBinaryExpressionOperation(
+					BinaryExpression.Operation.GE, entityField, value);
 
-		Assert.assertEquals(
-			BooleanClauseOccur.MUST,
-			queryBooleanClause.getBooleanClauseOccur());
-
-		TermRangeQuery termRangeQuery =
-			(TermRangeQueryImpl)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), termRangeQuery.getField());
-		Assert.assertEquals(value, termRangeQuery.getLowerTerm());
-		Assert.assertNull(termRangeQuery.getUpperTerm());
+		Assert.assertEquals(entityField.getName(), rangeTermFilter.getField());
+		Assert.assertEquals(value, rangeTermFilter.getLowerBound());
+		Assert.assertNull(rangeTermFilter.getUpperBound());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -105,24 +128,83 @@ public class ExpressionVisitorImplTest {
 
 		String value = "title1";
 
-		BooleanClause<Query> queryBooleanClause =
-			_expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.LE, entityField, value);
+		RangeTermFilter rangeTermFilter =
+			(RangeTermFilter)_expressionVisitorImpl.
+				visitBinaryExpressionOperation(
+					BinaryExpression.Operation.LE, entityField, value);
 
-		Assert.assertEquals(
-			BooleanClauseOccur.MUST,
-			queryBooleanClause.getBooleanClauseOccur());
-
-		TermRangeQuery termRangeQuery =
-			(TermRangeQueryImpl)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), termRangeQuery.getField());
-		Assert.assertEquals(value, termRangeQuery.getUpperTerm());
-		Assert.assertNull(termRangeQuery.getLowerTerm());
+		Assert.assertEquals(entityField.getName(), rangeTermFilter.getField());
+		Assert.assertEquals(value, rangeTermFilter.getUpperBound());
+		Assert.assertNull(rangeTermFilter.getLowerBound());
 	}
 
 	@Test
-	public void testVisitLiteralExpressionWithDoubleSingleQuotes() {
+	public void testVisitBinaryExpressionOperationWithOrOperation() {
+		TermFilter leftTermFilter = new TermFilter("title", "title1");
+
+		TermFilter rightTermFilter = new TermFilter("title", "title2");
+
+		BooleanFilter booleanFilter =
+			(BooleanFilter)_expressionVisitorImpl.
+				visitBinaryExpressionOperation(
+					BinaryExpression.Operation.OR, leftTermFilter,
+					rightTermFilter);
+
+		Assert.assertTrue(booleanFilter.hasClauses());
+
+		List<BooleanClause<Filter>> booleanClauses =
+			booleanFilter.getShouldBooleanClauses();
+
+		Assert.assertEquals(
+			booleanClauses.toString(), 2, booleanClauses.size());
+
+		BooleanClause<Filter> queryBooleanClause1 = booleanClauses.get(0);
+
+		Assert.assertEquals(leftTermFilter, queryBooleanClause1.getClause());
+		Assert.assertEquals(
+			BooleanClauseOccur.SHOULD,
+			queryBooleanClause1.getBooleanClauseOccur());
+
+		BooleanClause<Filter> queryBooleanClause2 = booleanClauses.get(1);
+
+		Assert.assertEquals(rightTermFilter, queryBooleanClause2.getClause());
+		Assert.assertEquals(
+			BooleanClauseOccur.SHOULD,
+			queryBooleanClause2.getBooleanClauseOccur());
+	}
+
+	@Test
+	public void testVisitDateISO8601LiteralExpression() {
+		LiteralExpression literalExpression = new LiteralExpressionImpl(
+			"2012-05-29T09:13:28Z", LiteralExpression.Type.DATE);
+
+		Assert.assertEquals(
+			"20120529091328",
+			_expressionVisitorImpl.visitLiteralExpression(literalExpression));
+	}
+
+	@Test
+	public void testVisitDateISOLiteralExpression() {
+		LiteralExpression literalExpression = new LiteralExpressionImpl(
+			"2012-05-29T11:58:16+00:00", LiteralExpression.Type.DATE);
+
+		Assert.assertEquals(
+			"20120529115816",
+			_expressionVisitorImpl.visitLiteralExpression(literalExpression));
+	}
+
+	@Test
+	public void testVisitDateUTCLiteralExpression() {
+		LiteralExpression literalExpression = new LiteralExpressionImpl(
+			"2012-05-29", LiteralExpression.Type.DATE);
+
+		Assert.assertEquals(
+			"20120529000000",
+			_expressionVisitorImpl.visitLiteralExpression(literalExpression));
+	}
+
+	@Test
+	public void testVisitStringLiteralExpressionWithDoubleSingleQuotes() {
 		LiteralExpression literalExpression = new LiteralExpressionImpl(
 			"'L''Oreal'", LiteralExpression.Type.STRING);
 
@@ -132,7 +214,7 @@ public class ExpressionVisitorImplTest {
 	}
 
 	@Test
-	public void testVisitLiteralExpressionWithMultipleDoubleSingleQuotes() {
+	public void testVisitStringLiteralExpressionWithMultipleDoubleSingleQuotes() {
 		LiteralExpression literalExpression = new LiteralExpressionImpl(
 			"'L''Oreal and L''Oreal'", LiteralExpression.Type.STRING);
 
@@ -142,7 +224,7 @@ public class ExpressionVisitorImplTest {
 	}
 
 	@Test
-	public void testVisitLiteralExpressionWithOneSingleQuote() {
+	public void testVisitStringLiteralExpressionWithOneSingleQuote() {
 		LiteralExpression literalExpression = new LiteralExpressionImpl(
 			"'L'Oreal'", LiteralExpression.Type.STRING);
 
@@ -152,7 +234,7 @@ public class ExpressionVisitorImplTest {
 	}
 
 	@Test
-	public void testVisitLiteralExpressionWithSurroundingSingleQuotes() {
+	public void testVisitStringLiteralExpressionWithSurroundingSingleQuotes() {
 		LiteralExpression literalExpression = new LiteralExpressionImpl(
 			"'LOreal'", LiteralExpression.Type.STRING);
 
@@ -163,7 +245,7 @@ public class ExpressionVisitorImplTest {
 
 	private static final ExpressionVisitorImpl _expressionVisitorImpl =
 		new ExpressionVisitorImpl(
-			LocaleUtil.getDefault(),
+			new SimpleDateFormat("yyyyMMddHHmmss"), LocaleUtil.getDefault(),
 			ExpressionVisitorImplTest.
 				_structuredContentSingleEntitySchemaBasedEdmProvider);
 
