@@ -63,16 +63,17 @@ class FragmentEntryLinkList extends Component {
 
 	/**
 	 * Callback that is executed when an item is being dragged.
-	 * @param {!MouseEvent} event
+	 * @param {object} data
+	 * @param {MouseEvent} data.originalEvent
 	 * @private
 	 * @review
 	 */
 
-	_handleDrag(data, event) {
+	_handleDrag(data) {
 		const targetItem = data.target;
 
 		if (targetItem && 'fragmentEntryLinkId' in targetItem.dataset) {
-			const mouseY = event.target.mousePos_.y;
+			const mouseY = data.originalEvent.clientY;
 			const targetItemRegion = position.getRegion(targetItem);
 
 			this._targetBorder = DRAG_POSITIONS.bottom;
@@ -98,7 +99,7 @@ class FragmentEntryLinkList extends Component {
 	* @review
 	*/
 
-	_handleDragEnd(data, event) {
+	_handleDragEnd() {
 		this.store.dispatchAction(
 			CLEAR_DRAG_TARGET
 		);
@@ -106,7 +107,8 @@ class FragmentEntryLinkList extends Component {
 
 	/**
 	 * Callback that is executed when an item is dropped.
-	 * @param {!MouseEvent} event
+	 * @param {object} data
+	 * @param {MouseEvent} event
 	 * @private
 	 * @review
 	 */
@@ -163,20 +165,10 @@ class FragmentEntryLinkList extends Component {
 	 * @review
 	 */
 
-	_handleEditableChanged(event) {
-		this.emit('editableChanged', event);
-	}
-
-	/**
-	 * @param {object} event
-	 * @private
-	 * @review
-	 */
-
 	_handleFragmentMove(event) {
 		const placeholderId = event.fragmentEntryLinkId;
-		const placeholderIndex = this.structure.indexOf(placeholderId);
-		const targetId = this.structure[placeholderIndex + event.direction];
+		const placeholderIndex = this.layoutData.structure.indexOf(placeholderId);
+		const targetId = this.layoutData.structure[placeholderIndex + event.direction];
 
 		if (event.direction === 1) {
 			this._targetBorder = DRAG_POSITIONS.bottom;
@@ -217,16 +209,6 @@ class FragmentEntryLinkList extends Component {
 	}
 
 	/**
-	 * @param {object} event
-	 * @private
-	 * @review
-	 */
-
-	_handleMappeableFieldClicked(event) {
-		this.emit('mappeableFieldClicked', event);
-	}
-
-	/**
 	 * @private
 	 * @review
 	 */
@@ -238,10 +220,11 @@ class FragmentEntryLinkList extends Component {
 
 		this._dragDrop = new DragDrop(
 			{
+				autoScroll: true,
 				dragPlaceholder: Drag.Placeholder.CLONE,
 				handles: '.drag-handler',
 				sources: '.drag-fragment',
-				targets: `.${this.dropTargetClass}`
+				targets: '.fragment-entry-link-drop-target'
 			}
 		);
 
@@ -272,17 +255,6 @@ class FragmentEntryLinkList extends Component {
 FragmentEntryLinkList.STATE = {
 
 	/**
-	 * CSS class for the fragments drop target.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @review
-	 * @type {!string}
-	 */
-
-	dropTargetClass: Config.string(),
-
-	/**
 	 * Nearest border of the hovered fragment entry link when dragging.
 	 * @default undefined
 	 * @instance
@@ -305,15 +277,36 @@ FragmentEntryLinkList.STATE = {
 	hoveredFragmentEntryLinkId: Config.string(),
 
 	/**
-	 * Array of fragmentEntryLinks
-	 * @default undefined
+	 * Data associated to the layout
+	 * @default {structure: []}
 	 * @instance
 	 * @memberOf FragmentEntryLinkList
 	 * @review
-	 * @type {!array}
+	 * @type {{structure: Array<string>}}
 	 */
 
-	structure: Config.array(),
+	layoutData: Config
+		.shapeOf(
+			{
+				structure: Config.arrayOf(Config.string())
+			}
+		)
+		.value(
+			{
+				structure: []
+			}
+		),
+
+	/**
+	 * Internal DragDrop instance.
+	 * @default null
+	 * @instance
+	 * @memberOf FragmentEntryLinkList
+	 * @review
+	 * @type {object|null}
+	 */
+
+	_dragDrop: Config.internal().value(null),
 
 	/**
 	 * Nearest border of the hovered fragment while dragging

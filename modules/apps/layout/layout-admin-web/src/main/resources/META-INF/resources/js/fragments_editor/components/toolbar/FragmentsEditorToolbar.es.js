@@ -3,9 +3,12 @@ import {Config} from 'metal-state';
 import Soy from 'metal-soy';
 
 import './TranslationStatus.es';
-import {TOGGLE_SIDEBAR} from '../../actions/actions.es';
 import {Store} from '../../store/store.es';
 import templates from './FragmentsEditorToolbar.soy';
+import {
+	TOGGLE_SIDEBAR,
+	UPDATE_TRANSLATION_STATUS
+} from '../../actions/actions.es';
 
 /**
  * FragmentsEditorToolbar
@@ -15,24 +18,27 @@ import templates from './FragmentsEditorToolbar.soy';
 class FragmentsEditorToolbar extends Component {
 
 	/**
+	 * @inheritDoc
+	 */
+
+	created() {
+		this.once(
+			'storeChanged',
+			() => {
+				this.store.dispatchAction(
+					UPDATE_TRANSLATION_STATUS
+				);
+			}
+		);
+	}
+
+	/**
 	 * @private
 	 * @review
 	 */
 
 	_handleToggleContextualSidebarButtonClick() {
 		this.store.dispatchAction(TOGGLE_SIDEBAR);
-	}
-
-	/**
-	 * @param {{languageId: string}} event
-	 * @private
-	 * @review
-	 */
-
-	_handleTranslationLanguageChange(event) {
-		const {languageId} = event;
-
-		this.emit('translationLanguageChange', {languageId});
 	}
 }
 

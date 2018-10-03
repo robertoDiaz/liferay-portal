@@ -2,7 +2,7 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 import {addClasses, removeClasses} from 'metal-dom';
-import {isFunction, isObject, object} from 'metal';
+import {isFunction, isObject} from 'metal';
 
 import FragmentEditableField from './FragmentEditableField.es';
 import MetalStore from '../../store/store.es';
@@ -32,8 +32,6 @@ class FragmentEntryLink extends Component {
 	 */
 
 	created() {
-		this._handleEditableChanged = this._handleEditableChanged.bind(this);
-		this._handleMapButtonClick = this._handleMapButtonClick.bind(this);
 		this._updateEditableStatus = this._updateEditableStatus.bind(this);
 	}
 
@@ -44,24 +42,6 @@ class FragmentEntryLink extends Component {
 
 	disposed() {
 		this._destroyEditables();
-	}
-
-	/**
-	 * Returns the given editable value
-	 */
-
-	getEditableValue(editableId) {
-		return this.getEditableValues()[editableId];
-	}
-
-	/**
-	 * Returns the editable values property content
-	 * @return {object}
-	 * @review
-	 */
-
-	getEditableValues() {
-		return this.editableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR];
 	}
 
 	/**
@@ -77,30 +57,6 @@ class FragmentEntryLink extends Component {
 				content: this.content ? Soy.toIncDom(this.content) : null
 			}
 		);
-	}
-
-	/**
-	 * Returns a new object with the updated editableId
-	 * @param {string} editableId
-	 * @param {object} content
-	 */
-
-	setEditableValue(editableId, content) {
-		const editableValues = this.getEditableValues();
-
-		const editableValue = this.getEditableValue(editableId);
-
-		editableValues[editableId] = object.mixin({}, editableValue, content);
-
-		this._update(
-			this.languageId,
-			this.defaultLanguageId,
-			[this._updateEditableStatus]
-		);
-
-		return {
-			[EDITABLE_FRAGMENT_ENTRY_PROCESSOR]: editableValues
-		};
 	}
 
 	/**
@@ -137,6 +93,12 @@ class FragmentEntryLink extends Component {
 				}
 			);
 		}
+
+		this._update(
+			this.languageId,
+			this.defaultLanguageId,
+			[this._updateEditableStatus]
+		);
 	}
 
 	/**
@@ -160,6 +122,21 @@ class FragmentEntryLink extends Component {
 	syncStyleModifier() {
 		if (this.content) {
 			this._renderContent(this.content);
+		}
+	}
+
+	/**
+	 * Propagate store to editables when it's loaded
+	 * @review
+	 */
+
+	syncStore() {
+		if (this._editables) {
+			this._editables.forEach(
+				editable => {
+					editable.store = this.store;
+				}
+			);
 		}
 	}
 
@@ -193,7 +170,6 @@ class FragmentEntryLink extends Component {
 						element: editable,
 
 						events: {
-							editableChanged: this._handleEditableChanged,
 							mapButtonClicked: this._handleMapButtonClick
 						},
 
@@ -207,6 +183,7 @@ class FragmentEntryLink extends Component {
 						},
 
 						showMapping: this.showMapping,
+						store: this.store,
 						type: editable.getAttribute('type')
 					}
 				);
@@ -240,24 +217,6 @@ class FragmentEntryLink extends Component {
 			{
 				direction,
 				fragmentEntryLinkId: this.fragmentEntryLinkId
-			}
-		);
-	}
-
-	/**
-	 * Handle a changed editable event
-	 * @param {{editableId: string, value: string}} event
-	 * @private
-	 * @review
-	 */
-
-	_handleEditableChanged(event) {
-		this.emit(
-			'editableChanged',
-			{
-				editableId: event.editableId,
-				fragmentEntryLinkId: this.fragmentEntryLinkId,
-				value: event.value
 			}
 		);
 	}
@@ -341,22 +300,6 @@ class FragmentEntryLink extends Component {
 	}
 
 	/**
-	 * Propagates mapButtonClick event.
-	 */
-
-	_handleMapButtonClick(event) {
-		this.emit(
-			'mappeableFieldClicked',
-			{
-				editableId: event.editableId,
-				editableType: event.editableType,
-				fragmentEntryLinkId: this.fragmentEntryLinkId,
-				mappedFieldId: event.mappedFieldId
-			}
-		);
-	}
-
-	/**
 	 * Renders the FragmentEntryLink content parsing with AUI
 	 * @param {string} content
 	 * @private
@@ -395,7 +338,7 @@ class FragmentEntryLink extends Component {
 	 */
 
 	_update(languageId, defaultLanguageId, updateFunctions) {
-		const editableValues = this.getEditableValues();
+		const editableValues = this.editableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR];
 
 		Object.keys(editableValues).forEach(
 			editableId => {
@@ -508,17 +451,6 @@ FragmentEntryLink.STATE = {
 	 */
 
 	defaultLanguageId: Config.string().required(),
-
-	/**
-	 * CSS class for the fragments drop target.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEntryLink
-	 * @review
-	 * @type {!string}
-	 */
-
-	dropTargetClass: Config.string(),
 
 	/**
 	 * Editable values that should be used instead of the default ones
@@ -682,5 +614,9 @@ FragmentEntryLink.STATE = {
 
 Soy.register(FragmentEntryLink, templates);
 
-export {FragmentEntryLink};
+export {
+	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+	FragmentEntryLink
+};
+
 export default FragmentEntryLink;

@@ -38,6 +38,22 @@ import java.util.List;
 public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 	@Override
+	public void addAssetEntrySelection(
+			long assetListEntryId, long assetEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		assetListEntryLocalService.addAssetEntrySelection(
+			assetListEntryId, assetEntryId, serviceContext);
+	}
+
+	@Override
 	public AssetListEntry addAssetListEntry(
 			long groupId, String title, int type, ServiceContext serviceContext)
 		throws PortalException {
@@ -48,6 +64,48 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 		return assetListEntryLocalService.addAssetListEntry(
 			getUserId(), groupId, title, type, serviceContext);
+	}
+
+	@Override
+	public AssetListEntry addDynamicAssetListEntry(
+			long userId, long groupId, String title, String typeSettings,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
+
+		return assetListEntryLocalService.addDynamicAssetListEntry(
+			getUserId(), groupId, title, typeSettings, serviceContext);
+	}
+
+	@Override
+	public AssetListEntry addManualAssetListEntry(
+			long userId, long groupId, String title, long[] assetEntryIds,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
+
+		return assetListEntryLocalService.addManualAssetListEntry(
+			getUserId(), groupId, title, assetEntryIds, serviceContext);
+	}
+
+	@Override
+	public void deleteAssetEntrySelection(long assetListEntryId, int position)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		assetListEntryLocalService.deleteAssetEntrySelection(
+			assetListEntryId, position);
 	}
 
 	@Override
@@ -121,6 +179,21 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 	public int getAssetListEntriesCount(long groupId, String title) {
 		return assetListEntryPersistence.countByG_LikeT(
 			groupId, _customSQL.keywords(title, WildcardMode.SURROUND)[0]);
+	}
+
+	@Override
+	public void moveAssetEntrySelection(
+			long assetListEntryId, int position, int newPosition)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		assetListEntryLocalService.moveAssetEntrySelection(
+			assetListEntryId, position, newPosition);
 	}
 
 	@Override

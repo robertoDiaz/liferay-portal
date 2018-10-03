@@ -552,6 +552,34 @@ public class GroupLocalServiceUtil {
 	}
 
 	/**
+	* Returns the active or inactive groups associated with the company.
+	*
+	* @param companyId the primary key of the company
+	* @param active whether to return only active groups, or only inactive
+	groups
+	* @return the active or inactive groups associated with the company
+	* @review
+	*/
+	public static java.util.List<com.liferay.portal.kernel.model.Group> getActiveGroups(
+		long companyId, boolean active, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.Group> obc) {
+		return getService().getActiveGroups(companyId, active, start, end, obc);
+	}
+
+	/**
+	* Returns the number of active or inactive groups associated with the company.
+	*
+	* @param companyId the primary key of the company
+	* @param active whether to count only active groups, or only inactive
+	groups
+	* @return the number of active or inactive groups associated with the company
+	* @review
+	*/
+	public static int getActiveGroupsCount(long companyId, boolean active) {
+		return getService().getActiveGroupsCount(companyId, active);
+	}
+
+	/**
 	* Returns the company group.
 	*
 	* @param companyId the primary key of the company
@@ -715,6 +743,13 @@ public class GroupLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.kernel.model.Group> getGroups(
+		long companyId, long parentGroupId, String name, boolean site,
+		int start, int end) {
+		return getService()
+				   .getGroups(companyId, parentGroupId, name, site, start, end);
+	}
+
+	public static java.util.List<com.liferay.portal.kernel.model.Group> getGroups(
 		long companyId, String treePath, boolean site) {
 		return getService().getGroups(companyId, treePath, site);
 	}
@@ -785,6 +820,11 @@ public class GroupLocalServiceUtil {
 	public static int getGroupsCount(long companyId, long parentGroupId,
 		boolean site) {
 		return getService().getGroupsCount(companyId, parentGroupId, site);
+	}
+
+	public static int getGroupsCount(long companyId, long parentGroupId,
+		String name, boolean site) {
+		return getService().getGroupsCount(companyId, parentGroupId, name, site);
 	}
 
 	/**

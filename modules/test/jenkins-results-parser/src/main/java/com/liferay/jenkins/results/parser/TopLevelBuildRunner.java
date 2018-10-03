@@ -63,7 +63,7 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 	}
 
 	protected String[] getDistFileNames() {
-		return new String[] {BuildData.JENKINS_BUILD_DATA_FILE_NAME};
+		return new String[] {BuildDatabase.BUILD_DATABASE_FILE_NAME};
 	}
 
 	protected void invokeBatchJob(String batchName) {
@@ -148,8 +148,6 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 			return;
 		}
 
-		writeJenkinsJSONObjectToFile();
-
 		BuildData buildData = getBuildData();
 
 		File workspaceDir = buildData.getWorkspaceDir();
@@ -184,11 +182,18 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 	}
 
 	private String _getJenkinsGitHubURL() {
-		String jenkinsCachedBranchName = workspace.getJenkinsCachedBranchName();
+		if (JenkinsResultsParserUtil.isCINode()) {
+			WorkspaceGitRepository jenkinsWorkspaceGitRepository =
+				workspace.getJenkinsWorkspaceGitRepository();
 
-		if (jenkinsCachedBranchName != null) {
-			return "https://github-dev.liferay.com/liferay/liferay-jenkins-ee" +
-				"/tree/" + jenkinsCachedBranchName;
+			String gitHubDevBranchName =
+				jenkinsWorkspaceGitRepository.getGitHubDevBranchName();
+
+			if (gitHubDevBranchName != null) {
+				return JenkinsResultsParserUtil.combine(
+					"https://github-dev.liferay.com/liferay/",
+					"liferay-jenkins-ee/tree/", gitHubDevBranchName);
+			}
 		}
 
 		BuildData buildData = getBuildData();

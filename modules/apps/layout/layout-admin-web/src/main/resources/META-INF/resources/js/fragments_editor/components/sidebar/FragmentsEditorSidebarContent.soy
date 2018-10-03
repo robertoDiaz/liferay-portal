@@ -1,0 +1,32 @@
+{namespace com.liferay.layout.admin.web.FragmentsEditorSidebarContent}
+
+/**
+ * FragmentsEditorSidebarContent
+ */
+{template .render}
+	{@param fragmentCollections: ?}
+	{@param fragmentEntryLinks: ?}
+	{@param layoutData: ?}
+	{@param sidebarTabs: list<[
+		enabled:bool,
+		id:string,
+		label:string
+	]>}
+	{@param spritemap: string}
+	{@param? highlightMapping: bool}
+	{@param? selectedMappingTypes: ?}
+	{@param? store: ?}
+
+	<div class="fragments-editor-sidebar-content">
+		{call com.liferay.layout.admin.web.SidebarFragmentsSection.render}
+			{param fragmentCollections: $fragmentCollections /}
+			{param fragmentEntryLinks: $fragmentEntryLinks /}
+			{param layoutData: $layoutData /}
+			{param sidebarTabs: $sidebarTabs /}
+			{param spritemap: $spritemap /}
+			{param highlightMapping: $highlightMapping /}
+			{param selectedMappingTypes: $selectedMappingTypes /}
+			{param store: $store /}
+		{/call}
+	</div>
+{/template}

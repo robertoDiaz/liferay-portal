@@ -34,12 +34,46 @@ public class AssetListEntryServiceWrapper implements AssetListEntryService,
 	}
 
 	@Override
+	public void addAssetEntrySelection(long assetListEntryId,
+		long assetEntryId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_assetListEntryService.addAssetEntrySelection(assetListEntryId,
+			assetEntryId, serviceContext);
+	}
+
+	@Override
 	public com.liferay.asset.list.model.AssetListEntry addAssetListEntry(
 		long groupId, String title, int type,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetListEntryService.addAssetListEntry(groupId, title, type,
 			serviceContext);
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntry addDynamicAssetListEntry(
+		long userId, long groupId, String title, String typeSettings,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryService.addDynamicAssetListEntry(userId, groupId,
+			title, typeSettings, serviceContext);
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntry addManualAssetListEntry(
+		long userId, long groupId, String title, long[] assetEntryIds,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryService.addManualAssetListEntry(userId, groupId,
+			title, assetEntryIds, serviceContext);
+	}
+
+	@Override
+	public void deleteAssetEntrySelection(long assetListEntryId, int position)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_assetListEntryService.deleteAssetEntrySelection(assetListEntryId,
+			position);
 	}
 
 	@Override
@@ -96,6 +130,14 @@ public class AssetListEntryServiceWrapper implements AssetListEntryService,
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _assetListEntryService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public void moveAssetEntrySelection(long assetListEntryId, int position,
+		int newPosition)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_assetListEntryService.moveAssetEntrySelection(assetListEntryId,
+			position, newPosition);
 	}
 
 	@Override

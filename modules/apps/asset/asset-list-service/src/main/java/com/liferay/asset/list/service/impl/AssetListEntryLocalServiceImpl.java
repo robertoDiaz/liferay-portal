@@ -14,9 +14,9 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.exception.AssetListEntryTitleException;
 import com.liferay.asset.list.exception.DuplicateAssetListEntryTitleException;
-import com.liferay.asset.list.exception.NoSuchEntryException;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.base.AssetListEntryLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -38,6 +38,26 @@ public class AssetListEntryLocalServiceImpl
 	extends AssetListEntryLocalServiceBaseImpl {
 
 	@Override
+	public void addAssetEntrySelection(
+			long assetListEntryId, long assetEntryId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
+
+		if (Objects.equals(
+				assetListEntry.getType(),
+				AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
+
+			throw new PortalException();
+		}
+
+		assetListEntryAssetEntryRelLocalService.addAssetListEntryAssetEntryRel(
+			assetListEntryId, assetEntryId, serviceContext);
+	}
+
+	@Override
 	public AssetListEntry addAssetListEntry(
 			long userId, long groupId, String title, int type,
 			ServiceContext serviceContext)
@@ -54,6 +74,7 @@ public class AssetListEntryLocalServiceImpl
 		AssetListEntry assetListEntry = assetListEntryPersistence.create(
 			assetListEntryId);
 
+		assetListEntry.setUuid(serviceContext.getUuid());
 		assetListEntry.setGroupId(groupId);
 		assetListEntry.setCompanyId(user.getCompanyId());
 		assetListEntry.setUserId(user.getUserId());
@@ -77,6 +98,58 @@ public class AssetListEntryLocalServiceImpl
 	}
 
 	@Override
+	public AssetListEntry addDynamicAssetListEntry(
+			long userId, long groupId, String title, String typeSettings,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetListEntry assetListEntry = addAssetListEntry(
+			userId, groupId, title, AssetListEntryTypeConstants.TYPE_DYNAMIC,
+			serviceContext);
+
+		assetListEntry.setTypeSettings(typeSettings);
+
+		return assetListEntryPersistence.update(assetListEntry);
+	}
+
+	@Override
+	public AssetListEntry addManualAssetListEntry(
+			long userId, long groupId, String title, long[] assetEntryIds,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetListEntry assetListEntry = addAssetListEntry(
+			userId, groupId, title, AssetListEntryTypeConstants.TYPE_MANUAL,
+			serviceContext);
+
+		for (long assetEntryId : assetEntryIds) {
+			addAssetEntrySelection(
+				assetListEntry.getAssetListEntryId(), assetEntryId,
+				serviceContext);
+		}
+
+		return assetListEntry;
+	}
+
+	@Override
+	public void deleteAssetEntrySelection(long assetListEntryId, int position)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
+
+		if (Objects.equals(
+				assetListEntry.getType(),
+				AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
+
+			throw new PortalException();
+		}
+
+		assetListEntryAssetEntryRelLocalService.
+			deleteAssetListEntryAssetEntryRel(assetListEntryId, position);
+	}
+
+	@Override
 	public AssetListEntry deleteAssetListEntry(AssetListEntry assetListEntry)
 		throws PortalException {
 
@@ -92,11 +165,7 @@ public class AssetListEntryLocalServiceImpl
 		throws PortalException {
 
 		AssetListEntry assetListEntry =
-			assetListEntryPersistence.fetchByPrimaryKey(assetListEntryId);
-
-		if (assetListEntry == null) {
-			throw new NoSuchEntryException();
-		}
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
 
 		// Resources
 
@@ -104,6 +173,25 @@ public class AssetListEntryLocalServiceImpl
 			assetListEntry, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		return assetListEntryPersistence.remove(assetListEntryId);
+	}
+
+	@Override
+	public void moveAssetEntrySelection(
+			long assetListEntryId, int position, int newPosition)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
+
+		if (Objects.equals(
+				assetListEntry.getType(),
+				AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
+
+			throw new PortalException();
+		}
+
+		assetListEntryAssetEntryRelLocalService.moveAssetListEntryAssetEntryRel(
+			assetListEntryId, position, newPosition);
 	}
 
 	@Override

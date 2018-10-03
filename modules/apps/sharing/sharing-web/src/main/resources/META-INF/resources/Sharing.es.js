@@ -1,5 +1,5 @@
 import Soy from 'metal-soy';
-import { Config } from 'metal-state';
+import {Config} from 'metal-state';
 
 import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
 
@@ -56,7 +56,7 @@ class Sharing extends PortletBase {
 				classNameId: this._classNameId,
 				classPK: this._classPK,
 				shareable: this.shareable,
-				sharingEntryPermissionDisplayActionKeyActionId: this.sharingEntryPermissionDisplayActionKeyActionId,
+				sharingEntryPermissionDisplayActionId: this.sharingEntryPermissionDisplayActionId,
 				userEmailAddress: this._getEmailAdress(this.userEmailAddress)
 			}
 		).then(
@@ -75,8 +75,9 @@ class Sharing extends PortletBase {
 	 */
 	_handleInputChange(event) {
 		const target = event.target;
-		const value = target.type === 'checkbox' ? target.checked : target.value;
+
 		const name = target.name;
+		const value = target.type === 'checkbox' ? target.checked : target.value;
 
 		this[name] = value;
 	}
@@ -91,7 +92,7 @@ class Sharing extends PortletBase {
 Sharing.STATE = {
 	shareable: Config.bool().value(true),
 	shareActionURL: Config.string().required(),
-	sharingEntryPermissionDisplayActionKeyActionId: Config.string().required()
+	sharingEntryPermissionDisplayActionId: Config.string().required()
 };
 
 Soy.register(Sharing, templates);

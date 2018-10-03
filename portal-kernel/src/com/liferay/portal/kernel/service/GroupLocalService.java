@@ -405,6 +405,31 @@ public interface GroupLocalService extends BaseLocalService,
 	public List<Group> getActiveGroups(long companyId, boolean active);
 
 	/**
+	* Returns the active or inactive groups associated with the company.
+	*
+	* @param companyId the primary key of the company
+	* @param active whether to return only active groups, or only inactive
+	groups
+	* @return the active or inactive groups associated with the company
+	* @review
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Group> getActiveGroups(long companyId, boolean active,
+		int start, int end, OrderByComparator<Group> obc);
+
+	/**
+	* Returns the number of active or inactive groups associated with the company.
+	*
+	* @param companyId the primary key of the company
+	* @param active whether to count only active groups, or only inactive
+	groups
+	* @return the number of active or inactive groups associated with the company
+	* @review
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getActiveGroupsCount(long companyId, boolean active);
+
+	/**
 	* Returns the company group.
 	*
 	* @param companyId the primary key of the company
@@ -546,6 +571,10 @@ public interface GroupLocalService extends BaseLocalService,
 		boolean site, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Group> getGroups(long companyId, long parentGroupId,
+		String name, boolean site, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Group> getGroups(long companyId, String treePath, boolean site);
 
 	/**
@@ -606,6 +635,10 @@ public interface GroupLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupsCount(long companyId, long parentGroupId, boolean site);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getGroupsCount(long companyId, long parentGroupId, String name,
+		boolean site);
 
 	/**
 	* Returns the number of groups that are direct children of the parent group
