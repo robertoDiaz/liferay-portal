@@ -61,7 +61,6 @@ import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -81,7 +80,9 @@ import com.liferay.portal.service.impl.LayoutTemplateLocalServiceImpl;
 import com.liferay.portal.servlet.filters.absoluteredirects.AbsoluteRedirectsResponse;
 import com.liferay.portal.servlet.filters.i18n.I18nFilter;
 import com.liferay.portal.setup.SetupWizardSampleDataUtil;
+import com.liferay.portal.struts.PortalRequestProcessor;
 import com.liferay.portal.struts.StrutsUtil;
+import com.liferay.portal.struts.TilesUtil;
 import com.liferay.portal.util.ExtRegistry;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.PortalInstances;
@@ -125,7 +126,6 @@ import javax.servlet.jsp.PageContext;
 import org.apache.struts.Globals;
 import org.apache.struts.action.ActionServlet;
 import org.apache.struts.action.RequestProcessor;
-import org.apache.struts.config.ControllerConfig;
 import org.apache.struts.config.ModuleConfig;
 
 /**
@@ -201,6 +201,12 @@ public class MainServlet extends ActionServlet {
 		servletContext.setAttribute(MainServlet.class.getName(), Boolean.TRUE);
 
 		callParentInit();
+
+		ModuleConfig moduleConfig = (ModuleConfig)servletContext.getAttribute(
+			Globals.MODULE_KEY);
+
+		_portalRequestProcessor = new PortalRequestProcessor(
+			this, moduleConfig);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Verify patch levels");
@@ -719,36 +725,9 @@ public class MainServlet extends ActionServlet {
 
 	@Override
 	protected synchronized RequestProcessor getRequestProcessor(
-			ModuleConfig moduleConfig)
-		throws ServletException {
+		ModuleConfig moduleConfig) {
 
-		ServletContext servletContext = getServletContext();
-
-		String key = Globals.REQUEST_PROCESSOR_KEY + moduleConfig.getPrefix();
-
-		RequestProcessor requestProcessor =
-			(RequestProcessor)servletContext.getAttribute(key);
-
-		if (requestProcessor == null) {
-			ControllerConfig controllerConfig =
-				moduleConfig.getControllerConfig();
-
-			try {
-				requestProcessor =
-					(RequestProcessor)InstanceFactory.newInstance(
-						ClassLoaderUtil.getPortalClassLoader(),
-						controllerConfig.getProcessorClass());
-			}
-			catch (Exception e) {
-				throw new ServletException(e);
-			}
-
-			requestProcessor.init(this, moduleConfig);
-
-			servletContext.setAttribute(key, requestProcessor);
-		}
-
-		return requestProcessor;
+		return null;
 	}
 
 	protected long getUserId(HttpServletRequest request) {
@@ -865,6 +844,18 @@ public class MainServlet extends ActionServlet {
 
 		serviceDependencyManager.registerDependencies(
 			filters.toArray(new Filter[0]));
+	}
+
+	@Override
+	protected void initModulePlugIns(ModuleConfig moduleConfig)
+		throws ServletException {
+
+		try {
+			TilesUtil.loadDefinitions(getServletContext());
+		}
+		catch (Exception e) {
+			throw new ServletException(e);
+		}
 	}
 
 	protected PluginPackage initPluginPackage() throws Exception {
@@ -1065,6 +1056,14 @@ public class MainServlet extends ActionServlet {
 		}
 
 		return userId;
+	}
+
+	@Override
+	protected void process(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException {
+
+		_portalRequestProcessor.process(request, response);
 	}
 
 	protected boolean processCompanyInactiveRequest(
@@ -1377,6 +1376,7 @@ public class MainServlet extends ActionServlet {
 
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_portalInitializedModuleServiceLifecycleServiceRegistration;
+	private PortalRequestProcessor _portalRequestProcessor;
 	private ServiceRegistration<ServletContext>
 		_servletContextServiceRegistration;
 	private ServiceRegistration<ModuleServiceLifecycle>

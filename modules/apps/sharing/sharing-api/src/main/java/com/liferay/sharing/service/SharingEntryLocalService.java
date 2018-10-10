@@ -132,34 +132,6 @@ public interface SharingEntryLocalService extends BaseLocalService,
 	public SharingEntry addSharingEntry(SharingEntry sharingEntry);
 
 	/**
-	* Returns the number of sharing entries that have been shared by a user.
-	*
-	* @param fromUserId the user id sharing the resource
-	* @return the number of sharing entries
-	*/
-	public int countFromUserSharingEntries(long fromUserId);
-
-	/**
-	* Returns the number of sharing entries of a resource that have been shared
-	* by a user.
-	*
-	* @param fromUserId the user id sharing the resource
-	* @param classNameId the class name ID of the resource
-	* @param classPK the primary key of the resource
-	* @return the number of sharing entries
-	*/
-	public int countFromUserSharingEntries(long fromUserId, long classNameId,
-		long classPK);
-
-	/**
-	* Returns the number of sharing entries that have been shared to a user.
-	*
-	* @param toUserId the user id who was shared the resource
-	* @return the number of sharing entries
-	*/
-	public int countToUserSharingEntries(long toUserId);
-
-	/**
 	* Creates a new sharing entry with the primary key. Does not add the sharing entry to the database.
 	*
 	* @param sharingEntryId the primary key for the new sharing entry
@@ -349,6 +321,28 @@ public interface SharingEntryLocalService extends BaseLocalService,
 		long classNameId, long classPK, int start, int end);
 
 	/**
+	* Returns the number of sharing entries that have been shared by a user.
+	*
+	* @param fromUserId the user id sharing the resource
+	* @return the number of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getFromUserSharingEntriesCount(long fromUserId);
+
+	/**
+	* Returns the number of sharing entries of a resource that have been shared
+	* by a user.
+	*
+	* @param fromUserId the user id sharing the resource
+	* @param classNameId the class name ID of the resource
+	* @param classPK the primary key of the resource
+	* @return the number of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getFromUserSharingEntriesCount(long fromUserId,
+		long classNameId, long classPK);
+
+	/**
 	* Returns a list of all the sharing entries of a group.
 	*
 	* @param groupId the primary key of the group
@@ -467,6 +461,19 @@ public interface SharingEntryLocalService extends BaseLocalService,
 		long groupId) throws PortalException;
 
 	/**
+	* Returns a list of sharing entries of a specific class name id and class
+	* pk that has been shared to a user.
+	*
+	* @param toUserId the user id that has been shared the resource
+	* @param classNameId the class name ID of the shared resource
+	* @param classPK the class pk of the shared resource
+	* @return the list of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SharingEntry> getToUserClassPKSharingEntries(long toUserId,
+		long classNameId, long classPK);
+
+	/**
 	* Returns a list of all the sharing entries that has been shared to a user.
 	*
 	* @param toUserId the user id that has been shared the resource
@@ -496,6 +503,41 @@ public interface SharingEntryLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<SharingEntry> getToUserSharingEntries(long toUserId,
+		long classNameId);
+
+	/**
+	* Returns the number of sharing entries that have been shared to a user.
+	*
+	* @param toUserId the user id who was shared the resource
+	* @return the number of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getToUserSharingEntriesCount(long toUserId);
+
+	/**
+	* Returns a list of all the sharing entries of a resource that has been
+	* shared to a user returning at most one per shared model
+	*
+	* @param toUserId the user id
+	* @param classNameId the classNameId to filter by
+	* @param orderByComparator the comparator to order the sharing entries
+	* @return the list of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SharingEntry> getUniqueToUserSharingEntries(long toUserId,
+		long classNameId, int start, int end,
+		OrderByComparator<SharingEntry> orderByComparator);
+
+	/**
+	* Returns the number of sharing entries of a resource that have been shared
+	* by to user returning at most one per shared model.
+	*
+	* @param toUserId the user id
+	* @param classNameId the classNameId to filter by
+	* @return the number of sharing entries
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUniqueToUserSharingEntriesCount(long toUserId,
 		long classNameId);
 
 	/**

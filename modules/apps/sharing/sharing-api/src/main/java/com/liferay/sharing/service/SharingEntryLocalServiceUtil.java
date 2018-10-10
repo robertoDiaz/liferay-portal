@@ -123,41 +123,6 @@ public class SharingEntryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of sharing entries that have been shared by a user.
-	*
-	* @param fromUserId the user id sharing the resource
-	* @return the number of sharing entries
-	*/
-	public static int countFromUserSharingEntries(long fromUserId) {
-		return getService().countFromUserSharingEntries(fromUserId);
-	}
-
-	/**
-	* Returns the number of sharing entries of a resource that have been shared
-	* by a user.
-	*
-	* @param fromUserId the user id sharing the resource
-	* @param classNameId the class name ID of the resource
-	* @param classPK the primary key of the resource
-	* @return the number of sharing entries
-	*/
-	public static int countFromUserSharingEntries(long fromUserId,
-		long classNameId, long classPK) {
-		return getService()
-				   .countFromUserSharingEntries(fromUserId, classNameId, classPK);
-	}
-
-	/**
-	* Returns the number of sharing entries that have been shared to a user.
-	*
-	* @param toUserId the user id who was shared the resource
-	* @return the number of sharing entries
-	*/
-	public static int countToUserSharingEntries(long toUserId) {
-		return getService().countToUserSharingEntries(toUserId);
-	}
-
-	/**
 	* Creates a new sharing entry with the primary key. Does not add the sharing entry to the database.
 	*
 	* @param sharingEntryId the primary key for the new sharing entry
@@ -399,6 +364,32 @@ public class SharingEntryLocalServiceUtil {
 	}
 
 	/**
+	* Returns the number of sharing entries that have been shared by a user.
+	*
+	* @param fromUserId the user id sharing the resource
+	* @return the number of sharing entries
+	*/
+	public static int getFromUserSharingEntriesCount(long fromUserId) {
+		return getService().getFromUserSharingEntriesCount(fromUserId);
+	}
+
+	/**
+	* Returns the number of sharing entries of a resource that have been shared
+	* by a user.
+	*
+	* @param fromUserId the user id sharing the resource
+	* @param classNameId the class name ID of the resource
+	* @param classPK the primary key of the resource
+	* @return the number of sharing entries
+	*/
+	public static int getFromUserSharingEntriesCount(long fromUserId,
+		long classNameId, long classPK) {
+		return getService()
+				   .getFromUserSharingEntriesCount(fromUserId, classNameId,
+			classPK);
+	}
+
+	/**
 	* Returns a list of all the sharing entries of a group.
 	*
 	* @param groupId the primary key of the group
@@ -537,6 +528,22 @@ public class SharingEntryLocalServiceUtil {
 	}
 
 	/**
+	* Returns a list of sharing entries of a specific class name id and class
+	* pk that has been shared to a user.
+	*
+	* @param toUserId the user id that has been shared the resource
+	* @param classNameId the class name ID of the shared resource
+	* @param classPK the class pk of the shared resource
+	* @return the list of sharing entries
+	*/
+	public static java.util.List<com.liferay.sharing.model.SharingEntry> getToUserClassPKSharingEntries(
+		long toUserId, long classNameId, long classPK) {
+		return getService()
+				   .getToUserClassPKSharingEntries(toUserId, classNameId,
+			classPK);
+	}
+
+	/**
 	* Returns a list of all the sharing entries that has been shared to a user.
 	*
 	* @param toUserId the user id that has been shared the resource
@@ -570,6 +577,47 @@ public class SharingEntryLocalServiceUtil {
 	public static java.util.List<com.liferay.sharing.model.SharingEntry> getToUserSharingEntries(
 		long toUserId, long classNameId) {
 		return getService().getToUserSharingEntries(toUserId, classNameId);
+	}
+
+	/**
+	* Returns the number of sharing entries that have been shared to a user.
+	*
+	* @param toUserId the user id who was shared the resource
+	* @return the number of sharing entries
+	*/
+	public static int getToUserSharingEntriesCount(long toUserId) {
+		return getService().getToUserSharingEntriesCount(toUserId);
+	}
+
+	/**
+	* Returns a list of all the sharing entries of a resource that has been
+	* shared to a user returning at most one per shared model
+	*
+	* @param toUserId the user id
+	* @param classNameId the classNameId to filter by
+	* @param orderByComparator the comparator to order the sharing entries
+	* @return the list of sharing entries
+	*/
+	public static java.util.List<com.liferay.sharing.model.SharingEntry> getUniqueToUserSharingEntries(
+		long toUserId, long classNameId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sharing.model.SharingEntry> orderByComparator) {
+		return getService()
+				   .getUniqueToUserSharingEntries(toUserId, classNameId, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* Returns the number of sharing entries of a resource that have been shared
+	* by to user returning at most one per shared model.
+	*
+	* @param toUserId the user id
+	* @param classNameId the classNameId to filter by
+	* @return the number of sharing entries
+	*/
+	public static int getUniqueToUserSharingEntriesCount(long toUserId,
+		long classNameId) {
+		return getService()
+				   .getUniqueToUserSharingEntriesCount(toUserId, classNameId);
 	}
 
 	/**

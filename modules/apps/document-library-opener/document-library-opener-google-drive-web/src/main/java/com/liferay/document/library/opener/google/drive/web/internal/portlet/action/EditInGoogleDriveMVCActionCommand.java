@@ -15,6 +15,7 @@
 package com.liferay.document.library.opener.google.drive.web.internal.portlet.action;
 
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.opener.google.drive.DLOpenerGoogleDriveFileReference;
 import com.liferay.document.library.opener.google.drive.DLOpenerGoogleDriveManager;
@@ -165,15 +166,20 @@ public class EditInGoogleDriveMVCActionCommand extends BaseMVCActionCommand {
 		else if (cmd.equals(
 					DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_CHECKIN)) {
 
-			boolean majorVersion = ParamUtil.getBoolean(
-				actionRequest, "majorVersion");
+			DLVersionNumberIncrease dlVersionNumberIncrease =
+				DLVersionNumberIncrease.valueOf(
+					ParamUtil.getString(
+						actionRequest, "versionIncrease",
+						DLVersionNumberIncrease.NONE.toString()));
+
 			String changeLog = ParamUtil.getString(actionRequest, "changeLog");
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
 			_dlAppService.checkInFileEntry(
-				fileEntryId, majorVersion, changeLog, serviceContext);
+				fileEntryId, dlVersionNumberIncrease, changeLog,
+				serviceContext);
 		}
 		else if (cmd.equals(
 					DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_CHECKOUT)) {

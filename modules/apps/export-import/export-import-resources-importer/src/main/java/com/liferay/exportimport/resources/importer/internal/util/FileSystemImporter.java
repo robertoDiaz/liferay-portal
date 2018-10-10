@@ -20,6 +20,7 @@ import com.liferay.document.library.kernel.exception.DuplicateFileEntryException
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
@@ -813,8 +814,9 @@ public class FileSystemImporter extends BaseImporter {
 				fileEntry = dlAppLocalService.updateFileEntry(
 					userId, fileEntry.getFileEntryId(), fileName,
 					mimeTypes.getContentType(fileName), fileName,
-					StringPool.BLANK, StringPool.BLANK, true, inputStream,
-					length, serviceContext);
+					StringPool.BLANK, StringPool.BLANK,
+					DLVersionNumberIncrease.MAJOR, inputStream, length,
+					serviceContext);
 
 				dlFileEntryLocalService.deleteFileVersion(
 					fileEntry.getUserId(), fileEntry.getFileEntryId(),
@@ -1297,8 +1299,6 @@ public class FileSystemImporter extends BaseImporter {
 		Map<Locale, String> descriptionMap = getMap(
 			layoutTemplateJSONObject, "description");
 
-		String uuid = layoutTemplateJSONObject.getString("uuid");
-
 		LayoutPrototype layoutPrototype = getLayoutPrototype(companyId, name);
 
 		if (layoutPrototype != null) {
@@ -1323,6 +1323,8 @@ public class FileSystemImporter extends BaseImporter {
 
 		serviceContext.setCompanyId(companyId);
 		serviceContext.setUserId(userId);
+
+		String uuid = layoutTemplateJSONObject.getString("uuid");
 
 		if (Validator.isNotNull(uuid)) {
 			serviceContext.setUuid(uuid);
@@ -1632,8 +1634,6 @@ public class FileSystemImporter extends BaseImporter {
 
 			String className = primaryKeysEntry.getKey();
 
-			Set<Long> primaryKeys = primaryKeysEntry.getValue();
-
 			Indexer<?> indexer = indexerRegistry.getIndexer(className);
 
 			if (indexer == null) {
@@ -1648,7 +1648,7 @@ public class FileSystemImporter extends BaseImporter {
 				_log.debug("Indexing " + className);
 			}
 
-			for (long primaryKey : primaryKeys) {
+			for (long primaryKey : primaryKeysEntry.getValue()) {
 				try {
 					indexer.reindex(className, primaryKey);
 				}
