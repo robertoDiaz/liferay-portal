@@ -34,10 +34,12 @@ public class AssetListEntryServiceWrapper implements AssetListEntryService,
 	}
 
 	@Override
-	public void addAssetEntrySelection(long assetListEntryId, long assetEntryId)
+	public void addAssetEntrySelection(long assetListEntryId,
+		long assetEntryId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_assetListEntryService.addAssetEntrySelection(assetListEntryId,
-			assetEntryId);
+			assetEntryId, serviceContext);
 	}
 
 	@Override
@@ -147,11 +149,19 @@ public class AssetListEntryServiceWrapper implements AssetListEntryService,
 	}
 
 	@Override
-	public com.liferay.asset.list.model.AssetListEntry updateAssetListEntrySettings(
+	public com.liferay.asset.list.model.AssetListEntry updateAssetListEntryTypeSettings(
 		long assetListEntryId, String typeSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetListEntryService.updateAssetListEntrySettings(assetListEntryId,
+		return _assetListEntryService.updateAssetListEntryTypeSettings(assetListEntryId,
 			typeSettings);
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntry updateAssetListEntryTypeSettingsProperties(
+		long assetListEntryId, String typeSettingsProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryService.updateAssetListEntryTypeSettingsProperties(assetListEntryId,
+			typeSettingsProperties);
 	}
 
 	@Override

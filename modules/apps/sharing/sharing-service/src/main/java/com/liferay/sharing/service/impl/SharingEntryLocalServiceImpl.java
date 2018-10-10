@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
@@ -181,45 +182,6 @@ public class SharingEntryLocalServiceImpl
 		}
 
 		return newSharingEntry;
-	}
-
-	/**
-	 * Returns the number of sharing entries that have been shared by a user.
-	 *
-	 * @param  fromUserId the user id sharing the resource
-	 * @return the number of sharing entries
-	 */
-	@Override
-	public int countFromUserSharingEntries(long fromUserId) {
-		return sharingEntryPersistence.countByFromUserId(fromUserId);
-	}
-
-	/**
-	 * Returns the number of sharing entries of a resource that have been shared
-	 * by a user.
-	 *
-	 * @param  fromUserId the user id sharing the resource
-	 * @param  classNameId the class name ID of the resource
-	 * @param  classPK the primary key of the resource
-	 * @return the number of sharing entries
-	 */
-	@Override
-	public int countFromUserSharingEntries(
-		long fromUserId, long classNameId, long classPK) {
-
-		return sharingEntryPersistence.countByFU_C_C(
-			fromUserId, classNameId, classPK);
-	}
-
-	/**
-	 * Returns the number of sharing entries that have been shared to a user.
-	 *
-	 * @param  toUserId the user id who was shared the resource
-	 * @return the number of sharing entries
-	 */
-	@Override
-	public int countToUserSharingEntries(long toUserId) {
-		return sharingEntryPersistence.countByToUserId(toUserId);
 	}
 
 	/**
@@ -391,6 +353,34 @@ public class SharingEntryLocalServiceImpl
 	}
 
 	/**
+	 * Returns the number of sharing entries that have been shared by a user.
+	 *
+	 * @param  fromUserId the user id sharing the resource
+	 * @return the number of sharing entries
+	 */
+	@Override
+	public int getFromUserSharingEntriesCount(long fromUserId) {
+		return sharingEntryPersistence.countByFromUserId(fromUserId);
+	}
+
+	/**
+	 * Returns the number of sharing entries of a resource that have been shared
+	 * by a user.
+	 *
+	 * @param  fromUserId the user id sharing the resource
+	 * @param  classNameId the class name ID of the resource
+	 * @param  classPK the primary key of the resource
+	 * @return the number of sharing entries
+	 */
+	@Override
+	public int getFromUserSharingEntriesCount(
+		long fromUserId, long classNameId, long classPK) {
+
+		return sharingEntryPersistence.countByFU_C_C(
+			fromUserId, classNameId, classPK);
+	}
+
+	/**
 	 * Returns a list of all the sharing entries of a group.
 	 *
 	 * @param  groupId the primary key of the group
@@ -426,6 +416,23 @@ public class SharingEntryLocalServiceImpl
 	 */
 	@Override
 	public List<SharingEntry> getSharingEntries(
+		long toUserId, long classNameId, long classPK) {
+
+		return sharingEntryPersistence.findByTU_C_C(
+			toUserId, classNameId, classPK);
+	}
+
+	/**
+	 * Returns a list of sharing entries of a specific class name id and class
+	 * pk that has been shared to a user.
+	 *
+	 * @param  toUserId the user id that has been shared the resource
+	 * @param  classNameId the class name ID of the shared resource
+	 * @param  classPK the class pk of the shared resource
+	 * @return the list of sharing entries
+	 */
+	@Override
+	public List<SharingEntry> getToUserClassPKSharingEntries(
 		long toUserId, long classNameId, long classPK) {
 
 		return sharingEntryPersistence.findByTU_C_C(
@@ -470,6 +477,51 @@ public class SharingEntryLocalServiceImpl
 		long toUserId, long classNameId) {
 
 		return sharingEntryPersistence.findByTU_C(toUserId, classNameId);
+	}
+
+	/**
+	 * Returns the number of sharing entries that have been shared to a user.
+	 *
+	 * @param  toUserId the user id who was shared the resource
+	 * @return the number of sharing entries
+	 */
+	@Override
+	public int getToUserSharingEntriesCount(long toUserId) {
+		return sharingEntryPersistence.countByToUserId(toUserId);
+	}
+
+	/**
+	 * Returns a list of all the sharing entries of a resource that has been
+	 * shared to a user returning at most one per shared model
+	 *
+	 * @param toUserId the user id
+	 * @param classNameId the classNameId to filter by
+	 * @param orderByComparator the comparator to order the sharing entries
+	 * @return the list of sharing entries
+	 */
+	@Override
+	public List<SharingEntry> getUniqueToUserSharingEntries(
+		long toUserId, long classNameId, int start, int end,
+		OrderByComparator<SharingEntry> orderByComparator) {
+
+		return sharingEntryFinder.findByToUserId(
+			toUserId, classNameId, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns the number of sharing entries of a resource that have been shared
+	 * by to user returning at most one per shared model.
+	 *
+	 *
+	 * @param toUserId the user id
+	 * @param classNameId the classNameId to filter by
+	 * @return the number of sharing entries
+	 */
+	@Override
+	public int getUniqueToUserSharingEntriesCount(
+		long toUserId, long classNameId) {
+
+		return sharingEntryFinder.countByToUserId(toUserId, classNameId);
 	}
 
 	/**

@@ -45,6 +45,14 @@ public abstract class BaseBuildData implements BuildData {
 	}
 
 	@Override
+	public String getBuildDescription() {
+		return JenkinsResultsParserUtil.combine(
+			"<a href=\"https://", getTopLevelMasterHostname(),
+			".liferay.com/userContent/", getUserContentRelativePath(),
+			"jenkins-report.html\">Jenkins Report</a>");
+	}
+
+	@Override
 	public Integer getBuildNumber() {
 		return getInt("build_number");
 	}
@@ -102,14 +110,19 @@ public abstract class BaseBuildData implements BuildData {
 	}
 
 	@Override
+	public String getUserContentRelativePath() {
+		return JenkinsResultsParserUtil.combine(
+			"jobs/", getTopLevelJobName(), "/builds/",
+			String.valueOf(getTopLevelBuildNumber()), "/");
+	}
+
+	@Override
 	public File getWorkspaceDir() {
 		return new File(getString("workspace_dir"));
 	}
 
 	protected static boolean isValidJSONObject(
 		JSONObject jsonObject, String type) {
-
-		System.out.println("* " + type);
 
 		if (type == null) {
 			return false;

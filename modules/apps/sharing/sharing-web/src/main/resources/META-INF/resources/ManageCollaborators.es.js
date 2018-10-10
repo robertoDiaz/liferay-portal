@@ -1,6 +1,5 @@
 import 'clay-sticker';
 import 'clay-select';
-import dom from 'metal-dom';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 import templates from './ManageCollaborators.soy';
@@ -64,12 +63,11 @@ class ManageCollaborators extends PortletBase {
 		let collaboratorId = event.delegateTarget.dataset.collaboratorId;
 		let sharingEntryId = event.delegateTarget.dataset.sharingentryId;
 
-		let collaboratorElement = dom.toElement('#collaborator' + collaboratorId);
+		this.collaborators = this.collaborators.filter(
+			collaborator => collaborator.id != collaboratorId
+		);
 
-		if (collaboratorElement) {
-			collaboratorElement.remove();
-			this._deleteSharingEntryIds.push(sharingEntryId);
-		}
+		this._deleteSharingEntryIds.push(sharingEntryId);
 	}
 
 	/**
@@ -89,10 +87,62 @@ class ManageCollaborators extends PortletBase {
 			}
 		)
 			.then(
-				(xhr) => {
-					this._closeDialog();
+				response => {
+					this.submitting = false;
+
+					const jsonResponse = response.json();
+
+					return response.ok ?
+						jsonResponse :
+						jsonResponse.then(
+							json => {
+								const error = new Error(json.errorMessage || response.statusText);
+								throw Object.assign(error, {response});
+							}
+						)
+					;
+				}
+			)
+			.then(
+				json => {
+					this._loadingResponse = false;
+					this._showNotification(json.successMessage);
+				}
+			)
+			.catch(
+				error => {
+					this._loadingResponse = false;
+					this._showNotification(error.message, true);
 				}
 			);
+
+		this._loadingResponse = true;
+	}
+
+	/**
+	 * Show notification in the opener and closes dialog
+	 * after is rendered
+	 * @param {string} message message for notification
+	 * @param {boolean} error Flag indicating if is an error or not
+	 * @private
+	 * @review
+	 */
+	_showNotification(message, error) {
+		const parentOpenToast = Liferay.Util.getOpener().Liferay.Util.openToast;
+
+		const openToastParams = {
+			events: {
+				'attached': this._closeDialog.bind(this)
+			},
+			message
+		};
+
+		if (error) {
+			openToastParams.title = Liferay.Language.get('error');
+			openToastParams.type = 'danger';
+		}
+
+		parentOpenToast(openToastParams);
 	}
 }
 

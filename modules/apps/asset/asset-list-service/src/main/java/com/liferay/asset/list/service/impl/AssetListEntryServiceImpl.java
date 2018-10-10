@@ -38,7 +38,9 @@ import java.util.List;
 public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 	@Override
-	public void addAssetEntrySelection(long assetListEntryId, long assetEntryId)
+	public void addAssetEntrySelection(
+			long assetListEntryId, long assetEntryId,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		AssetListEntry assetListEntry =
@@ -48,7 +50,7 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
 
 		assetListEntryLocalService.addAssetEntrySelection(
-			assetListEntryId, assetEntryId);
+			assetListEntryId, assetEntryId, serviceContext);
 	}
 
 	@Override
@@ -210,7 +212,7 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 	}
 
 	@Override
-	public AssetListEntry updateAssetListEntrySettings(
+	public AssetListEntry updateAssetListEntryTypeSettings(
 			long assetListEntryId, String typeSettings)
 		throws PortalException {
 
@@ -220,8 +222,24 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 		_assetListEntryModelResourcePermission.check(
 			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
 
-		return assetListEntryLocalService.updateAssetListEntrySettings(
+		return assetListEntryLocalService.updateAssetListEntryTypeSettings(
 			assetListEntryId, typeSettings);
+	}
+
+	@Override
+	public AssetListEntry updateAssetListEntryTypeSettingsProperties(
+			long assetListEntryId, String typeSettingsProperties)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		return assetListEntryLocalService.
+			updateAssetListEntryTypeSettingsProperties(
+				assetListEntryId, typeSettingsProperties);
 	}
 
 	private static volatile ModelResourcePermission<AssetListEntry>

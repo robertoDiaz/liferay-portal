@@ -26,6 +26,7 @@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/staging" prefix="liferay-staging" %><%@
+taglib uri="http://liferay.com/tld/text-localizer" prefix="liferay-text-localizer" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
@@ -79,6 +80,7 @@ page import="com.liferay.portal.kernel.model.Layout" %><%@
 page import="com.liferay.portal.kernel.model.LayoutConstants" %><%@
 page import="com.liferay.portal.kernel.model.LayoutSet" %><%@
 page import="com.liferay.portal.kernel.model.LayoutSetPrototype" %><%@
+page import="com.liferay.portal.kernel.model.ListType" %><%@
 page import="com.liferay.portal.kernel.model.ListTypeConstants" %><%@
 page import="com.liferay.portal.kernel.model.ModelHintsConstants" %><%@
 page import="com.liferay.portal.kernel.model.OrgLabor" %><%@
@@ -113,6 +115,7 @@ page import="com.liferay.portal.kernel.service.LayoutLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.LayoutSetPrototypeServiceUtil" %><%@
+page import="com.liferay.portal.kernel.service.ListTypeServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.OrgLaborServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.OrganizationLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.OrganizationServiceUtil" %><%@
@@ -132,6 +135,7 @@ page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.KeyValuePair" %><%@
 page import="com.liferay.portal.kernel.util.ListUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocalizationUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
@@ -166,6 +170,8 @@ page import="com.liferay.users.admin.user.action.contributor.UserActionContribut
 page import="com.liferay.users.admin.web.internal.CustomFieldsUtil" %><%@
 page import="com.liferay.users.admin.web.internal.constants.UsersAdminWebKeys" %><%@
 page import="com.liferay.users.admin.web.internal.display.context.InitDisplayContext" %><%@
+page import="com.liferay.users.admin.web.internal.display.context.OrgLaborDisplay" %><%@
+page import="com.liferay.users.admin.web.internal.display.context.OrgLaborFormDisplay" %><%@
 page import="com.liferay.users.admin.web.internal.display.context.OrganizationScreenNavigationDisplayContext" %><%@
 page import="com.liferay.users.admin.web.internal.display.context.SelectOrganizationManagementToolbarDisplayContext" %><%@
 page import="com.liferay.users.admin.web.internal.display.context.SelectOrganizationUsersManagementToolbarDisplayContext" %><%@
