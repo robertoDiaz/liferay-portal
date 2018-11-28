@@ -21,7 +21,8 @@ import com.liferay.liferaygen.internal.LiferayGenTarget;
 import com.liferay.liferaygen.internal.LiferayGenTargetImpl;
 import com.liferay.liferaygen.internal.config.LiferayGenActionConfig;
 import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -31,17 +32,16 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.lang.reflect.Modifier;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -52,6 +52,18 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = LiferayGenExecutorHandler.class)
 public class LiferayGenExecutorHandler {
+
+
+	@Activate
+	public void activate(BundleContext bundleContext) {
+		_serviceTrackerList = ServiceTrackerListFactory.open(
+			bundleContext, LiferayGenAction.class);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerList.close();
+	}
 
 	public LiferayGenAction createAction(Object actionObj) {
 		Class<?> clazz = getActionClass(actionObj);
@@ -88,36 +100,11 @@ public class LiferayGenExecutorHandler {
 	}
 
 	public List<LiferayGenAction> getAvailableActions() {
-		ClassLoader classLoader =
-			LiferayGenExecutorHandler.class.getClassLoader();
+		List<LiferayGenAction> actions = new ArrayList<>();
 
-		Set<Class<? extends LiferayGenAction>> actionClasses = null;
+		_serviceTrackerList.forEach(actions::add);
 
-		//TODO get the action classes from registry
-
-		Map<String, LiferayGenAction> actionMap = new TreeMap<>();
-
-		for (Class<? extends LiferayGenAction> actionClass : actionClasses) {
-			if (Modifier.isAbstract(actionClass.getModifiers())) {
-				continue;
-			}
-
-			if (!classLoader.equals(actionClass.getClassLoader())) {
-				continue;
-			}
-
-			try {
-				actionMap.put(actionClass.getName(), actionClass.newInstance());
-			}
-			catch (Exception e) {
-				_log.error(
-					StringBundler.concat(
-						"Action: ", actionClass, " Error: ", e),
-					e);
-			}
-		}
-
-		return new ArrayList<>(actionMap.values());
+		return actions;
 	}
 
 	public LiferayGenActionConfig getLiferayGenActionConfig(
@@ -385,4 +372,6 @@ public class LiferayGenExecutorHandler {
 	@Reference
 	private LiferayGenValueGenerator _liferayGenValueGenerator;
 
+	private ServiceTrackerList<LiferayGenAction, LiferayGenAction>
+		_serviceTrackerList;
 }
