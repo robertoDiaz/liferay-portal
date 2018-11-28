@@ -12,9 +12,12 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal;
+package com.liferay.liferaygen.util;
 
-import com.liferay.liferaygen.LiferayGenTarget;
+import com.liferay.liferaygen.LiferayGenAction;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jorge Díaz
@@ -22,24 +25,16 @@ import com.liferay.liferaygen.LiferayGenTarget;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferayGenTargetImpl implements LiferayGenTarget {
+public interface LiferayGenParameterHandler {
 
-	public LiferayGenTargetImpl(long groupId, Object value) {
-		_groupId = groupId;
-		_value = value;
-	}
+	public void cleanupIntegerParameters(Map<String, Object> map);
 
-	@Override
-	public long getGroupId() {
-		return _groupId;
-	}
+	public Map<String, Object> getBackedParameters(
+		LiferayGenAction liferayGenAction, Map<String, Object> configuration,
+		Map<String, Object> parameters);
 
-	@Override
-	public Object getValue() {
-		return _value;
-	}
+	public int getParamAsIntegerPercentage(
+		Map<String, Object> parameters, String parameter);
 
-	private final long _groupId;
-	private final Object _value;
-
+	List<Long> getGroupIds(Map<String, Object> parameters);
 }

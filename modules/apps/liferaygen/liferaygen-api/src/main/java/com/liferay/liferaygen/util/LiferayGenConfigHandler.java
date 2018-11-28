@@ -12,34 +12,18 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal;
+package com.liferay.liferaygen.util;
 
-import com.liferay.liferaygen.LiferayGenTarget;
-
+import java.util.Map;
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferayGenTargetImpl implements LiferayGenTarget {
+public interface LiferayGenConfigHandler {
 
-	public LiferayGenTargetImpl(long groupId, Object value) {
-		_groupId = groupId;
-		_value = value;
-	}
-
-	@Override
-	public long getGroupId() {
-		return _groupId;
-	}
-
-	@Override
-	public Object getValue() {
-		return _value;
-	}
-
-	private final long _groupId;
-	private final Object _value;
+	public Map<String, Object> getConfiguration(String configurationText)
+		throws Exception;
 
 }

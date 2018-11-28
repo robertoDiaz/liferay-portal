@@ -15,12 +15,15 @@
 package com.liferay.liferaygen.web.internal.util;
 
 import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.util.LiferayGenParameterHandler;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.web.internal.LiferayGenActionAdapter;
 import com.liferay.liferaygen.web.internal.LiferayGenExecutor;
-import com.liferay.liferaygen.web.internal.LiferayGenTarget;
+import com.liferay.liferaygen.LiferayGenTarget;
 import com.liferay.liferaygen.web.internal.LiferayGenTargetImpl;
-import com.liferay.liferaygen.web.internal.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
@@ -28,7 +31,10 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -137,13 +143,18 @@ public class LiferayGenExecutorHandler {
 			_log.info("Action: " + liferayGenAction.getClass());
 		}
 
-		List<Long> groupIds = LiferayGenParameterHandler.getGroupIds(
+		List<Long> groupIds = _liferayGenParameterHandler.getGroupIds(
 			backedParameters);
 
 		if (!liferayGenAction.hasScopeByGroupId()) {
+			LiferayGenValueGenerator liferayGenValueGenerator =
+				new LiferayGenValueGenerator(
+					_companyLocalService, _liferayGenQueryHandler, _portal,
+					_portletLocalService);
+
 			backedParameters.put(
 				LiferayGenConfigConstants.GROUP_ID,
-				_liferayGenValueGenerator.getRandomObjectFromList(groupIds));
+				liferayGenValueGenerator.getRandomObjectFromList(groupIds));
 
 			groupIds = Collections.singletonList(0L);
 		}
@@ -234,10 +245,15 @@ public class LiferayGenExecutorHandler {
 			numThreads = ((Number)numThreadsObj).longValue();
 		}
 
+		LiferayGenValueGenerator liferayGenValueGenerator =
+			new LiferayGenValueGenerator(
+				_companyLocalService, _liferayGenQueryHandler, _portal,
+				_portletLocalService);
+
 		return new LiferayGenActionConfig(
 			groupIds, liferayGenAction, liferayGenTargetMap, numExecutions,
 			numThreads, backedParameters, repeatLiferayGenTarget,
-			_liferayGenValueGenerator);
+			liferayGenValueGenerator);
 	}
 
 	protected Class<?> getActionClass(Object actionObj) {
@@ -369,9 +385,15 @@ public class LiferayGenExecutorHandler {
 	@Reference
 	private LiferayGenQueryHandler _liferayGenQueryHandler;
 
-	@Reference
-	private LiferayGenValueGenerator _liferayGenValueGenerator;
-
 	private ServiceTrackerList<LiferayGenAction, LiferayGenAction>
 		_serviceTrackerList;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 }

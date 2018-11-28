@@ -15,11 +15,12 @@
 package com.liferay.liferaygen.web.internal;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.web.internal.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.LiferayGenTarget;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
 import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
 import com.liferay.liferaygen.web.internal.util.ThreadLocalData;
-import com.liferay.liferaygen.web.internal.value.generator.LiferayGenValueGenerator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -40,7 +41,6 @@ import java.util.concurrent.Future;
  * @author Roberto Díaz
  */
 public class DefaultLiferayGenExecutor implements LiferayGenExecutor {
-
 
 	public DefaultLiferayGenExecutor(
 		Map<String, Object> configuration,

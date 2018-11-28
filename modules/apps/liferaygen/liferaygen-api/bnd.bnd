@@ -1,4 +1,9 @@
 Bundle-Name: Liferay Liferaygen API
 Bundle-SymbolicName: com.liferay.liferaygen.api
 Bundle-Version: 1.0.0
-Export-Package: com.liferay.liferaygen
+Export-Package:\
+	com.liferay.liferaygen,\
+	com.liferay.liferaygen.constants,\
+	com.liferay.liferaygen.util,\
+	com.liferay.liferaygen.action.config,\
+	com.liferay.liferaygen.value.generator

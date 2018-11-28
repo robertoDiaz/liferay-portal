@@ -15,11 +15,14 @@
 package com.liferay.liferaygen.web.internal.portlet;
 
 import com.liferay.liferaygen.constants.LiferaygenPortletKeys;
+import com.liferay.liferaygen.util.LiferayGenConfigHandler;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.web.internal.DefaultLiferayGenExecutor;
-import com.liferay.liferaygen.web.internal.config.LiferayGenConfigHandler;
 import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
-import com.liferay.liferaygen.web.internal.value.generator.LiferayGenValueGenerator;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import org.osgi.service.component.annotations.Component;
@@ -88,13 +91,18 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(actionRequest);
 
-			_liferayGenValueGenerator.setServletContext(
+			LiferayGenValueGenerator liferayGenValueGenerator =
+				new LiferayGenValueGenerator(
+					_companyLocalService, _liferayGenQueryHandler, _portal,
+					_portletLocalService);
+
+			liferayGenValueGenerator.setServletContext(
 				httpServletRequest.getServletContext());
 
 			DefaultLiferayGenExecutor defaultLiferayGenExecutor =
 				new DefaultLiferayGenExecutor(
 					configuration, _liferayGenExecutorHandler,
-					_liferayGenValueGenerator);
+					liferayGenValueGenerator);
 
 			defaultLiferayGenExecutor.run();
 		}
@@ -106,15 +114,21 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	Portal _portal;
+	private Portal _portal;
 
 	@Reference
 	LiferayGenConfigHandler _liferaygenConfigHandler;
 
 	@Reference
-	LiferayGenValueGenerator _liferayGenValueGenerator;
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
 
 	@Reference
 	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }

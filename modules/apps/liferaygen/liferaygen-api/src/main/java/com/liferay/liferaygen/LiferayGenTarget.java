@@ -12,9 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal;
-
-import com.liferay.liferaygen.LiferayGenTarget;
+package com.liferay.liferaygen;
 
 /**
  * @author Jorge Díaz
@@ -22,24 +20,10 @@ import com.liferay.liferaygen.LiferayGenTarget;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferayGenTargetImpl implements LiferayGenTarget {
+public interface LiferayGenTarget {
 
-	public LiferayGenTargetImpl(long groupId, Object value) {
-		_groupId = groupId;
-		_value = value;
-	}
+	public long getGroupId();
 
-	@Override
-	public long getGroupId() {
-		return _groupId;
-	}
-
-	@Override
-	public Object getValue() {
-		return _value;
-	}
-
-	private final long _groupId;
-	private final Object _value;
+	public Object getValue();
 
 }
