@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.config;
+package com.liferay.liferaygen.web.internal.config;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.LiferayGenTarget;
-import com.liferay.liferaygen.internal.util.LiferayGenValueGenerator;
+import com.liferay.liferaygen.web.internal.LiferayGenTarget;
+import com.liferay.liferaygen.web.internal.value.generator.LiferayGenValueGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;

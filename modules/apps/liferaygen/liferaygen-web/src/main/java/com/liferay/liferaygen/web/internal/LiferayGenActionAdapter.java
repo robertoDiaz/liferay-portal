@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal;
+package com.liferay.liferaygen.web.internal;
 
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,13 +34,13 @@ public class LiferayGenActionAdapter extends BaseLiferayGenAction {
 		_liferayGenExecutor = liferayGenExecutor;
 	}
 
-	public void configure(Map<String, Object> parameters) {
+	/*public void configure(Map<String, Object> parameters) {
 		super.configure(parameters);
 
 		if (_liferayGenExecutor != null) {
 			_liferayGenExecutor.configure(parameters);
 		}
-	}
+	}*/
 
 	@Override
 	public String doGetDescription() {

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.util;
+package com.liferay.liferaygen.web.internal.value.generator;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -20,6 +20,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.liferaygen.web.internal.util.LiferayGenQueryHandler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.ResourcedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -50,6 +52,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import com.liferay.portal.kernel.util.WebKeys;
 import com.maximeroussy.invitrode.WordGenerator;
 
 import java.awt.Color;
@@ -79,6 +82,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
@@ -88,6 +92,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.mock.web.portlet.MockActionRequest;
 
 /**
  * @author Jorge Díaz
@@ -279,9 +284,9 @@ public class LiferayGenValueGenerator {
 		return getLowerCaseText(length, StringPool.BLANK);
 	}
 
-	/*public MockActionRequest getMockActionRequest(
-			HttpServletRequest request, Portlet portlet,
-			PortletPreferences portletPreferences)
+	public MockActionRequest getMockActionRequest(
+		HttpServletRequest request, Portlet portlet,
+		PortletPreferences portletPreferences)
 		throws Exception {
 
 		MockActionRequest actionRequest = new MockActionRequest();
@@ -326,7 +331,7 @@ public class LiferayGenValueGenerator {
 		request.setAttribute("COLOR_SCHEME", layout.getColorScheme());
 
 		return request;
-	}*/
+	}
 
 	public ServletContext getMockServletContext() {
 		return _MOCK_SERVLET_CONTEXT;

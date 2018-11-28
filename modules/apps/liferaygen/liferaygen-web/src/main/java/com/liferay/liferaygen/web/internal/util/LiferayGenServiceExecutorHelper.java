@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.util;
+package com.liferay.liferaygen.web.internal.util;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;

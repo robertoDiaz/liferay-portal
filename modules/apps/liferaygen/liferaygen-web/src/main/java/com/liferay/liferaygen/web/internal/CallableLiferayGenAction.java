@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal;
+package com.liferay.liferaygen.web.internal;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.util.ThreadLocalData;
+import com.liferay.liferaygen.web.internal.util.ThreadLocalData;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;

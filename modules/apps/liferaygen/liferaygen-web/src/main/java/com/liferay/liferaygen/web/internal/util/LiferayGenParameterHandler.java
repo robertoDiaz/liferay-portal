@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.util;
+package com.liferay.liferaygen.web.internal.util;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

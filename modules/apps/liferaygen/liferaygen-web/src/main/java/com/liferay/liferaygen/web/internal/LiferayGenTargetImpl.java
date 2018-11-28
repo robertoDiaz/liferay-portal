@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.config.constants;
+package com.liferay.liferaygen.web.internal;
 
 /**
  * @author Jorge Díaz
@@ -20,18 +20,24 @@ package com.liferay.liferaygen.internal.config.constants;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferayGenConfigConstants {
+public class LiferayGenTargetImpl implements LiferayGenTarget {
 
-	public static final String ACTIONS = "actions";
+	public LiferayGenTargetImpl(long groupId, Object value) {
+		_groupId = groupId;
+		_value = value;
+	}
 
-	public static final String COMPANY_ID = "companyId";
+	@Override
+	public long getGroupId() {
+		return _groupId;
+	}
 
-	public static final String GROUP_ID = "groupId";
+	@Override
+	public Object getValue() {
+		return _value;
+	}
 
-	public static final String GROUP_IDS = "groupIds";
-
-	public static final String LOCALES = "locales";
-
-	public static final String PASSWORD = "password";
+	private final long _groupId;
+	private final Object _value;
 
 }

@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal;
+package com.liferay.liferaygen.web.internal;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;

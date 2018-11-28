@@ -12,15 +12,15 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.util;
+package com.liferay.liferaygen.web.internal.util;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.LiferayGenActionAdapter;
-import com.liferay.liferaygen.internal.LiferayGenExecutor;
-import com.liferay.liferaygen.internal.LiferayGenTarget;
-import com.liferay.liferaygen.internal.LiferayGenTargetImpl;
-import com.liferay.liferaygen.internal.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.LiferayGenActionAdapter;
+import com.liferay.liferaygen.web.internal.LiferayGenExecutor;
+import com.liferay.liferaygen.web.internal.LiferayGenTarget;
+import com.liferay.liferaygen.web.internal.LiferayGenTargetImpl;
+import com.liferay.liferaygen.web.internal.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.dao.orm.Conjunction;

@@ -14,14 +14,14 @@
 
 package com.liferay.liferaygen.web.internal.portlet;
 
-import com.liferay.liferaygen.config.ConfigUtil;
 import com.liferay.liferaygen.constants.LiferaygenPortletKeys;
-import com.liferay.liferaygen.impl.BaseExecutor;
-import com.liferay.liferaygen.util.ValueGenerator;
+import com.liferay.liferaygen.web.internal.DefaultLiferayGenExecutor;
+import com.liferay.liferaygen.web.internal.config.LiferayGenConfigHandler;
+import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
+import com.liferay.liferaygen.web.internal.value.generator.LiferayGenValueGenerator;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.util.PortalUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -48,8 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-blogs",
 		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.header-portlet-css=/blogs/css/main.css",
-		"com.liferay.portlet.icon=/blogs/icons/blogs.png",
+		"com.liferay.portlet.icon=/liferaygen/icons/icon.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
@@ -57,8 +56,9 @@ import javax.servlet.http.HttpServletRequest;
 		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.scopeable=true",
 		"com.liferay.portlet.use-default-template=true",
-		"javax.portlet.display-name=Blogs", "javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.mvc-command-names-default-views=/blogs/view",
+		"javax.portlet.display-name=Liferay Gen",
+		"javax.portlet.expiration-cache=0",
+		"javax.portlet.init-param.mvc-command-names-default-views=/lifearygen/view",
 		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.name=" + LiferaygenPortletKeys.LIFERAYGEN_ADMIN,
@@ -80,22 +80,23 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 
 		try {
 			String configurationText = ParamUtil.getString(
-					actionRequest, PARAM_CONFIGURATION);
+				actionRequest, PARAM_CONFIGURATION);
 
-			Map<String, Object> configuration = ConfigUtil.getConfiguration(
-					configurationText);
+			Map<String, Object> configuration =
+				_liferaygenConfigHandler.getConfiguration(configurationText);
 
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(actionRequest);
 
-			ValueGenerator.setServletContext(
+			_liferayGenValueGenerator.setServletContext(
 				httpServletRequest.getServletContext());
 
-			BaseExecutor executor = new BaseExecutor();
+			DefaultLiferayGenExecutor defaultLiferayGenExecutor =
+				new DefaultLiferayGenExecutor(
+					configuration, _liferayGenExecutorHandler,
+					_liferayGenValueGenerator);
 
-			executor.configure(configuration);
-
-			executor.run();
+			defaultLiferayGenExecutor.run();
 		}
 		catch (Throwable t) {
 			StringWriter sw = new StringWriter();
@@ -107,6 +108,13 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 	@Reference
 	Portal _portal;
 
+	@Reference
+	LiferayGenConfigHandler _liferaygenConfigHandler;
 
+	@Reference
+	LiferayGenValueGenerator _liferayGenValueGenerator;
+
+	@Reference
+	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
 
 }

@@ -12,7 +12,9 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal;
+package com.liferay.liferaygen.web.internal;
+
+import java.util.Map;
 
 /**
  * @author Jorge Díaz
@@ -20,10 +22,18 @@ package com.liferay.liferaygen.internal;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public interface LiferayGenTarget {
+public interface LiferayGenExecutor {
 
-	public long getGroupId();
+	/**
+	 * Configures the executor with configuration
+	 *
+	 * @param parameters
+	 */
+	public void configure(Map<String, Object> parameters);
 
-	public Object getValue();
+	/**
+	 * Executes all the configured actions
+	 */
+	public void run();
 
 }

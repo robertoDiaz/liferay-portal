@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal.config;
+package com.liferay.liferaygen.web.internal.config;
 
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
-import com.liferay.liferaygen.internal.util.LiferayGenValueGenerator;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.util.LiferayGenValueGenerator;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;

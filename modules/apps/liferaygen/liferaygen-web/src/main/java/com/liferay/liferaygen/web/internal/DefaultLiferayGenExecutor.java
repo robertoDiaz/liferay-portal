@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.liferaygen.internal;
+package com.liferay.liferaygen.web.internal;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
-import com.liferay.liferaygen.internal.util.LiferayGenExecutorHandler;
-import com.liferay.liferaygen.internal.util.LiferayGenValueGenerator;
-import com.liferay.liferaygen.internal.util.ThreadLocalData;
+import com.liferay.liferaygen.web.internal.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.web.internal.config.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
+import com.liferay.liferaygen.web.internal.util.ThreadLocalData;
+import com.liferay.liferaygen.web.internal.value.generator.LiferayGenValueGenerator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -33,17 +33,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-@Component(immediate = true, service = LiferayGenExecutor.class)
 public class DefaultLiferayGenExecutor implements LiferayGenExecutor {
+
+
+	public DefaultLiferayGenExecutor(
+		Map<String, Object> configuration,
+		LiferayGenExecutorHandler liferayGenExecutorHandler,
+		LiferayGenValueGenerator liferayGenValueGenerator) {
+
+		_configuration = configuration;
+		_liferayGenExecutorHandler = liferayGenExecutorHandler;
+		_liferayGenValueGenerator = liferayGenValueGenerator;
+	}
 
 	@Override
 	public void configure(Map<String, Object> configuration) {
@@ -239,10 +246,8 @@ public class DefaultLiferayGenExecutor implements LiferayGenExecutor {
 
 	private Map<String, Object> _configuration;
 
-	@Reference
 	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
 
-	@Reference
 	private LiferayGenValueGenerator _liferayGenValueGenerator;
 
 }
