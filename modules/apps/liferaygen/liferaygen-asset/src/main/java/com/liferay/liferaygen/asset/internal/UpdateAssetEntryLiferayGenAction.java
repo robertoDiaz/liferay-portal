@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.liferaygen.BaseLiferayGenAction;
 import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.util.LiferayGenConfigHandler;
 import com.liferay.liferaygen.util.LiferayGenParameterHandler;
 import com.liferay.liferaygen.util.LiferayGenQueryHandler;
 import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
@@ -34,11 +33,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jorge Díaz
@@ -48,10 +48,10 @@ import java.util.TreeMap;
  */
 @Component(
 	immediate = true,
-	properties = "liferaygen.action.class.name=com.liferay.liferaygen.asset.internal.LiferayGenActionUpdateAssetEntry",
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.asset.internal.UpdateAssetEntryLiferayGenAction",
 	service = LiferayGenAction.class
 )
-public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
+public class UpdateAssetEntryLiferayGenAction extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -77,11 +77,11 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 				put(
 					"setRandomViewCounterRatio",
 					"Probability percentage of creating a asset with a " +
-					"random view count value");
+						"random view count value");
 				put(
 					"setRandomRatingsRatio",
 					"Probability percentage of creating a asset with random " +
-					"rating values");
+						"rating values");
 				put(LiferayGenActionConfig.TARGET, "Asset to be updated");
 			}
 		};
@@ -106,8 +106,8 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 	protected void doRun() {
 		Map<String, Object> parameters = getParameters();
 
-		Object[] target =
-			(Object[])parameters.get(LiferayGenActionConfig.TARGET);
+		Object[] target = (Object[])parameters.get(
+			LiferayGenActionConfig.TARGET);
 
 		if (target == null) {
 			return;
@@ -116,15 +116,15 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 		Long classNameId = (Long)target[0];
 		Long classPK = (Long)target[1];
 
-		if (Validator.isNull(classNameId)||Validator.isNull(classPK)) {
+		if (Validator.isNull(classNameId) || Validator.isNull(classPK)) {
 			return;
 		}
 
 		String className = _portal.getClassName(classNameId);
 
 		int setViewCounterRatio =
-				_liferayGenParameterHandler.getParamAsIntegerPercentage(
-					parameters, "setRandomViewCounterRatio");
+			_liferayGenParameterHandler.getParamAsIntegerPercentage(
+				parameters, "setRandomViewCounterRatio");
 
 		LiferayGenValueGenerator liferayGenValueGenerator =
 			new LiferayGenValueGenerator(
@@ -132,7 +132,7 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 				_portletLocalService);
 
 		if (liferayGenValueGenerator.getBoolean(setViewCounterRatio)) {
-			setRandomViewCounter(liferayGenValueGenerator, className, classPK);
+			_setRandomViewCounter(liferayGenValueGenerator, className, classPK);
 		}
 
 		int setRandomRatingsRatio =
@@ -140,20 +140,20 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 				parameters, "setRandomRatingsRatio");
 
 		if (liferayGenValueGenerator.getBoolean(setRandomRatingsRatio)) {
-			setRandomRatings(liferayGenValueGenerator, className, classPK);
+			_setRandomRatings(liferayGenValueGenerator, className, classPK);
 		}
 	}
 
-	private void setRandomRatings(
-		LiferayGenValueGenerator liferayGenValueGenerator,
-		String className, long classPK) {
+	private void _setRandomRatings(
+		LiferayGenValueGenerator liferayGenValueGenerator, String className,
+		long classPK) {
 
 		int numberOfRatings =
 			liferayGenValueGenerator.getRandomIntegerFromRange(0, 20);
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		for (int i = 0; i<numberOfRatings; i++) {
+		for (int i = 0; i < numberOfRatings; i++) {
 			try {
 				long userId =
 					liferayGenValueGenerator.getRandomUserIdFromCache();
@@ -172,9 +172,10 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 		}
 	}
 
-	private void setRandomViewCounter(
-		LiferayGenValueGenerator liferayGenValueGenerator,
-		String className, long classPK) {
+	private void _setRandomViewCounter(
+		LiferayGenValueGenerator liferayGenValueGenerator, String className,
+		long classPK) {
+
 		try {
 			long userId = liferayGenValueGenerator.getRandomUserIdFromCache();
 
@@ -191,20 +192,14 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		LiferayGenActionUpdateAssetEntry.class);
-
-	@Reference
-	private CompanyLocalService _companyLocalService;
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpdateAssetEntryLiferayGenAction.class);
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private RatingsEntryLocalService _ratingsEntryLocalService;
-
-	@Reference
-	private LiferayGenConfigHandler _liferayGenConfigHandler;
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private LiferayGenParameterHandler _liferayGenParameterHandler;
@@ -217,5 +212,8 @@ public class LiferayGenActionUpdateAssetEntry extends BaseLiferayGenAction {
 
 	@Reference
 	private PortletLocalService _portletLocalService;
+
+	@Reference
+	private RatingsEntryLocalService _ratingsEntryLocalService;
 
 }

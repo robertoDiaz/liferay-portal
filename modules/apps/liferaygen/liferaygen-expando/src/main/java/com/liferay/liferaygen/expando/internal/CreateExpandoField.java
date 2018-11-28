@@ -12,11 +12,10 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions.expando;
+package com.liferay.liferaygen.expando.internal;
 
-import com.liferay.liferaygen.constants.ConfigConstants;
-import com.liferay.liferaygen.impl.BaseAction;
-import com.liferay.liferaygen.util.ValueGenerator;
+import com.liferay.liferaygen.BaseLiferayGenAction;
+import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -24,15 +23,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portlet.expando.model.CustomAttributesDisplay;
-import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
-import com.liferay.portlet.expando.model.ExpandoTable;
-import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
-import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -41,7 +32,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-public class CreateExpandoField extends BaseAction {
+
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.dummy.internal.LiferayGenActionDummy",
+	service = LiferayGenAction.class
+)
+public class CreateExpandoField extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -60,35 +65,37 @@ public class CreateExpandoField extends BaseAction {
 
 	@Override
 	protected void doRun() {
-
 		long companyId = (Long) _parameters.get(ConfigConstants.COMPANY_ID);
 
 		List<CustomAttributesDisplay> customAttributesDisplays =
-				PortletLocalServiceUtil.getCustomAttributesDisplays();
+			PortletLocalServiceUtil.getCustomAttributesDisplays();
 
 		CustomAttributesDisplay cad = ValueGenerator.getRandomObjectFromList(
 			customAttributesDisplays);
 
 		try {
 			ExpandoTable expandoTable = null;
+
 			try {
 				expandoTable = ExpandoTableLocalServiceUtil.addDefaultTable(
-						companyId, cad.getClassName());
+					companyId, cad.getClassName());
 			}
 			catch (Exception e) {
 				expandoTable = ExpandoTableLocalServiceUtil.getDefaultTable(
-						companyId, cad.getClassName());
+					companyId, cad.getClassName());
 			}
 
 			String name = ValueGenerator.getLowerCaseWord(10);
 			int type = ValueGenerator.getRandomObjectFromArray(availableTypes);
 
 			Serializable defaultData = getDefaultDataByType(type);
+
 			ExpandoColumn expandoColumn =
 					ExpandoColumnLocalServiceUtil.addColumn(
-							expandoTable.getTableId(), name, type, defaultData);
+						expandoTable.getTableId(), name, type, defaultData);
 
 			UnicodeProperties typeSettings = new UnicodeProperties();
+
 			typeSettings.put(
 				ExpandoColumnConstants.PROPERTY_HIDDEN,
 				GetterUtil.getString(ValueGenerator.getBoolean()));
@@ -113,6 +120,7 @@ public class CreateExpandoField extends BaseAction {
 									ExpandoColumnConstants.INDEX_TYPE_NONE,
 									ExpandoColumnConstants.INDEX_TYPE_KEYWORD
 								}))));
+
 					break;
 				case ExpandoColumnConstants.BOOLEAN_ARRAY:
 				case ExpandoColumnConstants.DATE_ARRAY:
@@ -142,7 +150,9 @@ public class CreateExpandoField extends BaseAction {
 									ExpandoColumnConstants.
 										PROPERTY_DISPLAY_TYPE_SELECTION_LIST,
 									ExpandoColumnConstants.
-										PROPERTY_DISPLAY_TYPE_TEXT_BOX}))));
+										PROPERTY_DISPLAY_TYPE_TEXT_BOX
+									}))));
+
 					break;
 				case ExpandoColumnConstants.STRING:
 					typeSettings.put(
@@ -167,6 +177,7 @@ public class CreateExpandoField extends BaseAction {
 									ExpandoColumnConstants.INDEX_TYPE_TEXT,
 									ExpandoColumnConstants.INDEX_TYPE_KEYWORD
 								}))));
+
 					break;
 				case ExpandoColumnConstants.STRING_ARRAY:
 					typeSettings.put(
@@ -190,20 +201,23 @@ public class CreateExpandoField extends BaseAction {
 									ExpandoColumnConstants.
 										PROPERTY_DISPLAY_TYPE_SELECTION_LIST,
 									ExpandoColumnConstants.
-										PROPERTY_DISPLAY_TYPE_TEXT_BOX}))));
+										PROPERTY_DISPLAY_TYPE_TEXT_BOX
+									}))));
+
 					break;
 				default:
+
 					break;
 			}
 
 			ExpandoColumnLocalServiceUtil.updateTypeSettings(
 				expandoColumn.getColumnId(), typeSettings.toString());
 		}
-		catch (PortalException e) {
-			_log.error(e, e);
+		catch (PortalException pe) {
+			_log.error(pe, pe);
 		}
-		catch (SystemException e) {
-			_log.error(e, e);
+		catch (SystemException se) {
+			_log.error(se, se);
 		}
 	}
 
@@ -222,59 +236,69 @@ public class CreateExpandoField extends BaseAction {
 					Double.MIN_VALUE, Double.MAX_VALUE);
 			case ExpandoColumnConstants.DOUBLE_ARRAY:
 				return new double[] {ValueGenerator.getRandomDoubleFromRange(
-					Double.MIN_VALUE, Double.MAX_VALUE)};
+					Double.MIN_VALUE, Double.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.FLOAT:
 				return ValueGenerator.getRandomFloatFromRange(
 					Float.MIN_VALUE, Float.MAX_VALUE);
 			case ExpandoColumnConstants.FLOAT_ARRAY:
 				return new float[] {ValueGenerator.getRandomFloatFromRange(
-					Float.MIN_VALUE, Float.MAX_VALUE)};
+					Float.MIN_VALUE, Float.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.INTEGER:
 				return ValueGenerator.getRandomIntegerFromRange(
 					Integer.MIN_VALUE, Integer.MAX_VALUE);
 			case ExpandoColumnConstants.INTEGER_ARRAY:
 				return new int[] {ValueGenerator.getRandomIntegerFromRange(
-					Integer.MIN_VALUE, Integer.MAX_VALUE)};
+					Integer.MIN_VALUE, Integer.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.LONG:
 				return ValueGenerator.getRandomLongFromRange(
 					Long.MIN_VALUE, Long.MAX_VALUE);
 			case ExpandoColumnConstants.LONG_ARRAY:
 				return new long[] {ValueGenerator.getRandomLongFromRange(
-					Long.MIN_VALUE, Long.MAX_VALUE)};
+					Long.MIN_VALUE, Long.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.NUMBER:
 				return ValueGenerator.getRandomDoubleFromRange(
 					Double.MIN_VALUE, Double.MAX_VALUE);
 			case ExpandoColumnConstants.NUMBER_ARRAY:
 				return new Number[] {ValueGenerator.getRandomDoubleFromRange(
-					Double.MIN_VALUE, Double.MAX_VALUE)};
+					Double.MIN_VALUE, Double.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.SHORT:
 				return ValueGenerator.getRandomShortFromRange(
 					Short.MIN_VALUE, Short.MAX_VALUE);
 			case ExpandoColumnConstants.SHORT_ARRAY:
 				return new short[] {ValueGenerator.getRandomShortFromRange(
-					Short.MIN_VALUE, Short.MAX_VALUE)};
+					Short.MIN_VALUE, Short.MAX_VALUE)
+				};
 			case ExpandoColumnConstants.STRING:
 				return ValueGenerator.getLowerCaseText(20);
 			case ExpandoColumnConstants.STRING_ARRAY:
 				return new String[] {ValueGenerator.getLowerCaseText(20)};
 			case ExpandoColumnConstants.STRING_LOCALIZED:
-				HashMap<Locale, String> stringLocalizedMap =
-					new HashMap<Locale, String>();
+				HashMap<Locale, String> stringLocalizedMap = new HashMap<>();
 				stringLocalizedMap.put(
 					LocaleUtil.getDefault(),
 					ValueGenerator.getLowerCaseText(20));
+
 				return stringLocalizedMap;
 			case ExpandoColumnConstants.STRING_ARRAY_LOCALIZED:
 				HashMap<Locale, String[]> stringArrayLocalizedMap =
-					new HashMap<Locale, String[]>();
+					new HashMap<>();
 				stringArrayLocalizedMap.put(
 					LocaleUtil.getDefault(),
 					new String[] {ValueGenerator.getLowerCaseText(20)});
+
 				return stringArrayLocalizedMap;
 		}
 
 		return StringPool.BLANK;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CreateExpandoField.class);
 
 	private static final Integer[] availableTypes = {
 		ExpandoColumnConstants.BOOLEAN, ExpandoColumnConstants.DATE,
@@ -287,7 +311,5 @@ public class CreateExpandoField extends BaseAction {
 		ExpandoColumnConstants.STRING, ExpandoColumnConstants.STRING_ARRAY,
 		ExpandoColumnConstants.STRING_LOCALIZED
 	};
-
-	private static Log _log = LogFactoryUtil.getLog(CreateExpandoField.class);
 
 }

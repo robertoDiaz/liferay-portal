@@ -12,18 +12,32 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions;
+package com.liferay.liferaygen.dummy.internal;
 
-import com.liferay.liferaygen.impl.BaseAction;
+import com.liferay.liferaygen.BaseLiferayGenAction;
+import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.model.ClassedModel;
-import com.liferay.portal.model.User;
+import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.model.User;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
-public class Dummy extends BaseAction {
+
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.dummy.internal.LiferayGenActionDummy",
+	service = LiferayGenAction.class
+)
+public class LiferayGenActionDummy extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -51,10 +65,14 @@ public class Dummy extends BaseAction {
 	protected void doRun() {
 		_log.error("start doRun");
 
-		for (Entry<String, Object> entry : _parameters.entrySet()) {
+		Map<String, Object> parameters = getParameters();
+
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 			Object value = entry.getValue();
 
-			if (value.getClass().isArray()) {
+			Class<?> clazz = value.getClass();
+
+			if (clazz.isArray()) {
 				value = Arrays.toString((Object[])value);
 			}
 
@@ -64,6 +82,7 @@ public class Dummy extends BaseAction {
 		_log.error("end doRun");
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(Dummy.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayGenActionDummy.class);
 
 }
