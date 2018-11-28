@@ -15,7 +15,7 @@
 package com.liferay.liferaygen.internal.util;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.internal.BaseLiferayGenAction;
+import com.liferay.liferaygen.internal.LiferayGenActionAdapter;
 import com.liferay.liferaygen.internal.LiferayGenExecutor;
 import com.liferay.liferaygen.internal.LiferayGenTarget;
 import com.liferay.liferaygen.internal.LiferayGenTargetImpl;
@@ -41,15 +41,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferayGenExecutorUtil {
+@Component(immediate = true, service = LiferayGenExecutorHandler.class)
+public class LiferayGenExecutorHandler {
 
-	public static LiferayGenAction createAction(Object actionObj) {
+	public LiferayGenAction createAction(Object actionObj) {
 		Class<?> clazz = getActionClass(actionObj);
 
 		if (clazz == null) {
@@ -66,8 +70,7 @@ public class LiferayGenExecutorUtil {
 			}
 
 			if (LiferayGenExecutor.class.isInstance(object)) {
-				return new LiferayGenExecutorWrapper(
-					(LiferayGenExecutor)object);
+				return new LiferayGenActionAdapter((LiferayGenExecutor)object);
 			}
 
 			_log.error(
@@ -84,7 +87,40 @@ public class LiferayGenExecutorUtil {
 		return null;
 	}
 
-	public static LiferayGenActionConfig createActionConfig(
+	public List<LiferayGenAction> getAvailableActions() {
+		ClassLoader classLoader =
+			LiferayGenExecutorHandler.class.getClassLoader();
+
+		Set<Class<? extends LiferayGenAction>> actionClasses = null;
+
+		//TODO get the action classes from registry
+
+		Map<String, LiferayGenAction> actionMap = new TreeMap<>();
+
+		for (Class<? extends LiferayGenAction> actionClass : actionClasses) {
+			if (Modifier.isAbstract(actionClass.getModifiers())) {
+				continue;
+			}
+
+			if (!classLoader.equals(actionClass.getClassLoader())) {
+				continue;
+			}
+
+			try {
+				actionMap.put(actionClass.getName(), actionClass.newInstance());
+			}
+			catch (Exception e) {
+				_log.error(
+					StringBundler.concat(
+						"Action: ", actionClass, " Error: ", e),
+					e);
+			}
+		}
+
+		return new ArrayList<>(actionMap.values());
+	}
+
+	public LiferayGenActionConfig getLiferayGenActionConfig(
 		Map<String, Object> configuration,
 		Map<String, Object> actionConfigMap) {
 
@@ -102,11 +138,11 @@ public class LiferayGenExecutorUtil {
 			(Map<String, Object>)actionConfigMap.get(
 				LiferayGenActionConfig.PARAMETERS);
 
-		Map<String, Object> effectiveParameters =
-			ParameterUtil.calculateEffectiveParameters(
+		Map<String, Object> backedParameters =
+			_liferayGenParameterHandler.getBackedParameters(
 				liferayGenAction, configuration, parameters);
 
-		liferayGenAction.configure(effectiveParameters);
+		liferayGenAction.configure(backedParameters);
 
 		liferayGenAction.init();
 
@@ -114,24 +150,25 @@ public class LiferayGenExecutorUtil {
 			_log.info("Action: " + liferayGenAction.getClass());
 		}
 
-		List<Long> groupIds = ParameterUtil.getGroupIds(effectiveParameters);
+		List<Long> groupIds = LiferayGenParameterHandler.getGroupIds(
+			backedParameters);
 
 		if (!liferayGenAction.hasScopeByGroupId()) {
-			effectiveParameters.put(
+			backedParameters.put(
 				LiferayGenConfigConstants.GROUP_ID,
-				ValueGenerator.getRandomObjectFromList(groupIds));
+				_liferayGenValueGenerator.getRandomObjectFromList(groupIds));
 
 			groupIds = Collections.singletonList(0L);
 		}
 
 		String sql = (String)actionConfigMap.get(LiferayGenActionConfig.SQL);
 
-		Map<Long, List<LiferayGenTarget>> liferayGentargetMap;
+		Map<Long, List<LiferayGenTarget>> liferayGenTargetMap;
 
 		try {
-			liferayGentargetMap = getTargetMap(
+			liferayGenTargetMap = getTargetMap(
 				groupIds, liferayGenAction, sql,
-				effectiveParameters.get(liferayGenAction.getEntityModelPk()));
+				backedParameters.get(liferayGenAction.getEntityModelPK()));
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -180,13 +217,13 @@ public class LiferayGenExecutorUtil {
 		if ((numExecutions == 0) && (numExecutionsPercentage != 0)) {
 			List<LiferayGenTarget> targetList = new ArrayList<>();
 
-			for (List<LiferayGenTarget> values : liferayGentargetMap.values()) {
+			for (List<LiferayGenTarget> values : liferayGenTargetMap.values()) {
 				targetList.addAll(values);
 			}
 
-			liferayGentargetMap = new HashMap<>();
+			liferayGenTargetMap = new HashMap<>();
 
-			liferayGentargetMap.put(0L, targetList);
+			liferayGenTargetMap.put(0L, targetList);
 
 			numExecutions = (long)(numExecutionsPercentage * targetList.size());
 
@@ -211,100 +248,12 @@ public class LiferayGenExecutorUtil {
 		}
 
 		return new LiferayGenActionConfig(
-			groupIds, liferayGenAction, liferayGentargetMap, numExecutions,
-			numThreads, effectiveParameters, repeatLiferayGenTarget);
+			groupIds, liferayGenAction, liferayGenTargetMap, numExecutions,
+			numThreads, backedParameters, repeatLiferayGenTarget,
+			_liferayGenValueGenerator);
 	}
 
-	public static List<LiferayGenAction> getAvailableActions() {
-		ClassLoader classLoader = LiferayGenExecutorUtil.class.getClassLoader();
-
-		Set<Class<? extends LiferayGenAction>> actionClasses = null;
-
-		//TODO get the action classes from registry
-
-		Map<String, LiferayGenAction> actionMap = new TreeMap<>();
-
-		for (Class<? extends LiferayGenAction> actionClass : actionClasses) {
-			if (Modifier.isAbstract(actionClass.getModifiers())) {
-				continue;
-			}
-
-			if (!classLoader.equals(actionClass.getClassLoader())) {
-				continue;
-			}
-
-			try {
-				actionMap.put(actionClass.getName(), actionClass.newInstance());
-			}
-			catch (Exception e) {
-				_log.error(
-					StringBundler.concat(
-						"Action: ", actionClass, " Error: ", e),
-					e);
-			}
-		}
-
-		return new ArrayList<>(actionMap.values());
-	}
-
-	public static class LiferayGenExecutorWrapper extends BaseLiferayGenAction {
-
-		public LiferayGenExecutorWrapper() {
-		}
-
-		public LiferayGenExecutorWrapper(
-			LiferayGenExecutor liferayGenExecutor) {
-
-			_liferayGenExecutor = liferayGenExecutor;
-		}
-
-		public void configure(Map<String, Object> parameters) {
-			super.configure(parameters);
-
-			if (_liferayGenExecutor != null) {
-				_liferayGenExecutor.configure(parameters);
-			}
-		}
-
-		@Override
-		public String doGetDescription() {
-			return "Allows executing the Executor as an Action";
-		}
-
-		@Override
-		@SuppressWarnings("serial")
-		public Map<String, Object> doGetParametersDefaultValues() {
-			return new TreeMap<String, Object>() {
-				{
-					put(LiferayGenConfigConstants.ACTIONS, null);
-				}
-			};
-		}
-
-		@Override
-		@SuppressWarnings("serial")
-		public Map<String, String> doGetParametersDescription() {
-			return new TreeMap<String, String>() {
-				{
-					put(
-						LiferayGenConfigConstants.ACTIONS,
-						"actions to execute");
-				}
-			};
-		}
-
-		@Override
-		public void doRun() {
-			if (_liferayGenExecutor != null) {
-				_liferayGenExecutor.run();
-			}
-		}
-
-		private LiferayGenExecutor _liferayGenExecutor;
-
-	}
-
-	protected static Class<?> getActionClass(Object actionObj) {
+	protected Class<?> getActionClass(Object actionObj) {
 		if (actionObj instanceof Class) {
 			return (Class<?>)actionObj;
 		}
@@ -333,7 +282,7 @@ public class LiferayGenExecutorUtil {
 		return null;
 	}
 
-	protected static List<LiferayGenTarget> getTargetList(
+	protected List<LiferayGenTarget> getTargetList(
 		long groupId, LiferayGenAction liferayGenAction, Object entityPKValue) {
 
 		Class<? extends ClassedModel> entityModel =
@@ -348,7 +297,7 @@ public class LiferayGenExecutorUtil {
 		if (entityPKValue != null) {
 			conjunction.add(
 				RestrictionsFactoryUtil.eq(
-					liferayGenAction.getEntityModelPk(), entityPKValue));
+					liferayGenAction.getEntityModelPK(), entityPKValue));
 		}
 
 		if (groupId != 0L) {
@@ -356,14 +305,14 @@ public class LiferayGenExecutorUtil {
 		}
 
 		List<Object> objectList =
-			(List<Object>)QueryUtil.executeEntityModelQuery(
+			(List<Object>)_liferayGenQueryHandler.executeEntityModelQuery(
 				entityModel.getName(), liferayGenAction.getEntityProperties(),
 				conjunction);
 
 		return getTargetListFromObjectList(groupId, objectList);
 	}
 
-	protected static List<LiferayGenTarget> getTargetListFromObjectList(
+	protected List<LiferayGenTarget> getTargetListFromObjectList(
 		long groupId, List<Object> objectList) {
 
 		List<LiferayGenTarget> targetList = new ArrayList<>();
@@ -377,7 +326,7 @@ public class LiferayGenExecutorUtil {
 		return targetList;
 	}
 
-	protected static Map<Long, List<LiferayGenTarget>> getTargetMap(
+	protected Map<Long, List<LiferayGenTarget>> getTargetMap(
 			List<Long> groupIds, LiferayGenAction liferayGenAction, String sql,
 			Object entityPKValue)
 		throws Exception {
@@ -396,7 +345,8 @@ public class LiferayGenExecutorUtil {
 					sqlGroup = sqlGroup + " and groupId = " + groupId;
 				}
 
-				List<Object> objectList = QueryUtil.executeSql(sql);
+				List<Object> objectList = _liferayGenQueryHandler.executeSql(
+					sql);
 
 				List<LiferayGenTarget> targetList = getTargetListFromObjectList(
 					groupId, objectList);
@@ -424,6 +374,15 @@ public class LiferayGenExecutorUtil {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayGenExecutorUtil.class);
+		LiferayGenExecutorHandler.class);
+
+	@Reference
+	private LiferayGenParameterHandler _liferayGenParameterHandler;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private LiferayGenValueGenerator _liferayGenValueGenerator;
 
 }

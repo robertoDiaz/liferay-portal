@@ -16,7 +16,7 @@ package com.liferay.liferaygen.internal.config;
 
 import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.liferaygen.internal.LiferayGenTarget;
-import com.liferay.liferaygen.internal.util.ValueGenerator;
+import com.liferay.liferaygen.internal.util.LiferayGenValueGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +52,8 @@ public class LiferayGenActionConfig {
 		List<Long> groupIds, LiferayGenAction liferayGenAction,
 		Map<Long, List<LiferayGenTarget>> liferayGenTargetMap,
 		long numExecutions, long numThreads, Map<String, Object> parameters,
-		boolean repeatLiferayGenTarget) {
+		boolean repeatLiferayGenTarget,
+		LiferayGenValueGenerator liferayGenValueGenerator) {
 
 		_groupIds = groupIds;
 		_liferayGenAction = liferayGenAction;
@@ -61,11 +62,13 @@ public class LiferayGenActionConfig {
 		_numThreads = numThreads;
 		_parameters = parameters;
 		_repeatLiferayGenTarget = repeatLiferayGenTarget;
+		_liferayGenValueGenerator = liferayGenValueGenerator;
 	}
 
 	public long getGroupId() {
-		Number number = (Number)ValueGenerator.getRandomObjectFromList(
-			_groupIds);
+		Number number =
+			(Number)_liferayGenValueGenerator.getRandomObjectFromList(
+				_groupIds);
 
 		return number.longValue();
 	}
@@ -129,6 +132,7 @@ public class LiferayGenActionConfig {
 	private final List<Long> _groupIds;
 	private final LiferayGenAction _liferayGenAction;
 	private final Map<Long, List<LiferayGenTarget>> _liferayGenTargetMap;
+	private final LiferayGenValueGenerator _liferayGenValueGenerator;
 	private final long _numExecutions;
 	private final long _numThreads;
 	private final Map<String, Object> _parameters;

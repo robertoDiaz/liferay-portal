@@ -20,10 +20,12 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionList;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.Connection;
@@ -34,72 +36,81 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class QueryUtil {
+@Component(immediate = true, service = LiferayGenQueryHandler.class)
+public class LiferayGenQueryHandler {
 
-	public static DynamicQuery createDynamicQuery(
+	public DynamicQuery createDynamicQuery(
 		PersistedModelLocalService persistedModelLocalService) {
 
-		return (DynamicQuery)ServiceUtil.executeServiceMethod(
-			persistedModelLocalService, "dynamicQuery", (Class<?>)null);
+		return (DynamicQuery)
+			_liferayGenServiceExecutorHelper.executeServiceMethod(
+				persistedModelLocalService, "dynamicQuery", (Class<?>)null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Object> executeDynamicQuery(
+	public List<Object> executeDynamicQuery(
 		PersistedModelLocalService persistedModelLocalService,
 		DynamicQuery dynamicQuery) {
 
-		return (List<Object>)ServiceUtil.executeServiceMethod(
-			persistedModelLocalService, "dynamicQuery", DynamicQuery.class,
-			dynamicQuery);
+		return (List<Object>)
+			_liferayGenServiceExecutorHelper.executeServiceMethod(
+				persistedModelLocalService, "dynamicQuery", DynamicQuery.class,
+				dynamicQuery);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Object> executeDynamicQuery(
+	//TODO typed method is possible??
+	public List<Object> executeDynamicQuery(
 		PersistedModelLocalService persistedModelLocalService,
 		DynamicQuery dynamicQuery, int start, int end) {
 
-		return (List<Object>)ServiceUtil.executeServiceMethod(
-			persistedModelLocalService, "dynamicQuery",
-			new Class<?>[] {DynamicQuery.class, int.class, int.class},
-			dynamicQuery, start, end);
+		return (List<Object>)
+			_liferayGenServiceExecutorHelper.executeServiceMethod(
+				persistedModelLocalService, "dynamicQuery",
+				new Class<?>[] {DynamicQuery.class, int.class, int.class},
+				dynamicQuery, start, end);
 	}
 
-	public static long executeDynamicQueryCount(
+	public long executeDynamicQueryCount(
 		PersistedModelLocalService persistedModelLocalService,
 		DynamicQuery dynamicQuery) {
 
-		return (Long)ServiceUtil.executeServiceMethod(
+		return (Long)_liferayGenServiceExecutorHelper.executeServiceMethod(
 			persistedModelLocalService, "dynamicQueryCount", DynamicQuery.class,
 			dynamicQuery);
 	}
 
-	public static List<?> executeEntityModelQuery(
+	public List<?> executeEntityModelQuery(
 		String className, String properties) {
 
 		return executeEntityModelQuery(className, properties, null);
 	}
 
-	public static List<?> executeEntityModelQuery(
+	public List<?> executeEntityModelQuery(
 		String className, String properties, Criterion criterion) {
 
 		return executeEntityModelQuery(
-			className, properties, criterion,
-			com.liferay.portal.kernel.dao.orm.QueryUtil.ALL_POS,
-			com.liferay.portal.kernel.dao.orm.QueryUtil.ALL_POS);
+			className, properties, criterion, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS);
 	}
 
-	public static List<Object> executeEntityModelQuery(
+	//TODO typed method is possible??
+	public List<Object> executeEntityModelQuery(
 		String className, String properties, Criterion criterion, int start,
 		int end) {
 
 		PersistedModelLocalService persistedModelLocalService =
-			ServiceUtil.getLocalService(className);
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				className);
 
 		DynamicQuery dynamicQuery = createDynamicQuery(
 			persistedModelLocalService);
@@ -115,9 +126,7 @@ public class QueryUtil {
 			dynamicQuery.add(criterion);
 		}
 
-		if ((start == com.liferay.portal.kernel.dao.orm.QueryUtil.ALL_POS) &&
-			(end == com.liferay.portal.kernel.dao.orm.QueryUtil.ALL_POS))
-		{
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS)) {
 			return executeDynamicQuery(
 				persistedModelLocalService, dynamicQuery);
 		}
@@ -126,21 +135,23 @@ public class QueryUtil {
 			persistedModelLocalService, dynamicQuery, start, end);
 	}
 
-	public static List<Object> executeEntityModelQuery(
+	//TODO typed method is possible??
+	public List<Object> executeEntityModelQuery(
 		String className, String properties, int start, int end) {
 
 		return executeEntityModelQuery(className, properties, null, start, end);
 	}
 
-	public static long executeEntityModelQueryCount(String className) {
+	public long executeEntityModelQueryCount(String className) {
 		return executeEntityModelQueryCount(className, null);
 	}
 
-	public static long executeEntityModelQueryCount(
+	public long executeEntityModelQueryCount(
 		String className, Criterion criterion) {
 
 		PersistedModelLocalService persistedModelLocalService =
-			ServiceUtil.getLocalService(className);
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				className);
 
 		DynamicQuery dynamicQuery = createDynamicQuery(
 			persistedModelLocalService);
@@ -153,7 +164,8 @@ public class QueryUtil {
 			persistedModelLocalService, dynamicQuery);
 	}
 
-	public static List<Object> executeSql(String sql) throws Exception {
+	//TODO typed method is possible??
+	public List<Object> executeSql(String sql) throws Exception {
 		if (sql == null) {
 			return null;
 		}
@@ -165,7 +177,7 @@ public class QueryUtil {
 		try {
 			con = DataAccess.getConnection();
 
-			sql = PortalUtil.transformSQL(sql);
+			sql = _portal.transformSQL(sql);
 
 			if (_log.isInfoEnabled()) {
 				_log.info("SQL: " + sql);
@@ -204,7 +216,7 @@ public class QueryUtil {
 		}
 	}
 
-	public static ProjectionList getPropertyProjection(String[] attributes) {
+	public ProjectionList getPropertyProjection(String[] attributes) {
 		String[] op = new String[attributes.length];
 		String[] attributesAux = new String[attributes.length];
 
@@ -247,9 +259,7 @@ public class QueryUtil {
 		return projectionList;
 	}
 
-	protected static Projection getPropertyProjection(
-		String attribute, String op) {
-
+	protected Projection getPropertyProjection(String attribute, String op) {
 		if ("rowCount".equals(op)) {
 			return ProjectionFactoryUtil.rowCount();
 		}
@@ -285,6 +295,17 @@ public class QueryUtil {
 		return property;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(QueryUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayGenQueryHandler.class);
+
+	@Reference
+	private LiferayGenServiceExecutorHelper _liferayGenServiceExecutorHelper;
+
+	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
+
+	@Reference
+	private Portal _portal;
 
 }

@@ -70,7 +70,7 @@ public interface LiferayGenAction {
 	 *
 	 * @return
 	 */
-	public String getEntityModelPk();
+	public String getEntityModelPK();
 
 	/**
 	 * Returns the entity properties that will be queried to fill "target"

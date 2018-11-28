@@ -17,9 +17,10 @@ package com.liferay.liferaygen.internal.util;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
 
 import java.lang.reflect.Method;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Jorge Díaz
@@ -27,11 +28,10 @@ import java.lang.reflect.Method;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class ServiceUtil {
+@Component(immediate = true, service = LiferayGenServiceExecutorHelper.class)
+public class LiferayGenServiceExecutorHelper {
 
-	//TODO componentizar
-
-	public static Object executeServiceMethod(
+	public Object executeServiceMethod(
 		PersistedModelLocalService persistedModelLocalService,
 		String methodName, Class<?> parameterType, Object... arg) {
 
@@ -45,7 +45,7 @@ public class ServiceUtil {
 			persistedModelLocalService, methodName, parameterTypes, arg);
 	}
 
-	public static Object executeServiceMethod(
+	public Object executeServiceMethod(
 		PersistedModelLocalService persistedModelLocalService,
 		String methodName, Class<?>[] parameterTypes, Object... arg) {
 
@@ -84,11 +84,6 @@ public class ServiceUtil {
 					"executeMethod: ", methodName, " method for ",
 					persistedModelLocalService, cause, e));
 		}
-	}
-
-	public static PersistedModelLocalService getLocalService(String className) {
-		return PersistedModelLocalServiceRegistryUtil.
-			getPersistedModelLocalService(className);
 	}
 
 	protected static Method getLocalServiceMethod(

@@ -17,9 +17,9 @@ package com.liferay.liferaygen.internal;
 import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.liferaygen.internal.config.LiferayGenActionConfig;
 import com.liferay.liferaygen.internal.config.constants.LiferayGenConfigConstants;
-import com.liferay.liferaygen.internal.util.LiferayGenExecutorUtil;
+import com.liferay.liferaygen.internal.util.LiferayGenExecutorHandler;
+import com.liferay.liferaygen.internal.util.LiferayGenValueGenerator;
 import com.liferay.liferaygen.internal.util.ThreadLocalData;
-import com.liferay.liferaygen.internal.util.ValueGenerator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -33,13 +33,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class BaseLiferayGenExecutor implements LiferayGenExecutor {
+@Component(immediate = true, service = LiferayGenExecutor.class)
+public class DefaultLiferayGenExecutor implements LiferayGenExecutor {
 
 	@Override
 	public void configure(Map<String, Object> configuration) {
@@ -61,10 +65,10 @@ public class BaseLiferayGenExecutor implements LiferayGenExecutor {
 
 			long startTime = System.currentTimeMillis();
 
-			ValueGenerator.resetCaches();
+			_liferayGenValueGenerator.resetCaches();
 
 			LiferayGenActionConfig liferayGenActionConfig =
-				LiferayGenExecutorUtil.createActionConfig(
+				_liferayGenExecutorHandler.getLiferayGenActionConfig(
 					_configuration, action);
 
 			if (liferayGenActionConfig != null) {
@@ -140,8 +144,8 @@ public class BaseLiferayGenExecutor implements LiferayGenExecutor {
 				parameters.put(LiferayGenConfigConstants.GROUP_ID, groupId);
 			}
 
-			LiferayGenAction actionCopy = LiferayGenExecutorUtil.createAction(
-				liferayGenAction);
+			LiferayGenAction actionCopy =
+				_liferayGenExecutorHandler.createAction(liferayGenAction);
 
 			actionCopy.configure(parameters);
 
@@ -223,15 +227,22 @@ public class BaseLiferayGenExecutor implements LiferayGenExecutor {
 		}
 
 		if (liferayGenActionConfig.isRepeatLiferayGenTarget()) {
-			return ValueGenerator.getRandomObjectFromList(targetList);
+			return _liferayGenValueGenerator.getRandomObjectFromList(
+				targetList);
 		}
 
-		return ValueGenerator.removeRandomObjectFromList(targetList);
+		return _liferayGenValueGenerator.removeRandomObjectFromList(targetList);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		BaseLiferayGenExecutor.class);
+		DefaultLiferayGenExecutor.class);
 
 	private Map<String, Object> _configuration;
+
+	@Reference
+	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
+
+	@Reference
+	private LiferayGenValueGenerator _liferayGenValueGenerator;
 
 }

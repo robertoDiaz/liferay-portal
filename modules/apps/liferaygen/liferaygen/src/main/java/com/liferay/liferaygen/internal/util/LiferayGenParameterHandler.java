@@ -29,15 +29,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class ParameterUtil {
+@Component(immediate = true, service = LiferayGenParameterHandler.class)
+public class LiferayGenParameterHandler {
 
-	public static Map<String, Object> calculateEffectiveParameters(
+	public void cleanupIntegerParameters(Map<String, Object> map) {
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			Object value = entry.getValue();
+
+			if (value instanceof Integer) {
+				Integer integer = (Integer)value;
+
+				map.put(entry.getKey(), integer.longValue());
+			}
+		}
+	}
+
+	public Map<String, Object> getBackedParameters(
 		LiferayGenAction liferayGenAction, Map<String, Object> configuration,
 		Map<String, Object> parameters) {
 
@@ -85,19 +100,7 @@ public class ParameterUtil {
 		return effectiveParameters;
 	}
 
-	public static void cleanupIntegerParameters(Map<String, Object> map) {
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			Object value = entry.getValue();
-
-			if (value instanceof Integer) {
-				Integer integer = (Integer)value;
-
-				map.put(entry.getKey(), integer.longValue());
-			}
-		}
-	}
-
-	public static int getParamAsIntegerPercentage(
+	public int getParamAsIntegerPercentage(
 		Map<String, Object> parameters, String parameter) {
 
 		if (!parameters.containsKey(parameter)) {
@@ -155,6 +158,7 @@ public class ParameterUtil {
 		return groupIds;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(ParameterUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayGenParameterHandler.class);
 
 }

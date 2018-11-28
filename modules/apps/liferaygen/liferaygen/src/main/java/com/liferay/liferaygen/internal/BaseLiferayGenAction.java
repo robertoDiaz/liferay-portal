@@ -72,7 +72,7 @@ public abstract class BaseLiferayGenAction implements LiferayGenAction {
 	}
 
 	@Override
-	public String getEntityModelPk() {
+	public String getEntityModelPK() {
 		return null;
 	}
 

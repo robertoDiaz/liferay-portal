@@ -39,13 +39,13 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
-import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -83,6 +83,9 @@ import javax.servlet.ServletContext;
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 
@@ -92,11 +95,10 @@ import org.springframework.mock.web.MockServletContext;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class ValueGenerator {
+@Component(immediate = true, service = LiferayGenValueGenerator.class)
+public class LiferayGenValueGenerator {
 
-	//todo componentizar (no tiene estado)
-
-	public static boolean canAddPortlet(Portlet portlet, Layout layout)
+	public boolean canAddPortlet(Portlet portlet, Layout layout)
 		throws PortalException {
 
 		if (portlet.isSystem() || portlet.isUndeployedPortlet()) {
@@ -121,14 +123,14 @@ public class ValueGenerator {
 		return true;
 	}
 
-	public static List<Long> getAllUserIdsFromCache() {
+	public List<Long> getAllUserIdsFromCache() {
 		List<Long> userIdsCurrentCompany = _userIdsCache.get(
 			CompanyThreadLocal.getCompanyId());
 
 		return new ArrayList<>(userIdsCurrentCompany);
 	}
 
-	public static List<String> getAvailableImageIOFormats() {
+	public List<String> getAvailableImageIOFormats() {
 		if (_availableImageIOFormats == null) {
 			List<String> temp = new ArrayList<>();
 
@@ -150,11 +152,11 @@ public class ValueGenerator {
 		return _availableImageIOFormats;
 	}
 
-	public static boolean getBoolean() {
+	public boolean getBoolean() {
 		return _RAND.nextBoolean();
 	}
 
-	public static boolean getBoolean(int truePercentage)
+	public boolean getBoolean(int truePercentage)
 		throws IllegalArgumentException {
 
 		if ((truePercentage < 0) || (truePercentage > 100)) {
@@ -169,7 +171,7 @@ public class ValueGenerator {
 		return false;
 	}
 
-	public static String getCSV(int size, int columns) {
+	public String getCSV(int size, int columns) {
 		StringBundler sb = new StringBundler(500);
 
 		while (sb.length() < size) {
@@ -192,15 +194,15 @@ public class ValueGenerator {
 		return sb.toString();
 	}
 
-	public static byte[] getImageText(String text) {
+	public byte[] getImageText(String text) {
 		return getImageText("png", text, "Arial", 48);
 	}
 
-	public static byte[] getImageText(String formatName, String text) {
+	public byte[] getImageText(String formatName, String text) {
 		return getImageText(formatName, text, "Arial", 48);
 	}
 
-	public static byte[] getImageText(
+	public byte[] getImageText(
 		String formatName, String text, String fontType, int fontSize) {
 
 		if (!isAvailableImageIOFormat(formatName)) {
@@ -213,24 +215,24 @@ public class ValueGenerator {
 		return convertRenderedImageToBytes(formatName, image);
 	}
 
-	public static String getLatinName(int length) {
+	public String getLatinName(int length) {
 		String randomString = getLowerCaseWord(length);
 
 		return StringUtil.toUpperCase(randomString.substring(0, 1)) +
 			randomString.substring(1);
 	}
 
-	public static String getLowerCaseText(int length) {
+	public String getLowerCaseText(int length) {
 		return getLowerCaseText(length, StringPool.SPACE);
 	}
 
-	public static String getLowerCaseText(int minLength, int maxLength) {
+	public String getLowerCaseText(int minLength, int maxLength) {
 		int length = getRandomIntegerFromRange(minLength, maxLength);
 
 		return getLowerCaseText(length, StringPool.SPACE);
 	}
 
-	public static String getLowerCaseText(int length, String separator) {
+	public String getLowerCaseText(int length, String separator) {
 		String text = StringPool.BLANK;
 
 		while (length > 0) {
@@ -273,11 +275,11 @@ public class ValueGenerator {
 		return text;
 	}
 
-	public static String getLowerCaseWord(int length) {
+	public String getLowerCaseWord(int length) {
 		return getLowerCaseText(length, StringPool.BLANK);
 	}
 
-	/*public static MockActionRequest getMockActionRequest(
+	/*public MockActionRequest getMockActionRequest(
 			HttpServletRequest request, Portlet portlet,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -307,7 +309,7 @@ public class ValueGenerator {
 		return actionRequest;
 	}
 
-	public static MockHttpServletRequest getMockHttpServletRequest(
+	public MockHttpServletRequest getMockHttpServletRequest(
 			Layout layout, User user, Locale locale)
 		throws Exception {
 
@@ -326,11 +328,11 @@ public class ValueGenerator {
 		return request;
 	}*/
 
-	public static ServletContext getMockServletContext() {
+	public ServletContext getMockServletContext() {
 		return _MOCK_SERVLET_CONTEXT;
 	}
 
-	public static ThemeDisplay getMockThemeDisplay(
+	public ThemeDisplay getMockThemeDisplay(
 			Layout layout, User user, Locale locale,
 			MockHttpServletRequest request)
 		throws Exception {
@@ -338,7 +340,7 @@ public class ValueGenerator {
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(user);
 
-		Company company = CompanyLocalServiceUtil.getCompany(
+		Company company = _companyLocalService.getCompany(
 			layout.getCompanyId());
 
 		long scopeGroupId = layout.getGroupId();
@@ -365,13 +367,13 @@ public class ValueGenerator {
 		themeDisplay.setRealUser(user);
 		themeDisplay.setScopeGroupId(scopeGroupId);
 		themeDisplay.setTimeZone(timeZone);
-		themeDisplay.setPathMain(PortalUtil.getPathMain());
+		themeDisplay.setPathMain(_portal.getPathMain());
 		themeDisplay.setPermissionChecker(permissionChecker);
 
 		return themeDisplay;
 	}
 
-	public static byte[] getPDF(int length) {
+	public byte[] getPDF(int length) {
 		String text = getLowerCaseText(length);
 
 		ByteArrayOutputStream byteArrayOutputStream =
@@ -390,7 +392,7 @@ public class ValueGenerator {
 		return byteArrayOutputStream.toByteArray();
 	}
 
-	public static byte[] getRandomBytes(int size) {
+	public byte[] getRandomBytes(int size) {
 		byte[] array = new byte[size];
 
 		_RAND.nextBytes(array);
@@ -398,11 +400,11 @@ public class ValueGenerator {
 		return array;
 	}
 
-	public static long getRandomClassPK(String className) {
+	public long getRandomClassPK(String className) {
 		return getRandomClassPK(className, 0, 0);
 	}
 
-	public static long getRandomClassPK(
+	public long getRandomClassPK(
 		String className, long companyId, long groupId) {
 
 		try {
@@ -465,21 +467,19 @@ public class ValueGenerator {
 		return 0;
 	}
 
-	public static Date getRandomDate() {
+	public Date getRandomDate() {
 		return getRandomDate(new Date(0), new Date(Long.MAX_VALUE));
 	}
 
-	public static Date getRandomDate(Date startDate, Date endDate) {
+	public Date getRandomDate(Date startDate, Date endDate) {
 		return new Date(_RD.nextLong(startDate.getTime(), endDate.getTime()));
 	}
 
-	public static Double getRandomDoubleFromRange(
-		double minValue, double maxValue) {
-
+	public Double getRandomDoubleFromRange(double minValue, double maxValue) {
 		return _RD.nextUniform(minValue, maxValue);
 	}
 
-	public static byte[] getRandomFileContent(String fileName) {
+	public byte[] getRandomFileContent(String fileName) {
 		String fileExtension = FileUtil.getExtension(fileName);
 
 		/* Try generating image using ImageIO library */
@@ -515,25 +515,21 @@ public class ValueGenerator {
 		return getRandomBytes(size * 16);
 	}
 
-	public static String getRandomFileExtension() {
+	public String getRandomFileExtension() {
 		return getRandomObjectFromArray(_EXTENSIONS);
 	}
 
-	public static Float getRandomFloatFromRange(
-		float minValue, float maxValue) {
-
+	public Float getRandomFloatFromRange(float minValue, float maxValue) {
 		return (float)_RD.nextUniform((double)minValue, (double)maxValue);
 	}
 
-	public static byte[] getRandomImage(
-		String formatName, int width, int height) {
-
+	public byte[] getRandomImage(String formatName, int width, int height) {
 		RenderedImage image = getRenderedImageRandom(width, height);
 
 		return convertRenderedImageToBytes(formatName, image);
 	}
 
-	public static DLFileEntry getRandomImageFromDL(Criterion criterion)
+	public DLFileEntry getRandomImageFromDL(Criterion criterion)
 		throws Exception {
 
 		Criterion extensionCriterion = RestrictionsFactoryUtil.in(
@@ -548,7 +544,7 @@ public class ValueGenerator {
 			DLFileEntry.class.getName(), conjunction);
 	}
 
-	public static int getRandomIntegerFromRange(int minValue, int maxValue) {
+	public int getRandomIntegerFromRange(int minValue, int maxValue) {
 		if (minValue == maxValue) {
 			return minValue;
 		}
@@ -556,7 +552,7 @@ public class ValueGenerator {
 		return _RD.nextInt(minValue, maxValue);
 	}
 
-	public static Long getRandomLongFromRange(long minValue, long maxValue) {
+	public Long getRandomLongFromRange(long minValue, long maxValue) {
 		if (minValue == maxValue) {
 			return minValue;
 		}
@@ -564,15 +560,14 @@ public class ValueGenerator {
 		return _RD.nextLong(minValue, maxValue);
 	}
 
-	public static ClassedModel getRandomObject(
-			String className, Criterion criterion)
+	public ClassedModel getRandomObject(String className, Criterion criterion)
 		throws Exception {
 
 		return (ClassedModel)getRandomObjectProperties(
 			className, null, criterion);
 	}
 
-	public static <T> T getRandomObjectFromArray(T[] array) {
+	public <T> T getRandomObjectFromArray(T[] array) {
 		if ((array == null) || (array.length == 0)) {
 			return null;
 		}
@@ -584,7 +579,7 @@ public class ValueGenerator {
 		return array[_RAND.nextInt(array.length)];
 	}
 
-	public static <T> T getRandomObjectFromList(List<T> list) {
+	public <T> T getRandomObjectFromList(List<T> list) {
 		if ((list == null) || list.isEmpty()) {
 			return null;
 		}
@@ -596,11 +591,11 @@ public class ValueGenerator {
 		return list.get(_RAND.nextInt(list.size()));
 	}
 
-	public static Object getRandomObjectProperties(
+	public Object getRandomObjectProperties(
 			String className, String properties, Criterion criterion)
 		throws Exception {
 
-		int count = (int)QueryUtil.executeEntityModelQueryCount(
+		int count = (int)_liferayGenQueryHandler.executeEntityModelQueryCount(
 			className, criterion);
 
 		if (count == 0) {
@@ -609,14 +604,14 @@ public class ValueGenerator {
 
 		int randomPos = getRandomIntegerFromRange(0, count - 1);
 
-		List<Object> objects = QueryUtil.executeEntityModelQuery(
+		List<Object> objects = _liferayGenQueryHandler.executeEntityModelQuery(
 			className, properties, criterion, randomPos, randomPos + 1);
 
 		return objects.get(0);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<ClassedModel> getRandomObjects(
+	public List<ClassedModel> getRandomObjects(
 			String className, Criterion criterion, long number)
 		throws Exception {
 
@@ -624,26 +619,22 @@ public class ValueGenerator {
 			className, null, criterion, number);
 	}
 
-	public static <T> List<T> getRandomObjectsFromArray(
-		T[] array, long number) {
-
+	public <T> List<T> getRandomObjectsFromArray(T[] array, long number) {
 		return getRandomObjectsFromList(Arrays.asList(array), number, false);
 	}
 
-	public static <T> List<T> getRandomObjectsFromArray(
+	public <T> List<T> getRandomObjectsFromArray(
 		T[] array, long number, boolean allowDuplicates) {
 
 		return getRandomObjectsFromList(
 			Arrays.asList(array), number, allowDuplicates);
 	}
 
-	public static <T> List<T> getRandomObjectsFromList(
-		List<T> list, long number) {
-
+	public <T> List<T> getRandomObjectsFromList(List<T> list, long number) {
 		return getRandomObjectsFromList(list, number, false);
 	}
 
-	public static <T> List<T> getRandomObjectsFromList(
+	public <T> List<T> getRandomObjectsFromList(
 		List<T> list, long number, boolean allowDuplicates) {
 
 		if ((number == 0) || (list == null) || list.isEmpty()) {
@@ -682,14 +673,14 @@ public class ValueGenerator {
 		return selected;
 	}
 
-	public static List<?> getRandomObjectsProperties(
+	public List<?> getRandomObjectsProperties(
 		String className, String properties, Criterion criterion, long number) {
 
 		if (number == 0) {
 			return Collections.emptyList();
 		}
 
-		int count = (int)QueryUtil.executeEntityModelQueryCount(
+		int count = (int)_liferayGenQueryHandler.executeEntityModelQueryCount(
 			className, criterion);
 
 		if (count == 0) {
@@ -701,8 +692,9 @@ public class ValueGenerator {
 		for (long i = 0; i < number; i++) {
 			int randomPos = getRandomIntegerFromRange(0, count - 1);
 
-			List<Object> objects = QueryUtil.executeEntityModelQuery(
-				className, properties, criterion, randomPos, randomPos + 1);
+			List<Object> objects =
+				_liferayGenQueryHandler.executeEntityModelQuery(
+					className, properties, criterion, randomPos, randomPos + 1);
 
 			result.addAll(objects);
 		}
@@ -710,9 +702,7 @@ public class ValueGenerator {
 		return result;
 	}
 
-	public static Portlet getRandomPortlet(Layout layout)
-		throws PortalException {
-
+	public Portlet getRandomPortlet(Layout layout) throws PortalException {
 		if (layout == null) {
 			return null;
 		}
@@ -720,16 +710,14 @@ public class ValueGenerator {
 		return getRandomPortlet(layout.getCompanyId(), layout);
 	}
 
-	public static Portlet getRandomPortlet(long companyId)
-		throws PortalException {
-
+	public Portlet getRandomPortlet(long companyId) throws PortalException {
 		return getRandomPortlet(companyId, null);
 	}
 
-	public static Portlet getRandomPortlet(long companyId, Layout layout)
+	public Portlet getRandomPortlet(long companyId, Layout layout)
 		throws PortalException {
 
-		List<Portlet> portlets = PortletLocalServiceUtil.getPortlets(
+		List<Portlet> portlets = _portletLocalService.getPortlets(
 			companyId, false, false);
 
 		while (true) {
@@ -745,9 +733,7 @@ public class ValueGenerator {
 		}
 	}
 
-	public static Short getRandomShortFromRange(
-		short minValue, short maxValue) {
-
+	public Short getRandomShortFromRange(short minValue, short maxValue) {
 		return (short)_RD.nextInt(minValue, maxValue);
 	}
 
@@ -755,7 +741,7 @@ public class ValueGenerator {
 	 * It is better to always use getLowerCaseWord method unless you want a
 	 * random alphanumeric string with random characters
 	 */
-	public static String getRandomString(int length) {
+	public String getRandomString(int length) {
 		return getRandomString(length, _ALPHANUM_LEXICON);
 	}
 
@@ -763,7 +749,7 @@ public class ValueGenerator {
 	 * It is better to always use getLowerCaseWord method unless you want a
 	 * random alphanumeric string with random characters
 	 */
-	public static String getRandomString(int length, String lexicon) {
+	public String getRandomString(int length, String lexicon) {
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
@@ -773,7 +759,7 @@ public class ValueGenerator {
 		return builder.toString();
 	}
 
-	public static long getRandomUserIdFromCache() {
+	public long getRandomUserIdFromCache() {
 		List<Long> result = getRandomUserIdsFromCache(1L);
 
 		if (result.isEmpty()) {
@@ -783,7 +769,7 @@ public class ValueGenerator {
 		return result.get(0);
 	}
 
-	public static List<Long> getRandomUserIdsFromCache(long number) {
+	public List<Long> getRandomUserIdsFromCache(long number) {
 		if (_userIdsCache == null) {
 			resetUserIdsCache();
 		}
@@ -794,7 +780,7 @@ public class ValueGenerator {
 		return getRandomObjectsFromList(userIdsCurrentCompany, number);
 	}
 
-	public static Map<Locale, String> getRandomValuesLocalizationMap(
+	public Map<Locale, String> getRandomValuesLocalizationMap(
 		Locale[] locales, int valuesLength) {
 
 		Map<Locale, String> localizationMap = new HashMap<>();
@@ -806,17 +792,17 @@ public class ValueGenerator {
 		return localizationMap;
 	}
 
-	public static String getUpperCaseWord(int length) {
+	public String getUpperCaseWord(int length) {
 		return StringUtil.toUpperCase(getLowerCaseWord(length));
 	}
 
-	public static boolean isAvailableImageIOFormat(String formatName) {
+	public boolean isAvailableImageIOFormat(String formatName) {
 		formatName = StringUtil.toLowerCase(formatName);
 
 		return getAvailableImageIOFormats().contains(formatName);
 	}
 
-	public static <T> T removeRandomObjectFromList(List<T> list) {
+	public <T> T removeRandomObjectFromList(List<T> list) {
 		if ((list == null) || list.isEmpty()) {
 			return null;
 		}
@@ -824,11 +810,11 @@ public class ValueGenerator {
 		return list.remove(_RAND.nextInt(list.size()));
 	}
 
-	public static void resetCaches() {
+	public void resetCaches() {
 		resetUserIdsCache();
 	}
 
-	public static void setServletContext(ServletContext servletContext) {
+	public void setServletContext(ServletContext servletContext) {
 		if (servletContext == null) {
 			return;
 		}
@@ -860,7 +846,7 @@ public class ValueGenerator {
 			servletContext.getServletContextName());
 	}
 
-	protected static byte[] convertRenderedImageToBytes(
+	protected byte[] convertRenderedImageToBytes(
 		String formatName, RenderedImage image) {
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -887,18 +873,18 @@ public class ValueGenerator {
 		return null;
 	}
 
-	protected static List<Long> getAllUserIds(long companyId) {
+	protected List<Long> getAllUserIds(long companyId) {
 		Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
 
 		conjunction.add(RestrictionsFactoryUtil.eq("defaultUser", false));
 		conjunction.add(RestrictionsFactoryUtil.eq("companyId", companyId));
 		conjunction.add(RestrictionsFactoryUtil.eq("status", 0));
 
-		return (List<Long>)QueryUtil.executeEntityModelQuery(
+		return (List<Long>)_liferayGenQueryHandler.executeEntityModelQuery(
 			User.class.getName(), "userId", conjunction);
 	}
 
-	protected static RenderedImage getRenderedImageFromText(
+	protected RenderedImage getRenderedImageFromText(
 		String text, String fontType, int fontSize) {
 
 		/*
@@ -958,8 +944,7 @@ public class ValueGenerator {
 		return img;
 	}
 
-	protected static BufferedImage getRenderedImageRandom(
-		int width, int height) {
+	protected BufferedImage getRenderedImageRandom(int width, int height) {
 
 		// create buffered image object img
 
@@ -985,13 +970,14 @@ public class ValueGenerator {
 		return img;
 	}
 
-	protected static void resetUserIdsCache() {
+	protected void resetUserIdsCache() {
 		_userIdsCache = _getUserIdsMap();
 	}
 
-	private static Map<Long, List<Long>> _getUserIdsMap() {
-		List<Long> companyIds = (List<Long>)QueryUtil.executeEntityModelQuery(
-			Company.class.getName(), "companyId");
+	private Map<Long, List<Long>> _getUserIdsMap() {
+		List<Long> companyIds =
+			(List<Long>)_liferayGenQueryHandler.executeEntityModelQuery(
+				Company.class.getName(), "companyId");
 
 		Map<Long, List<Long>> userIdsMap = new ConcurrentHashMap<>();
 
@@ -1005,7 +991,7 @@ public class ValueGenerator {
 	}
 
 	private static final String _ALPHANUM_LEXICON =
-		ValueGenerator._LETTER_LEXICON + ValueGenerator._NUMBER_LEXICON;
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345674890";
 
 	private static final String[] _EXTENSIONS = {
 		"txt", "csv", "pdf", "doc", "docx", "rtf", "odt", "mp3", "ogg", "wav",
@@ -1016,27 +1002,30 @@ public class ValueGenerator {
 		"jpg", "png", "txt", "csv", "pdf"
 	};
 
-	private static final String _LETTER_LEXICON =
-		ValueGenerator._UPPERCASE_LEXICON + ValueGenerator._LOWERCASE_LEXICON;
-
-	private static final String _LOWERCASE_LEXICON =
-		"abcdefghijklmnopqrstuvwxyz";
-
 	private static final MockServletContext _MOCK_SERVLET_CONTEXT =
 		new MockServletContext();
-
-	private static final String _NUMBER_LEXICON = "12345674890";
 
 	private static final Random _RAND = new Random();
 
 	private static final RandomData _RD = new RandomDataImpl();
 
-	private static final String _UPPERCASE_LEXICON =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayGenValueGenerator.class);
 
-	private static final Log _log = LogFactoryUtil.getLog(ValueGenerator.class);
+	private List<String> _availableImageIOFormats;
 
-	private static List<String> _availableImageIOFormats;
-	private static Map<Long, List<Long>> _userIdsCache;
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
+
+	private Map<Long, List<Long>> _userIdsCache;
 
 }
