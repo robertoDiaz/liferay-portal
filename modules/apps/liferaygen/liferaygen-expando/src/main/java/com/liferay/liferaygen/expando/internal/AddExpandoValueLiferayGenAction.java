@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
@@ -68,10 +69,12 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	properties = "liferaygen.action.class.name=com.liferay.liferaygen.asset.internal.LiferayGenActionUpdateAssetEntry",
+	properties = {
+		"liferaygen.action.class.name=com.liferay.liferaygen.expando.internal.AddExpandoValueLiferayGenAction"
+	},
 	service = LiferayGenAction.class
 )
-public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
+public class AddExpandoValueLiferayGenAction extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -126,14 +129,6 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 		Long classNameId = (Long)parameters.get(LiferayGenActionConfig.TARGET);
 
 		try {
-			ExpandoTable expandoTable =
-				_expandotableLocalService.getDefaultTable(
-					companyId, classNameId);
-
-			List<ExpandoColumn> expandoColumns =
-				_expandoColumnLocalService.getColumns(
-					expandoTable.getTableId());
-
 			ClassName className = _classNameLocalService.fetchClassName(
 				classNameId);
 
@@ -151,9 +146,17 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 				return;
 			}
 
-			classPK = getLatestClassPK(cnName, classPK);
+			classPK = _getLatestClassPK(cnName, classPK);
 
 			Map<String, Serializable> attributes = new HashMap<>();
+
+			ExpandoTable expandoTable =
+				_expandoTableLocalService.getDefaultTable(
+					companyId, classNameId);
+
+			List<ExpandoColumn> expandoColumns =
+				_expandoColumnLocalService.getColumns(
+					expandoTable.getTableId());
 
 			for (ExpandoColumn expandoColumn : expandoColumns) {
 				attributes.put(
@@ -190,6 +193,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 		}
 		else if (expandoColumn.getType() == ExpandoColumnConstants.DATE_ARRAY) {
 			Date[] possibleDates = (Date[])possibleValues;
+
 			Date possibleDate =
 				liferayGenValueGenerator.getRandomObjectFromList(
 					ListUtil.fromArray(possibleDates));
@@ -206,6 +210,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.DOUBLE_ARRAY) {
 
 			double[] possibleDoubles = (double[])possibleValues;
+
 			Double possibleDouble =
 				liferayGenValueGenerator.getRandomObjectFromArray(
 					ArrayUtil.toArray(possibleDoubles));
@@ -239,6 +244,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.INTEGER_ARRAY) {
 
 			int[] possibleIntegers = (int[])possibleValues;
+
 			Integer possibleInteger =
 				liferayGenValueGenerator.getRandomObjectFromArray(
 					ArrayUtil.toArray(possibleIntegers));
@@ -253,6 +259,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 		}
 		else if (expandoColumn.getType() == ExpandoColumnConstants.LONG_ARRAY) {
 			long[] possibleLongs = (long[])possibleValues;
+
 			Long possibleLong =
 				liferayGenValueGenerator.getRandomObjectFromArray(
 					ArrayUtil.toArray(possibleLongs));
@@ -269,6 +276,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.NUMBER_ARRAY) {
 
 			Number[] possibleNumbers = (Number[])possibleValues;
+
 			Number possibleNumber =
 				liferayGenValueGenerator.getRandomObjectFromList(
 					ListUtil.fromArray(possibleNumbers));
@@ -285,6 +293,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.SHORT_ARRAY) {
 
 			short[] possibleShorts = (short[])possibleValues;
+
 			Short possibleShort =
 				liferayGenValueGenerator.getRandomObjectFromArray(
 					ArrayUtil.toArray(possibleShorts));
@@ -300,6 +309,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.STRING_ARRAY) {
 
 			String[] possibleStrings = (String[])possibleValues;
+
 			String possibleString =
 				liferayGenValueGenerator.getRandomObjectFromList(
 					ListUtil.fromArray(possibleStrings));
@@ -312,6 +322,7 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 					ExpandoColumnConstants.STRING_LOCALIZED) {
 
 			HashMap<Locale, String> stringLocalizedMap = new HashMap<>();
+
 			stringLocalizedMap.put(
 				LocaleUtil.getDefault(),
 				liferayGenValueGenerator.getLowerCaseText(25));
@@ -322,8 +333,8 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 		return possibleValues;
 	}
 
-	private long getLatestClassPK(String className, long classPK) {
-		if (JournalArticle.class.getName().equals(className)) {
+	private long _getLatestClassPK(String className, long classPK) {
+		if (StringUtil.equals(JournalArticle.class.getName(), className)) {
 			JournalArticle journalArticle =
 				_journalArticleLocalService.fetchLatestArticle(
 					classPK, WorkflowConstants.STATUS_ANY, true);
@@ -335,30 +346,27 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 			classPK = journalArticle.getPrimaryKey();
 		}
 
-		if (DLFileEntry.class.getName().equals(className)) {
+		if (StringUtil.equals(DLFileEntry.class.getName(), className)) {
 			FileVersion fileVersion = null;
 
 			try {
 				fileVersion = _dlAppLocalService.getFileVersion(classPK);
+
+				return fileVersion.getPrimaryKey();
 			}
 			catch (Exception e) {
-				return classPK;
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"There is no file entry with " + classPK + " as PK", e);
+				}
 			}
-
-			classPK = fileVersion.getPrimaryKey();
 		}
 
 		return classPK;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayGenActionAddExpandoValue.class);
-
-	@Reference
-	ExpandoColumnLocalService _expandoColumnLocalService;
-
-	@Reference
-	ExpandoTableLocalService _expandotableLocalService;
+		AddExpandoValueLiferayGenAction.class);
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
@@ -368,6 +376,12 @@ public class LiferayGenActionAddExpandoValue extends BaseLiferayGenAction {
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
 
 	@Reference
 	private ExpandoValueLocalService _expandoValueLocalService;
