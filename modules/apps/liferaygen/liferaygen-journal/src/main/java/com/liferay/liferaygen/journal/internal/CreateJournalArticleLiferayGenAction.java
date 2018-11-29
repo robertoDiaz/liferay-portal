@@ -12,26 +12,46 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions.journal;
+package com.liferay.liferaygen.journal.internal;
 
-import com.liferay.liferaygen.config.ActionConfig;
-import com.liferay.liferaygen.constants.ConfigConstants;
-import com.liferay.liferaygen.impl.BaseAction;
-import com.liferay.liferaygen.util.ValueGenerator;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.expando.kernel.service.ExpandoValueLocalService;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleConstants;
+import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.liferaygen.BaseLiferayGenAction;
+import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Attribute;
@@ -40,22 +60,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
-import com.liferay.portal.model.ClassedModel;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.model.JournalArticleConstants;
-import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
-import com.liferay.util.PwdGenerator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +69,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-public class CreateJournalArticle extends BaseAction {
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.journal.internal.CreateJournalArticleLiferayGenAction",
+	service = LiferayGenAction.class
+)
+public class CreateJournalArticleLiferayGenAction extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -76,7 +95,7 @@ public class CreateJournalArticle extends BaseAction {
 	public Map<String, Object> doGetParametersDefaultValues() {
 		return new TreeMap<String, Object>() {
 			{
-				put("numberOfVersions", DEFAULT_NUMBER_OF_VERSIONS);
+				put("numberOfVersions", _DEFAULT_NUMBER_OF_VERSIONS);
 				put("structureId", null);
 			}
 		};
@@ -86,7 +105,9 @@ public class CreateJournalArticle extends BaseAction {
 	public Map<String, String> doGetParametersDescription() {
 		return new TreeMap<String, String>() {
 			{
-				put(ActionConfig.TARGET, "Structure to use during add action");
+				put(
+					LiferayGenActionConfig.TARGET,
+					"Structure to use during add action");
 				put(
 					"numberOfVersions",
 					"Number of versions to add per web content");
@@ -97,13 +118,14 @@ public class CreateJournalArticle extends BaseAction {
 
 	@Override
 	public Criterion getEntityFilter() {
-		long journalArticleClassNameId = PortalUtil.getClassNameId(
+		long journalArticleClassNameId = _portal.getClassNameId(
 			JournalArticle.class);
 
 		Criterion filterByClassNameId = RestrictionsFactoryUtil.eq(
 			"classNameId", journalArticleClassNameId);
 
 		Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
 		conjunction.add(filterByClassNameId);
 
 		return conjunction;
@@ -115,61 +137,69 @@ public class CreateJournalArticle extends BaseAction {
 	}
 
 	@Override
-	public String getEntityModelPk() {
+	public String getEntityModelPK() {
 		return "structureId";
 	}
 
 	protected static Calendar toCalendar(Date date) {
 		Calendar cal = Calendar.getInstance();
+
 		cal.setTime(date);
 
 		return cal;
 	}
 
 	protected void addDynamicContent(
+			LiferayGenValueGenerator liferayGenValueGenerator,
 			Element dynamicContent, String fieldType,
 			Map<String, byte[]> images, String instanceId, String name,
 			String[] listElementTypes, String index)
 		throws Exception {
 
 		if (fieldType.equals("boolean")) {
-			Boolean value = ValueGenerator.getBoolean();
+			Boolean value = liferayGenValueGenerator.getBoolean();
 
 			dynamicContent.addCDATA(value.toString());
 		}
 		else if (fieldType.equals("ddm-date")) {
-			Long value = ValueGenerator.getRandomLongFromRange(
-				0, 100*365*24*60*60*1000);
+			Long value = liferayGenValueGenerator.getRandomLongFromRange(
+				0, 100 * 365 * 24 * 60 * 60 * 1000);
 
-			dynamicContent.addCDATA(String.valueOf(value*1000));
+			dynamicContent.addCDATA(String.valueOf(value * 1000));
 		}
 		else if (fieldType.equals("ddm-decimal")) {
-			Float value = ValueGenerator.getRandomFloatFromRange(
+			Float value = liferayGenValueGenerator.getRandomFloatFromRange(
 				0, Float.MAX_VALUE);
 
 			dynamicContent.addCDATA(value.toString());
 		}
 		else if (fieldType.equals("document_library")) {
 			DLFileEntry dlFileEntry =
-				(DLFileEntry)ValueGenerator.getRandomObject(
+				(DLFileEntry)liferayGenValueGenerator.getRandomObject(
 					DLFileEntry.class.getName(), getFilterByGroupId());
 
 			dynamicContent.addCDATA(getDLFileEntryURL(dlFileEntry));
 		}
 		else if (fieldType.equals("text_area")) {
-			dynamicContent.addText(generateTextAreaContent());
+			dynamicContent.addText(
+				generateTextAreaContent(liferayGenValueGenerator));
 		}
 		else if (fieldType.equals("image")) {
-			String formatName = ValueGenerator.getRandomObjectFromList(
-				ValueGenerator.getAvailableImageIOFormats());
+			String formatName =
+				liferayGenValueGenerator.getRandomObjectFromList(
+					liferayGenValueGenerator.getAvailableImageIOFormats());
 
-			byte[] image = ValueGenerator.getRandomImage(
-				formatName, ValueGenerator.getRandomIntegerFromRange(100, 200),
-				ValueGenerator.getRandomIntegerFromRange(60, 120));
+			byte[] image = liferayGenValueGenerator.getRandomImage(
+				formatName,
+				liferayGenValueGenerator.getRandomIntegerFromRange(100, 200),
+				liferayGenValueGenerator.getRandomIntegerFromRange(60, 120));
 
-			if (image == null) {image = new byte[0]; }
+			if (image == null) {
+				image = new byte[0];
+			}
 
-			String key = instanceId + "_" + name + "_" + index;
+			String key = StringBundler.concat(
+				instanceId, "_", name, "_", index);
 
 			String languageId = dynamicContent.attributeValue("language-id");
 
@@ -182,19 +212,19 @@ public class CreateJournalArticle extends BaseAction {
 			dynamicContent.addCDATA("dummy_text");
 		}
 		else if (fieldType.equals("ddm-integer")) {
-			Integer value = ValueGenerator.getRandomIntegerFromRange(
+			Integer value = liferayGenValueGenerator.getRandomIntegerFromRange(
 				0, Integer.MAX_VALUE);
 
 			dynamicContent.addCDATA(value.toString());
 		}
 		else if (fieldType.equals("ddm-number")) {
-			Double value = ValueGenerator.getRandomDoubleFromRange(
+			Double value = liferayGenValueGenerator.getRandomDoubleFromRange(
 				0, Double.MAX_VALUE);
 
 			dynamicContent.addCDATA(value.toString());
 		}
 		else if (fieldType.equals("link_to_layout")) {
-			Layout layout = (Layout)ValueGenerator.getRandomObject(
+			Layout layout = (Layout)liferayGenValueGenerator.getRandomObject(
 				Layout.class.getName(), getFilterByGroupId());
 
 			dynamicContent.addCDATA(getLinkToLayout(layout));
@@ -202,18 +232,23 @@ public class CreateJournalArticle extends BaseAction {
 		else if (fieldType.equals("radio") || fieldType.endsWith("list")) {
 			if (fieldType.equals("radio")) {
 				dynamicContent.addCDATA(
-					"[\"" + ValueGenerator.getRandomObjectFromArray(
-						listElementTypes) + "\"]");
+					StringBundler.concat(
+						"[\"",
+						liferayGenValueGenerator.getRandomObjectFromArray(
+							listElementTypes),
+						"\"]"));
 			}
 			else if (fieldType.equals("list")) {
 				dynamicContent.addCDATA(
-					ValueGenerator.getRandomObjectFromArray(listElementTypes));
+					liferayGenValueGenerator.getRandomObjectFromArray(
+						listElementTypes));
 			}
 			else {
-				List<String> values = ValueGenerator.getRandomObjectsFromArray(
-					listElementTypes,
-					ValueGenerator.getRandomIntegerFromRange(
-						1, listElementTypes.length));
+				List<String> values =
+					liferayGenValueGenerator.getRandomObjectsFromArray(
+						listElementTypes,
+						liferayGenValueGenerator.getRandomIntegerFromRange(
+							1, listElementTypes.length));
 
 				for (String value : values) {
 					Element option = dynamicContent.addElement("option");
@@ -224,12 +259,14 @@ public class CreateJournalArticle extends BaseAction {
 		}
 		else if (fieldType.startsWith("text")) {
 			dynamicContent.addText(
-				ValueGenerator.getLowerCaseText(1, MAX_TEXT_FIELD_LENGTH));
+				liferayGenValueGenerator.getLowerCaseText(
+					1, _MAX_TEXT_FIELD_LENGTH));
 		}
 	}
 
 	protected void addLocalization(
-			Element element, Map<String, byte[]> images, Document structureDoc,
+			LiferayGenValueGenerator liferayGenValueGenerator, Element element,
+			Map<String, byte[]> images, Document structureDoc,
 			Map<String, String[]> listValues, Locale locale)
 		throws Exception {
 
@@ -237,7 +274,8 @@ public class CreateJournalArticle extends BaseAction {
 
 		for (Element dynamicElement : dynamicElements) {
 			addLocalization(
-				dynamicElement, images, structureDoc, listValues, locale);
+				liferayGenValueGenerator, dynamicElement, images, structureDoc,
+				listValues, locale);
 
 			if (isLocalizable(structureDoc, dynamicElement)) {
 				Element dynamicContentCurrentLocale = dynamicElement.addElement(
@@ -250,6 +288,7 @@ public class CreateJournalArticle extends BaseAction {
 				String instanceId = dynamicElement.attributeValue(
 					"instance-id");
 				String name = dynamicElement.attributeValue("name");
+
 				String type = dynamicElement.attributeValue("type");
 
 				if (type.equals("selection_break")) {
@@ -257,13 +296,14 @@ public class CreateJournalArticle extends BaseAction {
 				}
 
 				addDynamicContent(
-					dynamicContentCurrentLocale, type, images, instanceId, name,
-					listValues.get(name), index);
+					liferayGenValueGenerator, dynamicContentCurrentLocale, type,
+					images, instanceId, name, listValues.get(name), index);
 			}
 		}
 	}
 
 	protected JournalArticle addLocalizationVersion(
+			LiferayGenValueGenerator liferayGenValueGenerator,
 			JournalArticle journalArticle, Document doc, Locale locale,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -282,43 +322,53 @@ public class CreateJournalArticle extends BaseAction {
 
 		root.addAttribute("available-locales", availableLocales);
 
-		Map<String, byte[]> images = new HashMap<String, byte[]>();
+		Map<String, byte[]> images = new HashMap<>();
 
-		long journalArticleClassnameId =
-			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class);
+		long journalArticleClassnameId = _classNameLocalService.getClassNameId(
+			JournalArticle.class);
 
-		DDMStructure structure =
-			DDMStructureLocalServiceUtil.getStructure(
+		//TODO obtener esto: (null para compilar)
+		/*DDMStructure ddmStructure =
+			_ddmStructureLocalService.getStructure(
 				journalArticle.getGroupId(), journalArticleClassnameId,
 				journalArticle.getStructureId());
 
 		Document structureDoc = SAXReaderUtil.read(structure.getCompleteXsd());
+		*/
 
-		Map<String, String[]> listsValues = new TreeMap<String, String[]>();
+		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+			journalArticle.getGroupId(), journalArticleClassnameId,
+			journalArticle.getDDMStructureKey());
+
+		Document structureDoc = null;
+
+		Map<String, String[]> listsValues = new TreeMap<>();
 
 		addLocalization(
-			root, images, structureDoc,
+			liferayGenValueGenerator, root, images, structureDoc,
 			getListsValuesFromStructure(
 				structureDoc.getRootElement(), listsValues),
 			locale);
 
-		return JournalArticleServiceUtil.updateArticleTranslation(
+		return _journalArticleLocalService.updateArticleTranslation(
 			journalArticle.getGroupId(), journalArticle.getArticleId(),
 			journalArticle.getVersion(), locale,
-			ValueGenerator.getLowerCaseText(TITLE_LENGTH),
-			ValueGenerator.getLowerCaseText(DESCRIPTION_LENGTH),
+			liferayGenValueGenerator.getLowerCaseText(_TITLE_LENGTH),
+			liferayGenValueGenerator.getLowerCaseText(_DESCRIPTION_LENGTH),
 			doc.formattedString(), images, serviceContext);
 	}
 
 	protected void addValue(
-			Element element, Map<String, byte[]> images, Locale locale)
+			LiferayGenValueGenerator liferayGenValueGenerator, Element element,
+			Map<String, byte[]> images, Locale locale)
 		throws Exception {
 
-		boolean emptyField = ValueGenerator.getBoolean(PERCENTAGE_EMPTY_FIELDS);
-
 		String index = element.attributeValue("index");
+
 		String instanceId = element.attributeValue("instance-id");
+
 		String name = element.attributeValue("name");
+
 		String type = element.attributeValue("type");
 
 		if (type.equals("selection_break")) {
@@ -337,7 +387,7 @@ public class CreateJournalArticle extends BaseAction {
 
 		dynamicContent.addAttribute("language-id", locale.toString());
 
-		if (emptyField) {
+		if (liferayGenValueGenerator.getBoolean(_PERCENTAGE_EMPTY_FIELDS)) {
 			if (type.equals("radio")) {
 				dynamicContent.addCDATA("[]");
 			}
@@ -349,12 +399,13 @@ public class CreateJournalArticle extends BaseAction {
 		}
 
 		addDynamicContent(
-			dynamicContent, type, images, instanceId, name, listElementTypes,
-			index);
+			liferayGenValueGenerator, dynamicContent, type, images, instanceId,
+			name, listElementTypes, index);
 	}
 
 	protected void addValues(
-			Element element, Map<String, byte[]> images, Locale locale,
+			LiferayGenValueGenerator liferayGenValueGenerator, Element element,
+			Map<String, byte[]> images, Locale locale,
 			Map<String, Integer> repetitionsMap)
 		throws Exception {
 
@@ -364,9 +415,11 @@ public class CreateJournalArticle extends BaseAction {
 			String nameValue = dynamicElement.attributeValue("name");
 
 			dynamicElement.addAttribute(
-				"index", getIndexValue(repetitionsMap, nameValue));
+				"index", _getIndexValue(repetitionsMap, nameValue));
 
-			addValues(dynamicElement, images, locale, repetitionsMap);
+			addValues(
+				liferayGenValueGenerator, dynamicElement, images, locale,
+				repetitionsMap);
 
 			Element metadataElement = dynamicElement.element("meta-data");
 
@@ -413,7 +466,7 @@ public class CreateJournalArticle extends BaseAction {
 					dynamicElement.remove(typeAttribute);
 
 					if (GetterUtil.getBoolean(
-							dynamicElement.attributeValue("multiple"), false)) {
+							dynamicElement.attributeValue("multiple"))) {
 
 						dynamicElement.addAttribute("type", "multi-list");
 					}
@@ -491,19 +544,24 @@ public class CreateJournalArticle extends BaseAction {
 
 			dynamicElement.addAttribute("instance-id", instanceId);
 
-			addValue(dynamicElement, images, locale);
+			addValue(liferayGenValueGenerator, dynamicElement, images, locale);
 		}
 	}
 
-	protected void addVersions(JournalArticle journalArticle) throws Exception {
-		int numberOfVersions = Integer.parseInt(
-				MapUtil.getString(_parameters, "numberOfVersions"));
+	protected void addVersions(
+			LiferayGenValueGenerator liferayGenValueGenerator,
+			Map<String, Object> parameters, JournalArticle journalArticle)
+		throws Exception {
+
+		int numberOfVersions = GetterUtil.getInteger(
+			MapUtil.getString(parameters, "numberOfVersions"));
 
 		if (numberOfVersions == 0) {
 			return;
 		}
 
-		Locale[] locales = (Locale[]) _parameters.get(ConfigConstants.LOCALES);
+		Locale[] locales = (Locale[])parameters.get(
+			LiferayGenConfigConstants.LOCALES);
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
 
@@ -519,18 +577,20 @@ public class CreateJournalArticle extends BaseAction {
 		for (int i = 0; i < numberOfVersions; i++) {
 			if ((i < locales.length) && (locales[i] != defaultLocale)) {
 				journalArticle = addLocalizationVersion(
-					journalArticle, doc, locales[i], serviceContext);
+					liferayGenValueGenerator, journalArticle, doc, locales[i],
+					serviceContext);
 			}
 
 			Calendar cal = toCalendar(journalArticle.getDisplayDate());
 
-			Map<String, byte[]> images = new HashMap<String, byte[]>();
+			Map<String, byte[]> images = new HashMap<>();
 
-			long userId = ValueGenerator.getRandomUserIdFromCache();
+			long userId = liferayGenValueGenerator.getRandomUserIdFromCache();
 			long groupId = journalArticle.getGroupId();
 			long folderId = 0; /* TODO upgrade to 6.2: select a random folder */
 
-			journalArticle = JournalArticleLocalServiceUtil.updateArticle(
+			//TODO obtener esto: (null para compilar)
+			/*journalArticle = _journalArticleLocalService.updateArticle(
 				userId, groupId, folderId, journalArticle.getArticleId(),
 				journalArticle.getVersion(), journalArticle.getTitleMap(),
 				journalArticle.getDescriptionMap(), journalArticle.getContent(),
@@ -540,7 +600,18 @@ public class CreateJournalArticle extends BaseAction {
 				cal.get(Calendar.YEAR), cal.get(Calendar.HOUR),
 				cal.get(Calendar.MINUTE), 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0,
 				true, true, false, StringPool.BLANK, null, images,
-				StringPool.BLANK, serviceContext);
+				StringPool.BLANK, serviceContext);*/
+
+			journalArticle = _journalArticleLocalService.updateArticle(
+				userId, groupId, folderId, journalArticle.getArticleId(),
+				journalArticle.getVersion(), journalArticle.getTitleMap(),
+				journalArticle.getDescriptionMap(), null, null,
+				journalArticle.getStructureId(), journalArticle.getTemplateId(),
+				journalArticle.getLayoutUuid(), cal.get(Calendar.MONTH),
+				cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR),
+				cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), 0, 0, 0, 0, 0,
+				true, 0, 0, 0, 0, 0, true, true, false, StringPool.BLANK, null,
+				images, StringPool.BLANK, serviceContext);
 		}
 	}
 
@@ -549,10 +620,15 @@ public class CreateJournalArticle extends BaseAction {
 		try {
 			Locale defaultLocale = LocaleUtil.getSiteDefault();
 
-			DDMStructure ddmStructure = (DDMStructure) _parameters.get(
-				ActionConfig.TARGET);
+			Map<String, Object> parameters = getParameters();
 
-			Document doc = SAXReaderUtil.read(ddmStructure.getCompleteXsd());
+			DDMStructure ddmStructure = (DDMStructure)parameters.get(
+				LiferayGenActionConfig.TARGET);
+
+			//TODO null para compilar
+			//Document doc = SAXReaderUtil.read(ddmStructure.getCompleteXsd());
+
+			Document doc = null;
 
 			Element root = doc.getRootElement();
 
@@ -560,34 +636,44 @@ public class CreateJournalArticle extends BaseAction {
 
 			root.addAttribute("default-locale", defaultLocale.toString());
 
-			generateRepeatableFields(root);
+			LiferayGenValueGenerator liferayGenValueGenerator =
+				new LiferayGenValueGenerator(
+					_companyLocalService, _liferayGenQueryHandler, _portal,
+					_portletLocalService);
 
-			Map<String, byte[]> images = new HashMap<String, byte[]>();
+			generateRepeatableFields(liferayGenValueGenerator, root);
 
-			Map<String, Integer> repetitions = new HashMap<String, Integer>();
+			Map<String, byte[]> images = new HashMap<>();
 
-			addValues(root, images, defaultLocale, repetitions);
+			Map<String, Integer> repetitions = new HashMap<>();
+
+			addValues(
+				liferayGenValueGenerator, root, images, defaultLocale,
+				repetitions);
 
 			long groupId = GetterUtil.getLong(
-				_parameters.get(ConfigConstants.GROUP_ID));
+				parameters.get(LiferayGenConfigConstants.GROUP_ID));
 
-			long userId = ValueGenerator.getRandomUserIdFromCache();
+			long userId = liferayGenValueGenerator.getRandomUserIdFromCache();
 
 			long folderId = 0; /* TODO upgrade to 6.2: select a random folder */
 
-			Map<Locale, String> titleMap = new HashMap<Locale, String>();
+			Map<Locale, String> titleMap = new HashMap<>();
 
 			titleMap.put(
-				defaultLocale, ValueGenerator.getLowerCaseText(TITLE_LENGTH));
+				defaultLocale,
+				liferayGenValueGenerator.getLowerCaseText(_TITLE_LENGTH));
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(
 				defaultLocale,
-				ValueGenerator.getLowerCaseText(DESCRIPTION_LENGTH));
+				liferayGenValueGenerator.getLowerCaseText(_DESCRIPTION_LENGTH));
 
 			Date date = new Date();
+
 			Calendar cal = Calendar.getInstance();
+
 			cal.setTime(date);
 
 			String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -602,8 +688,9 @@ public class CreateJournalArticle extends BaseAction {
 				_log.debug("Generated xml: " + doc.formattedString());
 			}
 
-			JournalArticle journalArticle =
-				JournalArticleLocalServiceUtil.addArticle(
+			//TODO cambiar el null por lo que corresponda
+			/*JournalArticle journalArticle =
+				_journalArticleLocalService.addArticle(
 					userId, groupId, folderId, 0, 0, StringPool.BLANK, true,
 					JournalArticleConstants.VERSION_DEFAULT, titleMap,
 					descriptionMap, doc.formattedString(), "general",
@@ -613,71 +700,93 @@ public class CreateJournalArticle extends BaseAction {
 					cal.get(Calendar.YEAR), cal.get(Calendar.HOUR),
 					cal.get(Calendar.MINUTE), 0, 0, 0, 0, 0, true, 0, 0, 0, 0,
 					0, true, true, false, StringPool.BLANK, null, images,
-					StringPool.BLANK, serviceContext);
+					StringPool.BLANK, serviceContext);*/
 
-			addVersions(journalArticle);
+			JournalArticle journalArticle =
+				_journalArticleLocalService.addArticle(
+					userId, groupId, folderId, 0, 0, StringPool.BLANK, true,
+					JournalArticleConstants.VERSION_DEFAULT, titleMap,
+					descriptionMap, null, "general",
+					ddmStructure.getStructureKey(),
+					getJournalTemplateKey(
+						liferayGenValueGenerator,
+						ddmStructure.getStructureId()),
+					null, cal.get(Calendar.MONTH),
+					cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR),
+					cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), 0, 0, 0,
+					0, 0, true, 0, 0, 0, 0, 0, true, true, false,
+					StringPool.BLANK, null, images, StringPool.BLANK,
+					serviceContext);
+
+			addVersions(liferayGenValueGenerator, parameters, journalArticle);
 		}
 		catch (Exception e) {
 			_log.error("Error creating journal article", e);
 		}
 	}
 
-	protected void generateRepeatableFields(Element element) {
+	protected void generateRepeatableFields(
+		LiferayGenValueGenerator liferayGenValueGenerator, Element element) {
+
 		List<Element> dynamicElements = element.elements("dynamic-element");
 
-		List<Element> dynamicElementsCopy = new ArrayList<Element>(
-			dynamicElements);
+		List<Element> dynamicElementsCopy = new ArrayList<>(dynamicElements);
 
 		for (Element dynamicElement : dynamicElementsCopy) {
 			Attribute repeatableAttr = dynamicElement.attribute("repeatable");
 
 			boolean repeatable = false;
 
-			if (Validator.isNotNull(repeatableAttr)) {
+			if (repeatableAttr != null) {
 				dynamicElement.remove(repeatableAttr);
 
 				String repeatableValue = repeatableAttr.getValue();
 
-				repeatable = "true".equals(repeatableValue);
+				repeatable = repeatableValue.equals(StringPool.TRUE);
 			}
 
 			if (repeatable) {
-				int repetitions = ValueGenerator.getRandomIntegerFromRange(
-					0, MAX_REPETITIONS);
+				int repetitions =
+					liferayGenValueGenerator.getRandomIntegerFromRange(
+						0, _MAX_REPETITIONS);
 
 				int pos = dynamicElements.indexOf(dynamicElement);
 
 				for (int i = 1; i <= repetitions; i++) {
 					Element dynamicElementCopy = dynamicElement.createCopy();
 
-					generateRepeatableFields(dynamicElementCopy);
+					generateRepeatableFields(
+						liferayGenValueGenerator, dynamicElementCopy);
 
 					dynamicElements.add(pos + i, dynamicElementCopy);
 				}
 			}
 
-			generateRepeatableFields(dynamicElement);
+			generateRepeatableFields(liferayGenValueGenerator, dynamicElement);
 		}
 	}
 
-	protected String generateTextAreaContent() throws Exception {
-		String html = "<p>";
+	protected String generateTextAreaContent(
+			LiferayGenValueGenerator liferayGenValueGenerator)
+		throws Exception {
 
-		html += ValueGenerator.getLowerCaseText(
-			1, MAX_TEXT_AREA_PARAGRAPH_LENGTH);
-
-		html += CharPool.SPACE + getImageHtmlTag() + CharPool.SPACE +
-			ValueGenerator.getLowerCaseText(1, MAX_TEXT_FIELD_LENGTH);
-
-		html += CharPool.SPACE + getLinkToDocumentHtmlTag() + CharPool.SPACE +
-			ValueGenerator.getLowerCaseText(1, MAX_TEXT_FIELD_LENGTH);
-
-		html += CharPool.SPACE + getLinkToPageHtmlTag() + CharPool.SPACE +
-			ValueGenerator.getLowerCaseText(1, MAX_TEXT_FIELD_LENGTH);
-
-		html += "</p>";
-
-		return html;
+		return StringBundler.concat(
+			"<p>",
+			liferayGenValueGenerator.getLowerCaseText(
+				1, _MAX_TEXT_AREA_PARAGRAPH_LENGTH),
+			CharPool.SPACE, getImageHtmlTag(liferayGenValueGenerator),
+			CharPool.SPACE,
+			liferayGenValueGenerator.getLowerCaseText(
+				1, _MAX_TEXT_FIELD_LENGTH),
+			CharPool.SPACE, getLinkToDocumentHtmlTag(liferayGenValueGenerator),
+			CharPool.SPACE,
+			liferayGenValueGenerator.getLowerCaseText(
+				1, _MAX_TEXT_FIELD_LENGTH),
+			CharPool.SPACE, getLinkToPageHtmlTag(liferayGenValueGenerator),
+			CharPool.SPACE,
+			liferayGenValueGenerator.getLowerCaseText(
+				1, _MAX_TEXT_FIELD_LENGTH),
+			"</p>");
 	}
 
 	protected String getDLFileEntryURL(DLFileEntry dlFileEntry) {
@@ -685,53 +794,59 @@ public class CreateJournalArticle extends BaseAction {
 			return StringPool.BLANK;
 		}
 
-		return "/documents/" + dlFileEntry.getGroupId() +
-			CharPool.FORWARD_SLASH + dlFileEntry.getFolderId() +
-			CharPool.FORWARD_SLASH + dlFileEntry.getTitle() +
-			CharPool.FORWARD_SLASH + dlFileEntry.getUuid();
+		return StringBundler.concat(
+			"/documents/", dlFileEntry.getGroupId(), CharPool.FORWARD_SLASH,
+			dlFileEntry.getFolderId(), CharPool.FORWARD_SLASH,
+			dlFileEntry.getTitle(), CharPool.FORWARD_SLASH,
+			dlFileEntry.getUuid());
 	}
 
-	protected String getImageHtmlTag() throws Exception {
-		DLFileEntry image = ValueGenerator.getRandomImageFromDL(
+	protected String getImageHtmlTag(
+			LiferayGenValueGenerator liferayGenValueGenerator)
+		throws Exception {
+
+		DLFileEntry image = liferayGenValueGenerator.getRandomImageFromDL(
 			getFilterByGroupId());
 
 		if (image == null) {
 			throw new Exception(
-				"There is no images in DL. Please generate at least one " +
-				"before executiing this");
+				"No images could be found in DL Repository. Please generate " +
+					"at least one before executing this.");
 		}
 
 		return "<img alt=\"\" src=\"" + getDLFileEntryURL(image) + "\" /> ";
 	}
 
-	protected String getJournalTemplateKey(long structureId) throws Exception {
+	protected String getJournalTemplateKey(
+			LiferayGenValueGenerator liferayGenValueGenerator, long structureId)
+		throws Exception {
+
 		Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
 		conjunction.add(
 			RestrictionsFactoryUtil.eq(
 				"classNameId",
-				ClassNameLocalServiceUtil.getClassNameId(DDMStructure.class)));
+				_classNameLocalService.getClassNameId(DDMStructure.class)));
 		conjunction.add(RestrictionsFactoryUtil.eq("classPK", structureId));
 
 		DDMTemplate ddmTemplate =
-			(DDMTemplate)ValueGenerator.getRandomObject(
+			(DDMTemplate)liferayGenValueGenerator.getRandomObject(
 				DDMTemplate.class.getName(), conjunction);
 
 		return ddmTemplate.getTemplateKey();
 	}
 
-	protected String getLinkToDocumentHtmlTag() throws Exception {
-		DLFileEntry dlFileEntry = (DLFileEntry)ValueGenerator.getRandomObject(
-			DLFileEntry.class.getName(), getFilterByGroupId());
+	protected String getLinkToDocumentHtmlTag(
+			LiferayGenValueGenerator liferayGenValueGenerator)
+		throws Exception {
 
-		StringBundler html = new StringBundler(5);
+		DLFileEntry dlFileEntry =
+			(DLFileEntry)liferayGenValueGenerator.getRandomObject(
+				DLFileEntry.class.getName(), getFilterByGroupId());
 
-		html.append("<a href=\"");
-		html.append(getDLFileEntryURL(dlFileEntry));
-		html.append("\"> ");
-		html.append(dlFileEntry.getTitle());
-		html.append("</a>");
-
-		return html.toString();
+		return StringBundler.concat(
+			"<a href=\"", getDLFileEntryURL(dlFileEntry), "\"> ",
+			dlFileEntry.getTitle(), "</a>");
 	}
 
 	protected String getLinkToLayout(Layout layout) throws Exception {
@@ -742,7 +857,9 @@ public class CreateJournalArticle extends BaseAction {
 		String suffix = "public";
 
 		if (layout.isPrivateLayout()) {
-			if (layout.getGroup().isUser()) {
+			Group group = layout.getGroup();
+
+			if (group.isUser()) {
 				suffix = "private-user";
 			}
 			else {
@@ -761,45 +878,38 @@ public class CreateJournalArticle extends BaseAction {
 		return layoutLinkSB.toString();
 	}
 
-	protected String getLinkToPageHtmlTag() throws Exception {
-		Layout layout = (Layout)ValueGenerator.getRandomObject(
+	protected String getLinkToPageHtmlTag(
+			LiferayGenValueGenerator liferayGenValueGenerator)
+		throws Exception {
+
+		Layout layout = (Layout)liferayGenValueGenerator.getRandomObject(
 			Layout.class.getName(), getFilterByGroupId());
 
 		if (layout == null) {
 			return StringPool.BLANK;
 		}
 
-		Group group = GroupLocalServiceUtil.getGroup(layout.getGroupId());
+		Group group = _groupLocalService.getGroup(layout.getGroupId());
 
 		String layoutUrlPrefix = PropsUtil.get(
 			PropsKeys.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING);
 
 		if (layout.isPrivateLayout()) {
 			if (group.isSite()) {
-				layoutUrlPrefix =
-					PropsUtil.get(
-						PropsKeys.
-							LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING);
+				layoutUrlPrefix = PropsUtil.get(
+					PropsKeys.
+						LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING);
 			}
 			else if (group.isUser()) {
-				layoutUrlPrefix =
-					PropsUtil.get(
-						PropsKeys.
-							LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING);
+				layoutUrlPrefix = PropsUtil.get(
+					PropsKeys.LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING);
 			}
 		}
 
-		StringBundler html = new StringBundler(7);
-
-		html.append("<a href=\"");
-		html.append(layoutUrlPrefix);
-		html.append(group.getFriendlyURL());
-		html.append(layout.getFriendlyURL());
-		html.append("\">");
-		html.append(layout.getTitle(LocaleUtil.getSiteDefault()));
-		html.append("</a>");
-
-		return html.toString();
+		return StringBundler.concat(
+			"<a href=\"", layoutUrlPrefix, group.getFriendlyURL(),
+			layout.getFriendlyURL(), "\">",
+			layout.getTitle(LocaleUtil.getSiteDefault()), "</a>");
 	}
 
 	protected Map<String, String[]> getListsValuesFromStructure(
@@ -862,7 +972,7 @@ public class CreateJournalArticle extends BaseAction {
 		return false;
 	}
 
-	private String getIndexValue(
+	private String _getIndexValue(
 		Map<String, Integer> repetitionsMap, String nameValue) {
 
 		Integer index = MapUtil.getInteger(repetitionsMap, nameValue, 0);
@@ -872,22 +982,48 @@ public class CreateJournalArticle extends BaseAction {
 		return String.valueOf(index);
 	}
 
-	private static final int DEFAULT_NUMBER_OF_VERSIONS = 30;
+	private static final int _DEFAULT_NUMBER_OF_VERSIONS = 30;
 
-	private static final int DESCRIPTION_LENGTH = 20;
+	private static final int _DESCRIPTION_LENGTH = 20;
 
-	private static final int MAX_REPETITIONS = 3;
+	private static final int _MAX_REPETITIONS = 3;
 
-	private static final int MAX_TEXT_AREA_PARAGRAPH_LENGTH = 100;
+	private static final int _MAX_TEXT_AREA_PARAGRAPH_LENGTH = 100;
 
-	private static final int MAX_TEXT_BOX_FIELD_LENGTH = 200;
+	private static final int _MAX_TEXT_FIELD_LENGTH = 50;
 
-	private static final int MAX_TEXT_FIELD_LENGTH = 50;
+	private static final int _PERCENTAGE_EMPTY_FIELDS = 30;
 
-	private static final int PERCENTAGE_EMPTY_FIELDS = 30;
+	private static final int _TITLE_LENGTH = 10;
 
-	private static final int TITLE_LENGTH = 10;
+	private static final Log _log = LogFactoryUtil.getLog(
+		CreateJournalArticleLiferayGenAction.class);
 
-	private static Log _log = LogFactoryUtil.getLog(CreateJournalArticle.class);
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private ExpandoValueLocalService _expandoValueLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }

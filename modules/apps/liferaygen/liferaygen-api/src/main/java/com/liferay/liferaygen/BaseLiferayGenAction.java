@@ -131,7 +131,7 @@ public abstract class BaseLiferayGenAction implements LiferayGenAction {
 		}
 	}
 
-	protected abstract void doRun();
+	protected abstract void doRun() throws Exception;
 
 	private <T> Map<String, T> _getUnmodifiableMap(Map<String, T> map) {
 		if (map == null) {

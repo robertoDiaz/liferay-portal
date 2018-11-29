@@ -1,0 +1,46 @@
+#macro(runfield $field)
+	#foreach($sibling in $field.getSiblings())
+		#printfield($sibling)
+		#foreach($item in $sibling.getChildren())
+			#runfield($item)
+		#end
+		#if ($sibling != $field)
+			#runfield($sibling)
+		#end
+	#end
+#end
+
+#macro(printfield $field)
+	<p>
+		#if ($field.getType() == "boolean")
+			#if ($field.getData() == "true")
+				Yes $field.getName()
+			#else
+				No $field.getName()
+			#end
+		#elseif ($field.getType() == "ddm-date")
+			DATE $field.getName(): $field.getData()
+		#elseif ($field.getType() == "ddm-number" || $field.getType() == "ddm-integer" || $field.getType() == "ddm-decimal")
+			<b>$field.getName():</b> $field.getData()
+		#elseif ($field.getType() == "document_library")
+			<a href="$field.getData()">Download document</a>
+		#elseif ($field.getType() == "image")
+			<img height="200" src="$field.getData()" />
+		#elseif ($field.getType() == "selection_break")
+			<br>
+		#elseif ($field.getType() == "text" || $field.getType() == "text_box" || $field.getType() == "text_area" || $field.getType() == "radio" || $field.getType() == "list")
+			<b>$field.getName():</b> $field.getData()
+		#elseif ($field.getType() == "multi-list")
+			<b>$field.getName(): </b>
+			<ul>
+			#foreach($option in $field.getOptions())
+				<li> $option </li>
+			#end
+			</ul>
+		#elseif ($field.getType() == "link_to_layout")
+			<a href="$field.getUrl()">Go to page from link $field.getName()</a>
+		#else
+			OTHER: $field.getData()
+		#end
+	</p>
+#end
