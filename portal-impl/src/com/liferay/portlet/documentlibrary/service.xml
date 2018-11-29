@@ -587,4 +587,35 @@
 		<exception>RequiredFileEntryType</exception>
 		<exception>SourceFileName</exception>
 	</exceptions>
+	<entity human-name="document library preview" local-service="true" name="DLPreview">
+
+		<!-- PK fields -->
+
+		<column name="filePreviewId" primary="true" type="long" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Other fields -->
+
+		<column name="fileEntryId" type="long" />
+		<column name="fileVersionId" type="long" />
+		<column name="status" type="String" />
+
+		<!-- Order -->
+
+		<order by="desc">
+			<order-column name="filePreviewId" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="FileEntryId" return-type="Collection">
+			<finder-column name="fileEntryId" />
+		</finder>
+		<finder name="FileVersionId" return-type="Collection">
+			<finder-column name="fileVersionId" />
+		</finder>
+	</entity>
 </service-builder>
