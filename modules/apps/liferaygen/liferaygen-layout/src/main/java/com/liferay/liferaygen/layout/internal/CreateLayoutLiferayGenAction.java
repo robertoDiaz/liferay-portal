@@ -12,52 +12,59 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions;
+package com.liferay.liferaygen.layout.internal;
 
-import com.liferay.liferaygen.config.ActionConfig;
-import com.liferay.liferaygen.constants.ConfigConstants;
-import com.liferay.liferaygen.impl.BaseAction;
-import com.liferay.liferaygen.util.ParameterUtil;
-import com.liferay.liferaygen.util.ValueGenerator;
+import com.liferay.liferaygen.BaseLiferayGenAction;
+import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.util.LiferayGenParameterHandler;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
+import com.liferay.mobile.device.rules.model.MDRAction;
+import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
+import com.liferay.mobile.device.rules.service.MDRActionLocalService;
+import com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutPrototype;
+import com.liferay.portal.kernel.model.LayoutTemplate;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.PortletPreferencesIds;
+import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
+import com.liferay.portal.kernel.service.LayoutTemplateLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ClassedModel;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutConstants;
-import com.liferay.portal.model.LayoutPrototype;
-import com.liferay.portal.model.LayoutTemplate;
-import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.model.PortletPreferencesIds;
-import com.liferay.portal.model.Theme;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.service.LayoutPrototypeLocalServiceUtil;
-import com.liferay.portal.service.LayoutTemplateLocalServiceUtil;
-import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.mobiledevicerules.model.MDRAction;
-import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
-import com.liferay.portlet.mobiledevicerules.service.MDRActionLocalServiceUtil;
-import com.liferay.portlet.mobiledevicerules.service.MDRRuleGroupInstanceLocalServiceUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,7 +73,22 @@ import java.util.TreeMap;
 import javax.portlet.PortletPreferences;
 
 import javax.servlet.http.HttpServletRequest;
-public class CreateLayout extends BaseAction {
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.layout.internal.CreateLayoutLiferayGenAction",
+	service = LiferayGenAction.class
+)
+public class CreateLayoutLiferayGenAction extends BaseLiferayGenAction {
 
 	@Override
 	public String doGetDescription() {
@@ -92,12 +114,12 @@ public class CreateLayout extends BaseAction {
 				put(
 					"nonDefaultParentLayoutRatio",
 					"Probability percentage of creating a layout with a " +
-					"random parent layout");
+						"random parent layout");
 				put(
 					"nonPortletLayoutTypeRatio",
 					"Probability percentage of creating a layout of non " +
-					"portlet type");
-				put(ActionConfig.TARGET, "Parent layout");
+						"portlet type");
+				put(LiferayGenActionConfig.TARGET, "Parent layout");
 			}
 		};
 	}
@@ -129,52 +151,62 @@ public class CreateLayout extends BaseAction {
 	}
 
 	protected Object[] addLayout(
-			long userId, String languageId, long companyId, long groupId,
+			LiferayGenValueGenerator liferayGenValueGenerator, long userId,
+			String languageId, long companyId, long groupId,
 			boolean privateLayout, long parentLayoutId, boolean hidden,
 			String layoutType, Locale[] locales, ServiceContext serviceContext)
 		throws Exception {
 
 		Map<Locale, String> nameMap =
-			ValueGenerator.getRandomValuesLocalizationMap(
-				locales, ValueGenerator.getRandomIntegerFromRange(12, 20));
+			liferayGenValueGenerator.getRandomValuesLocalizationMap(
+				locales,
+				liferayGenValueGenerator.getRandomIntegerFromRange(12, 20));
 
 		Map<Locale, String> titleMap =
-			ValueGenerator.getRandomValuesLocalizationMap(
-				locales, ValueGenerator.getRandomIntegerFromRange(12, 20));
+			liferayGenValueGenerator.getRandomValuesLocalizationMap(
+				locales,
+				liferayGenValueGenerator.getRandomIntegerFromRange(12, 20));
 
 		Map<Locale, String> descriptionMap =
-			ValueGenerator.getRandomValuesLocalizationMap(
-				locales, ValueGenerator.getRandomIntegerFromRange(20, 65));
+			liferayGenValueGenerator.getRandomValuesLocalizationMap(
+				locales,
+				liferayGenValueGenerator.getRandomIntegerFromRange(20, 65));
 
 		Map<Locale, String> keywordsMap =
-			ValueGenerator.getRandomValuesLocalizationMap(locales, 0);
+			liferayGenValueGenerator.getRandomValuesLocalizationMap(locales, 0);
 
 		Map<Locale, String> robotsMap =
-			ValueGenerator.getRandomValuesLocalizationMap(locales, 0);
+			liferayGenValueGenerator.getRandomValuesLocalizationMap(locales, 0);
 
-		String friendlyURL = null;
+		//TODO create a real friendlyURLMap
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		long layoutPrototypeId = 0;
 
 		Layout layout = null;
+
 		UnicodeProperties layoutTypeSettingsProperties = null;
+
 		String oldFriendlyURL = StringPool.BLANK;
 
 		// Add layout
 
-		boolean inheritFromParentLayoutId = ValueGenerator.getBoolean();
+		boolean inheritFromParentLayoutId =
+			liferayGenValueGenerator.getBoolean();
 
 		if (inheritFromParentLayoutId && (parentLayoutId > 0)) {
-			Layout parentLayout = LayoutLocalServiceUtil.getLayout(
+			Layout parentLayout = _layoutLocalService.getLayout(
 				groupId, privateLayout, parentLayoutId);
 
-			layout = LayoutLocalServiceUtil.addLayout(
+			//TODO update call with TypeSettings instead of ""
+			layout = _layoutLocalService.addLayout(
 				userId, groupId, privateLayout, parentLayoutId, nameMap,
 				titleMap, parentLayout.getDescriptionMap(),
 				parentLayout.getKeywordsMap(), parentLayout.getRobotsMap(),
-				parentLayout.getType(), hidden, friendlyURL, serviceContext);
+				parentLayout.getType(), StringPool.BLANK, hidden,
+				friendlyURLMap, serviceContext);
 
-			LayoutLocalServiceUtil.updateLayout(
+			_layoutLocalService.updateLayout(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getLayoutId(), parentLayout.getTypeSettings());
 
@@ -190,7 +222,7 @@ public class CreateLayout extends BaseAction {
 		}
 		else if (layoutPrototypeId > 0) {
 			LayoutPrototype layoutPrototype =
-				LayoutPrototypeLocalServiceUtil.getLayoutPrototype(
+				_layoutPrototypeLocalService.getLayoutPrototype(
 					layoutPrototypeId);
 
 			String layoutPrototypeLinkEnabled = null;
@@ -203,32 +235,36 @@ public class CreateLayout extends BaseAction {
 			serviceContext.setAttribute(
 				"layoutPrototypeUuid", layoutPrototype.getUuid());
 
-			layout = LayoutLocalServiceUtil.addLayout(
+			//TODO update call with TypeSettings instead of ""
+			layout = _layoutLocalService.addLayout(
 				userId, groupId, privateLayout, parentLayoutId, nameMap,
 				titleMap, descriptionMap, keywordsMap, robotsMap, layoutType,
-				hidden, friendlyURL, serviceContext);
+				StringPool.BLANK, hidden, friendlyURLMap, serviceContext);
 		}
 		else {
-			layout = LayoutLocalServiceUtil.addLayout(
+			//TODO update call with TypeSettings instead of ""
+
+			layout = _layoutLocalService.addLayout(
 				userId, groupId, privateLayout, parentLayoutId, nameMap,
 				titleMap, descriptionMap, keywordsMap, robotsMap, layoutType,
-				hidden, friendlyURL, serviceContext);
+				StringPool.BLANK, hidden, friendlyURLMap, serviceContext);
 		}
 
 		UnicodeProperties formTypeSettingsProperties = new UnicodeProperties();
 
 		if (LayoutConstants.TYPE_LINK_TO_LAYOUT.equals(layoutType)) {
-			List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			List<Layout> layouts = _layoutLocalService.getLayouts(
 				groupId, privateLayout, LayoutConstants.TYPE_PORTLET);
 
-			if (layouts.size() > 0) {
-				Layout randomLayout = ValueGenerator.getRandomObjectFromList(
-					layouts);
+			if (!layouts.isEmpty()) {
+				Layout randomLayout =
+					liferayGenValueGenerator.getRandomObjectFromList(layouts);
 
 				formTypeSettingsProperties.put(
 					"linkToLayoutId=" + randomLayout.getLayoutId());
 				formTypeSettingsProperties.put(
 					"groupId=" + randomLayout.getGroupId());
+
 				formTypeSettingsProperties.put("show-alternate-links=true");
 				formTypeSettingsProperties.put("layoutUpdateable=true");
 				formTypeSettingsProperties.put(
@@ -255,15 +291,19 @@ public class CreateLayout extends BaseAction {
 				PropsKeys.DEFAULT_LAYOUT_TEMPLATE_ID);
 
 			List<LayoutTemplate> layoutTemplates =
-				LayoutTemplateLocalServiceUtil.getLayoutTemplates(
+				_layoutTemplateLocalService.getLayoutTemplates(
 					theme.getThemeId());
 
 			LayoutTemplate layoutTemplate =
-				ValueGenerator.getRandomObjectFromList(layoutTemplates);
-
-			while (layoutTemplate.getLayoutTemplateId().equals("freeform")) {
-				layoutTemplate = ValueGenerator.getRandomObjectFromList(
+				liferayGenValueGenerator.getRandomObjectFromList(
 					layoutTemplates);
+
+			while (StringUtil.equals(
+						"freeform", layoutTemplate.getLayoutTemplateId())) {
+
+				layoutTemplate =
+					liferayGenValueGenerator.getRandomObjectFromList(
+						layoutTemplates);
 			}
 
 			if (layoutTemplate != null) {
@@ -273,7 +313,7 @@ public class CreateLayout extends BaseAction {
 			layoutTypePortlet.setLayoutTemplateId(userId, layoutTemplateId);
 		}
 
-		LayoutLocalServiceUtil.updateLayout(
+		_layoutLocalService.updateLayout(
 			groupId, privateLayout, layout.getLayoutId(),
 			layout.getTypeSettings());
 
@@ -283,15 +323,10 @@ public class CreateLayout extends BaseAction {
 	protected void copyLookAndFeel(Layout targetLayout, Layout sourceLayout)
 		throws Exception {
 
-		LayoutLocalServiceUtil.updateLookAndFeel(
+		_layoutLocalService.updateLookAndFeel(
 			targetLayout.getGroupId(), targetLayout.isPrivateLayout(),
 			targetLayout.getLayoutId(), sourceLayout.getThemeId(),
-			sourceLayout.getColorSchemeId(), sourceLayout.getCss(), false);
-
-		LayoutLocalServiceUtil.updateLookAndFeel(
-			targetLayout.getGroupId(), targetLayout.isPrivateLayout(),
-			targetLayout.getLayoutId(), sourceLayout.getWapThemeId(),
-			sourceLayout.getWapColorSchemeId(), sourceLayout.getCss(), true);
+			sourceLayout.getColorSchemeId(), sourceLayout.getCss());
 	}
 
 	protected void copyPreferences(
@@ -312,7 +347,7 @@ public class CreateLayout extends BaseAction {
 				PortletPreferencesFactoryUtil.getPortletPreferencesIds(
 					request, targetLayout, sourcePortletId);
 
-			PortletPreferencesLocalServiceUtil.getPreferences(
+			_portletPreferencesLocalService.getPreferences(
 				portletPreferencesIds);
 
 			PortletPreferencesIds sourcePortletPreferencesIds =
@@ -320,10 +355,10 @@ public class CreateLayout extends BaseAction {
 					request, sourceLayout, sourcePortletId);
 
 			PortletPreferences sourcePreferences =
-				PortletPreferencesLocalServiceUtil.getPreferences(
+				_portletPreferencesLocalService.getPreferences(
 					sourcePortletPreferencesIds);
 
-			PortletPreferencesLocalServiceUtil.updatePreferences(
+			_portletPreferencesLocalService.updatePreferences(
 				portletPreferencesIds.getOwnerId(),
 				portletPreferencesIds.getOwnerType(),
 				portletPreferencesIds.getPlid(),
@@ -332,19 +367,17 @@ public class CreateLayout extends BaseAction {
 			// Copy portlet setup
 
 			PortletPreferences targetPreferences =
-				PortletPreferencesLocalServiceUtil.getPreferences(
+				_portletPreferencesLocalService.getPreferences(
 					companyId, PortletKeys.PREFS_OWNER_ID_DEFAULT,
 					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid(),
 					sourcePortletId);
 
-			sourcePreferences =
-				PortletPreferencesLocalServiceUtil.getPreferences(
-						companyId,
-					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, sourceLayout.getPlid(),
-					sourcePortletId);
+			sourcePreferences = _portletPreferencesLocalService.getPreferences(
+				companyId, PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, sourceLayout.getPlid(),
+				sourcePortletId);
 
-			PortletPreferencesLocalServiceUtil.updatePreferences(
+			_portletPreferencesLocalService.updatePreferences(
 				PortletKeys.PREFS_OWNER_ID_DEFAULT,
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid(),
 				sourcePortletId, sourcePreferences);
@@ -357,60 +390,73 @@ public class CreateLayout extends BaseAction {
 
 	@Override
 	protected void doRun() {
+		Map<String, Object> parameters = getParameters();
 
-		long companyId = (Long) _parameters.get(ConfigConstants.COMPANY_ID);
-		long groupId = (Long) _parameters.get(ConfigConstants.GROUP_ID);
+		long companyId = (Long)parameters.get(
+			LiferayGenConfigConstants.COMPANY_ID);
 
-		Locale[] locales = (Locale[]) _parameters.get(ConfigConstants.LOCALES);
+		long groupId = (Long)parameters.get(LiferayGenConfigConstants.GROUP_ID);
+
+		Locale[] locales = (Locale[])parameters.get(
+			LiferayGenConfigConstants.LOCALES);
 
 		int nonDefaultParentLayoutRatio =
-			ParameterUtil.getParamAsIntegerPercentage(
-				_parameters, "nonDefaultParentLayoutRatio");
+			_liferayGenParameterHandler.getParamAsIntegerPercentage(
+				parameters, "nonDefaultParentLayoutRatio");
 
 		long parentPlid = LayoutConstants.DEFAULT_PARENT_LAYOUT_ID;
 		long parentLayoutId = LayoutConstants.DEFAULT_PARENT_LAYOUT_ID;
 
+		LiferayGenValueGenerator liferayGenValueGenerator =
+			new LiferayGenValueGenerator(
+				_companyLocalService, _liferayGenQueryHandler, _portal,
+				_portletLocalService);
+
 		if ((nonDefaultParentLayoutRatio > 0) &&
-			ValueGenerator.getBoolean(nonDefaultParentLayoutRatio)) {
+			liferayGenValueGenerator.getBoolean(nonDefaultParentLayoutRatio)) {
 
 			parentPlid = MapUtil.getLong(
-				_parameters, ActionConfig.TARGET,
+				parameters, LiferayGenActionConfig.TARGET,
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 		}
 
 		int nonPortletLayoutTypeRatio =
-			ParameterUtil.getParamAsIntegerPercentage(
-				_parameters, "nonPortletLayoutTypeRatio");
+			_liferayGenParameterHandler.getParamAsIntegerPercentage(
+				parameters, "nonPortletLayoutTypeRatio");
 
 		String layoutType = LayoutConstants.TYPE_PORTLET;
 
 		if ((nonPortletLayoutTypeRatio > 0) &&
-			ValueGenerator.getBoolean(nonPortletLayoutTypeRatio)) {
+			liferayGenValueGenerator.getBoolean(nonPortletLayoutTypeRatio)) {
 
 			layoutType = LayoutConstants.TYPE_LINK_TO_LAYOUT;
 		}
 
-		boolean privateLayout = ValueGenerator.getBoolean();
-		boolean hidden = ValueGenerator.getBoolean(5);
+		boolean privateLayout = liferayGenValueGenerator.getBoolean();
+
+		boolean hidden = liferayGenValueGenerator.getBoolean(5);
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
 		try {
 			if (parentPlid != LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
-				Layout layout = LayoutLocalServiceUtil.getLayout(parentPlid);
+				Layout layout = _layoutLocalService.getLayout(parentPlid);
 
 				privateLayout = layout.isPrivateLayout();
 				parentLayoutId = layout.getLayoutId();
 			}
 
-			long userId = ValueGenerator.getRandomUserIdFromCache();
+			long userId = liferayGenValueGenerator.getRandomUserIdFromCache();
 
-			User user = UserLocalServiceUtil.fetchUser(userId);
+			User user = _userLocalService.getUser(userId);
+
 			String languageId = user.getLanguageId();
 
 			addLayout(
-				userId, languageId, companyId, groupId, privateLayout,
-				parentLayoutId, hidden, layoutType, locales, serviceContext);
+				liferayGenValueGenerator, userId, languageId, companyId,
+				groupId, privateLayout, parentLayoutId, hidden, layoutType,
+				locales, serviceContext);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -419,28 +465,28 @@ public class CreateLayout extends BaseAction {
 
 	protected void inheritMobileRuleGroups(
 			Layout layout, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<MDRRuleGroupInstance> parentMDRRuleGroupInstances =
-			MDRRuleGroupInstanceLocalServiceUtil.getRuleGroupInstances(
+			_mdrRuleGroupInstanceLocalService.getRuleGroupInstances(
 				Layout.class.getName(), layout.getParentPlid());
 
-		for (MDRRuleGroupInstance parentMDRRuleGroupInstance
-			: parentMDRRuleGroupInstances) {
+		for (MDRRuleGroupInstance parentMDRRuleGroupInstance :
+				parentMDRRuleGroupInstances) {
 
 			MDRRuleGroupInstance mdrRuleGroupInstance =
-				MDRRuleGroupInstanceLocalServiceUtil.addRuleGroupInstance(
+				_mdrRuleGroupInstanceLocalService.addRuleGroupInstance(
 					layout.getGroupId(), Layout.class.getName(),
 					layout.getPlid(),
 					parentMDRRuleGroupInstance.getRuleGroupId(),
 					parentMDRRuleGroupInstance.getPriority(), serviceContext);
 
 			List<MDRAction> parentMDRActions =
-				MDRActionLocalServiceUtil.getActions(
+				_mdrActionLocalService.getActions(
 					parentMDRRuleGroupInstance.getRuleGroupInstanceId());
 
 			for (MDRAction mdrAction : parentMDRActions) {
-				MDRActionLocalServiceUtil.addAction(
+				_mdrActionLocalService.addAction(
 					mdrRuleGroupInstance.getRuleGroupInstanceId(),
 					mdrAction.getNameMap(), mdrAction.getDescriptionMap(),
 					mdrAction.getType(), mdrAction.getTypeSettings(),
@@ -464,21 +510,23 @@ public class CreateLayout extends BaseAction {
 		}
 
 		Layout targetScopeLayout =
-			LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
+			_layoutLocalService.getLayoutByUuidAndGroupId(
 				targetLayout.getUuid(), targetLayout.getGroupId(),
 				targetLayout.isPrivateLayout());
 
 		if (!targetScopeLayout.hasScopeGroup()) {
-			GroupLocalServiceUtil.addGroup(
-				userId, Layout.class.getName(), targetLayout.getPlid(),
-				targetLayout.getName(languageId), null, 0, null, false, true,
-				null);
+			//TODO adjust this
+			_groupLocalService.addGroup(
+				userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
+				Layout.class.getName(), targetLayout.getPlid(),
+				targetLayout.getGroupId(), new HashMap<>(), new HashMap<>(), 0,
+				true, 0, null, false, true, true, null);
 		}
 
-		String portletTitle = PortalUtil.getPortletTitle(
+		String portletTitle = _portal.getPortletTitle(
 			sourcePortletId, languageId);
 
-		String newPortletTitle = PortalUtil.getNewPortletTitle(
+		String newPortletTitle = _portal.getNewPortletTitle(
 			portletTitle, String.valueOf(sourceLayout.getLayoutId()),
 			targetLayout.getName(languageId));
 
@@ -490,23 +538,54 @@ public class CreateLayout extends BaseAction {
 		targetPreferences.setValue(
 			"portletSetupTitle_" + languageId, newPortletTitle);
 		targetPreferences.setValue(
-			"portletSetupUseCustomTitle", Boolean.TRUE.toString());
+			"portletSetupUseCustomTitle", StringPool.TRUE);
 
 		targetPreferences.store();
 	}
 
-	private void addParameterLongCriterion(
-		Conjunction conjunction, String parameterName) {
+	private static final Log _log = LogFactoryUtil.getLog(
+		CreateLayoutLiferayGenAction.class);
 
-		Object parameterValue = _parameters.get(parameterName);
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
-		if (parameterValue != null) {
-			conjunction.add(
-				RestrictionsFactoryUtil.eq(
-					parameterName, GetterUtil.getLong(parameterValue)));
-		}
-	}
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
-	private static Log _log = LogFactoryUtil.getLog(CreateLayout.class);
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
+
+	@Reference
+	private LayoutTemplateLocalService _layoutTemplateLocalService;
+
+	@Reference
+	private LiferayGenParameterHandler _liferayGenParameterHandler;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private MDRActionLocalService _mdrActionLocalService;
+
+	@Reference
+	private MDRRuleGroupInstanceLocalService _mdrRuleGroupInstanceLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
+
+	@Reference
+	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
