@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	properties = {
-		"liferaygen.action.class.name=AddGenericPortletLiferayGenAction"
+		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.AddGenericPortletLiferayGenAction"
 	},
 	service = LiferayGenAction.class
 )
