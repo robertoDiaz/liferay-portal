@@ -15,15 +15,15 @@
 package com.liferay.liferaygen.web.internal.util;
 
 import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.LiferayGenTarget;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
 import com.liferay.liferaygen.util.LiferayGenParameterHandler;
 import com.liferay.liferaygen.util.LiferayGenQueryHandler;
 import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.web.internal.LiferayGenActionAdapter;
 import com.liferay.liferaygen.web.internal.LiferayGenExecutor;
-import com.liferay.liferaygen.LiferayGenTarget;
 import com.liferay.liferaygen.web.internal.LiferayGenTargetImpl;
-import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
-import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
@@ -59,16 +59,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = LiferayGenExecutorHandler.class)
 public class LiferayGenExecutorHandler {
 
-
 	@Activate
 	public void activate(BundleContext bundleContext) {
 		_serviceTrackerList = ServiceTrackerListFactory.open(
 			bundleContext, LiferayGenAction.class);
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerList.close();
 	}
 
 	public LiferayGenAction createAction(Object actionObj) {
@@ -256,6 +250,11 @@ public class LiferayGenExecutorHandler {
 			liferayGenValueGenerator);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerList.close();
+	}
+
 	protected Class<?> getActionClass(Object actionObj) {
 		if (actionObj instanceof Class) {
 			return (Class<?>)actionObj;
@@ -380,20 +379,21 @@ public class LiferayGenExecutorHandler {
 		LiferayGenExecutorHandler.class);
 
 	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
 	private LiferayGenParameterHandler _liferayGenParameterHandler;
 
 	@Reference
 	private LiferayGenQueryHandler _liferayGenQueryHandler;
 
-	private ServiceTrackerList<LiferayGenAction, LiferayGenAction>
-		_serviceTrackerList;
-
 	@Reference
 	private Portal _portal;
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private PortletLocalService _portletLocalService;
+
+	private ServiceTrackerList<LiferayGenAction, LiferayGenAction>
+		_serviceTrackerList;
+
 }

@@ -1,4 +1,4 @@
-<%--
+<%@ page import="com.liferay.portal.kernel.model.ClassedModel" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -16,114 +16,136 @@
 
 <%@ include file="/liferaygen/init.jsp" %>
 
-<portlet:actionURL name="generate" var="generateURL" />
-
-<aui:form action="<%= generateURL %>" method="post" name="fm">
-
 <%
-ClassLoader classLoader = ConfigUtil.class.getClassLoader();
+LiferayGenAdminDisplayContext liferayGenAdminDisplayContext = new LiferayGenAdminDisplayContext(request);
 
-InputStream inputStream = classLoader.getResourceAsStream("configuration.yml");
-
-String configuration = StringUtil.read(inputStream);
-
-String errorMessage = (String)request.getAttribute("errorMessage");
+LiferayGenAdminHelper liferayGenAdminHelper = liferayGenAdminDisplayContext.getLiferayGenAdminHelper();
 %>
 
-	<aui:input cssClass="lfr-textarea-container" name="configuration" resizable="<%= true %>" style="width: 600px; height: 300px;" type="textarea" value="<%= configuration %>" />
+<lifera:actionURL
+	name="/liferaygen/edit_liferaygen_action"
+	var="editLiferayGenActionURL"
+/>
 
-	<aui:button name="generate" type="submit" value="Generate" />
+<div class="container-fluid-1280 entry-body">
+	<aui:form action="<%= editLiferayGenActionURL %>" method="post" name="fm">
 
-	<br />
+		<%
+		/*Class<?> clazz = liferayGenAdminDisplayContext.getClass();
 
-<%
-	if (Validator.isNotNull(errorMessage)) {
-%>
+		ClassLoader classLoader = clazz.getClassLoader();
 
-	<br />
+		InputStream inputStream = classLoader.getResourceAsStream("configuration.yml");
 
-	<aui:input cssClass="lfr-textarea-container" name="error" resizable="<%= true %>" style="width: 600px; height: 300px;" type="textarea" value="<%= errorMessage %>" />
+		String configuration = StringUtil.read(inputStream);*/
 
-<%
-	}
-%>
+		String configuration = "this is a test";
 
-<h3>Configuration syntax example</h3>
-<pre>
-globalParameter1: value1
-globalParameter2: value2
-actions:
-&nbsp;&nbsp;- action: name.of.my.Action1
-&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 10
-&nbsp;&nbsp;&nbsp;&nbsp;parameters: {localParameter1: value1, localParameter2: value2}
-&nbsp;&nbsp;- action: name.of.my.Action2
-&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 80%
-&nbsp;&nbsp;- action: name.of.my.Action3
-&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 10
-&nbsp;&nbsp;&nbsp;&nbsp;repeatTarget: false
-&nbsp;&nbsp;&nbsp;&nbsp;parameters: {localParameter3: value3, localParameter4: value4}
-</pre>
+		String errorMessage = (String)request.getAttribute("errorMessage");
+		%>
 
-<h3>Available actions</h3>
+		<aui:input cssClass="lfr-textarea-container" name="configuration" resizable="<%= true %>" style="width: 600px; height: 300px;" type="textarea" value="<%= configuration %>" />
 
-<%
-	List<Action> actionList = ExecutorUtil.getAvailableActions();
+		<aui:button name="generate" type="submit" value="Generate" />
 
-	for (Action action : actionList) {
-%>
+		<br />
 
-		<h4><%= action.getClass().getName() %></h4>
-		<%= action.getDescription() %><br />
+		<c:if test="<%= Validator.isNotNull(errorMessage) %>">
+			<br />
 
-<%
-	Map<String, String> parametersDescription = new TreeMap<String, String>(action.getParametersDescription());
-	String targetDescription = parametersDescription.remove(ActionConfig.TARGET);
-	if (!parametersDescription.isEmpty())
-	{
-%>
+			<aui:input cssClass="lfr-textarea-container" name="error" resizable="<%= true %>" style="width: 600px; height: 300px;" type="textarea" value="<%= errorMessage %>" />
+		</c:if>
 
-		<br /><u>Parameters</u>:
-		<ul>
+	<h3>Configuration syntax example</h3>
+	<pre>
+	globalParameter1: value1
+	globalParameter2: value2
+	actions:
+	&nbsp;&nbsp;- action: name.of.my.Action1
+	&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 10
+	&nbsp;&nbsp;&nbsp;&nbsp;parameters: {localParameter1: value1, localParameter2: value2}
+	&nbsp;&nbsp;- action: name.of.my.Action2
+	&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 80%
+	&nbsp;&nbsp;- action: name.of.my.Action3
+	&nbsp;&nbsp;&nbsp;&nbsp;numExecutions: 10
+	&nbsp;&nbsp;&nbsp;&nbsp;repeatTarget: false
+	&nbsp;&nbsp;&nbsp;&nbsp;parameters: {localParameter3: value3, localParameter4: value4}
+	</pre>
 
-<%
-		for (String parameter : parametersDescription.keySet()) {
-			String parameterDescription = action.getParametersDescription().get(parameter);
-			String defaultValue = "<i>&lt;empty&gt;</i>";
-			Object defaultValueObj = action.getParametersDefaultValues().get(parameter);
-			if (defaultValueObj != null) {
-				defaultValue = defaultValueObj.toString();
-			}
-%>
+	<h3>Available actions</h3>
 
-			<li><i><%= parameter %></i>: (default: <%= defaultValue %>) <%= parameterDescription %></li>
+		<%
+		List<LiferayGenAction> liferayGenAdminHelperAvailableActions = liferayGenAdminHelper.getAvailableActions();
 
-<%
+		for (LiferayGenAction liferayGenAction : liferayGenAdminHelperAvailableActions) {
+		%>
+
+			<h4><%= liferayGenAction.getName() %></h4>
+
+			<%= liferayGenAction.getDescription() %><br />
+
+			<%
+			Map<String, String> liferayGenActionParametersDescription = liferayGenAction.getParametersDescription();
+
+			Map<String, String> parametersDescription = new TreeMap<String, String>(liferayGenActionParametersDescription);
+
+			String targetDescription = parametersDescription.remove(LiferayGenActionConfig.TARGET);
+			%>
+
+			<c:choose>
+				<c:when test="<%= !parametersDescription.isEmpty() %>">
+					<br />
+
+					<u>Parameters</u>:
+
+					<ul>
+
+					<%
+					for (String parameter : parametersDescription.keySet()) {
+						String parameterDescription = liferayGenActionParametersDescription.get(parameter);
+
+						String defaultValue = "<i>&lt;empty&gt;</i>";
+
+						Map<String, Object> parametersDefaultValues = liferayGenAction.getParametersDefaultValues();
+
+						Object defaultValueObj = parametersDefaultValues.get(parameter);
+
+						if (defaultValueObj != null) {
+							defaultValue = defaultValueObj.toString();
+						}
+					%>
+
+						<li><i><%= parameter %></i>: (default: <%= defaultValue %>) <%= parameterDescription %></li>
+
+					<%
+					}
+					%>
+
+					</ul>
+				</c:when>
+				<c:otherwise>
+					<br />
+
+					<c:if test=" <%= targetDescription != null %>">
+
+						<%
+						String modelProperty = StringPool.BLANK;
+
+						if (liferayGenAction.getEntityProperties() != null) {
+							modelProperty = StringPool.COLON + liferayGenAction.getEntityProperties();
+						}
+
+						Class<? extends ClassedModel> entityModel = liferayGenAction.getEntityModel();
+						%>
+
+						<u>Target param</u>: <%= targetDescription %> (<%= entityModel.getName() %><%= modelProperty %>)<br /><br />
+					</c:if>
+				</c:otherwise>
+			</c:choose>
+
+		<%
 		}
-%>
+		%>
 
-		</ul>
-
-<%
-	}
-	if (parametersDescription.isEmpty()) {
-%>
-
-	<br />
-
-<%
-	}
-	if (targetDescription != null) {
-		String modelProperty = "";
-		if (action.getEntityProperties() != null) {
-			modelProperty = ":" + action.getEntityProperties();
-		}
-%>
-
-		<u>Target param</u>: <%= targetDescription %> (<%= action.getEntityModel().getName() %><%= modelProperty %>)<br /><br />
-
-<%
-	}
-}
-%>
-
-</aui:form>
+	</aui:form>
+</div>

@@ -16,9 +16,9 @@ package com.liferay.liferaygen.web.internal;
 
 import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.liferaygen.LiferayGenTarget;
-import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
 import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
 import com.liferay.liferaygen.web.internal.util.ThreadLocalData;
 import com.liferay.petra.string.StringBundler;
@@ -245,9 +245,7 @@ public class DefaultLiferayGenExecutor implements LiferayGenExecutor {
 		DefaultLiferayGenExecutor.class);
 
 	private Map<String, Object> _configuration;
-
-	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
-
-	private LiferayGenValueGenerator _liferayGenValueGenerator;
+	private final LiferayGenExecutorHandler _liferayGenExecutorHandler;
+	private final LiferayGenValueGenerator _liferayGenValueGenerator;
 
 }

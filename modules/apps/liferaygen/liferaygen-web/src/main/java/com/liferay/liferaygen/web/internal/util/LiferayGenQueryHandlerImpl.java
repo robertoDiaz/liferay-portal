@@ -303,7 +303,7 @@ public class LiferayGenQueryHandlerImpl implements LiferayGenQueryHandler {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayGenQueryHandler.class);
+		LiferayGenQueryHandlerImpl.class);
 
 	@Reference
 	private LiferayGenServiceExecutorHelper _liferayGenServiceExecutorHelper;

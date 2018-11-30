@@ -12,33 +12,30 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.portlet;
+package com.liferay.liferaygen.web.internal.portlet.action;
 
-import com.liferay.liferaygen.constants.LiferaygenPortletKeys;
+import com.liferay.liferaygen.constants.LiferayGenPortletKeys;
 import com.liferay.liferaygen.util.LiferayGenConfigHandler;
 import com.liferay.liferaygen.util.LiferayGenQueryHandler;
 import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.web.internal.DefaultLiferayGenExecutor;
 import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
-import javax.portlet.Portlet;
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jorge Díaz
@@ -49,35 +46,18 @@ import javax.servlet.http.HttpServletRequest;
 @Component(
 	immediate = true,
 	property = {
-		"com.liferay.portlet.css-class-wrapper=portlet-blogs",
-		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.icon=/liferaygen/icons/icon.png",
-		"com.liferay.portlet.preferences-owned-by-group=true",
-		"com.liferay.portlet.preferences-unique-per-layout=false",
-		"com.liferay.portlet.private-request-attributes=false",
-		"com.liferay.portlet.private-session-attributes=false",
-		"com.liferay.portlet.render-weight=50",
-		"com.liferay.portlet.scopeable=true",
-		"com.liferay.portlet.use-default-template=true",
-		"javax.portlet.display-name=Liferay Gen",
-		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.mvc-command-names-default-views=/lifearygen/view",
-		"javax.portlet.init-param.portlet-title-based-navigation=true",
-		"javax.portlet.init-param.template-path=/META-INF/resources/",
-		"javax.portlet.name=" + LiferaygenPortletKeys.LIFERAYGEN_ADMIN,
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.supports.mime-type=text/html"
+		"javax.portlet.name=" + LiferayGenPortletKeys.LIFERAY_GEN_ADMIN,
+		"mvc.command.name=/liferaygen/edit_liferaygen_action"
 	},
-	service = Portlet.class
+	service = MVCActionCommand.class
 )
-public class LiferaygenAdminPortlet extends MVCPortlet {
+public class EditLiferayGenActionMVCActionCommand extends BaseMVCActionCommand {
 
 	public static final String PARAM_CONFIGURATION = "configuration";
 
-	public void generate(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
+	@Override
+	protected void doProcessAction(
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		_portal.copyRequestParameters(actionRequest, actionResponse);
 
@@ -86,7 +66,7 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 				actionRequest, PARAM_CONFIGURATION);
 
 			Map<String, Object> configuration =
-				_liferaygenConfigHandler.getConfiguration(configurationText);
+				_liferayGenConfigHandler.getConfiguration(configurationText);
 
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(actionRequest);
@@ -106,27 +86,25 @@ public class LiferaygenAdminPortlet extends MVCPortlet {
 
 			defaultLiferayGenExecutor.run();
 		}
-		catch (Throwable t) {
-			StringWriter sw = new StringWriter();
-			t.printStackTrace(new PrintWriter(sw));
-			actionRequest.setAttribute("errorMessage", sw.toString());
+		catch (Exception e) {
+			actionRequest.setAttribute("errorMessage", e.toString());
 		}
 	}
-
-	@Reference
-	private Portal _portal;
-
-	@Reference
-	LiferayGenConfigHandler _liferaygenConfigHandler;
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
 	@Reference
-	private LiferayGenQueryHandler _liferayGenQueryHandler;
+	private LiferayGenConfigHandler _liferayGenConfigHandler;
 
 	@Reference
 	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private PortletLocalService _portletLocalService;

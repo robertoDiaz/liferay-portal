@@ -18,7 +18,6 @@ import com.liferay.liferaygen.constants.LiferayGenConfigConstants;
 import com.liferay.liferaygen.util.LiferayGenConfigHandler;
 import com.liferay.liferaygen.util.LiferayGenQueryHandler;
 import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
-import com.liferay.liferaygen.web.internal.util.LiferayGenExecutorHandler;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -157,22 +156,16 @@ public class LiferayGenConfigHandlerImpl implements LiferayGenConfigHandler {
 	}
 
 	@Reference
-	private Portal _portal;
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	com.liferay.liferaygen.util.LiferayGenConfigHandler _liferaygenConfigHandler;
-
-	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private LiferayGenQueryHandler _liferayGenQueryHandler;
 
 	@Reference
-	private LiferayGenExecutorHandler _liferayGenExecutorHandler;
+	private Portal _portal;
 
 	@Reference
 	private PortletLocalService _portletLocalService;

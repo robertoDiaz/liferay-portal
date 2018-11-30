@@ -105,35 +105,6 @@ public class LiferayGenParameterHandlerImpl
 	}
 
 	@Override
-	public int getParamAsIntegerPercentage(
-		Map<String, Object> parameters, String parameter) {
-
-		if (!parameters.containsKey(parameter)) {
-			throw new IllegalArgumentException(
-				"missing parameter " + parameter);
-		}
-
-		String parameterValue = String.valueOf(parameters.get(parameter));
-
-		if (parameterValue.endsWith("%")) {
-			parameterValue = parameterValue.substring(
-				0, parameterValue.length() - 1);
-		}
-
-		int percentageValue = GetterUtil.getInteger(parameterValue);
-
-		if (percentageValue < 0) {
-			return 0;
-		}
-
-		if (percentageValue > 100) {
-			return 100;
-		}
-
-		return percentageValue;
-	}
-
-	@Override
 	public List<Long> getGroupIds(Map<String, Object> parameters) {
 		List list = (List)parameters.get(LiferayGenConfigConstants.GROUP_IDS);
 
@@ -164,7 +135,36 @@ public class LiferayGenParameterHandlerImpl
 		return groupIds;
 	}
 
+	@Override
+	public int getParamAsIntegerPercentage(
+		Map<String, Object> parameters, String parameter) {
+
+		if (!parameters.containsKey(parameter)) {
+			throw new IllegalArgumentException(
+				"missing parameter " + parameter);
+		}
+
+		String parameterValue = String.valueOf(parameters.get(parameter));
+
+		if (parameterValue.endsWith("%")) {
+			parameterValue = parameterValue.substring(
+				0, parameterValue.length() - 1);
+		}
+
+		int percentageValue = GetterUtil.getInteger(parameterValue);
+
+		if (percentageValue < 0) {
+			return 0;
+		}
+
+		if (percentageValue > 100) {
+			return 100;
+		}
+
+		return percentageValue;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
-		LiferayGenParameterHandler.class);
+		LiferayGenParameterHandlerImpl.class);
 
 }
