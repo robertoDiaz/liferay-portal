@@ -12,38 +12,41 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions.portlet;
+package com.liferay.liferaygen.asset.internal.portlet;
 
-import com.liferay.liferaygen.config.ActionConfig;
-import com.liferay.liferaygen.util.QueryUtil;
-import com.liferay.liferaygen.util.ValueGenerator;
+import aQute.bnd.annotation.component.Activate;
+
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassName;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
+import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.RSSUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.ClassName;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.PortletConfigFactoryUtil;
-import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.util.RSSUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,22 +62,47 @@ import javax.portlet.PortletPreferences;
 
 import javax.servlet.ServletContext;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.portlet.MockActionRequest;
 import org.springframework.mock.web.portlet.MockActionResponse;
-public class AddPortletAssetPublisherDynamic
-	extends AddPortletAssetPublisherBase {
+
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.asset.internal.portlet.AddDynamicAssetPublisherPortletLiferayGenAction",
+	service = LiferayGenAction.class
+)
+public class AddDynamicAssetPublisherPortletLiferayGenAction
+	extends BaseAssetPublisherAddPortletLiferayGenAction {
+
+	@Activate
+	public void activate() {
+		liferayGenValueGenerator = new LiferayGenValueGenerator(
+			_companyLocalService, _liferayGenQueryHandler, _portal,
+			_portletLocalService);
+
+		initUpdateLayoutActionMethod();
+	}
 
 	@Override
 	public void destroy() {
-		assetRendererClassNameIdsPerGroupIdCache = null;
+		_assetRendererClassNameIdsPerGroupIdCache = null;
 	}
 
 	@Override
 	public String doGetDescription() {
-		return "Adds a random dynamic Asset Publisher in a random layout in " +
-			"a random position. Portlet configuration will be random. Layout " +
-			"can be specified in parameters";
+		return StringBundler.concat(
+			"Adds a random dynamic Asset Publisher in a random layout in a ",
+			"random position. Portlet configuration will be random. Layout ",
+			"can be specified in parameters");
 	}
 
 	@Override
@@ -96,17 +124,18 @@ public class AddPortletAssetPublisherDynamic
 				put(
 					"layoutId",
 					"Force adding portlet to the layout with this layoutId, " +
-					"instead of using target parameter");
+						"instead of using target parameter");
 				put("plid", "Same as layoutId");
-				put(ActionConfig.TARGET, "Layout to use during add action");
+				put(
+					LiferayGenActionConfig.TARGET,
+					"Layout to use during add action");
 			}
 		};
 	}
 
 	@Override
 	public void init() {
-		assetRendererClassNameIdsPerGroupIdCache =
-			new ConcurrentHashMap<Long, List<Long>>();
+		_assetRendererClassNameIdsPerGroupIdCache = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -126,10 +155,12 @@ public class AddPortletAssetPublisherDynamic
 		Locale locale = getLayoutDefaultLocale(layout);
 
 		MockHttpServletRequest request =
-			ValueGenerator.getMockHttpServletRequest(layout, user, locale);
+			liferayGenValueGenerator.getMockHttpServletRequest(
+				layout, user, locale);
 
-		MockActionRequest actionRequest = ValueGenerator.getMockActionRequest(
-			request, portlet, portletPreferences);
+		MockActionRequest actionRequest =
+			liferayGenValueGenerator.getMockActionRequest(
+				request, portlet, portletPreferences);
 
 		MockActionResponse actionResponse = new MockActionResponse();
 
@@ -137,17 +168,22 @@ public class AddPortletAssetPublisherDynamic
 			portlet, (ServletContext)request.getAttribute(WebKeys.CTX));
 
 		/* set selection style to dynamic */
+
 		actionRequest.setParameter(Constants.CMD, "selection-style");
+
 		setPreferencesParameter(actionRequest, "selectionStyle", "dynamic");
 
 		configurationAction.processAction(
 			portletConfig, actionRequest, actionResponse);
 
 		portletPreferences = getPortletPreferences(layout, portlet);
+
 		actionRequest.setPreferences(portletPreferences);
 
 		/* set scope */
+
 		actionRequest.setParameter(Constants.CMD, "select-scope");
+
 		setPreferencesParameter(
 			actionRequest, "scopeIds", "Group_" + layout.getGroupId());
 
@@ -155,100 +191,108 @@ public class AddPortletAssetPublisherDynamic
 			portletConfig, actionRequest, actionResponse);
 
 		portletPreferences = getPortletPreferences(layout, portlet);
+
 		actionRequest.setPreferences(portletPreferences);
 
-		List<Long> availableClassNameIds = getAssetRendererClassNameIds(
+		List<Long> availableClassNameIds = _getAssetRendererClassNameIds(
 			layout.getGroupId());
 
-		/* getSelectedClassNameIds method selects with following percentages:
+		/* _getSelectedClassNameIds method selects with following percentages:
 		 * 20% = zero (=any) asset types
 		 * 30% = one random asset type
 		 * 30% = JournalArticle asset type
 		 * 20% = more than one random asset type
 		 */
-		long numberOfIdsToSelect = getNumberOfIdsToSelect(
-				availableClassNameIds);
+		long numberOfIdsToSelect = _getNumberOfIdsToSelect(
+			availableClassNameIds);
 
-		List<Long> selectedClassNameIds = getSelectedClassNameIds(
-				availableClassNameIds, numberOfIdsToSelect);
+		List<Long> selectedClassNameIds = _getSelectedClassNameIds(
+			availableClassNameIds, numberOfIdsToSelect);
 
 		String anyAssetType = String.valueOf(numberOfIdsToSelect == 0);
+
 		String classNameIds = StringUtil.merge(selectedClassNameIds);
 
 		/* update defaultAssetPublisher */
 		actionRequest.setParameter(Constants.CMD, Constants.UPDATE);
 		actionRequest.setParameter(
 			"defaultAssetPublisher",
-			Boolean.toString(ValueGenerator.getBoolean()));
+			Boolean.toString(liferayGenValueGenerator.getBoolean()));
 
 		setPreferencesParameter(actionRequest, "anyAssetType", anyAssetType);
 		setPreferencesParameter(actionRequest, "classNameIds", classNameIds);
 
 		if (selectedClassNameIds.size() == 1) {
-			setAssetClassTypeParameters(
+			_setAssetClassTypeParameters(
 				actionRequest, selectedClassNameIds.get(0), layout, locale);
 		}
 
 		setPreferencesParameter(
 			actionRequest, "orderByColumn1",
-			ValueGenerator.getRandomObjectFromArray(
+			liferayGenValueGenerator.getRandomObjectFromArray(
 				new String[] {
-					"title","createDate","modifiedDate","publishDate",
-					"expirationDate","priority","viewCount","ratings"}));
+					"title", "createDate", "modifiedDate", "publishDate",
+					"expirationDate", "priority", "viewCount", "ratings"
+				}));
 
 		setPreferencesParameter(
 			actionRequest, "orderByType1",
-			ValueGenerator.getRandomObjectFromArray(
-				new String[] {"ASC","DESC"}));
+			liferayGenValueGenerator.getRandomObjectFromArray(
+				new String[] {"ASC", "DESC"}));
 
 		setPreferencesParameter(
 			actionRequest, "orderByColumn2",
-			ValueGenerator.getRandomObjectFromArray(
+			liferayGenValueGenerator.getRandomObjectFromArray(
 				new String[] {
-					"title","createDate","modifiedDate","publishDate",
-					"expirationDate","priority","viewCount","ratings"}));
+					"title", "createDate", "modifiedDate", "publishDate",
+					"expirationDate", "priority", "viewCount", "ratings"
+				}));
 
 		setPreferencesParameter(
 			actionRequest, "orderByType2",
-			ValueGenerator.getRandomObjectFromArray(
-				new String[] {"ASC","DESC"}));
+			liferayGenValueGenerator.getRandomObjectFromArray(
+				new String[] {"ASC", "DESC"}));
 
 		setPreferencesParameter(
 			actionRequest, "enableRss",
-			Boolean.toString(ValueGenerator.getBoolean()));
+			Boolean.toString(liferayGenValueGenerator.getBoolean()));
 
 		setPreferencesParameter(
-			actionRequest, "rssName", ValueGenerator.getLowerCaseWord(10));
+			actionRequest, "rssName",
+			liferayGenValueGenerator.getLowerCaseWord(10));
 
 		setPreferencesParameter(
 			actionRequest, "rssDelta",
-			ValueGenerator.getRandomObjectFromArray(
+			liferayGenValueGenerator.getRandomObjectFromArray(
 				new String[] {
-					"1","2","3","4","5","10","15","20","25","30","40","50","60",
-					"70","80","90","100"}));
+					"1", "2", "3", "4", "5", "10", "15", "20", "25", "30", "40",
+					"50", "60", "70", "80", "90", "100"
+				}));
 
 		setPreferencesParameter(
 			actionRequest, "rssDisplayStyle",
-			ValueGenerator.getRandomObjectFromArray(
+			liferayGenValueGenerator.getRandomObjectFromArray(
 				new String[] {
-					RSSUtil.DISPLAY_STYLE_ABSTRACT,
-					RSSUtil.DISPLAY_STYLE_TITLE}));
+					RSSUtil.DISPLAY_STYLE_ABSTRACT, RSSUtil.DISPLAY_STYLE_TITLE
+				}));
 
 		setPreferencesParameter(
 			actionRequest, "rssFormat",
-			ValueGenerator.getRandomObjectFromArray(
+			liferayGenValueGenerator.getRandomObjectFromArray(
 				new String[] {"rss10", "rss20", "atom10"}));
 
 		try {
 			configurationAction.processAction(
 				portletConfig, actionRequest, actionResponse);
 		}
-		catch (PrincipalException pe) {
+		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
-				String warn = pe.getMessage();
+				String warn = e.getMessage();
 
 				if (Validator.isNull(warn)) {
-					warn = pe.getClass().getName();
+					Class<? extends Exception> clazz = e.getClass();
+
+					warn = clazz.getName();
 				}
 
 				_log.warn(warn);
@@ -256,7 +300,7 @@ public class AddPortletAssetPublisherDynamic
 		}
 	}
 
-	private static String getClassName(
+	private static String _getClassName(
 		AssetRendererFactory assetRendererFactory) {
 
 		Class<?> clazz = assetRendererFactory.getClass();
@@ -268,28 +312,29 @@ public class AddPortletAssetPublisherDynamic
 		return className.substring(pos + 1);
 	}
 
-	private List<Long> getAssetRendererClassNameIds(long groupId)
-		throws PortalException, SystemException {
+	private List<Long> _getAssetRendererClassNameIds(long groupId)
+		throws PortalException {
 
-		if ((assetRendererClassNameIdsPerGroupIdCache != null) &&
-			assetRendererClassNameIdsPerGroupIdCache.containsKey(groupId)) {
+		if ((_assetRendererClassNameIdsPerGroupIdCache != null) &&
+			_assetRendererClassNameIdsPerGroupIdCache.containsKey(groupId)) {
 
-			return assetRendererClassNameIdsPerGroupIdCache.get(groupId);
+			return _assetRendererClassNameIdsPerGroupIdCache.get(groupId);
 		}
 
 		Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
 		conjunction.add(RestrictionsFactoryUtil.eq("groupId", groupId));
 		conjunction.add(RestrictionsFactoryUtil.eq("visible", true));
 
 		List<Long> availableClassNameIds =
-			(List<Long>)QueryUtil.executeEntityModelQuery(
+			(List<Long>)_liferayGenQueryHandler.executeEntityModelQuery(
 				AssetEntry.class.getName(), "distinct(classNameId)",
 				conjunction);
 
-		List<Long> assetRendererClassNameIds = new ArrayList<Long>();
+		List<Long> assetRendererClassNameIds = new ArrayList<>();
 
 		for (Long classNameId : availableClassNameIds) {
-			ClassName className = ClassNameLocalServiceUtil.getClassName(
+			ClassName className = _classNameLocalService.getClassName(
 				classNameId);
 
 			AssetRendererFactory assetRendererFactory =
@@ -302,31 +347,32 @@ public class AddPortletAssetPublisherDynamic
 			}
 		}
 
-		if (assetRendererClassNameIdsPerGroupIdCache != null) {
-			assetRendererClassNameIdsPerGroupIdCache.put(
+		if (_assetRendererClassNameIdsPerGroupIdCache != null) {
+			_assetRendererClassNameIdsPerGroupIdCache.put(
 				groupId, assetRendererClassNameIds);
 		}
 
 		return assetRendererClassNameIds;
 	}
 
-	private List<Long> getAvailableClassTypeIds(
+	private List<Long> _getAvailableClassTypeIds(
 			AssetRendererFactory assetRendererFactory, long companyId,
 			long groupId, Locale locale)
 		throws Exception {
 
-		Company company = CompanyLocalServiceUtil.getCompany(companyId);
+		Company company = _companyLocalService.getCompany(companyId);
 
-		long[] groupIds = {company.getGroup().getGroupId(), groupId};
+		long[] groupIds = {company.getGroupId(), groupId};
 
 		Map<Long, String> classTypes = assetRendererFactory.getClassTypes(
-				groupIds, locale);
+			groupIds, locale);
 
 		if ((classTypes == null) || classTypes.isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
 		conjunction.add(
 			RestrictionsFactoryUtil.eq(
 				"classNameId", assetRendererFactory.getClassNameId()));
@@ -334,13 +380,12 @@ public class AddPortletAssetPublisherDynamic
 		conjunction.add(
 			RestrictionsFactoryUtil.in("classTypeId", classTypes.keySet()));
 
-		return (List<Long>)QueryUtil.executeEntityModelQuery(
-				AssetEntry.class.getName(), "distinct(classTypeId)",
-				conjunction);
+		return (List<Long>)_liferayGenQueryHandler.executeEntityModelQuery(
+			AssetEntry.class.getName(), "distinct(classTypeId)", conjunction);
 	}
 
-	private <T> long getNumberOfIdsToSelect(Collection<T> availableIds) {
-		long mode = ValueGenerator.getRandomLongFromRange(0, 4);
+	private <T> long _getNumberOfIdsToSelect(Collection<T> availableIds) {
+		long mode = liferayGenValueGenerator.getRandomLongFromRange(0, 4);
 
 		if (mode == 0) {
 
@@ -359,14 +404,15 @@ public class AddPortletAssetPublisherDynamic
 			// Select more than one asset type = 20%
 
 			long min = Math.min(2, availableIds.size());
+
 			long max = Math.max(min, availableIds.size());
 
-			return ValueGenerator.getRandomLongFromRange(min, max);
+			return liferayGenValueGenerator.getRandomLongFromRange(min, max);
 		}
 	}
 
-	private List<Long> getSelectedClassNameIds(
-			List<Long> availableClassNameIds, long numberOfIdsToSelect) {
+	private List<Long> _getSelectedClassNameIds(
+		List<Long> availableClassNameIds, long numberOfIdsToSelect) {
 
 		if (numberOfIdsToSelect == 0) {
 			return availableClassNameIds;
@@ -375,31 +421,32 @@ public class AddPortletAssetPublisherDynamic
 		if (numberOfIdsToSelect == 1) {
 			Long randomClassNameId;
 
-			if (ValueGenerator.getBoolean()) {
+			if (liferayGenValueGenerator.getBoolean()) {
 
 				// When numberOfClassNameIds==1, select JournalArticle = 50%
 
-				randomClassNameId = PortalUtil.getClassNameId(
+				randomClassNameId = _portal.getClassNameId(
 					JournalArticle.class);
 			}
 			else {
-				randomClassNameId = ValueGenerator.getRandomObjectFromList(
-					availableClassNameIds);
+				randomClassNameId =
+					liferayGenValueGenerator.getRandomObjectFromList(
+						availableClassNameIds);
 			}
 
 			return Collections.singletonList(randomClassNameId);
 		}
 
-		return ValueGenerator.getRandomObjectsFromList(
+		return liferayGenValueGenerator.getRandomObjectsFromList(
 			availableClassNameIds, numberOfIdsToSelect);
 	}
 
-	private void setAssetClassTypeParameters(
+	private void _setAssetClassTypeParameters(
 			MockActionRequest actionRequest, long classNameId, Layout layout,
 			Locale locale)
 		throws Exception {
 
-		String className = PortalUtil.getClassName(classNameId);
+		String className = _portal.getClassName(classNameId);
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
@@ -413,9 +460,9 @@ public class AddPortletAssetPublisherDynamic
 			return;
 		}
 
-		List<Long> availableClassTypeIds = getAvailableClassTypeIds(
-				assetRendererFactory, layout.getCompanyId(),
-				layout.getGroupId(), locale);
+		List<Long> availableClassTypeIds = _getAvailableClassTypeIds(
+			assetRendererFactory, layout.getCompanyId(), layout.getGroupId(),
+			locale);
 
 		if (availableClassTypeIds.isEmpty()) {
 			return;
@@ -423,21 +470,22 @@ public class AddPortletAssetPublisherDynamic
 
 		List<Long> selectedClassTypeIds;
 
-		long numberOfIdsToSelect = getNumberOfIdsToSelect(
-				availableClassTypeIds);
+		long numberOfIdsToSelect = _getNumberOfIdsToSelect(
+			availableClassTypeIds);
 
 		if (numberOfIdsToSelect == 0) {
 			selectedClassTypeIds = availableClassTypeIds;
 		}
 		else {
-			selectedClassTypeIds = ValueGenerator.getRandomObjectsFromList(
-				availableClassTypeIds, numberOfIdsToSelect);
+			selectedClassTypeIds =
+				liferayGenValueGenerator.getRandomObjectsFromList(
+					availableClassTypeIds, numberOfIdsToSelect);
 		}
 
 		String anyClassType = String.valueOf(numberOfIdsToSelect == 0);
 		String classTypeIds = StringUtil.merge(selectedClassTypeIds);
 
-		String assetRendererFactoryName = getClassName(assetRendererFactory);
+		String assetRendererFactoryName = _getClassName(assetRendererFactory);
 
 		setPreferencesParameter(
 			actionRequest, "anyClassType" + assetRendererFactoryName,
@@ -447,10 +495,25 @@ public class AddPortletAssetPublisherDynamic
 			classTypeIds);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		AddPortletAssetPublisherDynamic.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AddDynamicAssetPublisherPortletLiferayGenAction.class);
 
 	private static Map<Long, List<Long>>
-		assetRendererClassNameIdsPerGroupIdCache = null;
+		_assetRendererClassNameIdsPerGroupIdCache;
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }

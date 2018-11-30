@@ -12,25 +12,30 @@
  * details.
  */
 
-package com.liferay.liferaygen.web.internal.actions.portlet;
+package com.liferay.liferaygen.asset.internal.portlet;
 
-import com.liferay.liferaygen.config.ActionConfig;
-import com.liferay.liferaygen.util.QueryUtil;
-import com.liferay.liferaygen.util.ValueGenerator;
+import aQute.bnd.annotation.component.Activate;
+
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.liferaygen.LiferayGenAction;
+import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
+import com.liferay.liferaygen.util.LiferayGenQueryHandler;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
+import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.PortletConfigFactoryUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,23 +49,46 @@ import javax.portlet.PortletPreferences;
 
 import javax.servlet.ServletContext;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.portlet.MockActionRequest;
 import org.springframework.mock.web.portlet.MockActionResponse;
 
-import static com.liferay.liferaygen.util.ValueGenerator.getRandomIntegerFromRange;
-public class AddPortletAssetPublisherManual
-	extends AddPortletAssetPublisherBase {
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
+@Component(
+	immediate = true,
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.asset.internal.portlet.AddManualAssetPublisherPortletLiferayGenAction",
+	service = LiferayGenAction.class
+)
+public class AddManualAssetPublisherPortletLiferayGenAction
+	extends BaseAssetPublisherAddPortletLiferayGenAction {
+
+	@Activate
+	public void activate() {
+		liferayGenValueGenerator = new LiferayGenValueGenerator(
+			_companyLocalService, _liferayGenQueryHandler, _portal,
+			_portletLocalService);
+
+		initUpdateLayoutActionMethod();
+	}
 
 	public void destroy() {
-		assetEntryMapCache = null;
+		_assetEntryMapCache = null;
 	}
 
 	@Override
 	public String doGetDescription() {
-		return "Adds a random manual Asset Publisher in a random layout in a " +
-			"random position. Portlet configuration will be random. Layout " +
-			"can be specified in parameters";
+		return StringBundler.concat(
+			"Adds a random manual Asset Publisher in a random layout in a ",
+			"random position. Portlet configuration will be random. Layout ",
+			"can be specified in parameters");
 	}
 
 	@Override
@@ -82,21 +110,23 @@ public class AddPortletAssetPublisherManual
 				put(
 					"layoutId",
 					"Force adding portlet to the layout with this layoutId, " +
-					"instead of using target parameter");
+						"instead of using target parameter");
 				put("plid", "Same as layoutId");
-				put(ActionConfig.TARGET, "Layout to use during add action");
+				put(
+					LiferayGenActionConfig.TARGET,
+					"Layout to use during add action");
 			}
 		};
 	}
 
 	public void init() {
 		List<Object[]> allVisibleAssetEntries =
-			(List<Object[]>)QueryUtil.executeEntityModelQuery(
-				AssetEntry.class.getName(), "entryId,classNameId,groupId",
+			(List<Object[]>)_liferayGenQueryHandler.executeEntityModelQuery(
+				AssetEntry.class.getName(), "entryId, classNameId, groupId",
 				RestrictionsFactoryUtil.eq("visible", true));
 
 		Map<Long, List<Object[]>> assetEntryMapCacheAux =
-			new ConcurrentHashMap<Long, List<Object[]>>();
+			new ConcurrentHashMap<>();
 
 		for (Object[] assetEntry : allVisibleAssetEntries) {
 			Long groupId = (Long)assetEntry[2];
@@ -105,7 +135,7 @@ public class AddPortletAssetPublisherManual
 				groupId);
 
 			if (groupAssetEntries == null) {
-				groupAssetEntries = new ArrayList<Object[]>();
+				groupAssetEntries = new ArrayList<>();
 
 				assetEntryMapCacheAux.put(groupId, groupAssetEntries);
 			}
@@ -113,7 +143,7 @@ public class AddPortletAssetPublisherManual
 			groupAssetEntries.add(assetEntry);
 		}
 
-		assetEntryMapCache = assetEntryMapCacheAux;
+		_assetEntryMapCache = assetEntryMapCacheAux;
 	}
 
 	@Override
@@ -133,10 +163,12 @@ public class AddPortletAssetPublisherManual
 		Locale locale = getLayoutDefaultLocale(layout);
 
 		MockHttpServletRequest request =
-			ValueGenerator.getMockHttpServletRequest(layout, user, locale);
+			liferayGenValueGenerator.getMockHttpServletRequest(
+				layout, user, locale);
 
-		MockActionRequest actionRequest = ValueGenerator.getMockActionRequest(
-			request, portlet, portletPreferences);
+		MockActionRequest actionRequest =
+			liferayGenValueGenerator.getMockActionRequest(
+				request, portlet, portletPreferences);
 
 		MockActionResponse actionResponse = new MockActionResponse();
 
@@ -145,16 +177,19 @@ public class AddPortletAssetPublisherManual
 
 		/* set selection style to manual */
 		actionRequest.setParameter(Constants.CMD, "selection-style");
+
 		setPreferencesParameter(actionRequest, "selectionStyle", "manual");
 
 		configurationAction.processAction(
 			portletConfig, actionRequest, actionResponse);
 
 		portletPreferences = getPortletPreferences(layout, portlet);
+
 		actionRequest.setPreferences(portletPreferences);
 
 		/* set scope */
 		actionRequest.setParameter(Constants.CMD, "select-scope");
+
 		setPreferencesParameter(
 			actionRequest, "scopeIds", "Group_" + layout.getGroupId());
 
@@ -162,6 +197,7 @@ public class AddPortletAssetPublisherManual
 			portletConfig, actionRequest, actionResponse);
 
 		portletPreferences = getPortletPreferences(layout, portlet);
+
 		actionRequest.setPreferences(portletPreferences);
 
 		try {
@@ -169,17 +205,19 @@ public class AddPortletAssetPublisherManual
 			actionRequest.setParameter(Constants.CMD, Constants.UPDATE);
 			actionRequest.setParameter(
 				"defaultAssetPublisher",
-				Boolean.toString(ValueGenerator.getBoolean()));
+				Boolean.toString(liferayGenValueGenerator.getBoolean()));
 
 			configurationAction.processAction(
 				portletConfig, actionRequest, actionResponse);
 		}
-		catch (PrincipalException pe) {
+		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
-				String warn = pe.getMessage();
+				String warn = e.getMessage();
 
 				if (Validator.isNull(warn)) {
-					warn = pe.getClass().getName();
+					Class<? extends Exception> clazz = e.getClass();
+
+					warn = clazz.getName();
 				}
 
 				_log.warn(warn);
@@ -187,22 +225,22 @@ public class AddPortletAssetPublisherManual
 		}
 
 		portletPreferences = getPortletPreferences(layout, portlet);
+
 		actionRequest.setPreferences(portletPreferences);
 
-		List<Object[]> groupAssetEntries = assetEntryMapCache.get(
+		List<Object[]> groupAssetEntries = _assetEntryMapCache.get(
 			layout.getGroupId());
 
-		int numElements = getRandomIntegerFromRange(
-			1, MAX_ASSET_PUBLISHER_ELEMENTS);
+		int numElements = liferayGenValueGenerator.getRandomIntegerFromRange(
+			1, _MAX_ASSET_PUBLISHER_ELEMENTS);
 
 		List<Object[]> assetEntryList =
-			(List<Object[]>)ValueGenerator.getRandomObjectsFromList(
+			liferayGenValueGenerator.getRandomObjectsFromList(
 				groupAssetEntries, numElements);
 
 		for (Object[] assetEntry : assetEntryList) {
 			String assetEntryId = String.valueOf((Long)assetEntry[0]);
-			String assetEntryType = PortalUtil.getClassName(
-				(Long)assetEntry[1]);
+			String assetEntryType = _portal.getClassName((Long)assetEntry[1]);
 
 			actionRequest.setParameter(Constants.CMD, "add-selection");
 			actionRequest.setParameter("assetEntryId", assetEntryId);
@@ -213,15 +251,28 @@ public class AddPortletAssetPublisherManual
 				portletConfig, actionRequest, actionResponse);
 
 			portletPreferences = getPortletPreferences(layout, portlet);
+
 			actionRequest.setPreferences(portletPreferences);
 		}
 	}
 
-	private static final int MAX_ASSET_PUBLISHER_ELEMENTS = 200;
+	private static final int _MAX_ASSET_PUBLISHER_ELEMENTS = 200;
 
-	private static Log _log = LogFactoryUtil.getLog(
-		AddPortletAssetPublisherManual.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AddManualAssetPublisherPortletLiferayGenAction.class);
 
-	private static Map<Long, List<Object[]>> assetEntryMapCache = null;
+	private static Map<Long, List<Object[]>> _assetEntryMapCache;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private LiferayGenQueryHandler _liferayGenQueryHandler;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }
