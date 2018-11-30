@@ -15,8 +15,8 @@
 package com.liferay.liferaygen.action.config;
 
 import com.liferay.liferaygen.LiferayGenAction;
-import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 import com.liferay.liferaygen.LiferayGenTarget;
+import com.liferay.liferaygen.value.generator.LiferayGenValueGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;

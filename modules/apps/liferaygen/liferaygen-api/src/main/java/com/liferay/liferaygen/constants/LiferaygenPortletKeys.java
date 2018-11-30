@@ -14,8 +14,15 @@
 
 package com.liferay.liferaygen.constants;
 
+/**
+ * @author Jorge Díaz
+ * @author Alberto Chaparro
+ * @author Daniel Couso
+ * @author Roberto Díaz
+ */
 public class LiferaygenPortletKeys {
 
-	public static final String LIFERAYGEN_ADMIN =
-		"com_liferay_liferaygen_web_portlet_LiferaygenAdminPortlet";
+	public static final String LIFERAY_GEN_ADMIN =
+		"com_liferay_liferaygen_web_portlet_LiferayGenAdminPortlet";
+
 }

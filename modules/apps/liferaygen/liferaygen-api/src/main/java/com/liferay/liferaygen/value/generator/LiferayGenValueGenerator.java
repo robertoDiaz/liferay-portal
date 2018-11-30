@@ -50,8 +50,8 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-
 import com.liferay.portal.kernel.util.WebKeys;
+
 import com.maximeroussy.invitrode.WordGenerator;
 
 import java.awt.Color;
@@ -81,6 +81,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 
 import javax.portlet.PortletPreferences;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -101,8 +102,8 @@ public class LiferayGenValueGenerator {
 
 	public LiferayGenValueGenerator(
 		CompanyLocalService companyLocalService,
-		LiferayGenQueryHandler liferayGenQueryHandler,
-		Portal portal, PortletLocalService portletLocalService) {
+		LiferayGenQueryHandler liferayGenQueryHandler, Portal portal,
+		PortletLocalService portletLocalService) {
 
 		_companyLocalService = companyLocalService;
 		_liferayGenQueryHandler = liferayGenQueryHandler;
@@ -292,8 +293,8 @@ public class LiferayGenValueGenerator {
 	}
 
 	public MockActionRequest getMockActionRequest(
-		HttpServletRequest request, Portlet portlet,
-		PortletPreferences portletPreferences)
+			HttpServletRequest request, Portlet portlet,
+			PortletPreferences portletPreferences)
 		throws Exception {
 
 		MockActionRequest actionRequest = new MockActionRequest();
@@ -1025,15 +1026,10 @@ public class LiferayGenValueGenerator {
 		LiferayGenValueGenerator.class);
 
 	private List<String> _availableImageIOFormats;
-
-	private CompanyLocalService _companyLocalService;
-
-	private LiferayGenQueryHandler _liferayGenQueryHandler;
-
-	private Portal _portal;
-
-	private PortletLocalService _portletLocalService;
-
+	private final CompanyLocalService _companyLocalService;
+	private final LiferayGenQueryHandler _liferayGenQueryHandler;
+	private final Portal _portal;
+	private final PortletLocalService _portletLocalService;
 	private Map<Long, List<Long>> _userIdsCache;
 
 }

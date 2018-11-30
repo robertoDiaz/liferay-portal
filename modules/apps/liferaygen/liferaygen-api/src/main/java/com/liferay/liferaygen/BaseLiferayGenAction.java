@@ -40,10 +40,6 @@ public abstract class BaseLiferayGenAction implements LiferayGenAction {
 		_parameters = parameters;
 	}
 
-	protected Map<String, Object> getParameters() {
-		return _parameters;
-	}
-
 	@Override
 	public void destroy() {
 	}
@@ -132,6 +128,10 @@ public abstract class BaseLiferayGenAction implements LiferayGenAction {
 	}
 
 	protected abstract void doRun() throws Exception;
+
+	protected Map<String, Object> getParameters() {
+		return _parameters;
+	}
 
 	private <T> Map<String, T> _getUnmodifiableMap(Map<String, T> map) {
 		if (map == null) {

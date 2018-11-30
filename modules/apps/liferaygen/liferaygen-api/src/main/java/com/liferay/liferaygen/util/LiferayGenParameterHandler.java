@@ -33,8 +33,9 @@ public interface LiferayGenParameterHandler {
 		LiferayGenAction liferayGenAction, Map<String, Object> configuration,
 		Map<String, Object> parameters);
 
+	public List<Long> getGroupIds(Map<String, Object> parameters);
+
 	public int getParamAsIntegerPercentage(
 		Map<String, Object> parameters, String parameter);
 
-	List<Long> getGroupIds(Map<String, Object> parameters);
 }

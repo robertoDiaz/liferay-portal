@@ -15,6 +15,7 @@
 package com.liferay.liferaygen.util;
 
 import java.util.Map;
+
 /**
  * @author Jorge Díaz
  * @author Alberto Chaparro
