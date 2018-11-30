@@ -16,7 +16,10 @@ package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLPreview;
+import com.liferay.document.library.kernel.model.DLPreviewConstants;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.service.DLPreviewLocalServiceUtil;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.document.library.kernel.util.DLUtil;
@@ -103,7 +106,7 @@ public class PDFProcessorImpl
 
 	@Override
 	public void generateImages(
-			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+		FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
 		_generateImages(sourceFileVersion, destinationFileVersion);
@@ -255,8 +258,8 @@ public class PDFProcessorImpl
 
 	@Override
 	protected void doExportGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			Element fileEntryElement)
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		Element fileEntryElement)
 		throws Exception {
 
 		exportThumbnails(
@@ -267,8 +270,8 @@ public class PDFProcessorImpl
 
 	@Override
 	protected void doImportGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			FileEntry importedFileEntry, Element fileEntryElement)
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		FileEntry importedFileEntry, Element fileEntryElement)
 		throws Exception {
 
 		importThumbnails(
@@ -280,8 +283,8 @@ public class PDFProcessorImpl
 	}
 
 	protected void exportPreviews(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			Element fileEntryElement)
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		Element fileEntryElement)
 		throws Exception {
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
@@ -334,8 +337,8 @@ public class PDFProcessorImpl
 	}
 
 	protected void importPreviews(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			FileEntry importedFileEntry, Element fileEntryElement)
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		FileEntry importedFileEntry, Element fileEntryElement)
 		throws Exception {
 
 		int previewFileCount = GetterUtil.getInteger(
@@ -358,18 +361,18 @@ public class PDFProcessorImpl
 
 			arguments.add(
 				"-dDEVICEWIDTH=" +
-					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
+				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
 
 			arguments.add(
 				"-dDEVICEHEIGHT=" +
-					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
+				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
 		}
 		else if ((PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH != 0) &&
 				 (PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT == 0)) {
 
 			arguments.add(
 				"-dDEVICEWIDTH=" +
-					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
+				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
 
 			arguments.add("-dDEVICEHEIGHT=" + scaledDimensions.get("height"));
 		}
@@ -380,7 +383,7 @@ public class PDFProcessorImpl
 
 			arguments.add(
 				"-dDEVICEHEIGHT=" +
-					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
+				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
 		}
 	}
 
@@ -402,7 +405,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImages(
-			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+		FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
 		try {
@@ -435,21 +438,21 @@ public class PDFProcessorImpl
 				}
 
 				try (InputStream inputStream =
-						destinationFileVersion.getContentStream(false)) {
+						 destinationFileVersion.getContentStream(false)) {
 
 					_generateImages(destinationFileVersion, inputStream);
 				}
 			}
 			else if (DocumentConversionUtil.isEnabled()) {
 				try (InputStream inputStream =
-						destinationFileVersion.getContentStream(false)) {
+						 destinationFileVersion.getContentStream(false)) {
 
 					String tempFileId = DLUtil.getTempFileId(
 						destinationFileVersion.getFileEntryId(),
 						destinationFileVersion.getVersion());
 
 					if (Objects.equals(
-							"PWC", destinationFileVersion.getVersion()) ||
+						"PWC", destinationFileVersion.getVersion()) ||
 						destinationFileVersion.isPending()) {
 
 						File file = new File(
@@ -477,7 +480,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImages(
-			FileVersion fileVersion, InputStream inputStream)
+		FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		if (GhostscriptUtil.isEnabled()) {
@@ -528,8 +531,16 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesGS(
-			FileVersion fileVersion, File file, boolean thumbnail)
+		FileVersion fileVersion, File file, boolean thumbnail)
 		throws Exception {
+
+		DLPreview dlPreview=
+			DLPreviewLocalServiceUtil.fetchDLPreview(fileVersion);
+
+		if (dlPreview == null) {
+			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
+				fileVersion.getFileEntryId(), fileVersion.getFileVersionId());
+		}
 
 		// Generate images
 
@@ -600,11 +611,19 @@ public class PDFProcessorImpl
 				errorMessage += " resulted in a canceled timeout for " + future;
 			}
 
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 			_log.error(errorMessage);
 
 			throw te;
 		}
 		catch (Exception e) {
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 			_log.error(e, e);
 
 			throw e;
@@ -635,6 +654,10 @@ public class PDFProcessorImpl
 						previewTempFile);
 				}
 				finally {
+					dlPreview.setStatus(DLPreviewConstants.STATUS_CREATED);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 					FileUtil.delete(previewTempFile);
 				}
 			}
@@ -642,7 +665,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesGS(
-			FileVersion fileVersion, InputStream inputStream)
+		FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		File file = null;
@@ -660,6 +683,14 @@ public class PDFProcessorImpl
 	private void _generateImagesPB(FileVersion fileVersion, File file)
 		throws Exception {
 
+		DLPreview dlPreview =
+			DLPreviewLocalServiceUtil.fetchDLPreview(fileVersion);
+
+		if (dlPreview == null) {
+			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
+				fileVersion.getFileEntryId(), fileVersion.getFileVersionId());
+		}
+
 		String tempFileId = DLUtil.getTempFileId(
 			fileVersion.getFileEntryId(), fileVersion.getVersion());
 
@@ -670,7 +701,11 @@ public class PDFProcessorImpl
 		if (previewFilesCount == 0) {
 			_log.error(
 				"Unable to decrypt PDF document for file version " +
-					fileVersion.getFileVersionId());
+				fileVersion.getFileVersionId());
+
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 
 			return;
 		}
@@ -752,19 +787,19 @@ public class PDFProcessorImpl
 				if (generateThumbnail && generatePreview) {
 					errorMessage =
 						"Timeout when generating thumbnail and preview for " +
-							decryptedFile.getPath();
+						decryptedFile.getPath();
 				}
 				else {
 					if (generateThumbnail) {
 						errorMessage =
 							"Timeout when generating thumbnail for " +
-								decryptedFile.getPath();
+							decryptedFile.getPath();
 					}
 
 					if (generatePreview) {
 						errorMessage =
 							"Timeout when generating preview for " +
-								decryptedFile.getPath();
+							decryptedFile.getPath();
 					}
 				}
 
@@ -775,10 +810,18 @@ public class PDFProcessorImpl
 
 				_log.error(errorMessage);
 
+				dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+				DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 				throw te;
 			}
 			catch (Exception e) {
 				_log.error(e, e);
+
+				dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+				DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 
 				throw e;
 			}
@@ -816,6 +859,10 @@ public class PDFProcessorImpl
 						fileVersion.getCompanyId(), PREVIEW_PATH,
 						getPreviewFilePath(fileVersion, index + 1),
 						previewFile);
+
+					dlPreview.setStatus(DLPreviewConstants.STATUS_CREATED);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 				}
 				finally {
 					FileUtil.delete(previewFile);
@@ -861,7 +908,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesPB(
-			FileVersion fileVersion, InputStream inputStream)
+		FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		File file = null;
@@ -883,8 +930,8 @@ public class PDFProcessorImpl
 			StringPool.BLANK);
 
 		for (String decryptPassword : decryptPasswords) {
-			try (PDDocument pdDocument = PDDocument.load(
-					encryptedFile, decryptPassword)) {
+			try (PDDocument pdDocument =
+					 PDDocument.load(encryptedFile, decryptPassword)) {
 
 				pdDocument.setAllSecurityToBeRemoved(true);
 
@@ -921,7 +968,7 @@ public class PDFProcessorImpl
 
 			double widthFactor =
 				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH /
-					width;
+				width;
 
 			float height = pdRectangle.getHeight();
 
@@ -931,7 +978,7 @@ public class PDFProcessorImpl
 
 			double heightFactor =
 				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT /
-					height;
+				height;
 
 			int scaledWidth = (int)Math.round(heightFactor * width);
 
@@ -979,7 +1026,7 @@ public class PDFProcessorImpl
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
 
 		if (_fileVersionIds.contains(
-				destinationFileVersion.getFileVersionId())) {
+			destinationFileVersion.getFileVersionId())) {
 
 			return;
 		}
