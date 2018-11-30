@@ -87,6 +87,11 @@ public class CreateUserLiferayGenAction extends BaseLiferayGenAction {
 	}
 
 	@Override
+	public String getName() {
+		return "CreateUserLiferayGenAction";
+	}
+
+	@Override
 	public boolean hasScopeByGroupId() {
 		return false;
 	}

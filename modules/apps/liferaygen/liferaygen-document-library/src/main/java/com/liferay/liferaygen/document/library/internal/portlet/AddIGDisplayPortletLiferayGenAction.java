@@ -117,6 +117,11 @@ public class AddIGDisplayPortletLiferayGenAction
 	}
 
 	@Override
+	public String getName() {
+		return "AddIGDisplayPortletLiferayGenAction";
+	}
+
+	@Override
 	protected void doUpdatePortletPreferences(
 			User user, Layout layout, Portlet portlet,
 			PortletPreferences portletPreferences)

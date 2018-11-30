@@ -134,6 +134,11 @@ public class AddDynamicAssetPublisherPortletLiferayGenAction
 	}
 
 	@Override
+	public String getName() {
+		return "AddDynamicAssetPublisherPortletLiferayGenAction";
+	}
+
+	@Override
 	public void init() {
 		_assetRendererClassNameIdsPerGroupIdCache = new ConcurrentHashMap<>();
 	}

@@ -82,6 +82,13 @@ public interface LiferayGenAction {
 	public String getEntityProperties();
 
 	/**
+	 * Returns action description
+	 *
+	 * @return description
+	 */
+	public String getName();
+
+	/**
 	 * Returns the default values for action parameters
 	 *
 	 * @return default parameters

@@ -45,9 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	properties = {
-		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.AddGenericPortletLiferayGenAction"
-	},
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.AddGenericPortletLiferayGenAction",
 	service = LiferayGenAction.class
 )
 public class AddGenericPortletLiferayGenAction
@@ -102,6 +100,11 @@ public class AddGenericPortletLiferayGenAction
 					"Layout to use during add action");
 			}
 		};
+	}
+
+	@Override
+	public String getName() {
+		return "AddGenericPortletLiferayGenAction";
 	}
 
 	@Override

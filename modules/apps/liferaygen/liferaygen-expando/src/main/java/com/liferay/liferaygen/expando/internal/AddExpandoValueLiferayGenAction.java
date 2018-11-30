@@ -69,9 +69,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	properties = {
-		"liferaygen.action.class.name=com.liferay.liferaygen.expando.internal.AddExpandoValueLiferayGenAction"
-	},
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.expando.internal.AddExpandoValueLiferayGenAction",
 	service = LiferayGenAction.class
 )
 public class AddExpandoValueLiferayGenAction extends BaseLiferayGenAction {
@@ -115,6 +113,11 @@ public class AddExpandoValueLiferayGenAction extends BaseLiferayGenAction {
 	@Override
 	public String getEntityProperties() {
 		return "classNameId";
+	}
+
+	@Override
+	public String getName() {
+		return "AddExpandoValueLiferayGenAction";
 	}
 
 	@Override

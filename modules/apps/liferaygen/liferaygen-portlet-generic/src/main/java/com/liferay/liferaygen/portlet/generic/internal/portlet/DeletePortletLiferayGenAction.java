@@ -54,9 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	properties = {
-		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.DeletePortletLiferayGenAction"
-	},
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.DeletePortletLiferayGenAction",
 	service = LiferayGenAction.class
 )
 public class DeletePortletLiferayGenAction extends BasePortletLiferayGenAction {
@@ -98,6 +96,11 @@ public class DeletePortletLiferayGenAction extends BasePortletLiferayGenAction {
 					"Layout to use during delete action");
 			}
 		};
+	}
+
+	@Override
+	public String getName() {
+		return "DeletePortletLiferayGenAction";
 	}
 
 	@Override

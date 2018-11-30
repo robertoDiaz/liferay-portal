@@ -20,7 +20,7 @@ package com.liferay.liferaygen.constants;
  * @author Daniel Couso
  * @author Roberto Díaz
  */
-public class LiferaygenPortletKeys {
+public class LiferayGenPortletKeys {
 
 	public static final String LIFERAY_GEN_ADMIN =
 		"com_liferay_liferaygen_web_portlet_LiferayGenAdminPortlet";

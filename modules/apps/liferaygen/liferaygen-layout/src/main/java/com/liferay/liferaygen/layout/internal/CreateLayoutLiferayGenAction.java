@@ -146,6 +146,11 @@ public class CreateLayoutLiferayGenAction extends BaseLiferayGenAction {
 	}
 
 	@Override
+	public String getName() {
+		return "CreateLayoutLiferayGenAction";
+	}
+
+	@Override
 	public boolean hasScopeByGroupId() {
 		return true;
 	}

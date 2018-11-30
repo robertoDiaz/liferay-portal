@@ -58,9 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	properties = {
-		"liferaygen.action.class.name=com.liferay.liferaygen.expando.internal.CreateExpandoFieldLiferayGenAction"
-	},
+	properties = "liferaygen.action.class.name=com.liferay.liferaygen.expando.internal.CreateExpandoFieldLiferayGenAction",
 	service = LiferayGenAction.class
 )
 public class CreateExpandoFieldLiferayGenAction extends BaseLiferayGenAction {
@@ -78,6 +76,11 @@ public class CreateExpandoFieldLiferayGenAction extends BaseLiferayGenAction {
 	@Override
 	public Map<String, String> doGetParametersDescription() {
 		return null;
+	}
+
+	@Override
+	public String getName() {
+		return "CreateExpandoFieldLiferayGenAction";
 	}
 
 	@Override

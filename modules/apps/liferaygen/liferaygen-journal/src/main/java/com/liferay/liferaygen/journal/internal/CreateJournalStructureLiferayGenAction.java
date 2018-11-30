@@ -114,6 +114,11 @@ public class CreateJournalStructureLiferayGenAction
 		};
 	}
 
+	@Override
+	public String getName() {
+		return "CreateJournalStructureLiferayGenAction";
+	}
+
 	protected static String getVMTemplateContent() throws IOException {
 		ClassLoader classLoader =
 			CreateJournalStructureLiferayGenAction.class.getClassLoader();

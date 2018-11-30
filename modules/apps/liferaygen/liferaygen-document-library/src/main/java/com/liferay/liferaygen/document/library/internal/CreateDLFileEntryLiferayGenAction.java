@@ -97,6 +97,11 @@ public class CreateDLFileEntryLiferayGenAction extends BaseLiferayGenAction {
 	}
 
 	@Override
+	public String getName() {
+		return "CreateDLFileEntryLiferayGenAction";
+	}
+
+	@Override
 	protected void doRun() {
 		Map<String, Object> parameters = getParameters();
 

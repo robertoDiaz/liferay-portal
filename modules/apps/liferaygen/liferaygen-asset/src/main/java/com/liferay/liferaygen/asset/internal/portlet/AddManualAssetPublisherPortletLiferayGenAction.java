@@ -119,6 +119,11 @@ public class AddManualAssetPublisherPortletLiferayGenAction
 		};
 	}
 
+	@Override
+	public String getName() {
+		return "AddManualAssetPublisherPortletLiferayGenAction";
+	}
+
 	public void init() {
 		List<Object[]> allVisibleAssetEntries =
 			(List<Object[]>)_liferayGenQueryHandler.executeEntityModelQuery(

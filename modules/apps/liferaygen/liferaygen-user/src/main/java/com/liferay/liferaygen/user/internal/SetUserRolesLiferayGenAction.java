@@ -100,6 +100,11 @@ public class SetUserRolesLiferayGenAction extends BaseLiferayGenAction {
 	}
 
 	@Override
+	public String getName() {
+		return "SetUserRolesLiferayGenAction";
+	}
+
+	@Override
 	protected void doRun() {
 		Map<String, Object> parameters = getParameters();
 

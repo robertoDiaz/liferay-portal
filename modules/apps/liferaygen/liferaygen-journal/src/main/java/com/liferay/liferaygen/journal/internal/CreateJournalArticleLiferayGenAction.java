@@ -141,6 +141,11 @@ public class CreateJournalArticleLiferayGenAction extends BaseLiferayGenAction {
 		return "structureId";
 	}
 
+	@Override
+	public String getName() {
+		return "CreateJournalArticleLiferayGenAction";
+	}
+
 	protected static Calendar toCalendar(Date date) {
 		Calendar cal = Calendar.getInstance();
 

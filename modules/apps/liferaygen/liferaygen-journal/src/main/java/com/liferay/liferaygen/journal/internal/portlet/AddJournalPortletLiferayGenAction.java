@@ -113,6 +113,11 @@ public class AddJournalPortletLiferayGenAction
 	}
 
 	@Override
+	public String getName() {
+		return "AddJournalPortletLiferayGenAction";
+	}
+
+	@Override
 	protected void doUpdatePortletPreferences(
 			User user, Layout layout, Portlet portlet,
 			PortletPreferences portletPreferences)

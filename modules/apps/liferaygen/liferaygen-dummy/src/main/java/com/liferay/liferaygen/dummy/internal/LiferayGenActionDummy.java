@@ -62,6 +62,11 @@ public class LiferayGenActionDummy extends BaseLiferayGenAction {
 		return "userId,contactId";
 	}
 
+	@Override
+	public String getName() {
+		return "LiferayGenActionDummy";
+	}
+
 	protected void doRun() {
 		_log.error("start doRun");
 

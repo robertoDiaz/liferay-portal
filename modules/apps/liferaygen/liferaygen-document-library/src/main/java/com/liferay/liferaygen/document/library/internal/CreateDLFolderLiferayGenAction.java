@@ -93,6 +93,11 @@ public class CreateDLFolderLiferayGenAction extends BaseLiferayGenAction {
 		return "folderId";
 	}
 
+	@Override
+	public String getName() {
+		return "CreateDLFolderLiferayGenAction";
+	}
+
 	public void init() {
 		_portal.getClassNameId(
 			"com.liferay.portal.repository.liferayrepository." +

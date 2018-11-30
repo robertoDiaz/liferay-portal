@@ -103,6 +103,11 @@ public class UpdateAssetEntryLiferayGenAction extends BaseLiferayGenAction {
 	}
 
 	@Override
+	public String getName() {
+		return "UpdateAssetEntryLiferayGenAction";
+	}
+
+	@Override
 	protected void doRun() {
 		Map<String, Object> parameters = getParameters();
 

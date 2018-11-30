@@ -95,6 +95,11 @@ public abstract class BaseLiferayGenAction implements LiferayGenAction {
 		return RestrictionsFactoryUtil.eq("groupId", groupId);
 	}
 
+	@Override
+	public String getName() {
+		return null;
+	}
+
 	public final Map<String, Object> getParametersDefaultValues() {
 		return _getUnmodifiableMap(doGetParametersDefaultValues());
 	}
