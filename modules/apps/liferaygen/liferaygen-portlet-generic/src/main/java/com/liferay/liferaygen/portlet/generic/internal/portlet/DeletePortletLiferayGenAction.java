@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.portlet.generic.internal;
+package com.liferay.liferaygen.portlet.generic.internal.portlet;
 
 import com.liferay.liferaygen.LiferayGenAction;
 import com.liferay.liferaygen.action.config.LiferayGenActionConfig;
@@ -55,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	properties = {
-		"liferaygen.action.class.name=DeletePortletLiferayGenAction"
+		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.DeletePortletLiferayGenAction"
 	},
 	service = LiferayGenAction.class
 )

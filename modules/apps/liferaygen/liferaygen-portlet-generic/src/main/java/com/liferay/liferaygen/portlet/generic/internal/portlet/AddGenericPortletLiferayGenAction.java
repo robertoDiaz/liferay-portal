@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.liferaygen.portlet.generic.internal;
+package com.liferay.liferaygen.portlet.generic.internal.portlet;
 
 import aQute.bnd.annotation.component.Activate;
 
@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	properties = {
-		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.AddGenericPortletLiferayGenAction"
+		"liferaygen.action.class.name=com.liferay.liferaygen.portlet.generic.internal.portlet.AddGenericPortletLiferayGenAction"
 	},
 	service = LiferayGenAction.class
 )
