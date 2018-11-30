@@ -106,7 +106,7 @@ public class PDFProcessorImpl
 
 	@Override
 	public void generateImages(
-		FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
 		_generateImages(sourceFileVersion, destinationFileVersion);
@@ -258,8 +258,8 @@ public class PDFProcessorImpl
 
 	@Override
 	protected void doExportGeneratedFiles(
-		PortletDataContext portletDataContext, FileEntry fileEntry,
-		Element fileEntryElement)
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			Element fileEntryElement)
 		throws Exception {
 
 		exportThumbnails(
@@ -270,8 +270,8 @@ public class PDFProcessorImpl
 
 	@Override
 	protected void doImportGeneratedFiles(
-		PortletDataContext portletDataContext, FileEntry fileEntry,
-		FileEntry importedFileEntry, Element fileEntryElement)
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry, Element fileEntryElement)
 		throws Exception {
 
 		importThumbnails(
@@ -283,8 +283,8 @@ public class PDFProcessorImpl
 	}
 
 	protected void exportPreviews(
-		PortletDataContext portletDataContext, FileEntry fileEntry,
-		Element fileEntryElement)
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			Element fileEntryElement)
 		throws Exception {
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
@@ -337,8 +337,8 @@ public class PDFProcessorImpl
 	}
 
 	protected void importPreviews(
-		PortletDataContext portletDataContext, FileEntry fileEntry,
-		FileEntry importedFileEntry, Element fileEntryElement)
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry, Element fileEntryElement)
 		throws Exception {
 
 		int previewFileCount = GetterUtil.getInteger(
@@ -405,7 +405,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImages(
-		FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
 		try {
@@ -438,21 +438,21 @@ public class PDFProcessorImpl
 				}
 
 				try (InputStream inputStream =
-						 destinationFileVersion.getContentStream(false)) {
+						destinationFileVersion.getContentStream(false)) {
 
 					_generateImages(destinationFileVersion, inputStream);
 				}
 			}
 			else if (DocumentConversionUtil.isEnabled()) {
 				try (InputStream inputStream =
-						 destinationFileVersion.getContentStream(false)) {
+						destinationFileVersion.getContentStream(false)) {
 
 					String tempFileId = DLUtil.getTempFileId(
 						destinationFileVersion.getFileEntryId(),
 						destinationFileVersion.getVersion());
 
 					if (Objects.equals(
-						"PWC", destinationFileVersion.getVersion()) ||
+							"PWC", destinationFileVersion.getVersion()) ||
 						destinationFileVersion.isPending()) {
 
 						File file = new File(
@@ -480,7 +480,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImages(
-		FileVersion fileVersion, InputStream inputStream)
+			FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		if (GhostscriptUtil.isEnabled()) {
@@ -531,11 +531,11 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesGS(
-		FileVersion fileVersion, File file, boolean thumbnail)
+			FileVersion fileVersion, File file, boolean thumbnail)
 		throws Exception {
 
-		DLPreview dlPreview=
-			DLPreviewLocalServiceUtil.fetchDLPreview(fileVersion);
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			fileVersion);
 
 		if (dlPreview == null) {
 			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
@@ -665,7 +665,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesGS(
-		FileVersion fileVersion, InputStream inputStream)
+			FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		File file = null;
@@ -683,8 +683,8 @@ public class PDFProcessorImpl
 	private void _generateImagesPB(FileVersion fileVersion, File file)
 		throws Exception {
 
-		DLPreview dlPreview =
-			DLPreviewLocalServiceUtil.fetchDLPreview(fileVersion);
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			fileVersion);
 
 		if (dlPreview == null) {
 			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
@@ -908,7 +908,7 @@ public class PDFProcessorImpl
 	}
 
 	private void _generateImagesPB(
-		FileVersion fileVersion, InputStream inputStream)
+			FileVersion fileVersion, InputStream inputStream)
 		throws Exception {
 
 		File file = null;
@@ -931,7 +931,7 @@ public class PDFProcessorImpl
 
 		for (String decryptPassword : decryptPasswords) {
 			try (PDDocument pdDocument =
-					 PDDocument.load(encryptedFile, decryptPassword)) {
+					PDDocument.load(encryptedFile, decryptPassword)) {
 
 				pdDocument.setAllSecurityToBeRemoved(true);
 
@@ -1026,7 +1026,7 @@ public class PDFProcessorImpl
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
 
 		if (_fileVersionIds.contains(
-			destinationFileVersion.getFileVersionId())) {
+				destinationFileVersion.getFileVersionId())) {
 
 			return;
 		}
