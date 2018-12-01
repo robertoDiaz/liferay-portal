@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
@@ -69,6 +70,17 @@ public interface DLPreviewLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public DLPreview addDLPreview(DLPreview dlPreview);
+
+	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link DLPreviewLocalServiceUtil} to access the document library preview local service.
+	*/
+	public DLPreview addDLPreview(long fileEntryId, long fileVersionId)
+		throws PortalException;
+
+	public DLPreview addDLPreview(long fileEntryId, long fileVersionId,
+		String status) throws PortalException;
 
 	/**
 	* Creates a new document library preview with the primary key. Does not add the document library preview to the database.
@@ -172,6 +184,9 @@ public interface DLPreviewLocalService extends BaseLocalService,
 		Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DLPreview fetchDLPreview(FileVersion fileVersion);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DLPreview fetchDLPreview(long filePreviewId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -210,6 +225,13 @@ public interface DLPreviewLocalService extends BaseLocalService,
 	public int getDLPreviewsCount();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public String getDLPreviewStatus(FileVersion fileVersion);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public String getDLPreviewStatus(long fileEntryId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
@@ -232,4 +254,7 @@ public interface DLPreviewLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public DLPreview updateDLPreview(DLPreview dlPreview);
+
+	public DLPreview updateDLPreview(long dlPreviewId, long fileEntryId,
+		long fileVersionId, String status);
 }

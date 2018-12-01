@@ -46,6 +46,26 @@ public class DLPreviewLocalServiceWrapper implements DLPreviewLocalService,
 	}
 
 	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link DLPreviewLocalServiceUtil} to access the document library preview local service.
+	*/
+	@Override
+	public com.liferay.document.library.kernel.model.DLPreview addDLPreview(
+		long fileEntryId, long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlPreviewLocalService.addDLPreview(fileEntryId, fileVersionId);
+	}
+
+	@Override
+	public com.liferay.document.library.kernel.model.DLPreview addDLPreview(
+		long fileEntryId, long fileVersionId, String status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlPreviewLocalService.addDLPreview(fileEntryId, fileVersionId,
+			status);
+	}
+
+	/**
 	* Creates a new document library preview with the primary key. Does not add the document library preview to the database.
 	*
 	* @param filePreviewId the primary key for the new document library preview
@@ -179,6 +199,12 @@ public class DLPreviewLocalServiceWrapper implements DLPreviewLocalService,
 
 	@Override
 	public com.liferay.document.library.kernel.model.DLPreview fetchDLPreview(
+		com.liferay.portal.kernel.repository.model.FileVersion fileVersion) {
+		return _dlPreviewLocalService.fetchDLPreview(fileVersion);
+	}
+
+	@Override
+	public com.liferay.document.library.kernel.model.DLPreview fetchDLPreview(
 		long filePreviewId) {
 		return _dlPreviewLocalService.fetchDLPreview(filePreviewId);
 	}
@@ -230,6 +256,18 @@ public class DLPreviewLocalServiceWrapper implements DLPreviewLocalService,
 	}
 
 	@Override
+	public String getDLPreviewStatus(
+		com.liferay.portal.kernel.repository.model.FileVersion fileVersion) {
+		return _dlPreviewLocalService.getDLPreviewStatus(fileVersion);
+	}
+
+	@Override
+	public String getDLPreviewStatus(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlPreviewLocalService.getDLPreviewStatus(fileEntryId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		return _dlPreviewLocalService.getIndexableActionableDynamicQuery();
 	}
@@ -261,6 +299,13 @@ public class DLPreviewLocalServiceWrapper implements DLPreviewLocalService,
 	public com.liferay.document.library.kernel.model.DLPreview updateDLPreview(
 		com.liferay.document.library.kernel.model.DLPreview dlPreview) {
 		return _dlPreviewLocalService.updateDLPreview(dlPreview);
+	}
+
+	@Override
+	public com.liferay.document.library.kernel.model.DLPreview updateDLPreview(
+		long dlPreviewId, long fileEntryId, long fileVersionId, String status) {
+		return _dlPreviewLocalService.updateDLPreview(dlPreviewId, fileEntryId,
+			fileVersionId, status);
 	}
 
 	@Override

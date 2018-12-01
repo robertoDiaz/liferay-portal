@@ -53,6 +53,23 @@ public class DLPreviewLocalServiceUtil {
 	}
 
 	/**
+	* NOTE FOR DEVELOPERS:
+	*
+	* Never reference this class directly. Always use {@link DLPreviewLocalServiceUtil} to access the document library preview local service.
+	*/
+	public static com.liferay.document.library.kernel.model.DLPreview addDLPreview(
+		long fileEntryId, long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().addDLPreview(fileEntryId, fileVersionId);
+	}
+
+	public static com.liferay.document.library.kernel.model.DLPreview addDLPreview(
+		long fileEntryId, long fileVersionId, String status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().addDLPreview(fileEntryId, fileVersionId, status);
+	}
+
+	/**
 	* Creates a new document library preview with the primary key. Does not add the document library preview to the database.
 	*
 	* @param filePreviewId the primary key for the new document library preview
@@ -175,6 +192,11 @@ public class DLPreviewLocalServiceUtil {
 	}
 
 	public static com.liferay.document.library.kernel.model.DLPreview fetchDLPreview(
+		com.liferay.portal.kernel.repository.model.FileVersion fileVersion) {
+		return getService().fetchDLPreview(fileVersion);
+	}
+
+	public static com.liferay.document.library.kernel.model.DLPreview fetchDLPreview(
 		long filePreviewId) {
 		return getService().fetchDLPreview(filePreviewId);
 	}
@@ -221,6 +243,16 @@ public class DLPreviewLocalServiceUtil {
 		return getService().getDLPreviewsCount();
 	}
 
+	public static String getDLPreviewStatus(
+		com.liferay.portal.kernel.repository.model.FileVersion fileVersion) {
+		return getService().getDLPreviewStatus(fileVersion);
+	}
+
+	public static String getDLPreviewStatus(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getDLPreviewStatus(fileEntryId);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		return getService().getIndexableActionableDynamicQuery();
 	}
@@ -249,6 +281,13 @@ public class DLPreviewLocalServiceUtil {
 	public static com.liferay.document.library.kernel.model.DLPreview updateDLPreview(
 		com.liferay.document.library.kernel.model.DLPreview dlPreview) {
 		return getService().updateDLPreview(dlPreview);
+	}
+
+	public static com.liferay.document.library.kernel.model.DLPreview updateDLPreview(
+		long dlPreviewId, long fileEntryId, long fileVersionId, String status) {
+		return getService()
+				   .updateDLPreview(dlPreviewId, fileEntryId, fileVersionId,
+			status);
 	}
 
 	public static DLPreviewLocalService getService() {
