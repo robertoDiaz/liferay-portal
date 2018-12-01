@@ -415,6 +415,14 @@ create table DLFolder (
 	statusDate DATE null
 );
 
+create table DLPreview (
+	filePreviewId LONG not null primary key,
+	groupId LONG,
+	fileEntryId LONG,
+	fileVersionId LONG,
+	status VARCHAR(75) null
+);
+
 create table EmailAddress (
 	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,

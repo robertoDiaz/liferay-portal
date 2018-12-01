@@ -17,6 +17,7 @@
 	<import class="com.liferay.document.library.kernel.model.DLFileShortcut" />
 	<import class="com.liferay.document.library.kernel.model.DLFileVersion" />
 	<import class="com.liferay.document.library.kernel.model.DLFolder" />
+	<import class="com.liferay.document.library.kernel.model.DLPreview" />
 	<import class="com.liferay.expando.kernel.model.ExpandoColumn" />
 	<import class="com.liferay.expando.kernel.model.ExpandoRow" />
 	<import class="com.liferay.expando.kernel.model.ExpandoTable" />
@@ -1375,6 +1376,15 @@
 		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="statusByUserId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="statusByUserName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="statusDate" type="org.hibernate.type.TimestampType" />
+	</class>
+	<class name="com.liferay.portlet.documentlibrary.model.impl.DLPreviewImpl" table="DLPreview">
+		<id access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="filePreviewId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="fileEntryId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="fileVersionId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="status" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.liferay.portlet.expando.model.impl.ExpandoColumnImpl" table="ExpandoColumn">
 		<id access="com.liferay.portal.dao.orm.hibernate.LiferayPropertyAccessor" name="columnId" type="long">

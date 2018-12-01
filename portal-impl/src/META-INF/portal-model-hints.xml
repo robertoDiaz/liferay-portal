@@ -374,6 +374,13 @@
 		<field name="statusByUserName" type="String" />
 		<field name="statusDate" type="Date" />
 	</model>
+	<model name="com.liferay.document.library.kernel.model.DLPreview">
+		<field name="filePreviewId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="fileEntryId" type="long" />
+		<field name="fileVersionId" type="long" />
+		<field name="status" type="String" />
+	</model>
 	<model name="com.liferay.expando.kernel.model.ExpandoColumn">
 		<field name="columnId" type="long" />
 		<field name="companyId" type="long" />
