@@ -33,6 +33,7 @@ import com.liferay.petra.process.ProcessExecutor;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.GhostscriptUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -361,18 +362,18 @@ public class PDFProcessorImpl
 
 			arguments.add(
 				"-dDEVICEWIDTH=" +
-				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
+					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
 
 			arguments.add(
 				"-dDEVICEHEIGHT=" +
-				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
+					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
 		}
 		else if ((PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH != 0) &&
 				 (PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT == 0)) {
 
 			arguments.add(
 				"-dDEVICEWIDTH=" +
-				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
+					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
 
 			arguments.add("-dDEVICEHEIGHT=" + scaledDimensions.get("height"));
 		}
@@ -383,7 +384,7 @@ public class PDFProcessorImpl
 
 			arguments.add(
 				"-dDEVICEHEIGHT=" +
-				PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
+					PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
 		}
 	}
 
@@ -701,7 +702,7 @@ public class PDFProcessorImpl
 		if (previewFilesCount == 0) {
 			_log.error(
 				"Unable to decrypt PDF document for file version " +
-				fileVersion.getFileVersionId());
+					fileVersion.getFileVersionId());
 
 			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
 
@@ -787,19 +788,19 @@ public class PDFProcessorImpl
 				if (generateThumbnail && generatePreview) {
 					errorMessage =
 						"Timeout when generating thumbnail and preview for " +
-						decryptedFile.getPath();
+							decryptedFile.getPath();
 				}
 				else {
 					if (generateThumbnail) {
 						errorMessage =
 							"Timeout when generating thumbnail for " +
-							decryptedFile.getPath();
+								decryptedFile.getPath();
 					}
 
 					if (generatePreview) {
 						errorMessage =
 							"Timeout when generating preview for " +
-							decryptedFile.getPath();
+								decryptedFile.getPath();
 					}
 				}
 
@@ -968,7 +969,7 @@ public class PDFProcessorImpl
 
 			double widthFactor =
 				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH /
-				width;
+					width;
 
 			float height = pdRectangle.getHeight();
 
@@ -978,7 +979,7 @@ public class PDFProcessorImpl
 
 			double heightFactor =
 				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT /
-				height;
+					height;
 
 			int scaledWidth = (int)Math.round(heightFactor * width);
 
@@ -1052,6 +1053,20 @@ public class PDFProcessorImpl
 		}
 
 		if (generateImages) {
+			DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+				destinationFileVersion);
+
+			if (dlPreview == null) {
+				try {
+					DLPreviewLocalServiceUtil.addDLPreview(
+						destinationFileVersion.getFileEntryId(),
+						destinationFileVersion.getFileVersionId());
+				}
+				catch (PortalException pe) {
+					_log.error(pe, pe);
+				}
+			}
+
 			_fileVersionIds.add(destinationFileVersion.getFileVersionId());
 
 			sendGenerationMessage(

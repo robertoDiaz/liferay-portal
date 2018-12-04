@@ -15,7 +15,7 @@
 package com.liferay.document.library.preview.pdf.internal;
 
 import com.liferay.document.library.kernel.model.DLPreviewConstants;
-import com.liferay.document.library.kernel.service.DLPreviewLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLPreviewLocalService;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
 import com.liferay.document.library.kernel.util.PDFProcessorUtil;
 import com.liferay.document.library.preview.DLPreviewRenderer;
@@ -85,7 +85,7 @@ public class PDFDLPreviewRendererProvider implements DLPreviewRendererProvider {
 				throw new DLPreviewGenerationInProcessException();
 			}
 
-			String status = DLPreviewLocalServiceUtil.getDLPreviewStatus(
+			String status = _dlPreviewLocalService.getDLPreviewStatus(
 				fileVersion);
 
 			if (status.equals(DLPreviewConstants.STATUS_FAILURE)) {
@@ -96,6 +96,9 @@ public class PDFDLPreviewRendererProvider implements DLPreviewRendererProvider {
 			throw new DLPreviewGenerationInProcessException();
 		}
 	}
+
+	@Reference
+	private DLPreviewLocalService _dlPreviewLocalService;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.document.library.preview.pdf)"
