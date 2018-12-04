@@ -15,7 +15,10 @@
 package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLPreview;
+import com.liferay.document.library.kernel.model.DLPreviewConstants;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.service.DLPreviewLocalServiceUtil;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.document.library.kernel.util.ImageProcessor;
@@ -267,6 +270,9 @@ public class ImageProcessorImpl
 			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
 		try {
 			if (sourceFileVersion != null) {
 				copy(sourceFileVersion, destinationFileVersion);
@@ -280,6 +286,12 @@ public class ImageProcessorImpl
 				return;
 			}
 
+			if (dlPreview == null) {
+				DLPreviewLocalServiceUtil.addDLPreview(
+					destinationFileVersion.getFileEntryId(),
+					destinationFileVersion.getFileVersionId());
+			}
+
 			try (InputStream inputStream =
 					destinationFileVersion.getContentStream(false)) {
 
@@ -290,6 +302,10 @@ public class ImageProcessorImpl
 				RenderedImage renderedImage = imageBag.getRenderedImage();
 
 				if (renderedImage == null) {
+					dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 					return;
 				}
 
@@ -301,6 +317,10 @@ public class ImageProcessorImpl
 							bytes, imageBag.getType());
 
 					if (future == null) {
+						dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+						DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 						return;
 					}
 
@@ -318,6 +338,10 @@ public class ImageProcessorImpl
 
 				if (!_hasPreview(destinationFileVersion)) {
 					_storePreviewImage(destinationFileVersion, renderedImage);
+
+					dlPreview.setStatus(DLPreviewConstants.STATUS_CREATED);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 				}
 
 				if (!hasThumbnails(destinationFileVersion)) {
@@ -329,6 +353,10 @@ public class ImageProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug(nsfee, nsfee);
 			}
+
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 		}
 		finally {
 			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
@@ -405,6 +433,20 @@ public class ImageProcessorImpl
 		}
 
 		_fileVersionIds.add(destinationFileVersion.getFileVersionId());
+
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
+		if (dlPreview == null) {
+			try {
+				DLPreviewLocalServiceUtil.addDLPreview(
+					destinationFileVersion.getFileEntryId(),
+					destinationFileVersion.getFileVersionId());
+			}
+			catch (PortalException pe) {
+				_log.error(pe, pe);
+			}
+		}
 
 		sendGenerationMessage(
 			DestinationNames.DOCUMENT_LIBRARY_IMAGE_PROCESSOR,
