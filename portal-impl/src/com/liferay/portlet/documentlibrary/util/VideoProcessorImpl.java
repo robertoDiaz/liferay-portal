@@ -15,7 +15,10 @@
 package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLPreview;
+import com.liferay.document.library.kernel.model.DLPreviewConstants;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.service.DLPreviewLocalServiceUtil;
 import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.VideoProcessor;
@@ -28,6 +31,7 @@ import com.liferay.petra.process.ProcessExecutor;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
@@ -412,6 +416,15 @@ public class VideoProcessorImpl
 			return;
 		}
 
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
+		if (dlPreview == null) {
+			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
+				destinationFileVersion.getFileEntryId(),
+				destinationFileVersion.getFileVersionId());
+		}
+
 		File[] previewTempFiles = new File[_PREVIEW_TYPES.length];
 
 		File videoTempFile = null;
@@ -436,6 +449,9 @@ public class VideoProcessorImpl
 						file = liferayFileVersion.getFile(false);
 					}
 					catch (UnsupportedOperationException uoe) {
+						dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+						DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 					}
 				}
 
@@ -466,8 +482,16 @@ public class VideoProcessorImpl
 				try {
 					_generateVideoXuggler(
 						destinationFileVersion, file, previewTempFiles);
+
+					dlPreview.setStatus(DLPreviewConstants.STATUS_CREATED);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 				}
 				catch (Exception e) {
+					dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 					_log.error(e, e);
 				}
 			}
@@ -488,6 +512,10 @@ public class VideoProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug(nsfee, nsfee);
 			}
+
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 		}
 		finally {
 			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
@@ -618,6 +646,20 @@ public class VideoProcessorImpl
 			!isSupported(destinationFileVersion)) {
 
 			return;
+		}
+
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
+		if (dlPreview == null) {
+			try {
+				DLPreviewLocalServiceUtil.addDLPreview(
+					destinationFileVersion.getFileEntryId(),
+					destinationFileVersion.getFileVersionId());
+			}
+			catch (PortalException pe) {
+				_log.error(pe, pe);
+			}
 		}
 
 		_fileVersionIds.add(destinationFileVersion.getFileVersionId());
