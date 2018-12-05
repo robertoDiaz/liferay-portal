@@ -15,7 +15,10 @@
 package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLPreview;
+import com.liferay.document.library.kernel.model.DLPreviewConstants;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
+import com.liferay.document.library.kernel.service.DLPreviewLocalServiceUtil;
 import com.liferay.document.library.kernel.util.AudioProcessor;
 import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.document.library.kernel.util.DLUtil;
@@ -28,6 +31,7 @@ import com.liferay.petra.process.ProcessExecutor;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.InputResource;
 import com.liferay.portal.fabric.OutputResource;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -267,6 +271,15 @@ public class AudioProcessorImpl
 			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
 		throws Exception {
 
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
+		if (dlPreview == null) {
+			dlPreview = DLPreviewLocalServiceUtil.addDLPreview(
+				destinationFileVersion.getFileEntryId(),
+				destinationFileVersion.getFileVersionId());
+		}
+
 		String tempFileId = DLUtil.getTempFileId(
 			destinationFileVersion.getFileEntryId(),
 			destinationFileVersion.getVersion());
@@ -305,6 +318,9 @@ public class AudioProcessorImpl
 						file = liferayFileVersion.getFile(false);
 					}
 					catch (UnsupportedOperationException uoe) {
+						dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+						DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 					}
 				}
 
@@ -321,8 +337,16 @@ public class AudioProcessorImpl
 				try {
 					_generateAudioXuggler(
 						destinationFileVersion, file, previewTempFiles);
+
+					dlPreview.setStatus(DLPreviewConstants.STATUS_CREATED);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 				}
 				catch (Exception e) {
+					dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+					DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
+
 					_log.error(e, e);
 				}
 			}
@@ -331,6 +355,10 @@ public class AudioProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug(nsfee, nsfee);
 			}
+
+			dlPreview.setStatus(DLPreviewConstants.STATUS_FAILURE);
+
+			DLPreviewLocalServiceUtil.updateDLPreview(dlPreview);
 		}
 		finally {
 			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
@@ -454,6 +482,20 @@ public class AudioProcessorImpl
 			!isSupported(destinationFileVersion)) {
 
 			return;
+		}
+
+		DLPreview dlPreview = DLPreviewLocalServiceUtil.fetchDLPreview(
+			destinationFileVersion);
+
+		if (dlPreview == null) {
+			try {
+				DLPreviewLocalServiceUtil.addDLPreview(
+					destinationFileVersion.getFileEntryId(),
+					destinationFileVersion.getFileVersionId());
+			}
+			catch (PortalException pe) {
+				_log.error(pe, pe);
+			}
 		}
 
 		_fileVersionIds.add(destinationFileVersion.getFileVersionId());
