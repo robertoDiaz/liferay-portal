@@ -700,6 +700,18 @@ public class PropsValues {
 
 	public static final boolean FACEBOOK_CONNECT_VERIFIED_ACCOUNT_REQUIRED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.FACEBOOK_CONNECT_VERIFIED_ACCOUNT_REQUIRED));
 
+	public static final String FALLBACK_USER_EMAIL_ADDRESS_PREFIX = PropsUtil.get(PropsKeys.FALLBACK_USER_EMAIL_ADDRESS_PREFIX);
+
+	public static String FALLBACK_USER_FIRST_NAME = PropsUtil.get(PropsKeys.FALLBACK_USER_FIRST_NAME);
+
+	public static String FALLBACK_USER_LAST_NAME = PropsUtil.get(PropsKeys.FALLBACK_USER_LAST_NAME);
+
+	public static final String FALLBACK_USER_MIDDLE_NAME = PropsUtil.get(PropsKeys.FALLBACK_USER_MIDDLE_NAME);
+
+	public static final String FALLBACK_USER_PASSWORD = PropsUtil.get(PropsKeys.FALLBACK_USER_PASSWORD);
+
+	public static String FALLBACK_USER_SCREEN_NAME = PropsUtil.get(PropsKeys.FALLBACK_USER_SCREEN_NAME);
+
 	public static final String[] FIELD_EDITABLE_DOMAINS = PropsUtil.getArray(PropsKeys.FIELD_EDITABLE_DOMAINS);
 
 	public static final String[] FIELD_EDITABLE_ROLES = PropsUtil.getArray(PropsKeys.FIELD_EDITABLE_ROLES);
