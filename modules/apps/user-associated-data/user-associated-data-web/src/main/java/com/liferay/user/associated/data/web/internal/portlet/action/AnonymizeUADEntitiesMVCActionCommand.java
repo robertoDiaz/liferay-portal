@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.user.associated.data.anonymizer.UADAnonymizer;
 import com.liferay.user.associated.data.constants.UserAssociatedDataPortletKeys;
-import com.liferay.user.associated.data.web.internal.util.UADAnonymizerHelper;
+import com.liferay.user.associated.data.util.UADAnonymizerHelper;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
