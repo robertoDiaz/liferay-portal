@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.service.impl;
 
+import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.dynamic.data.mapping.exception.FormInstanceNameException;
 import com.liferay.dynamic.data.mapping.exception.FormInstanceStructureIdException;
@@ -437,16 +438,29 @@ public class DDMFormInstanceLocalServiceImpl
 		throws PortalException {
 
 		Repository portletRepository =
-			PortletFileRepositoryUtil.getPortletRepository(
+			PortletFileRepositoryUtil.fetchPortletRepository(
 				ddmFormInstance.getGroupId(),
 				"com.liferay.dynamic.data.mapping.form.web");
 
-		Folder folder = PortletFileRepositoryUtil.getPortletFolder(
-			portletRepository.getRepositoryId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			String.valueOf(ddmFormInstance.getFormInstanceId()));
+		if (portletRepository == null) {
+			return;
+		}
 
-		PortletFileRepositoryUtil.deletePortletFolder(folder.getFolderId());
+		try {
+			Folder folder = PortletFileRepositoryUtil.getPortletFolder(
+				portletRepository.getRepositoryId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				String.valueOf(ddmFormInstance.getFormInstanceId()));
+
+			PortletFileRepositoryUtil.deletePortletFolder(folder.getFolderId());
+		}
+		catch (PortalException pe) {
+			if (pe instanceof NoSuchFolderException) {
+				return;
+			}
+
+			throw pe;
+		}
 	}
 
 	protected DDMFormInstance doUpdateFormInstance(
