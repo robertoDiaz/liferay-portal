@@ -232,10 +232,14 @@ public class JournalArticleAssetRenderer
 					WebKeys.THEME_DISPLAY);
 			}
 
+			String ddmTemplateKey = ParamUtil.getString(
+				portletRequest, "ddmTemplateKey");
+
 			JournalArticleDisplay articleDisplay =
 				JournalArticleLocalServiceUtil.getArticleDisplay(
-					_article, null, null, LanguageUtil.getLanguageId(locale), 1,
-					portletRequestModel, themeDisplay);
+					_article, ddmTemplateKey, null,
+					LanguageUtil.getLanguageId(locale), 1, portletRequestModel,
+					themeDisplay);
 
 			summary = HtmlUtil.unescape(
 				HtmlUtil.stripHtml(articleDisplay.getContent()));
@@ -567,6 +571,11 @@ public class JournalArticleAssetRenderer
 
 		String ddmTemplateKey = (String)request.getAttribute(
 			WebKeys.JOURNAL_TEMPLATE_ID);
+
+		if (Validator.isNull(ddmTemplateKey)) {
+			ddmTemplateKey = ParamUtil.getString(request, "ddmTemplateKey");
+		}
+
 		String viewMode = ParamUtil.getString(
 			request, "viewMode", Constants.VIEW);
 		String languageId = LanguageUtil.getLanguageId(request);
