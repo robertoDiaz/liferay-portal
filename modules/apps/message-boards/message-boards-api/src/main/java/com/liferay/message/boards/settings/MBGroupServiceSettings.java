@@ -70,6 +70,32 @@ public class MBGroupServiceSettings {
 		_typedSettings = new TypedSettings(settings);
 	}
 
+	public String getAdminEmailFromAddress() {
+		return _typedSettings.getValue("adminEmailFromAddress");
+	}
+
+	public String getAdminEmailFromName() {
+		return _typedSettings.getValue("adminEmailFromName");
+	}
+
+	public LocalizedValuesMap getDiscussionEmailBody() {
+		return _typedSettings.getLocalizedValuesMap("discussionEmailBody");
+	}
+
+	public String getDiscussionEmailBodyXml() {
+		return LocalizationUtil.getXml(
+			getDiscussionEmailBody(), "discussionEmailBody");
+	}
+
+	public LocalizedValuesMap getDiscussionEmailSubject() {
+		return _typedSettings.getLocalizedValuesMap("discussionEmailSubject");
+	}
+
+	public String getDiscussionEmailSubjectXml() {
+		return LocalizationUtil.getXml(
+			getDiscussionEmailSubject(), "discussionEmailSubject");
+	}
+
 	public String getEmailFromAddress() {
 		return _typedSettings.getValue("emailFromAddress");
 	}
@@ -204,6 +230,13 @@ public class MBGroupServiceSettings {
 		fallbackKeys.add(
 			"allowAnonymousPosting",
 			PropsKeys.MESSAGE_BOARDS_ANONYMOUS_POSTING_ENABLED);
+		fallbackKeys.add(
+			"adminEmailFromAddress", PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+		fallbackKeys.add("adminEmailFromName", PropsKeys.ADMIN_EMAIL_FROM_NAME);
+		fallbackKeys.add(
+			"discussionEmailBody", PropsKeys.DISCUSSION_EMAIL_BODY);
+		fallbackKeys.add(
+			"discussionEmailSubject", PropsKeys.DISCUSSION_EMAIL_SUBJECT);
 		fallbackKeys.add(
 			"emailFromAddress", PropsKeys.MESSAGE_BOARDS_EMAIL_FROM_ADDRESS,
 			PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
