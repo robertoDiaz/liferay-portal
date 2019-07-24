@@ -154,7 +154,7 @@ public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 		throws Exception {
 
 		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
-			_getThumbnailAdaptiveMedia(fileVersion);
+			_getThumbnailAdaptiveMedia(fileVersion, index);
 
 		Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
 			adaptiveMediaStream.findFirst();
@@ -175,7 +175,7 @@ public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 		throws Exception {
 
 		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
-			_getThumbnailAdaptiveMedia(fileVersion);
+			_getThumbnailAdaptiveMedia(fileVersion, index);
 
 		Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
 			adaptiveMediaStream.findFirst();
@@ -287,17 +287,42 @@ public class AMImageEntryProcessor implements DLProcessor, ImageProcessor {
 			FileVersion fileVersion)
 		throws PortalException {
 
+		return _getThumbnailAdaptiveMedia(fileVersion, 0);
+	}
+
+	private Stream<AdaptiveMedia<AMImageProcessor>> _getThumbnailAdaptiveMedia(
+			FileVersion fileVersion, int index)
+		throws PortalException {
+
+		final int maxWidth;
+		final int maxHeight;
+
+		if (index == 1) {
+			maxWidth = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH);
+			maxHeight = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT);
+		}
+		else if (index == 2) {
+			maxWidth = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_WIDTH);
+			maxHeight = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_HEIGHT);
+		}
+		else {
+			maxWidth = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH);
+			maxHeight = PrefsPropsUtil.getInteger(
+				PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT);
+		}
+
 		return _amImageFinder.getAdaptiveMediaStream(
 			amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
 				fileVersion
 			).with(
-				AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
-				PrefsPropsUtil.getInteger(
-					PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH)
+				AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH, maxWidth
 			).with(
-				AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
-				PrefsPropsUtil.getInteger(
-					PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT)
+				AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT, maxHeight
 			).done());
 	}
 
