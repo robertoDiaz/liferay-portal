@@ -30,6 +30,8 @@ if (selectionMethod.equals("users")) {
 else {
 	statsUsers = BlogsStatsUserLocalServiceUtil.getGroupStatsUsers(scopeGroupId, 0, max);
 }
+
+boolean statsUserRendered = false;
 %>
 
 <c:choose>
@@ -70,6 +72,23 @@ else {
 
 				if (entries.size() == 1) {
 					BlogsEntry entry = (BlogsEntry)entries.get(0);
+
+					if (!permissionChecker.hasPermission(group, BlogsEntry.class.getName(), entry.getEntryId(), ActionKeys.VIEW)) {
+						statsUser = BlogsStatsUserLocalServiceUtil.getStatsUser(scopeGroupId, user2.getUserId());
+
+						entriesCount = BlogsEntryLocalServiceUtil.getGroupUserEntriesCount(scopeGroupId, user2.getUserId(), now, entriesCountQueryDefinition);
+
+						entries = BlogsEntryLocalServiceUtil.getGroupUserEntries(scopeGroupId, user2.getUserId(), now, entriesQueryDefinition);
+
+						if (entries.size() == 1) {
+							entry = (BlogsEntry)entries.get(0);
+						}
+						else {
+							continue;
+						}
+					}
+
+					statsUserRendered = true;
 
 					StringBundler sb = new StringBundler(4);
 
@@ -113,9 +132,16 @@ else {
 		}
 		%>
 
-		<liferay-ui:search-iterator
-			paginate="<%= false %>"
-			searchContainer="<%= searchContainer %>"
-		/>
+		<c:choose>
+			<c:when test="<%= statsUserRendered %>">
+				<liferay-ui:search-iterator
+					paginate="<%= false %>"
+					searchContainer="<%= searchContainer %>"
+				/>
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message key="there-are-no-recent-bloggers" />
+			</c:otherwise>
+		</c:choose>
 	</c:otherwise>
 </c:choose>
