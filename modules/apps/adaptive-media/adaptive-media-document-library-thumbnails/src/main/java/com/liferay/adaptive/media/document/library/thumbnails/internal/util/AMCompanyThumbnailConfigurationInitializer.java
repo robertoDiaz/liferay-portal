@@ -46,9 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AMCompanyThumbnailConfigurationInitializer {
 
-	public void initializeCompany(Company company)
-		throws Exception {
-
+	public void initializeCompany(Company company) throws Exception {
 		int dlFileEntryPreviewMaxHeight = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
 		int dlFileEntryPreviewMaxWidth = PrefsPropsUtil.getInteger(
@@ -150,8 +148,9 @@ public class AMCompanyThumbnailConfigurationInitializer {
 		return null;
 	}
 
-	private AMImageConfigurationEntry _createAMDocumentLibraryPreviewConfiguration(
-			Company company, int maxHeight, int maxWidth)
+	private AMImageConfigurationEntry
+			_createAMDocumentLibraryPreviewConfiguration(
+				Company company, int maxHeight, int maxWidth)
 		throws AMImageConfigurationException, IOException {
 
 		String name = String.format("%s %dx%d", "Preview", maxWidth, maxHeight);
@@ -160,8 +159,9 @@ public class AMCompanyThumbnailConfigurationInitializer {
 			company, name, maxHeight, maxWidth);
 	}
 
-	private AMImageConfigurationEntry _createAMDocumentLibraryThumbnailConfiguration(
-			Company company, int maxHeight, int maxWidth)
+	private AMImageConfigurationEntry
+			_createAMDocumentLibraryThumbnailConfiguration(
+				Company company, int maxHeight, int maxWidth)
 		throws AMImageConfigurationException, IOException {
 
 		String name = String.format(
