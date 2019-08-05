@@ -94,8 +94,8 @@ public class AMCompanyThumbnailConfigurationInitializer {
 
 			AMImageConfigurationEntry thumbnailCustom1AMConfigurationEntry =
 				_createAMDocumentLibraryThumbnailConfiguration(
-					company, dlFileEntryThumbnailMaxHeight,
-					dlFileEntryThumbnailMaxWidth);
+					company, dlFileEntryThumbnailCustom1MaxHeight,
+					dlFileEntryThumbnailCustom1MaxWidth);
 
 			if (thumbnailCustom1AMConfigurationEntry != null) {
 				_prefsPropsToConfigurationUpgradeHelper.mapConfigurations(
@@ -116,8 +116,8 @@ public class AMCompanyThumbnailConfigurationInitializer {
 
 			AMImageConfigurationEntry thumbnailCustom2AMConfigurationEntry =
 				_createAMDocumentLibraryThumbnailConfiguration(
-					company, dlFileEntryThumbnailMaxHeight,
-					dlFileEntryThumbnailMaxWidth);
+					company, dlFileEntryThumbnailCustom2MaxHeight,
+					dlFileEntryThumbnailCustom2MaxWidth);
 
 			if (thumbnailCustom2AMConfigurationEntry != null) {
 				_prefsPropsToConfigurationUpgradeHelper.mapConfigurations(
