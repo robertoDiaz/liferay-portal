@@ -77,7 +77,7 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				_prefsPropsToConfigurationUpgradeHelper.mapConfigurations(
 					AMThumbnailConfiguration.class,
 					new KeyValuePair(
-						thumbnailAMConfigurationEntry.getName(),
+						thumbnailAMConfigurationEntry.getUUID(),
 						"thumbnailAMConfiguration"));
 			}
 		}
@@ -99,7 +99,7 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				_prefsPropsToConfigurationUpgradeHelper.mapConfigurations(
 					AMThumbnailConfiguration.class,
 					new KeyValuePair(
-						thumbnailCustom1AMConfigurationEntry.getName(),
+						thumbnailCustom1AMConfigurationEntry.getUUID(),
 						"thumbnailCustom1AMConfiguration"));
 			}
 		}
@@ -121,7 +121,7 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				_prefsPropsToConfigurationUpgradeHelper.mapConfigurations(
 					AMThumbnailConfiguration.class,
 					new KeyValuePair(
-						thumbnailCustom2AMConfigurationEntry.getName(),
+						thumbnailCustom2AMConfigurationEntry.getUUID(),
 						"thumbnailCustom2AMConfiguration"));
 			}
 		}
