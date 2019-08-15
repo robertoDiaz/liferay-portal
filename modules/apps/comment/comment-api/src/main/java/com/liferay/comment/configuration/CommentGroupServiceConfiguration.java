@@ -62,4 +62,16 @@ public interface CommentGroupServiceConfiguration {
 	)
 	public LocalizedValuesMap discussionEmailSubject();
 
+	@Meta.AD(
+		deflt = "true", name = "allow-asset-owners-to-edit-other-user's-comments",
+		required = false
+	)
+	public boolean enableOwnersToEditOtherUserComments();
+
+	@Meta.AD(
+		deflt = "true", name = "allow-asset-owners-to-delete-other-user's-comments",
+		required = false
+	)
+	public boolean enableOwnersToDeleteOtherUserComments();
+
 }
