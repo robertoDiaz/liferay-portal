@@ -14,9 +14,11 @@
 
 package com.liferay.comment.taglib.internal.context;
 
+import com.liferay.comment.configuration.CommentGroupServiceConfiguration;
 import com.liferay.comment.constants.CommentConstants;
 import com.liferay.comment.taglib.internal.context.util.DiscussionRequestHelper;
 import com.liferay.comment.taglib.internal.context.util.DiscussionTaglibHelper;
+import com.liferay.message.boards.constants.MBConstants;
 import com.liferay.portal.kernel.comment.DiscussionComment;
 import com.liferay.portal.kernel.comment.DiscussionPermission;
 import com.liferay.portal.kernel.comment.WorkflowableComment;
@@ -25,9 +27,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -57,9 +62,9 @@ public class DefaultCommentTreeDisplayContext
 			_discussionRequestHelper.getRequest(), "save");
 
 		if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(
-				_discussionRequestHelper.getCompanyId(),
-				_discussionRequestHelper.getScopeGroupId(),
-				CommentConstants.getDiscussionClassName()) &&
+			_discussionRequestHelper.getCompanyId(),
+			_discussionRequestHelper.getScopeGroupId(),
+			CommentConstants.getDiscussionClassName()) &&
 			!isCommentPending()) {
 
 			publishButtonLabel = LanguageUtil.get(
@@ -72,7 +77,7 @@ public class DefaultCommentTreeDisplayContext
 
 	@Override
 	public boolean isActionControlsVisible() throws PortalException {
-		if ((_discussionComment == null) ||
+		if ((_discussionComment == null) || !isEditDeletePermission() ||
 			_discussionTaglibHelper.isHideControls() || _isStagingGroup()) {
 
 			return false;
@@ -83,7 +88,19 @@ public class DefaultCommentTreeDisplayContext
 
 	@Override
 	public boolean isDeleteActionControlVisible() throws PortalException {
-		if ((_discussionPermission == null) || _isStagingGroup()) {
+		long groupId = _discussionRequestHelper.getScopeGroupId();
+
+		CommentGroupServiceConfiguration commentGroupServiceConfiguration =
+			_getCommentGroupServiceConfiguration(groupId);
+
+		boolean deleteComment =
+			commentGroupServiceConfiguration.
+				enableOwnersToDeleteOtherUserComments();
+
+		if ((_discussionPermission == null) ||
+			(!isGroupAdmin() && !isCommentAuthor() && !deleteComment) ||
+			_isStagingGroup()) {
+
 			return false;
 		}
 
@@ -102,7 +119,19 @@ public class DefaultCommentTreeDisplayContext
 
 	@Override
 	public boolean isEditActionControlVisible() throws PortalException {
-		if (!hasUpdatePermission() || _isStagingGroup()) {
+		long groupId = _discussionRequestHelper.getScopeGroupId();
+
+		CommentGroupServiceConfiguration commentGroupServiceConfiguration =
+			_getCommentGroupServiceConfiguration(groupId);
+
+		boolean editComment =
+			commentGroupServiceConfiguration.
+				enableOwnersToEditOtherUserComments();
+
+		if (!hasUpdatePermission() ||
+			(!isGroupAdmin() && !isCommentAuthor() && !editComment) ||
+			_isStagingGroup()) {
+
 			return false;
 		}
 
@@ -116,6 +145,35 @@ public class DefaultCommentTreeDisplayContext
 		}
 
 		return hasUpdatePermission();
+	}
+
+	public boolean isEditDeletePermission() throws PortalException {
+		long groupId = _discussionRequestHelper.getScopeGroupId();
+
+		CommentGroupServiceConfiguration commentGroupServiceConfiguration =
+			_getCommentGroupServiceConfiguration(groupId);
+
+		boolean editComment =
+			commentGroupServiceConfiguration.
+				enableOwnersToEditOtherUserComments();
+
+		boolean deleteComment =
+			commentGroupServiceConfiguration.
+				enableOwnersToDeleteOtherUserComments();
+
+		if (isGroupAdmin()) {
+			return true;
+		}
+		else if (editComment || deleteComment) {
+			return true;
+		}
+		else if(isCommentAuthor()) {
+			return true;
+		}
+
+
+			return false;
+
 	}
 
 	@Override
@@ -195,7 +253,7 @@ public class DefaultCommentTreeDisplayContext
 				(WorkflowableComment)_discussionComment;
 
 			if (workflowableComment.getStatus() ==
-					WorkflowConstants.STATUS_APPROVED) {
+				WorkflowConstants.STATUS_APPROVED) {
 
 				approved = true;
 			}
@@ -228,7 +286,7 @@ public class DefaultCommentTreeDisplayContext
 				(WorkflowableComment)_discussionComment;
 
 			if (workflowableComment.getStatus() ==
-					WorkflowConstants.STATUS_PENDING) {
+				WorkflowConstants.STATUS_PENDING) {
 
 				pending = true;
 			}
@@ -246,6 +304,15 @@ public class DefaultCommentTreeDisplayContext
 
 		return permissionChecker.isGroupAdmin(
 			_discussionRequestHelper.getScopeGroupId());
+	}
+
+	private CommentGroupServiceConfiguration
+	_getCommentGroupServiceConfiguration(long groupId)
+		throws ConfigurationException {
+
+		return ConfigurationProviderUtil.getConfiguration(
+			CommentGroupServiceConfiguration.class,
+			new GroupServiceSettingsLocator(groupId, MBConstants.SERVICE_NAME));
 	}
 
 	private boolean _isStagingGroup() {
