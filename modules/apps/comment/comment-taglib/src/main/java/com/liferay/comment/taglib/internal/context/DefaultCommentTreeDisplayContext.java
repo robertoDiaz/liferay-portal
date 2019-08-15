@@ -62,9 +62,9 @@ public class DefaultCommentTreeDisplayContext
 			_discussionRequestHelper.getRequest(), "save");
 
 		if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(
-			_discussionRequestHelper.getCompanyId(),
-			_discussionRequestHelper.getScopeGroupId(),
-			CommentConstants.getDiscussionClassName()) &&
+				_discussionRequestHelper.getCompanyId(),
+				_discussionRequestHelper.getScopeGroupId(),
+				CommentConstants.getDiscussionClassName()) &&
 			!isCommentPending()) {
 
 			publishButtonLabel = LanguageUtil.get(
@@ -167,13 +167,11 @@ public class DefaultCommentTreeDisplayContext
 		else if (editComment || deleteComment) {
 			return true;
 		}
-		else if(isCommentAuthor()) {
+		else if (isCommentAuthor()) {
 			return true;
 		}
 
-
-			return false;
-
+		return false;
 	}
 
 	@Override
@@ -253,7 +251,7 @@ public class DefaultCommentTreeDisplayContext
 				(WorkflowableComment)_discussionComment;
 
 			if (workflowableComment.getStatus() ==
-				WorkflowConstants.STATUS_APPROVED) {
+					WorkflowConstants.STATUS_APPROVED) {
 
 				approved = true;
 			}
@@ -286,7 +284,7 @@ public class DefaultCommentTreeDisplayContext
 				(WorkflowableComment)_discussionComment;
 
 			if (workflowableComment.getStatus() ==
-				WorkflowConstants.STATUS_PENDING) {
+					WorkflowConstants.STATUS_PENDING) {
 
 				pending = true;
 			}
@@ -307,7 +305,7 @@ public class DefaultCommentTreeDisplayContext
 	}
 
 	private CommentGroupServiceConfiguration
-	_getCommentGroupServiceConfiguration(long groupId)
+			_getCommentGroupServiceConfiguration(long groupId)
 		throws ConfigurationException {
 
 		return ConfigurationProviderUtil.getConfiguration(
