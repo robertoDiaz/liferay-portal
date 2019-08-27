@@ -343,12 +343,12 @@
 
 					var img = document.createElement('img');
 					img.src = imagePath;
-					img.alt =
-						r[2] === undefined
-							? options && options.defaultImageText
-								? options.defaultImageText
-								: ''
-							: r[2].replace(/~(.)/g, '$1');
+					if(r[2] != undefined){
+						img.alt = r[2].replace(/~(.)/g, '$1');
+					}
+					else if( options && options.defaultImageText) {
+						img.alt = opstions.defaultImageText
+					}
 					node.appendChild(img);
 				}
 			},
