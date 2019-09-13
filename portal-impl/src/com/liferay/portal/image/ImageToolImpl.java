@@ -14,6 +14,7 @@
 
 package com.liferay.portal.image;
 
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.concurrent.FutureConverter;
@@ -57,12 +58,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 
@@ -72,6 +76,8 @@ import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import net.jmge.gif.Gif89Encoder;
 
 import org.im4java.core.IMOperation;
@@ -940,9 +946,30 @@ public class ImageToolImpl implements ImageTool {
 		Iterator<ImageReaderSpi> imageReaderSpis =
 			defaultIIORegistry.getServiceProviders(ImageReaderSpi.class, true);
 
+		try {
+			Registry registry = RegistryUtil.getRegistry();
+
+			Object imageReaderSpiProvider = registry.getService(
+				"com.liferay.document.library.image.reader.spi.provider." +
+					"ImageReaderSpiProviderHandler");
+
+			Method getImageReaderSpies = ReflectionUtil.getDeclaredMethod(
+				imageReaderSpiProvider.getClass(), "getImageReaderSpis");
+
+			List<ImageReaderSpi> curImageReaderSpiList =
+				(List<ImageReaderSpi>)getImageReaderSpies.invoke(null);
+
+			defaultIIORegistry.registerServiceProviders(
+				curImageReaderSpiList.iterator());
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Could not retrieve registered ImageReaderSpis", e);
+			}
+		}
+
 		while (imageReaderSpis.hasNext()) {
 			ImageReaderSpi imageReaderSpi = imageReaderSpis.next();
-
 			if (imageReaderSpi instanceof CMYKJPEGImageReaderSpi) {
 				secondImageReaderSpi = imageReaderSpi;
 			}
