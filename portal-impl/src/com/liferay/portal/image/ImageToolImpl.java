@@ -14,6 +14,7 @@
 
 package com.liferay.portal.image;
 
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.concurrent.FutureConverter;
@@ -34,6 +35,8 @@ import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
@@ -57,12 +60,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.lang.reflect.Method;
+
 import java.net.URL;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 
@@ -943,6 +949,28 @@ public class ImageToolImpl implements ImageTool {
 
 		Iterator<ImageReaderSpi> imageReaderSpis =
 			defaultIIORegistry.getServiceProviders(ImageReaderSpi.class, true);
+
+		try {
+			Registry registry = RegistryUtil.getRegistry();
+
+			Object imageReaderSpiProvider = registry.getService(
+				"com.liferay.document.library.image.reader.spi.provider." +
+					"ImageReaderSpiProviderHandler");
+
+			Method getImageReaderSpis = ReflectionUtil.getDeclaredMethod(
+				imageReaderSpiProvider.getClass(), "getImageReaderSpis");
+
+			List<ImageReaderSpi> curImageReaderSpiList =
+				(List<ImageReaderSpi>)getImageReaderSpis.invoke(null);
+
+			defaultIIORegistry.registerServiceProviders(
+				curImageReaderSpiList.iterator());
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Could not retrieve registered ImageReaderSpis", e);
+			}
+		}
 
 		while (imageReaderSpis.hasNext()) {
 			ImageReaderSpi imageReaderSpi = imageReaderSpis.next();
