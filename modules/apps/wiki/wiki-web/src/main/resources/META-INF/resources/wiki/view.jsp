@@ -375,9 +375,15 @@ if (portletTitleBasedNavigation) {
 
 							<c:if test="<%= wikiPortletInstanceSettingsHelper.isEnableComments() %>">
 								<div id="<portlet:namespace />wikiCommentsPanel">
+
+									<%
+									Discussion discussion = CommentManagerUtil.getDiscussion(user.getUserId(), scopeGroupId, WikiPage.class.getName(), wikiPage.getResourcePrimKey(), new ServiceContextFunction(request));
+									%>
+
 									<liferay-comment:discussion
 										className="<%= WikiPage.class.getName() %>"
 										classPK="<%= wikiPage.getResourcePrimKey() %>"
+										discussion="<%= discussion %>"
 										formName="fm2"
 										ratingsEnabled="<%= wikiPortletInstanceSettingsHelper.isEnableCommentRatings() %>"
 										redirect="<%= currentURL %>"

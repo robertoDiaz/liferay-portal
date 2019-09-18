@@ -365,9 +365,15 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 
 			<c:if test="<%= assetPublisherDisplayContext.isEnableComments() && assetRenderer.isCommentable() %>">
 				<div class="col-md-12 mt-4">
+
+					<%
+					Discussion discussion = CommentManagerUtil.getDiscussion(user.getUserId(), scopeGroupId, assetEntry.getClassName(), assetEntry.getClassPK(), new ServiceContextFunction(request));
+					%>
+
 					<liferay-comment:discussion
 						className="<%= assetEntry.getClassName() %>"
 						classPK="<%= assetEntry.getClassPK() %>"
+						discussion="<%= discussion %>"
 						formName='<%= "fm" + assetEntry.getClassPK() %>'
 						ratingsEnabled="<%= assetPublisherDisplayContext.isEnableCommentRatings() %>"
 						redirect="<%= currentURL %>"

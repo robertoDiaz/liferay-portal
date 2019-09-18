@@ -17,9 +17,12 @@
 <%@ include file="/init.jsp" %>
 
 <%@ page import="com.liferay.document.library.configuration.DLConfiguration" %><%@
+page import="com.liferay.portal.kernel.comment.CommentManagerUtil" %><%@
+page import="com.liferay.portal.kernel.comment.Discussion" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %><%@
 page import="com.liferay.portal.kernel.search.QueryConfig" %><%@
+page import="com.liferay.portal.kernel.service.ServiceContextFunction" %><%@
 page import="com.liferay.portal.kernel.servlet.HttpHeaders" %><%@
 page import="com.liferay.portal.kernel.util.TempFileEntryUtil" %><%@
 page import="com.liferay.wiki.configuration.WikiGroupServiceConfiguration" %><%@
