@@ -19,9 +19,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
+
+import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -30,9 +33,11 @@ import org.osgi.framework.BundleListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Matthew Tambara
+ * @author Roberto Díaz
  */
 @Component(immediate = true, service = {})
 public class JspReloader {
@@ -90,10 +95,41 @@ public class JspReloader {
 
 				Bundle bundle = bundleEvent.getBundle();
 
-				File file = new File(
-					_WORK_DIR,
+				Dictionary<String, String> headers = bundle.getHeaders();
+
+				String fragmentHostHeader = headers.get("Fragment-Host");
+
+				String symbolicNameAndVersion =
 					bundle.getSymbolicName() + StringPool.DASH +
-						bundle.getVersion());
+						bundle.getVersion();
+
+				if (Validator.isNotNull(fragmentHostHeader)) {
+					int semicolonIndex = fragmentHostHeader.indexOf(
+						StringPool.SEMICOLON);
+
+					int equalIndex = fragmentHostHeader.indexOf(
+						StringPool.EQUAL);
+
+					symbolicNameAndVersion = StringBundler.concat(
+						fragmentHostHeader.substring(0, semicolonIndex),
+						StringPool.DASH,
+						fragmentHostHeader.substring(
+							equalIndex + 2, fragmentHostHeader.length() - 1));
+
+					if (type == BundleEvent.UPDATED) {
+						_jspReloaderBlacklist.addBundleSymbolicNameBlacklist(
+							symbolicNameAndVersion);
+					}
+					else if ((type == BundleEvent.UNINSTALLED) &&
+							 _jspReloaderBlacklist.isBlacklisted(
+								 symbolicNameAndVersion)) {
+
+						_jspReloaderBlacklist.removeBundleSymbolicNameBlacklist(
+							symbolicNameAndVersion);
+					}
+				}
+
+				File file = new File(_WORK_DIR, symbolicNameAndVersion);
 
 				if (file.exists()) {
 					FileUtil.deltree(file);
@@ -116,5 +152,8 @@ public class JspReloader {
 			}
 
 		};
+
+	@Reference
+	private JSPReloaderBlacklist _jspReloaderBlacklist;
 
 }

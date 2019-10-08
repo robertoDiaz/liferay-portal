@@ -18,6 +18,8 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import com.liferay.taglib.servlet.JspFactorySwapper;
 
 import java.io.File;
@@ -199,22 +201,28 @@ public class JspServlet extends HttpServlet {
 			"development",
 			String.valueOf(PropsValues.WORK_DIR_OVERRIDE_ENABLED));
 		defaults.put("httpMethods", "GET,POST,HEAD");
-		defaults.put(
-			"jspCompilerClassName",
-			"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
-				"CompilerWrapper");
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		JSPReloaderBlacklist jspReloaderBlacklist = registry.getService(
+			JSPReloaderBlacklist.class);
+
+		String symbolicNameAndVersion = StringBundler.concat(
+			_bundle.getSymbolicName(), StringPool.DASH, _bundle.getVersion());
+
+		if (!jspReloaderBlacklist.isBlacklisted(symbolicNameAndVersion)) {
+			defaults.put(
+				"jspCompilerClassName",
+				"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
+					"CompilerWrapper");
+		}
+
 		defaults.put("keepgenerated", "false");
 		defaults.put("logVerbosityLevel", "NONE");
 		defaults.put("saveBytecode", "true");
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_WORK_DIR);
-		sb.append(_bundle.getSymbolicName());
-		sb.append(StringPool.DASH);
-		sb.append(_bundle.getVersion());
-
-		defaults.put(_INIT_PARAMETER_NAME_SCRATCH_DIR, sb.toString());
+		defaults.put(
+			_INIT_PARAMETER_NAME_SCRATCH_DIR,
+			_WORK_DIR + symbolicNameAndVersion);
 
 		defaults.put(
 			TagHandlerPool.OPTION_TAGPOOL, JspTagHandlerPool.class.getName());

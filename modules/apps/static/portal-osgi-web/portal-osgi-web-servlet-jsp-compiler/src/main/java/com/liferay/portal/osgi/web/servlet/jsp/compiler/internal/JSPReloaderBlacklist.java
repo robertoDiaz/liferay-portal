@@ -1,0 +1,46 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.portal.osgi.web.servlet.jsp.compiler.internal;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+
+/**
+ * @author Roberto Díaz
+ */
+@Component(service = JSPReloaderBlacklist.class)
+public class JSPReloaderBlacklist {
+
+	public void addBundleSymbolicNameBlacklist(String bundleSymbolicName) {
+		bundleSymbolicNameBlacklist.add(bundleSymbolicName);
+	}
+
+	public boolean isBlacklisted(String bundleSymbolicName) {
+		if (bundleSymbolicNameBlacklist.contains(bundleSymbolicName)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public void removeBundleSymbolicNameBlacklist(String bundleSymbolicName) {
+		bundleSymbolicNameBlacklist.remove(bundleSymbolicName);
+	}
+
+	private final List bundleSymbolicNameBlacklist = new ArrayList<>();
+
+}
