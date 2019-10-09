@@ -25,7 +25,15 @@ folder = folder.toEscapedModel();
 
 Date modifiedDate = folder.getLastPostDate();
 
-String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
+if (Validator.isNull(modifiedDate)) {
+	modifiedDate = folder.getModifiedDate();
+}
+
+String modifiedDateDescription = null;
+
+if (Validator.isNotNull(modifiedDate)) {
+	modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
+}
 
 PortletURL rowURL = liferayPortletResponse.createRenderURL();
 
@@ -42,8 +50,14 @@ rowURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
 
 <span>
 	<c:choose>
-		<c:when test="<%= Validator.isNull(folder.getUserName()) %>">
+		<c:when test="<%= Validator.isNull(folder.getUserName()) && Validator.isNotNull(modifiedDateDescription) %>">
 			<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription} %>" key="modified-x-ago" />
+		</c:when>
+		<c:when test="<%= Validator.isNull(folder.getUserName()) && Validator.isNull(modifiedDateDescription) %>">
+			<liferay-ui:message key="modification-date-not-available" />
+		</c:when>
+		<c:when test="<%= Validator.isNotNull(folder.getUserName()) && Validator.isNull(modifiedDateDescription) %>">
+			<liferay-ui:message arguments="<%= new String[] {folder.getUserName()} %>" key="x-modified" />
 		</c:when>
 		<c:otherwise>
 			<liferay-ui:message arguments="<%= new String[] {folder.getUserName(), modifiedDateDescription} %>" key="x-modified-x-ago" />
