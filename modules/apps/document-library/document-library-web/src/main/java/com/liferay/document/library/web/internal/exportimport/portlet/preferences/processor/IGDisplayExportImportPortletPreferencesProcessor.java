@@ -19,6 +19,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 
@@ -39,14 +40,22 @@ public class IGDisplayExportImportPortletPreferencesProcessor
 
 	@Override
 	public List<Capability> getExportCapabilities() {
-		return _dlExportImportPortletPreferencesProcessor.
-			getExportCapabilities();
+		List<Capability> exportCapabilities = 
+			_dlExportImportPortletPreferencesProcessor.getExportCapabilities();
+
+		exportCapabilities.add(igDisplayExportCapability);
+
+		return exportCapabilities;
 	}
 
 	@Override
 	public List<Capability> getImportCapabilities() {
-		return _dlExportImportPortletPreferencesProcessor.
-			getImportCapabilities();
+		List<Capability> importCapabilities = 
+			_dlExportImportPortletPreferencesProcessor.	getImportCapabilities();
+
+		importCapabilities.add(igDisplayImportCapability);
+
+		return importCapabilities;
 	}
 
 	@Override
@@ -74,5 +83,11 @@ public class IGDisplayExportImportPortletPreferencesProcessor
 	@Reference
 	private DLExportImportPortletPreferencesProcessor
 		_dlExportImportPortletPreferencesProcessor;
+
+	@Reference(target = "(name=IGDisplayExportCapability)")
+	protected Capability igDisplayExportCapability;
+
+	@Reference(target = "(name=IGDisplayImportCapability)")
+	protected Capability igDisplayImportCapability;
 
 }
