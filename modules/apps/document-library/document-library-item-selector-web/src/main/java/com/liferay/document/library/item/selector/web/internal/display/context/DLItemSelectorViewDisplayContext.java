@@ -291,7 +291,11 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 
 	public PortletURL getUploadURL(
 			LiferayPortletResponse liferayPortletResponse)
-		throws PortalException {
+		throws Exception {
+
+		if (!isShowDragAndDropZone()) {
+			return null;
+		}
 
 		List<AssetVocabulary> assetVocabularies =
 			_assetVocabularyService.getGroupVocabularies(
@@ -324,6 +328,25 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 
 	public boolean isSearch() {
 		return _search;
+	}
+
+	public boolean isShowDragAndDropZone() throws Exception {
+		if (_showDragAndDropZone != null) {
+			return _showDragAndDropZone;
+		}
+
+		if (DLUtil.hasWorkflowDefinitionLink(
+				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
+				getFolderId(),
+				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT)) {
+
+			_showDragAndDropZone = false;
+		}
+		else {
+			_showDragAndDropZone = true;
+		}
+
+		return _showDragAndDropZone;
 	}
 
 	private long _getFileEntryTypeId() {
@@ -459,6 +482,7 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 	private Repository _repository;
 	private final boolean _search;
 	private SearchContext _searchContext;
+	private Boolean _showDragAndDropZone;
 	private final StagingGroupHelper _stagingGroupHelper;
 	private int[] _startAndEnd;
 	private final ThemeDisplay _themeDisplay;
