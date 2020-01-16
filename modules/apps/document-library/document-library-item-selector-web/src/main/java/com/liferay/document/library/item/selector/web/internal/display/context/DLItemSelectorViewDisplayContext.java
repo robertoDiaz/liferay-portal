@@ -290,8 +290,7 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 	}
 
 	public PortletURL getUploadURL(
-			LiferayPortletResponse liferayPortletResponse)
-		throws Exception {
+		LiferayPortletResponse liferayPortletResponse) {
 
 		if (!isShowDragAndDropZone()) {
 			return null;
@@ -330,7 +329,7 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 		return _search;
 	}
 
-	public boolean isShowDragAndDropZone() throws Exception {
+	public boolean isShowDragAndDropZone() {
 		if (_showDragAndDropZone != null) {
 			return _showDragAndDropZone;
 		}
