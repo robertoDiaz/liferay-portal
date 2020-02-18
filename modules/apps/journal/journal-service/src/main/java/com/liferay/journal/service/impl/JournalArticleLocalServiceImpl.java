@@ -421,7 +421,8 @@ public class JournalArticleLocalServiceImpl
 		friendlyURLMap = _checkFriendlyURLMap(locale, friendlyURLMap, titleMap);
 
 		Map<String, String> urlTitleMap = _getURLTitleMap(
-			groupId, resourcePrimKey, friendlyURLMap, titleMap);
+			groupId, resourcePrimKey, friendlyURLMap, titleMap,
+			article.getFriendlyURLMap());
 
 		String urlTitle = urlTitleMap.get(LocaleUtil.toLanguageId(locale));
 
@@ -5591,7 +5592,8 @@ public class JournalArticleLocalServiceImpl
 		Locale locale = getArticleDefaultLocale(content);
 
 		Map<String, String> urlTitleMap = _getURLTitleMap(
-			groupId, article.getResourcePrimKey(), friendlyURLMap, titleMap);
+			groupId, article.getResourcePrimKey(), friendlyURLMap, titleMap,
+			article.getFriendlyURLMap());
 
 		String urlTitle = urlTitleMap.get(LocaleUtil.toLanguageId(locale));
 
@@ -8843,8 +8845,10 @@ public class JournalArticleLocalServiceImpl
 	}
 
 	private Map<String, String> _getURLTitleMap(
-		long groupId, long resourcePrimKey, Map<Locale, String> friendlyURLMap,
-		Map<Locale, String> titleMap) {
+			long groupId, long resourcePrimKey,
+			Map<Locale, String> friendlyURLMap, Map<Locale, String> titleMap,
+			Map<Locale, String> oldFriendlyURLMap)
+		throws ArticleFriendlyURLException {
 
 		Map<String, String> urlTitleMap = new HashMap<>();
 
@@ -8852,6 +8856,13 @@ public class JournalArticleLocalServiceImpl
 			String friendlyURL = friendlyURLMap.get(entry.getKey());
 
 			if (Validator.isNull(friendlyURL)) {
+				if (!oldFriendlyURLMap.isEmpty() &&
+					Validator.isNotNull(
+						oldFriendlyURLMap.get(entry.getKey()))) {
+
+					throw new ArticleFriendlyURLException.MustNotModifyToNull();
+				}
+
 				friendlyURL = titleMap.get(entry.getKey());
 
 				if (Validator.isNull(friendlyURL)) {
