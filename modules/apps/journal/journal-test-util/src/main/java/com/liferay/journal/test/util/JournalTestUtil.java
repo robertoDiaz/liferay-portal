@@ -951,7 +951,8 @@ public class JournalTestUtil {
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true,
 			article.isIndexable(), article.isSmallImage(),
-			article.getSmallImageURL(), null, null, null, serviceContext);
+			article.getSmallImageURL(), null, null,
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	public static JournalArticle updateArticleWithWorkflow(
