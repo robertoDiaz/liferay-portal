@@ -14,6 +14,7 @@
 
 package com.liferay.friendly.url.internal.servlet;
 
+import com.liferay.friendly.url.internal.url.entry.localization.resolver.FriendlyURLEntryLocalizationResolverHandler;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.lang.HashUtil;
@@ -353,6 +354,9 @@ public class FriendlyURLServlet extends HttpServlet {
 		Redirect redirect = null;
 
 		try {
+			friendlyURLLocalizedResolverHandler.resolvePath(
+				httpServletRequest, httpServletResponse, pathInfo);
+
 			redirect = getRedirect(httpServletRequest, pathInfo);
 
 			if (httpServletRequest.getAttribute(WebKeys.LAST_PATH) == null) {
@@ -591,6 +595,10 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		return locale;
 	}
+
+	@Reference
+	protected FriendlyURLEntryLocalizationResolverHandler
+		friendlyURLLocalizedResolverHandler;
 
 	@Reference
 	protected GroupLocalService groupLocalService;
