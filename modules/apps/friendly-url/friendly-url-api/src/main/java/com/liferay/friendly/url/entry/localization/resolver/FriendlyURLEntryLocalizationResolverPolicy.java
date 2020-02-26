@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author Roberto Díaz
@@ -30,6 +31,6 @@ public interface FriendlyURLEntryLocalizationResolverPolicy {
 			HttpServletResponse httpServletResponse,
 			FriendlyURLEntryLocalization friendlyURLEntryLocalization,
 			String path)
-		throws PortalException;
+		throws PortalException, IOException;
 
 }

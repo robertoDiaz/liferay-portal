@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.util.PortalInstances;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +61,7 @@ public class FriendlyURLEntryLocalizationResolverHandler {
 	public void resolvePath(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String path)
-		throws PortalException {
+		throws IOException, PortalException {
 
 		long groupId = _getGroupId(httpServletRequest, path);
 
@@ -90,12 +91,12 @@ public class FriendlyURLEntryLocalizationResolverHandler {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext, FriendlyURLEntryLocalizationResolver.class);
-
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, FriendlyURLEntryLocalizationResolverPolicy.class,
 			"friendly.url.localization.resolver.policy.name");
+
+		_serviceTrackerList = ServiceTrackerListFactory.open(
+			bundleContext, FriendlyURLEntryLocalizationResolver.class);
 
 		_friendlyURLEntryLocalizationResolverConfiguration =
 			ConfigurableUtil.createConfigurable(
@@ -110,6 +111,7 @@ public class FriendlyURLEntryLocalizationResolverHandler {
 
 	@Deactivate
 	protected void deactivate() {
+		_serviceTrackerMap.close();
 		_serviceTrackerList.close();
 	}
 

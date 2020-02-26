@@ -16,7 +16,6 @@ package com.liferay.friendly.url.internal.url.entry.localization.resolver.policy
 
 import com.liferay.friendly.url.entry.localization.resolver.FriendlyURLEntryLocalizationResolverPolicy;
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
-import com.liferay.portal.kernel.exception.PortalException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,8 +38,7 @@ public class DefaultFriendlyURLEntryLocalizationResolverPolicy
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
 			FriendlyURLEntryLocalization friendlyURLEntryLocalization,
-			String path)
-		throws PortalException {
+			String path) {
 	}
 
 }

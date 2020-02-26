@@ -15,6 +15,7 @@
 package com.liferay.friendly.url.entry.localization.resolver;
 
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Roberto Díaz
@@ -22,6 +23,7 @@ import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 public interface FriendlyURLEntryLocalizationResolver {
 
 	public FriendlyURLEntryLocalization fetchFriendlyURLEntryLocalization(
-		long groupId, String path);
+			long groupId, String path)
+		throws PortalException;
 
 }
