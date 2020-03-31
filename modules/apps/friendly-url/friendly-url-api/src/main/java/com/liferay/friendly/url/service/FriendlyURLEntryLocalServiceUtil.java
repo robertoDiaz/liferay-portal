@@ -475,11 +475,23 @@ public class FriendlyURLEntryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	/**
+	 * * @deprecated As of Mueller (7.2.x), replaced by {@link FriendlyURLEntryLocalService
+	 */
+	@Deprecated
 	public static String getUniqueUrlTitle(
 		long groupId, long classNameId, long classPK, String urlTitle) {
 
 		return getService().getUniqueUrlTitle(
 			groupId, classNameId, classPK, urlTitle);
+	}
+
+	public static String getUniqueUrlTitle(
+		long groupId, long classNameId, long classPK, String languageId,
+		String urlTitle) {
+
+		return getService().getUniqueUrlTitle(
+			groupId, classNameId, classPK, languageId, urlTitle);
 	}
 
 	public static void setMainFriendlyURLEntry(
