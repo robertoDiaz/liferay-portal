@@ -154,7 +154,7 @@ ItemSelectorRepositoryEntryManagementToolbarDisplayContext itemSelectorRepositor
 						if (fileEntry != null) {
 							FileVersion latestFileVersion = fileEntry.getLatestFileVersion();
 
-							String title = DLUtil.getTitleWithExtension(fileEntry);
+							String title = fileEntry.getTitle();
 
 							JSONObject itemMedatadaJSONObject = ItemSelectorRepositoryEntryBrowserUtil.getItemMetadataJSONObject(fileEntry, locale);
 
@@ -311,7 +311,7 @@ ItemSelectorRepositoryEntryManagementToolbarDisplayContext itemSelectorRepositor
 								if (fileEntry != null) {
 									FileVersion latestFileVersion = fileEntry.getLatestFileVersion();
 
-									String title = DLUtil.getTitleWithExtension(fileEntry);
+									String title = fileEntry.getTitle();
 
 									JSONObject itemMedatadaJSONObject = ItemSelectorRepositoryEntryBrowserUtil.getItemMetadataJSONObject(fileEntry, locale);
 
@@ -427,7 +427,7 @@ ItemSelectorRepositoryEntryManagementToolbarDisplayContext itemSelectorRepositor
 
 									FileVersion latestFileVersion = fileEntry.getLatestFileVersion();
 
-									String title = DLUtil.getTitleWithExtension(fileEntry);
+									String title = fileEntry.getTitle();
 
 									JSONObject itemMedatadaJSONObject = ItemSelectorRepositoryEntryBrowserUtil.getItemMetadataJSONObject(fileEntry, locale);
 
