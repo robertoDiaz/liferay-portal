@@ -266,20 +266,14 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 			_assetVocabularyService.getGroupVocabularies(
 				_getStagingAwareGroupId());
 
-		if (!assetVocabularies.isEmpty()) {
-			long classNameId = _classNameLocalService.getClassNameId(
-				DLFileEntryConstants.getClassName());
-			long defaultFileEntryTypeId =
-				DLFileEntryTypeLocalServiceUtil.getDefaultFileEntryTypeId(
-					_getFolderId());
+		List<AssetVocabulary> companyAssetVocabularies =
+			_assetVocabularyService.getGroupVocabularies(
+				_themeDisplay.getCompanyGroupId());
 
-			for (AssetVocabulary assetVocabulary : assetVocabularies) {
-				if (assetVocabulary.isRequired(
-						classNameId, defaultFileEntryTypeId)) {
+		if (_hasRequiredVocabularies(assetVocabularies) ||
+			_hasRequiredVocabularies(companyAssetVocabularies)) {
 
-					return null;
-				}
-			}
+			return null;
 		}
 
 		PortletURL portletURL = liferayPortletResponse.createActionURL(
@@ -496,6 +490,29 @@ public class DLItemSelectorViewDisplayContext<T extends ItemSelectorCriterion> {
 		_startAndEnd = SearchPaginationUtil.calculateStartAndEnd(cur, delta);
 
 		return _startAndEnd;
+	}
+
+	private boolean _hasRequiredVocabularies(
+			List<AssetVocabulary> assetVocabularies)
+		throws PortalException {
+
+		if (!assetVocabularies.isEmpty()) {
+			long classNameId = _classNameLocalService.getClassNameId(
+				DLFileEntryConstants.getClassName());
+			long defaultFileEntryTypeId =
+				DLFileEntryTypeLocalServiceUtil.getDefaultFileEntryTypeId(
+					_getFolderId());
+
+			for (AssetVocabulary assetVocabulary : assetVocabularies) {
+				if (assetVocabulary.isRequired(
+						classNameId, defaultFileEntryTypeId)) {
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private boolean _isEverywhereScopeFilter() {
