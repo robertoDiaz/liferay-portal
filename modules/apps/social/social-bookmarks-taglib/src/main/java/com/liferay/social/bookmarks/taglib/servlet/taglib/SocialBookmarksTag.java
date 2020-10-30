@@ -198,13 +198,24 @@ public class SocialBookmarksTag extends IncludeTag {
 					WebKeys.THEME_DISPLAY);
 
 			try {
-				_url = PortalUtil.getCanonicalURL(
-					_urlImpl.toString(), themeDisplay,
+				_url = PortalUtil.getAlternateURL(
+					_urlImpl.toString(), themeDisplay, themeDisplay.getLocale(),
 					themeDisplay.getLayout());
 			}
 			catch (PortalException portalException) {
-				_log.error(
-					"Unable to get canonical URL " + _urlImpl, portalException);
+				_log.warn(
+					"Unable to get alternate URL " + _urlImpl, portalException);
+
+				try {
+					_url = PortalUtil.getCanonicalURL(
+						_urlImpl.toString(), themeDisplay,
+						themeDisplay.getLayout());
+				}
+				catch (PortalException e) {
+					_log.error(
+						"Unable to get canoical URL " + _urlImpl,
+						portalException);
+				}
 			}
 		}
 
