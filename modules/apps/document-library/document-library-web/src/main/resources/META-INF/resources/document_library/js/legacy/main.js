@@ -529,6 +529,7 @@ AUI.add(
 								);
 							}
 						},
+						selectedData: [instance.getFolderId()],
 						selectEventName: namespace + 'selectFolder',
 						size: 'lg',
 						title: Lang.sub(dialogTitle, [selectedItems]),

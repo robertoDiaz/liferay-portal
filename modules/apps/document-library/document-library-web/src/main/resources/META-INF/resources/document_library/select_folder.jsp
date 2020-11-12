@@ -157,6 +157,8 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 							cssClass="selector-button"
 							data='<%=
 								HashMapBuilder.<String, Object>put(
+									"entityid", curFolder.getFolderId() 
+								).put(
 									"folderid", curFolder.getFolderId()
 								).put(
 									"folderissupportsmetadata", curFolder.isSupportsMetadata()
