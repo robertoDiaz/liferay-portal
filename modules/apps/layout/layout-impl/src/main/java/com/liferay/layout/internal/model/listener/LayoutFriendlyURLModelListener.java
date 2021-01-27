@@ -14,6 +14,7 @@
 
 package com.liferay.layout.internal.model.listener;
 
+import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.layout.friendly.url.LayoutFriendlyURLEntryHelper;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -25,6 +26,7 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.staging.StagingGroupHelper;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,6 +57,17 @@ public class LayoutFriendlyURLModelListener
 			if (!_stagingGroupHelper.isLiveGroup(
 					layoutFriendlyURL.getGroupId())) {
 
+				List<FriendlyURLEntry> previousFriendlyURLEntries =
+					_friendlyURLEntryLocalService.getFriendlyURLEntries(
+						layoutFriendlyURL.getGroupId(),
+						_layoutFriendlyURLEntryHelper.getClassNameId(
+							layoutFriendlyURL.isPrivateLayout()),
+						layoutFriendlyURL.getPlid());
+
+				if (!previousFriendlyURLEntries.isEmpty()) {
+					_removePreviousFriendlyURLEntry(layoutFriendlyURL);
+				}
+
 				_friendlyURLEntryLocalService.addFriendlyURLEntry(
 					layoutFriendlyURL.getGroupId(),
 					_layoutFriendlyURLEntryHelper.getClassNameId(
@@ -69,6 +82,16 @@ public class LayoutFriendlyURLModelListener
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
 		}
+	}
+
+	private void _removePreviousFriendlyURLEntry(
+		LayoutFriendlyURL layoutFriendlyURL) {
+
+		_friendlyURLEntryLocalService.deleteFriendlyURLEntry(
+			layoutFriendlyURL.getGroupId(),
+			_layoutFriendlyURLEntryHelper.getClassNameId(
+				layoutFriendlyURL.isPrivateLayout()),
+			layoutFriendlyURL.getPlid());
 	}
 
 	@Reference
