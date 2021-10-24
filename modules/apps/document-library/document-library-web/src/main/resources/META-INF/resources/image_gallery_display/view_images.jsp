@@ -87,6 +87,9 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 						playerHeight = PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_HEIGHT;
 					}
 				}
+				else if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED) {
+					imagePreviewURL = DLURLHelperUtil.getThumbnailSrc(fileEntry, fileVersion, themeDisplay);
+				}
 
 				String title = fileEntry.getTitle();
 
