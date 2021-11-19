@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 package com.liferay.layout.internal.service;
 
 import com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException;
@@ -11,11 +25,8 @@ import com.liferay.portal.kernel.exception.LayoutFriendlyURLsException;
 import com.liferay.portal.kernel.exception.LayoutNameException;
 import com.liferay.portal.kernel.exception.LayoutParentLayoutIdException;
 import com.liferay.portal.kernel.exception.LayoutTypeException;
-import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -31,23 +42,21 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalServiceHelper;
-import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
-import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.persistence.LayoutFriendlyURLPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.comparator.LayoutPriorityComparator;
 import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.util.LayoutTypeControllerTracker;
 import com.liferay.sites.kernel.util.SitesUtil;
@@ -111,7 +120,7 @@ public class LayoutLocalServiceHelperImpl
 					Layout layout = _layoutLocalService.fetchLayout(
 						groupId, privateLayout, layoutId);
 
-					if (Validator.isNull(layout)) {
+					if (layout == null) {
 						friendlyURL = originalFriendlyURL + i;
 					}
 					else {
@@ -174,43 +183,33 @@ public class LayoutLocalServiceHelperImpl
 		long groupId, boolean privateLayout, long parentLayoutId,
 		String sourcePrototypeLayoutUuid, int defaultPriority) {
 
-		try {
-			int priority = defaultPriority;
+		int priority = defaultPriority;
 
-			if (priority < 0) {
-				Layout layout = _layoutPersistence.findByG_P_P_First(
-					groupId, privateLayout, parentLayoutId,
-					new LayoutPriorityComparator(false));
+		if (priority < 0) {
+			Layout layout = _layoutLocalService.fetchFirstLayout(
+				groupId, privateLayout, parentLayoutId);
 
-				priority = layout.getPriority() + 1;
+			if (layout == null) {
+				return 0;
 			}
 
-			if ((priority < _PRIORITY_BUFFER) &&
-				Validator.isNull(sourcePrototypeLayoutUuid)) {
-
-				LayoutSet layoutSet = _layoutSetPersistence.fetchByG_P(
-					groupId, privateLayout);
-
-				if (Validator.isNotNull(
-						layoutSet.getLayoutSetPrototypeUuid()) &&
-					layoutSet.isLayoutSetPrototypeLinkEnabled()) {
-
-					priority = priority + _PRIORITY_BUFFER;
-				}
-			}
-
-			return priority;
+			priority = layout.getPriority() + 1;
 		}
-		catch (NoSuchLayoutException noSuchLayoutException) {
 
-			// LPS-52675
+		if ((priority < _PRIORITY_BUFFER) &&
+			Validator.isNull(sourcePrototypeLayoutUuid)) {
 
-			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchLayoutException, noSuchLayoutException);
+			LayoutSet layoutSet = _layoutSetLocalService.fetchLayoutSet(
+				groupId, privateLayout);
+
+			if (Validator.isNotNull(layoutSet.getLayoutSetPrototypeUuid()) &&
+				layoutSet.isLayoutSetPrototypeLinkEnabled()) {
+
+				priority = priority + _PRIORITY_BUFFER;
 			}
-
-			return 0;
 		}
+
+		return priority;
 	}
 
 	@Override
@@ -226,7 +225,7 @@ public class LayoutLocalServiceHelperImpl
 
 			// Ensure parent layout exists
 
-			Layout parentLayout = _layoutPersistence.fetchByG_P_L(
+			Layout parentLayout = _layoutLocalService.fetchLayout(
 				groupId, privateLayout, parentLayoutId);
 
 			if (parentLayout == null) {
@@ -242,7 +241,7 @@ public class LayoutLocalServiceHelperImpl
 			LayoutSetPrototype layoutSetPrototype, String layoutUuid)
 		throws PortalException {
 
-		Layout layout = _layoutPersistence.fetchByUUID_G_P(
+		Layout layout = _layoutLocalService.fetchLayout(
 			layoutUuid, layoutSetPrototype.getGroupId(), true);
 
 		if (layout != null) {
@@ -264,15 +263,13 @@ public class LayoutLocalServiceHelperImpl
 		boolean firstLayout = false;
 
 		if (parentLayoutId == LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
-			List<Layout> layouts = _layoutPersistence.findByG_P_P(
-				groupId, privateLayout, parentLayoutId, 0, 1);
+			Layout layout = _layoutLocalService.fetchFirstLayout(
+				groupId, privateLayout, parentLayoutId);
 
-			if (layouts.isEmpty()) {
+			if (layout == null) {
 				firstLayout = true;
 			}
 			else {
-				Layout layout = layouts.get(0);
-
 				long firstLayoutId = layout.getLayoutId();
 
 				if (firstLayoutId == layoutId) {
@@ -285,9 +282,9 @@ public class LayoutLocalServiceHelperImpl
 			// Layout cannot become a child of a layout that is not sortable
 			// because it is linked to a layout set prototype
 
-			Layout layout = _layoutPersistence.fetchByG_P_L(
+			Layout layout = _layoutLocalService.fetchLayout(
 				groupId, privateLayout, layoutId);
-			Layout parentLayout = _layoutPersistence.findByG_P_L(
+			Layout parentLayout = _layoutLocalService.fetchLayout(
 				groupId, privateLayout, parentLayoutId);
 
 			if (((layout == null) ||
@@ -317,8 +314,8 @@ public class LayoutLocalServiceHelperImpl
 		}
 
 		if (!layoutTypeController.isParentable()) {
-			int count = _layoutPersistence.countByG_P_P(
-				groupId, privateLayout, layoutId);
+			int count = _layoutLocalService.getLayoutsCount(
+				_groupLocalService.getGroup(groupId), privateLayout, layoutId);
 
 			if (count > 0) {
 				throw new LayoutTypeException(
@@ -392,8 +389,8 @@ public class LayoutLocalServiceHelperImpl
 				_layoutFriendlyURLEntryHelper.getClassNameId(privateLayout),
 				friendlyURL);
 
-		if (Validator.isNotNull(friendlyURLEntryLocalization)) {
-			Layout layout = _layoutPersistence.findByPrimaryKey(
+		if (friendlyURLEntryLocalization != null) {
+			Layout layout = _layoutLocalService.fetchLayout(
 				friendlyURLEntryLocalization.getClassPK());
 
 			if ((layout.getLayoutId() != layoutId) ||
@@ -457,7 +454,7 @@ public class LayoutLocalServiceHelperImpl
 		}
 
 		List<FriendlyURLMapper> friendlyURLMappers =
-			PortletLocalServiceUtil.getFriendlyURLMappers();
+			_portletLocalService.getFriendlyURLMappers();
 
 		for (FriendlyURLMapper friendlyURLMapper : friendlyURLMappers) {
 			if (friendlyURLMapper.isCheckMappingWithPrefix()) {
@@ -486,7 +483,7 @@ public class LayoutLocalServiceHelperImpl
 
 			String i18nPathLanguageId =
 				StringPool.SLASH +
-					PortalUtil.getI18nPathLanguageId(locale, languageId);
+					_portal.getI18nPathLanguageId(locale, languageId);
 
 			String underlineI18nPathLanguageId = StringUtil.replace(
 				i18nPathLanguageId, CharPool.DASH, CharPool.UNDERLINE);
@@ -609,7 +606,7 @@ public class LayoutLocalServiceHelperImpl
 			long parentLayoutId)
 		throws PortalException {
 
-		Layout layout = _layoutPersistence.findByG_P_L(
+		Layout layout = _layoutLocalService.fetchLayout(
 			groupId, privateLayout, layoutId);
 
 		if (parentLayoutId == layout.getParentLayoutId()) {
@@ -624,7 +621,7 @@ public class LayoutLocalServiceHelperImpl
 
 		// Layout cannot become a child of a layout that is not parentable
 
-		Layout parentLayout = _layoutPersistence.findByG_P_L(
+		Layout parentLayout = _layoutLocalService.fetchLayout(
 			groupId, privateLayout, parentLayoutId);
 
 		LayoutType parentLayoutType = parentLayout.getLayoutType();
@@ -646,7 +643,7 @@ public class LayoutLocalServiceHelperImpl
 
 		// Layout cannot become descendant of itself
 
-		if (PortalUtil.isLayoutDescendant(layout, parentLayoutId)) {
+		if (_portal.isLayoutDescendant(layout, parentLayoutId)) {
 			throw new LayoutParentLayoutIdException(
 				LayoutParentLayoutIdException.SELF_DESCENDANT);
 		}
@@ -659,9 +656,9 @@ public class LayoutLocalServiceHelperImpl
 			return;
 		}
 
-		List<Layout> layouts = _layoutPersistence.findByG_P_P(
-			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, 0,
-			2);
+		List<Layout> layouts = _layoutLocalService.getLayouts(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			true, 0, 2, null);
 
 		// You can only reach this point if there are more than two layouts
 		// at the root level because of the descendant check
@@ -687,7 +684,7 @@ public class LayoutLocalServiceHelperImpl
 	protected boolean hasGuestViewPermission(Layout layout)
 		throws PortalException {
 
-		Role role = RoleLocalServiceUtil.getRole(
+		Role role = _roleLocalService.getRole(
 			layout.getCompanyId(), RoleConstants.GUEST);
 
 		return _resourcePermissionLocalService.hasResourcePermission(
@@ -703,9 +700,6 @@ public class LayoutLocalServiceHelperImpl
 
 	private static final int _PRIORITY_BUFFER = 1000000;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutLocalServiceHelperImpl.class);
-
 	private static final Pattern _urlSeparatorPattern = Pattern.compile(
 		"/[A-Za-z]");
 
@@ -713,10 +707,10 @@ public class LayoutLocalServiceHelperImpl
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 
 	@Reference
-	private LayoutFriendlyURLEntryHelper _layoutFriendlyURLEntryHelper;
+	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private LayoutFriendlyURLPersistence _layoutFriendlyURLPersistence;
+	private LayoutFriendlyURLEntryHelper _layoutFriendlyURLEntryHelper;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
@@ -725,9 +719,18 @@ public class LayoutLocalServiceHelperImpl
 	private LayoutPersistence _layoutPersistence;
 
 	@Reference
-	private LayoutSetPersistence _layoutSetPersistence;
+	private LayoutSetLocalService _layoutSetLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 }
