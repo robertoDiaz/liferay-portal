@@ -18,12 +18,14 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.constants.DDMFormConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.item.selector.criterion.DDMUserPersonalFolderItemSelectorCriterion;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
@@ -69,7 +71,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -394,13 +395,18 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			return StringPool.BLANK;
 		}
 
-		return _html.escape(
-			StringBundler.concat(
-				themeDisplay.getPathContext(), "/documents/",
-				fileEntry.getRepositoryId(), StringPool.SLASH,
-				fileEntry.getFolderId(), StringPool.SLASH,
-				URLCodec.encodeURL(_html.unescape(fileEntry.getTitle()), true),
-				StringPool.SLASH, fileEntry.getUuid()));
+		try {
+			return _dlURLHelper.getDownloadURL(
+				fileEntry, fileEntry.getFileVersion(), themeDisplay,
+				StringPool.BLANK, false, false);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private String _getGuestUploadURL(
@@ -705,6 +711,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFolder)"
 	)
 	private ModelResourcePermission<DLFolder> _dlFolderModelResourcePermission;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
