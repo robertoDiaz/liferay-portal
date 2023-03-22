@@ -26,3 +26,15 @@ Group siteGroup = (Group)request.getAttribute("site.group");
 
 	<p class="small text-secondary"><liferay-ui:message arguments='<%= new Object[] {HtmlUtil.escape(siteGroup.getDescriptiveName(themeDisplay.getLocale())), themeDisplay.getPortalURL() + "/documents" + siteGroup.getFriendlyURL()} %>' key="can-user-with-view-permission-browse-the-site-document-library-files-and-folders" translateArguments="<%= false %>" /></p>
 </aui:field-wrapper>
+
+<%
+String orderByColumn = PropertiesParamUtil.getString(groupTypeSettingsUnicodeProperties, request, "orderByColumn","modifiedDate");
+%>
+
+<aui:select label="orderByColumn" name="TypeSettingsProperties--orderByColumn--">
+	<aui:option label="title" selected='<%= Objects.equals(orderByColumn, "title") %>' value="title" />
+	<aui:option label="create-date" selected='<%= Objects.equals(orderByColumn, "creationDate") %>' value="creationDate" />
+	<aui:option label="downloads" selected='<%= Objects.equals(orderByColumn, "downloads") %>' value="downloads" />
+	<aui:option label="modified-date" selected='<%= Objects.equals(orderByColumn, "modifiedDate") %>' value="modifiedDate" />
+	<aui:option label="size" selected='<%= Objects.equals(orderByColumn, "size") %>' value="size" />
+</aui:select>

@@ -91,6 +91,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -214,7 +215,16 @@ public class DLAdminDisplayContext {
 		}
 
 		if (Validator.isNull(orderByCol)) {
-			orderByCol = _getPortletPreference("order-by-col", "modifiedDate");
+			Group siteGroup = _themeDisplay.getSiteGroup();
+
+			UnicodeProperties typeSettingsUnicodeProperties =
+				siteGroup.getTypeSettingsProperties();
+
+			orderByCol = _getPortletPreference(
+				"order-by-col",
+				GetterUtil.getString(
+					typeSettingsUnicodeProperties.getProperty(
+						"orderByColumn"), "modifiedDate"));
 		}
 		else {
 			_setPortletPreference("order-by-col", orderByCol);
