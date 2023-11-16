@@ -302,11 +302,20 @@ export default function propsTransformer({
 	};
 
 	const openCreateAIImage = (aiImageCreatorAvailable, aiImageCreatorURL) => {
-		console.log(
-			'openCreateAIImage',
-			aiImageCreatorAvailable,
-			aiImageCreatorURL
-		);
+		if (!aiImageCreatorAvailable) {
+			Liferay.componentReady(`${portletNamespace}ConfigueAIModal`).then(
+				(configureAIModal) => {
+					configureAIModal.open();
+				}
+			);
+		}
+		else {
+			openSelectionModal({
+				size: 'lg',
+				title: Liferay.Language.get('create-ai-image'),
+				url: aiImageCreatorURL,
+			});
+		}
 	};
 
 	const permissions = () => {
