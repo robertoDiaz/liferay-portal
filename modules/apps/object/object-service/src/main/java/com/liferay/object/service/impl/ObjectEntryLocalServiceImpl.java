@@ -3500,8 +3500,6 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		List<String> columnNames = new ArrayList<>();
-
 		StringBundler sb = new StringBundler();
 
 		sb.append("insert into ");
@@ -3510,6 +3508,8 @@ public class ObjectEntryLocalServiceImpl
 		sb.append(
 			dynamicObjectDefinitionLocalizationTable.getForeignKeyColumnName());
 		sb.append(", languageId");
+
+		List<String> columnNames = new ArrayList<>();
 
 		columnNames.add(
 			dynamicObjectDefinitionLocalizationTable.getForeignKeyColumnName());
@@ -3599,25 +3599,23 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values, int workflowAction)
 		throws PortalException {
 
+		List<String> columnNames = new ArrayList<>();
+
+		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
+
+		columnNames.add(primaryKeyColumn.getName());
+
+		int count = 1;
+		List<ObjectField> objectFields =
+			dynamicObjectDefinitionTable.getObjectFields();
+
 		StringBundler sb = new StringBundler();
 
 		sb.append("insert into ");
 		sb.append(dynamicObjectDefinitionTable.getName());
 		sb.append(" (");
-
-		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
-			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
-
 		sb.append(primaryKeyColumn.getName());
-
-		int count = 1;
-
-		List<String> columnNames = new ArrayList<>();
-
-		columnNames.add(primaryKeyColumn.getName());
-
-		List<ObjectField> objectFields =
-			dynamicObjectDefinitionTable.getObjectFields();
 
 		boolean staticValues = true;
 
