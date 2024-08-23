@@ -4087,23 +4087,23 @@ public class ObjectEntryLocalServiceImpl
 				insertedValues, columnNames.get(index - 1), valueString);
 		}
 		else if ((sqlType == Types.DATE) || (sqlType == Types.TIMESTAMP)) {
-			String valueString = GetterUtil.getString(value);
+			Timestamp timestamp = null;
 
-			Timestamp timestampValue = null;
+			String valueString = GetterUtil.getString(value);
 
 			if (value instanceof Date) {
 				Date date = (Date)value;
 
-				timestampValue = new Timestamp(date.getTime());
+				timestamp = new Timestamp(date.getTime());
 
-				preparedStatement.setTimestamp(index, timestampValue);
+				preparedStatement.setTimestamp(index, timestamp);
 			}
 			else if (value instanceof LocalDateTime) {
 				LocalDateTime localDateTime = (LocalDateTime)value;
 
-				timestampValue = Timestamp.valueOf(localDateTime);
+				timestamp = Timestamp.valueOf(localDateTime);
 
-				preparedStatement.setTimestamp(index, timestampValue);
+				preparedStatement.setTimestamp(index, timestamp);
 			}
 			else if (valueString.isEmpty()) {
 				preparedStatement.setTimestamp(index, null);
@@ -4112,13 +4112,13 @@ public class ObjectEntryLocalServiceImpl
 				Date date = DateUtil.parseDate(
 					"yyyy-MM-dd", valueString, LocaleUtil.getSiteDefault());
 
-				timestampValue = new Timestamp(date.getTime());
+				timestamp = new Timestamp(date.getTime());
 
-				preparedStatement.setTimestamp(index, timestampValue);
+				preparedStatement.setTimestamp(index, timestamp);
 			}
 
 			_putInsertedValue(
-				insertedValues, columnNames.get(index - 1), timestampValue);
+				insertedValues, columnNames.get(index - 1), timestamp);
 		}
 		else if (sqlType == Types.DECIMAL) {
 			if (Validator.isNull(String.valueOf(value))) {
@@ -4144,20 +4144,20 @@ public class ObjectEntryLocalServiceImpl
 				insertedValues, columnNames.get(index - 1), doubleValue);
 		}
 		else if (sqlType == Types.INTEGER) {
-			Integer integerValue = GetterUtil.getInteger(value);
+			Integer integer = GetterUtil.getInteger(value);
 
-			preparedStatement.setInt(index, integerValue);
+			preparedStatement.setInt(index, integer);
 
 			_putInsertedValue(
-				insertedValues, columnNames.get(index - 1), integerValue);
+				insertedValues, columnNames.get(index - 1), integer);
 		}
 		else if (sqlType == Types.VARCHAR) {
-			String stringValue = String.valueOf(value);
+			String string = String.valueOf(value);
 
-			preparedStatement.setString(index, stringValue);
+			preparedStatement.setString(index, string);
 
 			_putInsertedValue(
-				insertedValues, columnNames.get(index - 1), stringValue);
+				insertedValues, columnNames.get(index - 1), string);
 		}
 		else {
 			throw new IllegalArgumentException(
