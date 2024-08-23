@@ -3500,6 +3500,14 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
+		List<String> columnNames = new ArrayList<>();
+
+		columnNames.add(
+			dynamicObjectDefinitionLocalizationTable.getForeignKeyColumnName());
+		columnNames.add("languageId");
+
+		int count = 2;
+
 		StringBundler sb = new StringBundler();
 
 		sb.append("insert into ");
@@ -3508,14 +3516,6 @@ public class ObjectEntryLocalServiceImpl
 		sb.append(
 			dynamicObjectDefinitionLocalizationTable.getForeignKeyColumnName());
 		sb.append(", languageId");
-
-		List<String> columnNames = new ArrayList<>();
-
-		columnNames.add(
-			dynamicObjectDefinitionLocalizationTable.getForeignKeyColumnName());
-		columnNames.add("languageId");
-
-		int count = 2;
 
 		for (ObjectField objectField : objectFields) {
 			if (objectField.isRequired() &&
