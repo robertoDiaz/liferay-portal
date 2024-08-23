@@ -336,17 +336,17 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 	}
 
 	private String _adjustMySQLJDBCURL(String url) {
-		boolean ismySQL = false;
+		boolean mySQL = false;
 
 		for (String mysqlJDBCURLPrefix : _MYSQL_JDBC_URL_PREFIXES) {
 			if (url.startsWith(mysqlJDBCURLPrefix)) {
-				ismySQL = true;
+				mySQL = true;
 
 				break;
 			}
 		}
 
-		if (!ismySQL) {
+		if (!mySQL) {
 			return url;
 		}
 
