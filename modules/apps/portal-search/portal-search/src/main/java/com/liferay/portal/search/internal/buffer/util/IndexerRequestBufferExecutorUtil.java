@@ -36,38 +36,39 @@ public class IndexerRequestBufferExecutorUtil {
 	public static void execute(
 		IndexerRequestBuffer indexerRequestBuffer, int numRequests) {
 
-		if (SearchContext.isBatchMode()) {
-			ServiceContext serviceContext =
-				ServiceContextThreadLocal.getServiceContext();
-
-			if (serviceContext != null) {
-				serviceContext = (ServiceContext)serviceContext.clone();
-			}
-
-			ServiceContext finalServiceContext = serviceContext;
-
-			ExecutorService executorService =
-				SystemExecutorServiceUtil.getExecutorService();
-
-			SearchContext.registerBatchModeSyncFuture(
-				executorService.submit(
-					() -> {
-						ServiceContextThreadLocal.pushServiceContext(
-							finalServiceContext);
-
-						try (SafeCloseable safeCloseable =
-								SearchContext.openBatchMode(false)) {
-
-							_execute(indexerRequestBuffer, numRequests, false);
-						}
-						finally {
-							ServiceContextThreadLocal.popServiceContext();
-						}
-					}));
-		}
-		else {
+		if (!SearchContext.isBatchMode()) {
 			_execute(indexerRequestBuffer, numRequests, true);
+
+			return;
 		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext != null) {
+			serviceContext = (ServiceContext)serviceContext.clone();
+		}
+
+		ServiceContext finalServiceContext = serviceContext;
+
+		ExecutorService executorService =
+			SystemExecutorServiceUtil.getExecutorService();
+
+		SearchContext.registerBatchModeSyncFuture(
+			executorService.submit(
+				() -> {
+					ServiceContextThreadLocal.pushServiceContext(
+						finalServiceContext);
+
+					try (SafeCloseable safeCloseable =
+							SearchContext.openBatchMode(false)) {
+
+						_execute(indexerRequestBuffer, numRequests, false);
+					}
+					finally {
+						ServiceContextThreadLocal.popServiceContext();
+					}
+				}));
 	}
 
 	private static void _execute(
