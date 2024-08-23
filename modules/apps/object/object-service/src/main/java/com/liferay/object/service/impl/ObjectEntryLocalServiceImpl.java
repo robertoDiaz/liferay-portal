@@ -299,11 +299,11 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition, objectEntryId, values, workflowAction,
 			insertedValues);
 
-		boolean dynamicObjectDefinitionStaicValues = _insertIntoTable(
+		boolean dynamicObjectDefinitionStaticValues = _insertIntoTable(
 			_getDynamicObjectDefinitionTable(objectDefinitionId), objectEntryId,
 			values, workflowAction, insertedValues);
 
-		boolean extensionDynamicObjectDefinitionStaicValues = _insertIntoTable(
+		boolean extensionDynamicObjectDefinitionStaticValues = _insertIntoTable(
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId),
 			objectEntryId, values, workflowAction, insertedValues);
 
@@ -323,8 +323,8 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
-		if (dynamicObjectDefinitionStaicValues &&
-			extensionDynamicObjectDefinitionStaicValues) {
+		if (dynamicObjectDefinitionStaticValues &&
+			extensionDynamicObjectDefinitionStaticValues) {
 
 			_addLocalizedObjectFieldValues(
 				DynamicObjectDefinitionLocalizationTableFactory.create(
