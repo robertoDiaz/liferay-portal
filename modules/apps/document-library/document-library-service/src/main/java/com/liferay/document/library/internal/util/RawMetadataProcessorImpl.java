@@ -5,6 +5,7 @@
 
 package com.liferay.document.library.internal.util;
 
+import com.liferay.document.library.configuration.DLFileEntryRawMetadataProcessorConfigurationProvider;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
@@ -26,6 +27,9 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
@@ -39,6 +43,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.ArrayUtils;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -104,8 +110,37 @@ public class RawMetadataProcessorImpl
 
 	@Override
 	public boolean isSupported(String mimeType) {
-		return !_dlFileEntryRawMetadataProcesorExcludedMimeTypes.contains(
-			mimeType);
+		long groupId = 0;
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext != null) {
+			groupId = GetterUtil.getLong(
+				serviceContext.getScopeGroupId(),
+				GroupThreadLocal.getGroupId());
+		}
+
+		try {
+			if (_dlFileEntryRawMetadataProcesorExcludedMimeTypes.contains(
+					mimeType) ||
+				ArrayUtils.contains(
+					_dlFileEntryRawMetadataProcessorConfigurationProvider.
+						getGroupExcludedMimeTypes(groupId),
+					mimeType)) {
+
+				return false;
+			}
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException);
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -189,6 +224,10 @@ public class RawMetadataProcessorImpl
 
 	@Reference
 	private DLFileEntryMetadataLocalService _dlFileEntryMetadataLocalService;
+
+	@Reference
+	private DLFileEntryRawMetadataProcessorConfigurationProvider
+		_dlFileEntryRawMetadataProcessorConfigurationProvider;
 
 	@Reference
 	private Portal _portal;
