@@ -222,11 +222,13 @@ components:
                 externalReferenceCode:
                     description:
                         The user group's external reference code.
+                    readOnly: true
                     type: string
                 id:
                     description:
                         The user group's ID.
                     format: int64
+                    readOnly: true
                     type: integer
                 name:
                     description:
