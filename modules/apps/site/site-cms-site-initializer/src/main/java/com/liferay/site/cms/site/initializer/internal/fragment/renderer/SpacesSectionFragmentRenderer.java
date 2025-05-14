@@ -130,6 +130,11 @@ public class SpacesSectionFragmentRenderer extends BaseSectionFragmentRenderer {
 				).put(
 					"assetLibrariesCount", assetLibrariesCount
 				).put(
+					"newSpaceURL",
+					StringBundler.concat(
+						themeDisplay.getPathFriendlyURLPublic(),
+						GroupConstants.CMS_FRIENDLY_URL, "/new-space")
+				).put(
 					"showAddButton",
 					_portletResourcePermission.contains(
 						themeDisplay.getPermissionChecker(),
