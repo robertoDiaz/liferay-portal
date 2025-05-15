@@ -7,10 +7,17 @@ import {State} from '../contexts/StateContext';
 import {Space} from '../types/Space';
 import ApiHelper from './ApiHelper';
 
-async function addSpace({name}: {name: State['name']}) {
+async function addSpace({
+	description,
+	name,
+}: {
+	description?: string;
+	name: State['name'];
+}) {
 	return await ApiHelper.post(
 		'/o/headless-asset-library/v1.0/asset-libraries',
 		{
+			description,
 			name,
 		}
 	);
