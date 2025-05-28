@@ -169,8 +169,6 @@ public class JournalArticleSitemapURLProviderTest {
 		DepotEntry depotEntry = null;
 
 		try {
-			Element rootElement = _getRootElement();
-
 			depotEntry = _depotEntryLocalService.addDepotEntry(
 				HashMapBuilder.put(
 					LocaleUtil.getDefault(), RandomTestUtil.randomString()
@@ -197,7 +195,7 @@ public class JournalArticleSitemapURLProviderTest {
 				article,
 				_layoutLocalService.getLayout(
 					layoutPageTemplateEntry.getPlid()),
-				rootElement,
+				_getRootElement(),
 				FriendlyURLResolverConstants.URL_SEPARATOR_JOURNAL_ARTICLE);
 		}
 		finally {
