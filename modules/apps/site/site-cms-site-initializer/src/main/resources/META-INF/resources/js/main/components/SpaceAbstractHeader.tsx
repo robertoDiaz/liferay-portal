@@ -41,6 +41,7 @@ export default function SpaceAbstractHeader({
 					assetLibraryCreatorUserId: props.assetLibraryCreatorUserId,
 					assetLibraryId: props.assetLibraryId,
 				}),
+			onClose: () => window.location.reload(),
 			size: 'md',
 			title,
 		});
