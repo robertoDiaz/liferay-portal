@@ -5,6 +5,7 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0;
 
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.google.places.constants.GooglePlacesWebKeys;
 import com.liferay.headless.admin.site.dto.v1_0.Site;
 import com.liferay.headless.admin.site.resource.v1_0.SiteResource;
@@ -84,10 +85,13 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/site.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = SiteResource.class
 )
 @CTAware
-public class SiteResourceImpl extends BaseSiteResourceImpl {
+public class SiteResourceImpl
+	extends BaseSiteResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate<Site> {
 
 	@Override
 	public void deleteSite(String externalReferenceCode) throws Exception {
@@ -107,6 +111,40 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 		}
 
 		_groupService.deleteGroup(group.getGroupId());
+	}
+
+	@Override
+	public ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor
+		getExportImportDescriptor() {
+
+		return new ExportImportDescriptor() {
+
+			@Override
+			public String getLabelLanguageKey() {
+				return "site";
+			}
+
+			@Override
+			public String getModelClassName() {
+				return Group.class.getName();
+			}
+
+			@Override
+			public String getPortletId() {
+				return "com_liferay_site_admin_web_portlet_SiteDataPortlet";
+			}
+
+			@Override
+			public String getResourceClassName() {
+				return SiteResource.class.getName();
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.COMPANY;
+			}
+
+		};
 	}
 
 	@Override
