@@ -159,6 +159,8 @@ renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custo
 						type="<%= Constants.EXPORT %>"
 					/>
 
+					<aui:input label="multiSitesGroupIds" maxlength='500' name="multiSitesGroupIds" />
+
 					<liferay-staging:permissions
 						action="<%= Constants.EXPORT %>"
 						descriptionCSSClass="permissions-description"

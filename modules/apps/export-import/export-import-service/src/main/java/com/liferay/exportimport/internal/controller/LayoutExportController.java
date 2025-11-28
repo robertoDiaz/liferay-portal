@@ -26,6 +26,7 @@ import com.liferay.exportimport.lar.DeletionSystemEventExporter;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -45,6 +46,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -62,6 +64,7 @@ import com.liferay.site.model.adapter.StagedGroup;
 import java.io.File;
 import java.io.Serializable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -138,7 +141,61 @@ public class LayoutExportController implements ExportController {
 		}
 	}
 
-	protected File doExport(PortletDataContext portletDataContext)
+	private void _exportMultiSites(PortletDataContext portletDataContext)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled(portletDataContext.getCompanyId(), "LPD-35914")) {
+			return;
+		}
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		String multiSitesGroupIds = MapUtil.getString(
+			parameterMap, "multiSitesGroupIds");
+
+		if (Validator.isNull(multiSitesGroupIds)) {
+			return;
+		}
+
+		List<String> groupIds = ListUtil.fromString(multiSitesGroupIds, ",");
+
+		long originalGroupId = portletDataContext.getGroupId();
+		long originalScopeGroupId = portletDataContext.getScopeGroupId();
+		long originalSourceGroupId = portletDataContext.getSourceGroupId();
+
+
+		try {
+			for (String groupIdString : groupIds) {
+				long groupId = Long.parseLong(groupIdString);
+
+				portletDataContext.setGroupId(groupId);
+				portletDataContext.setScopeGroupId(groupId);
+				portletDataContext.setSourceGroupId(groupId);
+
+				long[] layoutIds = _exportImportHelper.getAllLayoutIds(
+					groupId, false);
+
+				portletDataContext.setLayoutIds(layoutIds);
+
+				portletDataContext.getPrimaryKeys().clear();
+				portletDataContext.getNewPrimaryKeysMaps().clear();
+
+				portletDataContext.setPortletId(null);
+				portletDataContext.setPlid(0);
+				portletDataContext.setPrivateLayout(false);
+
+				_exportSite(groupId, portletDataContext);
+			}
+		}
+		finally {
+			portletDataContext.setGroupId(originalGroupId);
+			portletDataContext.setScopeGroupId(originalScopeGroupId);
+			portletDataContext.setSourceGroupId(originalSourceGroupId);
+		}
+	}
+
+	private void _exportSite(Long groupId, PortletDataContext portletDataContext)
 		throws Exception {
 
 		Map<String, String[]> parameterMap =
@@ -340,8 +397,22 @@ public class LayoutExportController implements ExportController {
 			_log.info("Exporting layouts takes " + stopWatch.getTime() + " ms");
 		}
 
+		String basePath = "/";
+
+		if (groupId != null) {
+			basePath += "/group/" + groupId + "/";
+		}
+
 		portletDataContext.addZipEntry(
-			"/manifest.xml", document.formattedString());
+			basePath + "manifest.xml", document.formattedString());
+	}
+
+	protected File doExport(PortletDataContext portletDataContext)
+		throws Exception {
+
+		_exportSite(null, portletDataContext);
+
+		_exportMultiSites(portletDataContext);
 
 		ZipWriter zipWriter = portletDataContext.getZipWriter();
 
