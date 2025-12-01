@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
@@ -64,6 +65,7 @@ import com.liferay.site.model.adapter.StagedGroup;
 import java.io.File;
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -184,6 +186,14 @@ public class LayoutExportController implements ExportController {
 				portletDataContext.setPortletId(null);
 				portletDataContext.setPlid(0);
 				portletDataContext.setPrivateLayout(false);
+
+				List<Portlet> exportablePortlets =
+					_exportImportHelper.getExportablePortlets(
+						portletDataContext.getCompanyId(), false, groupId);
+
+				for (Portlet portlet : exportablePortlets) {
+					parameterMap.put("PORTLET_DATA_"+portlet.getPortletId(), new String[] {Boolean.TRUE.toString()});
+				}
 
 				_exportSite(groupId, portletDataContext);
 			}
