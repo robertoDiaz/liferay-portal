@@ -153,6 +153,8 @@ public class LayoutExportController implements ExportController {
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
+		Map<String, String[]> originalParameterMap = new HashMap<>(parameterMap);
+
 		String multiSitesGroupIds = MapUtil.getString(
 			parameterMap, "multiSitesGroupIds");
 
@@ -191,6 +193,24 @@ public class LayoutExportController implements ExportController {
 					_exportImportHelper.getExportablePortlets(
 						portletDataContext.getCompanyId(), false, groupId);
 
+				parameterMap.clear();
+				parameterMap.putAll(originalParameterMap);
+
+				parameterMap.put("COMMENTS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("DELETIONS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("LAYOUT_SET_PROTOTYPE_SETTINGS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("LAYOUT_SET_SETTINGS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("LOGO", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PERMISSIONS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_ARCHIVED_SETUPS_ALL", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_CONFIGURATION_ALL", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_DATA", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_DATA_CONTROL_DEFAULT", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_SETUP_ALL", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("PORTLET_USER_PREFERENCES_ALL", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("RATINGS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put("THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
+
 				for (Portlet portlet : exportablePortlets) {
 					parameterMap.put("PORTLET_DATA_"+portlet.getPortletId(), new String[] {Boolean.TRUE.toString()});
 				}
@@ -202,6 +222,9 @@ public class LayoutExportController implements ExportController {
 			portletDataContext.setGroupId(originalGroupId);
 			portletDataContext.setScopeGroupId(originalScopeGroupId);
 			portletDataContext.setSourceGroupId(originalSourceGroupId);
+
+			parameterMap.clear();
+			parameterMap.putAll(originalParameterMap);
 		}
 	}
 
