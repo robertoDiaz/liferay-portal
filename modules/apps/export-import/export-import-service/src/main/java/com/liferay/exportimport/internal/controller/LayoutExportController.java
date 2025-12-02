@@ -237,7 +237,8 @@ public class LayoutExportController implements ExportController {
 		}
 
 		long[] groupIds = GetterUtil.getLongValues(
-			ListUtil.fromString(multiSitesGroupIds, ","));
+			ArrayUtil.toStringArray(
+				ListUtil.fromString(multiSitesGroupIds, ",")));
 
 		long originalGroupId = portletDataContext.getGroupId();
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
