@@ -69,6 +69,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -143,17 +144,90 @@ public class LayoutExportController implements ExportController {
 		}
 	}
 
+	protected File doExport(PortletDataContext portletDataContext)
+		throws Exception {
+
+		_exportSite(null, portletDataContext);
+
+		_exportMultiSites(portletDataContext);
+
+		ZipWriter zipWriter = portletDataContext.getZipWriter();
+
+		return zipWriter.getFile();
+	}
+
+	protected PortletDataContext getPortletDataContext(
+			ExportImportConfiguration exportImportConfiguration)
+		throws Exception {
+
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		long sourceGroupId = MapUtil.getLong(settingsMap, "sourceGroupId");
+
+		Group group = _groupLocalService.getGroup(sourceGroupId);
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+		DateRange dateRange = ExportImportDateUtil.getDateRange(
+			exportImportConfiguration);
+		ZipWriter zipWriter = _exportImportHelper.getLayoutSetZipWriter(
+			sourceGroupId);
+
+		PortletDataContext portletDataContext =
+			_portletDataContextFactory.createExportPortletDataContext(
+				group.getCompanyId(), sourceGroupId, parameterMap,
+				dateRange.getStartDate(), dateRange.getEndDate(), zipWriter);
+
+		boolean privateLayout = MapUtil.getBoolean(
+			settingsMap, "privateLayout");
+		long[] layoutIds = GetterUtil.getLongValues(
+			settingsMap.get("layoutIds"));
+
+		String cmd = MapUtil.getString(parameterMap, Constants.CMD);
+
+		if (ArrayUtil.contains(layoutIds, 0) &&
+			!Objects.equals(cmd, Constants.EXPORT) &&
+			!Objects.equals(cmd, Constants.PUBLISH_TO_LIVE) &&
+			!Objects.equals(cmd, Constants.PUBLISH_TO_REMOTE)) {
+
+			layoutIds = _exportImportHelper.getAllLayoutIds(
+				sourceGroupId, privateLayout);
+		}
+
+		portletDataContext.setExportImportProcessId(
+			String.valueOf(
+				exportImportConfiguration.getExportImportConfigurationId()));
+		portletDataContext.setPrivateLayout(privateLayout);
+		portletDataContext.setLayoutIds(layoutIds);
+
+		return portletDataContext;
+	}
+
+	protected int getProcessFlag() {
+		if (ExportImportThreadLocal.isLayoutStagingInProcess()) {
+			return ExportImportLifecycleConstants.
+				PROCESS_FLAG_LAYOUT_STAGING_IN_PROCESS;
+		}
+
+		return ExportImportLifecycleConstants.
+			PROCESS_FLAG_LAYOUT_EXPORT_IN_PROCESS;
+	}
+
 	private void _exportMultiSites(PortletDataContext portletDataContext)
 		throws Exception {
 
-		if (!FeatureFlagManagerUtil.isEnabled(portletDataContext.getCompanyId(), "LPD-35914")) {
+		if (!FeatureFlagManagerUtil.isEnabled(
+				portletDataContext.getCompanyId(), "LPD-35914")) {
+
 			return;
 		}
 
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
-		Map<String, String[]> originalParameterMap = new HashMap<>(parameterMap);
+		Map<String, String[]> originalParameterMap = new HashMap<>(
+			parameterMap);
 
 		String multiSitesGroupIds = MapUtil.getString(
 			parameterMap, "multiSitesGroupIds");
@@ -162,28 +236,30 @@ public class LayoutExportController implements ExportController {
 			return;
 		}
 
-		List<String> groupIds = ListUtil.fromString(multiSitesGroupIds, ",");
+		long[] groupIds = GetterUtil.getLongValues(
+			ListUtil.fromString(multiSitesGroupIds, ","));
 
 		long originalGroupId = portletDataContext.getGroupId();
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
 		long originalSourceGroupId = portletDataContext.getSourceGroupId();
 
-
 		try {
-			for (String groupIdString : groupIds) {
-				long groupId = Long.parseLong(groupIdString);
-
+			for (long groupId : groupIds) {
 				portletDataContext.setGroupId(groupId);
 				portletDataContext.setScopeGroupId(groupId);
 				portletDataContext.setSourceGroupId(groupId);
 
-				long[] layoutIds = _exportImportHelper.getAllLayoutIds(
-					groupId, false);
+				portletDataContext.setLayoutIds(
+					_exportImportHelper.getAllLayoutIds(groupId, false));
 
-				portletDataContext.setLayoutIds(layoutIds);
+				Set<String> primaryKeys = portletDataContext.getPrimaryKeys();
 
-				portletDataContext.getPrimaryKeys().clear();
-				portletDataContext.getNewPrimaryKeysMaps().clear();
+				primaryKeys.clear();
+
+				Map<String, Map<?, ?>> newPrimaryKeysMaps =
+					portletDataContext.getNewPrimaryKeysMaps();
+
+				newPrimaryKeysMaps.clear();
 
 				portletDataContext.setPortletId(null);
 				portletDataContext.setPlid(0);
@@ -196,23 +272,46 @@ public class LayoutExportController implements ExportController {
 				parameterMap.clear();
 				parameterMap.putAll(originalParameterMap);
 
-				parameterMap.put("COMMENTS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("DELETIONS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("LAYOUT_SET_PROTOTYPE_SETTINGS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("LAYOUT_SET_SETTINGS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("LOGO", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PERMISSIONS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_ARCHIVED_SETUPS_ALL", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_CONFIGURATION_ALL", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_DATA", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_DATA_CONTROL_DEFAULT", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_SETUP_ALL", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("PORTLET_USER_PREFERENCES_ALL", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("RATINGS", new String[] {Boolean.TRUE.toString()});
-				parameterMap.put("THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"COMMENTS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"DELETIONS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"LAYOUT_SET_PROTOTYPE_SETTINGS",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"LAYOUT_SET_SETTINGS",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"LOGO", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PERMISSIONS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_ARCHIVED_SETUPS_ALL",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_CONFIGURATION_ALL",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_DATA", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_DATA_CONTROL_DEFAULT",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_SETUP_ALL",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"PORTLET_USER_PREFERENCES_ALL",
+					new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"RATINGS", new String[] {Boolean.TRUE.toString()});
+				parameterMap.put(
+					"THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
 
 				for (Portlet portlet : exportablePortlets) {
-					parameterMap.put("PORTLET_DATA_"+portlet.getPortletId(), new String[] {Boolean.TRUE.toString()});
+					parameterMap.put(
+						"PORTLET_DATA_" + portlet.getPortletId(),
+						new String[] {Boolean.TRUE.toString()});
 				}
 
 				_exportSite(groupId, portletDataContext);
@@ -228,7 +327,8 @@ public class LayoutExportController implements ExportController {
 		}
 	}
 
-	private void _exportSite(Long groupId, PortletDataContext portletDataContext)
+	private void _exportSite(
+			Long groupId, PortletDataContext portletDataContext)
 		throws Exception {
 
 		Map<String, String[]> parameterMap =
@@ -438,76 +538,6 @@ public class LayoutExportController implements ExportController {
 
 		portletDataContext.addZipEntry(
 			basePath + "manifest.xml", document.formattedString());
-	}
-
-	protected File doExport(PortletDataContext portletDataContext)
-		throws Exception {
-
-		_exportSite(null, portletDataContext);
-
-		_exportMultiSites(portletDataContext);
-
-		ZipWriter zipWriter = portletDataContext.getZipWriter();
-
-		return zipWriter.getFile();
-	}
-
-	protected PortletDataContext getPortletDataContext(
-			ExportImportConfiguration exportImportConfiguration)
-		throws Exception {
-
-		Map<String, Serializable> settingsMap =
-			exportImportConfiguration.getSettingsMap();
-
-		long sourceGroupId = MapUtil.getLong(settingsMap, "sourceGroupId");
-
-		Group group = _groupLocalService.getGroup(sourceGroupId);
-
-		Map<String, String[]> parameterMap =
-			(Map<String, String[]>)settingsMap.get("parameterMap");
-		DateRange dateRange = ExportImportDateUtil.getDateRange(
-			exportImportConfiguration);
-		ZipWriter zipWriter = _exportImportHelper.getLayoutSetZipWriter(
-			sourceGroupId);
-
-		PortletDataContext portletDataContext =
-			_portletDataContextFactory.createExportPortletDataContext(
-				group.getCompanyId(), sourceGroupId, parameterMap,
-				dateRange.getStartDate(), dateRange.getEndDate(), zipWriter);
-
-		boolean privateLayout = MapUtil.getBoolean(
-			settingsMap, "privateLayout");
-		long[] layoutIds = GetterUtil.getLongValues(
-			settingsMap.get("layoutIds"));
-
-		String cmd = MapUtil.getString(parameterMap, Constants.CMD);
-
-		if (ArrayUtil.contains(layoutIds, 0) &&
-			!Objects.equals(cmd, Constants.EXPORT) &&
-			!Objects.equals(cmd, Constants.PUBLISH_TO_LIVE) &&
-			!Objects.equals(cmd, Constants.PUBLISH_TO_REMOTE)) {
-
-			layoutIds = _exportImportHelper.getAllLayoutIds(
-				sourceGroupId, privateLayout);
-		}
-
-		portletDataContext.setExportImportProcessId(
-			String.valueOf(
-				exportImportConfiguration.getExportImportConfigurationId()));
-		portletDataContext.setPrivateLayout(privateLayout);
-		portletDataContext.setLayoutIds(layoutIds);
-
-		return portletDataContext;
-	}
-
-	protected int getProcessFlag() {
-		if (ExportImportThreadLocal.isLayoutStagingInProcess()) {
-			return ExportImportLifecycleConstants.
-				PROCESS_FLAG_LAYOUT_STAGING_IN_PROCESS;
-		}
-
-		return ExportImportLifecycleConstants.
-			PROCESS_FLAG_LAYOUT_EXPORT_IN_PROCESS;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
