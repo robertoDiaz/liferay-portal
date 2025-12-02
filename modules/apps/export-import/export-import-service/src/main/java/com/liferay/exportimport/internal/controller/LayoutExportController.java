@@ -226,15 +226,15 @@ public class LayoutExportController implements ExportController {
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
-		Map<String, String[]> originalParameterMap = new HashMap<>(
-			parameterMap);
-
 		String multiSitesGroupIds = MapUtil.getString(
 			parameterMap, "multiSitesGroupIds");
 
 		if (Validator.isNull(multiSitesGroupIds)) {
 			return;
 		}
+
+		Map<String, String[]> originalParameterMap = new HashMap<>(
+			parameterMap);
 
 		long[] groupIds = GetterUtil.getLongValues(
 			ArrayUtil.toStringArray(
@@ -266,11 +266,8 @@ public class LayoutExportController implements ExportController {
 				portletDataContext.setPlid(0);
 				portletDataContext.setPrivateLayout(false);
 
-				List<Portlet> exportablePortlets =
-					_exportImportHelper.getExportablePortlets(
-						portletDataContext.getCompanyId(), false, groupId);
-
 				parameterMap.clear();
+
 				parameterMap.putAll(originalParameterMap);
 
 				parameterMap.put(
@@ -309,6 +306,10 @@ public class LayoutExportController implements ExportController {
 				parameterMap.put(
 					"THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
 
+				List<Portlet> exportablePortlets =
+					_exportImportHelper.getExportablePortlets(
+						portletDataContext.getCompanyId(), false, groupId);
+
 				for (Portlet portlet : exportablePortlets) {
 					parameterMap.put(
 						"PORTLET_DATA_" + portlet.getPortletId(),
@@ -324,6 +325,7 @@ public class LayoutExportController implements ExportController {
 			portletDataContext.setSourceGroupId(originalSourceGroupId);
 
 			parameterMap.clear();
+
 			parameterMap.putAll(originalParameterMap);
 		}
 	}
