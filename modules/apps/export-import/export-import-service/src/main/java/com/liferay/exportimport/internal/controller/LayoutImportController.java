@@ -465,7 +465,13 @@ public class LayoutImportController implements ImportController {
 
 		// XML
 
-		String xml = zipReader.getEntryAsString("/manifest.xml");
+		String xmlFileName = "/manifest.xml";
+
+		if (_isMultiSiteImport(groupId, parameterMap)) {
+			xmlFileName = "/group/" + groupId + xmlFileName;
+		}
+
+		String xml = zipReader.getEntryAsString(xmlFileName);
 
 		if (xml == null) {
 			throw new LARFileException(LARFileException.TYPE_MISSING_MANIFEST);
@@ -1423,6 +1429,23 @@ public class LayoutImportController implements ImportController {
 		ZipReader zipReader = portletDataContext.getZipReader();
 
 		zipReader.close();
+	}
+
+	private boolean _isMultiSiteImport(
+		long groupId, Map<String, String[]> parameterMap) {
+
+		String multiSitesGroupIds = MapUtil.getString(
+			parameterMap, "multiSitesGroupIds");
+
+		if (Validator.isNull(multiSitesGroupIds)) {
+			return false;
+		}
+
+		long[] groupIds = GetterUtil.getLongValues(
+			ArrayUtil.toStringArray(
+				ListUtil.fromString(multiSitesGroupIds, ",")));
+
+		return ArrayUtil.contains(groupIds, groupId);
 	}
 
 	private void _validateLayoutPrototypes(
