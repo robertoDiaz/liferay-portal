@@ -407,6 +407,13 @@ public class LayoutExportController implements ExportController {
 		headerElement.addAttribute(
 			"build-number", String.valueOf(ReleaseInfo.getBuildNumber()));
 
+		if (Validator.isNotNull(groupId)) {
+			Group group = _groupLocalService.getGroup(groupId);
+
+			headerElement.addAttribute(
+				"site-external-reference-code", group.getExternalReferenceCode());
+		}
+
 		headerElement.addAttribute(
 			"schema-version",
 			ExportImportConstants.EXPORT_IMPORT_SCHEMA_VERSION);
