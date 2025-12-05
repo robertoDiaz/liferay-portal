@@ -157,7 +157,7 @@ public class LayoutImportController implements ImportController {
 			zipReader = _zipReaderFactory.getZipReader(file);
 
 			validateFile(
-				layoutSet.getCompanyId(), targetGroupId, parameterMap,
+				layoutSet.getCompanyId(), targetGroupId ,0, parameterMap,
 				zipReader);
 
 			PortletDataContext portletDataContext = getPortletDataContext(
@@ -272,7 +272,7 @@ public class LayoutImportController implements ImportController {
 			zipReader = _zipReaderFactory.getZipReader(file);
 
 			validateFile(
-				layoutSet.getCompanyId(), targetGroupId, parameterMap,
+				layoutSet.getCompanyId(), targetGroupId, 0, parameterMap,
 				zipReader);
 
 			PortletDataContext portletDataContext = getPortletDataContext(
@@ -459,7 +459,7 @@ public class LayoutImportController implements ImportController {
 	}
 
 	protected void validateFile(
-			long companyId, long groupId, Map<String, String[]> parameterMap,
+			long companyId, long groupId, long sourceGroupId2, Map<String, String[]> parameterMap,
 			ZipReader zipReader)
 		throws Exception {
 
@@ -467,8 +467,8 @@ public class LayoutImportController implements ImportController {
 
 		String xmlFileName = "/manifest.xml";
 
-		if (_isMultiSiteImport(groupId, parameterMap)) {
-			xmlFileName = "/group/" + groupId + xmlFileName;
+		if (_isMultiSiteImport(sourceGroupId2, parameterMap)) {
+			xmlFileName = "/group/" + sourceGroupId2 + xmlFileName;
 		}
 
 		String xml = zipReader.getEntryAsString(xmlFileName);
@@ -1043,12 +1043,33 @@ public class LayoutImportController implements ImportController {
 
 		try {
 			for (long groupId : groupIds) {
-				portletDataContext.setGroupId(groupId);
-				portletDataContext.setScopeGroupId(groupId);
+				String siteExternalReferenceCode =
+					getSiteExternalReferenceCode(portletDataContext, groupId);
+
+				if (Validator.isNull(siteExternalReferenceCode)) {
+					_log.error("Target site does not have an ERC defined.");
+
+					continue;
+				}
+
+				Group targetSite =
+					_groupLocalService.fetchGroupByExternalReferenceCode(
+						siteExternalReferenceCode,
+						portletDataContext.getCompanyId());
+
+				if (targetSite == null) {
+					_log.error("Target site with ERC "+siteExternalReferenceCode+" could not be found.");
+
+					continue;
+				}
+
+				long targetGroupId = targetSite.getGroupId();
+
+				portletDataContext.setGroupId(targetGroupId);
+				portletDataContext.setScopeGroupId(targetGroupId);
 				portletDataContext.setSourceGroupId(groupId);
 
-				portletDataContext.setLayoutIds(
-					_exportImportHelper.getAllLayoutIds(groupId, false));
+				portletDataContext.setLayoutIds(null);
 
 				Set<String> primaryKeys = portletDataContext.getPrimaryKeys();
 
@@ -1103,15 +1124,15 @@ public class LayoutImportController implements ImportController {
 				parameterMap.put(
 					"THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
 
-				List<Portlet> exportablePortlets =
+				/* List<Portlet> exportablePortlets =
 					_exportImportHelper.getExportablePortlets(
 						portletDataContext.getCompanyId(), false, groupId);
 
 				for (Portlet portlet : exportablePortlets) {
 					parameterMap.put(
 						"PORTLET_DATA_" + portlet.getPortletId(),
-						new String[] {Boolean.TRUE.toString()});
-				}
+						new String[]{Boolean.TRUE.toString()});
+				} */
 
 				_importSite(portletDataContext, userId);
 			}
@@ -1125,6 +1146,36 @@ public class LayoutImportController implements ImportController {
 
 			parameterMap.putAll(originalParameterMap);
 		}
+	}
+
+	private String getSiteExternalReferenceCode(
+		PortletDataContext portletDataContext, long groupId) throws LARFileException {
+
+		Map<String, String[]> parameterMap = portletDataContext.getParameterMap();
+
+		String xmlFileName = "/manifest.xml";
+
+		if (_isMultiSiteImport(groupId, parameterMap)) {
+			xmlFileName = "/group/" + groupId + xmlFileName;
+		}
+
+		String xml = portletDataContext.getZipReader().getEntryAsString(xmlFileName);
+
+		Element rootElement = null;
+
+		try {
+			Document document = SAXReaderUtil.read(xml);
+
+			rootElement = document.getRootElement();
+		}
+		catch (Exception exception) {
+			throw new LARFileException(
+				LARFileException.TYPE_INVALID_MANIFEST, exception);
+		}
+
+		Element headerElement = rootElement.element("header");
+
+		return headerElement.attributeValue("site-external-reference-code");
 	}
 
 	private void _importSite(PortletDataContext portletDataContext, long userId)
@@ -1176,7 +1227,7 @@ public class LayoutImportController implements ImportController {
 		// LAR validation
 
 		validateFile(
-			companyId, portletDataContext.getGroupId(), parameterMap,
+			companyId, portletDataContext.getGroupId(), portletDataContext.getSourceGroupId(), parameterMap,
 			portletDataContext.getZipReader());
 
 		// Source and target group id
@@ -1433,6 +1484,10 @@ public class LayoutImportController implements ImportController {
 
 	private boolean _isMultiSiteImport(
 		long groupId, Map<String, String[]> parameterMap) {
+
+		if (Validator.isNull(groupId)) {
+			return false;
+		}
 
 		String multiSitesGroupIds = MapUtil.getString(
 			parameterMap, "multiSitesGroupIds");
