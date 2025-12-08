@@ -563,7 +563,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			if (classedModel instanceof Layout) {
 				missingReferenceElement.addAttribute(
-					"element-path", "/manifest.xml");
+					"element-path", getManifestXmlFilePath());
 			}
 			else {
 				missingReferenceElement.addAttribute(
@@ -893,6 +893,22 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public ManifestSummary getManifestSummary() {
 		return _manifestSummary;
+	}
+
+	@Override
+	public String getManifestXmlFilePath() {
+
+		Map<String, String[]> parameterMap =
+			getParameterMap();
+
+		long currentMultiSitesGroupId = MapUtil.getLong(
+			parameterMap, "currentMultiSitesGroupId");
+
+		if (Validator.isNull(currentMultiSitesGroupId)) {
+			return "/manifest.xml";
+		}
+
+		return "/group/" + currentMultiSitesGroupId + "/manifest.xml";
 	}
 
 	@Override

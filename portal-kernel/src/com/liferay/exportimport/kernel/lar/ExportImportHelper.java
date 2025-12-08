@@ -119,6 +119,10 @@ public interface ExportImportHelper {
 			PortletDataContext portletDataContext)
 		throws Exception;
 
+	String getManifestXmlFilePath(
+		Map<String, String[]> parameterMap)
+		throws Exception;
+
 	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
 		throws PortalException;
 
