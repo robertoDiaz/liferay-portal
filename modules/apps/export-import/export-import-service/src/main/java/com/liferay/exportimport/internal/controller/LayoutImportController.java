@@ -24,7 +24,10 @@ import com.liferay.exportimport.kernel.lar.MissingReference;
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerStatusMessageSenderUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
@@ -465,13 +468,7 @@ public class LayoutImportController implements ImportController {
 
 		// XML
 
-		String xmlFileName = "/manifest.xml";
-
-		if (_isMultiSiteImport(sourceGroupId2, parameterMap)) {
-			xmlFileName = "/group/" + sourceGroupId2 + xmlFileName;
-		}
-
-		String xml = zipReader.getEntryAsString(xmlFileName);
+		String xml = zipReader.getEntryAsString(_exportImportHelper.getManifestXmlFilePath(parameterMap));
 
 		if (xml == null) {
 			throw new LARFileException(LARFileException.TYPE_MISSING_MANIFEST);
@@ -1040,9 +1037,14 @@ public class LayoutImportController implements ImportController {
 		long originalGroupId = portletDataContext.getGroupId();
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
 		long originalSourceGroupId = portletDataContext.getSourceGroupId();
+		Element originalImportDataRootElement =
+			portletDataContext.getImportDataRootElement();
 
 		try {
 			for (long groupId : groupIds) {
+				parameterMap.put(
+					"currentMultiSitesGroupId", new String[] {String.valueOf(groupId)});
+
 				String siteExternalReferenceCode =
 					getSiteExternalReferenceCode(portletDataContext, groupId);
 
@@ -1124,15 +1126,79 @@ public class LayoutImportController implements ImportController {
 				parameterMap.put(
 					"THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
 
-				/* List<Portlet> exportablePortlets =
-					_exportImportHelper.getExportablePortlets(
-						portletDataContext.getCompanyId(), false, groupId);
+				parameterMap.put(
+					"currentMultiSitesGroupId", new String[] {String.valueOf(groupId)});
 
-				for (Portlet portlet : exportablePortlets) {
+				ManifestSummary manifestSummary =
+					_exportImportHelper.getManifestSummary(portletDataContext);
+
+				List<Portlet> dataPortlets = manifestSummary.getDataPortlets();
+
+				for (Portlet portlet : dataPortlets) {
+					PortletDataHandler portletDataHandler = portlet.getPortletDataHandlerInstance();
+
+					if (portletDataHandler == null) {
+						continue;
+					}
+
+					if (!portletDataHandler.isEnabled(portletDataContext.getCompanyId())) {
+						continue;
+					}
+
+					long importModelCount = portletDataHandler.getExportModelCount(manifestSummary);
+
+					long modelDeletionCount = manifestSummary.getModelDeletionCount(portletDataHandler.getDeletionSystemEventStagedModelTypes());
+
+					if (importModelCount <= 0) {
+						continue;
+					}
+
 					parameterMap.put(
 						"PORTLET_DATA_" + portlet.getPortletId(),
 						new String[]{Boolean.TRUE.toString()});
-				} */
+
+					PortletDataHandlerControl[] importControls = portletDataHandler.getImportControls();
+					PortletDataHandlerControl[] importMetadataControls = portletDataHandler.getImportMetadataControls();
+
+					for (PortletDataHandlerControl importControl : importControls) {
+						if (!(importControl instanceof PortletDataHandlerBoolean)) {
+							continue;
+						}
+
+						String className = importControl.getClassName();
+
+						if (Validator.isNull(className)) {
+							continue;
+						}
+
+						StagedModelType stagedModelType = new StagedModelType(className, importControl.getReferrerClassName());
+
+						long modelAdditionCount = manifestSummary.getModelAdditionCount(stagedModelType);
+
+						if (modelAdditionCount <= 0) {
+							continue;
+						}
+
+						parameterMap.put(
+							importControl.getNamespacedControlName(),
+							new String[]{Boolean.TRUE.toString()});
+					}
+				}
+
+				Element importDataRootElement =
+					_getCurrentRootElement(portletDataContext);
+
+				if (importDataRootElement != null) {
+					portletDataContext.setImportDataRootElement(
+						importDataRootElement);
+				}
+
+				Element missingReferencesElement =
+					_getCurrentMissingReferencesElement(portletDataContext);
+
+				if (missingReferencesElement != null) {
+					portletDataContext.setMissingReferencesElement(missingReferencesElement);
+				}
 
 				_importSite(portletDataContext, userId);
 			}
@@ -1142,10 +1208,42 @@ public class LayoutImportController implements ImportController {
 			portletDataContext.setScopeGroupId(originalScopeGroupId);
 			portletDataContext.setSourceGroupId(originalSourceGroupId);
 
+			portletDataContext.setImportDataRootElement(originalImportDataRootElement);
+
 			parameterMap.clear();
 
 			parameterMap.putAll(originalParameterMap);
 		}
+	}
+
+	private Element _getCurrentMissingReferencesElement(PortletDataContext portletDataContext)
+		throws PortletDataException {
+		Element rootElement = _getCurrentRootElement(portletDataContext);
+
+		Element missingReferencesElement = rootElement.element(
+			"missing-references");
+
+		return  missingReferencesElement;
+	}
+
+	private static Element _getCurrentRootElement(PortletDataContext portletDataContext)
+		throws PortletDataException {
+		String xml = portletDataContext.getZipEntryAsString(portletDataContext.getManifestXmlFilePath());
+
+		Element rootElement = null;
+
+		try {
+			Document document = SAXReaderUtil.read(xml);
+
+			rootElement = document.getRootElement();
+		}
+		catch (Exception exception) {
+			throw new PortletDataException(
+				"Unable to create portlet data context for the import " +
+				"process because of an invalid LAR manifest",
+				exception);
+		}
+		return rootElement;
 	}
 
 	private String getSiteExternalReferenceCode(
@@ -1153,13 +1251,7 @@ public class LayoutImportController implements ImportController {
 
 		Map<String, String[]> parameterMap = portletDataContext.getParameterMap();
 
-		String xmlFileName = "/manifest.xml";
-
-		if (_isMultiSiteImport(groupId, parameterMap)) {
-			xmlFileName = "/group/" + groupId + xmlFileName;
-		}
-
-		String xml = portletDataContext.getZipReader().getEntryAsString(xmlFileName);
+		String xml = portletDataContext.getZipReader().getEntryAsString(portletDataContext.getManifestXmlFilePath());
 
 		Element rootElement = null;
 

@@ -306,6 +306,9 @@ public class LayoutExportController implements ExportController {
 				parameterMap.put(
 					"THEME_REFERENCE", new String[] {Boolean.TRUE.toString()});
 
+				parameterMap.put(
+					"currentMultiSitesGroupId", new String[] {String.valueOf(groupId)});
+
 				List<Portlet> exportablePortlets =
 					_exportImportHelper.getExportablePortlets(
 						portletDataContext.getCompanyId(), false, groupId);
@@ -540,14 +543,8 @@ public class LayoutExportController implements ExportController {
 			_log.info("Exporting layouts takes " + stopWatch.getTime() + " ms");
 		}
 
-		String basePath = "/";
-
-		if (groupId != null) {
-			basePath += "/group/" + groupId + "/";
-		}
-
 		portletDataContext.addZipEntry(
-			basePath + "manifest.xml", document.formattedString());
+			portletDataContext.getManifestXmlFilePath(), document.formattedString());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
