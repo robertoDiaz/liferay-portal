@@ -16,7 +16,6 @@ import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
-import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -66,7 +65,6 @@ import com.liferay.site.model.adapter.StagedGroup;
 import java.io.File;
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -323,7 +321,7 @@ public class LayoutExportController implements ExportController {
 						new String[] {Boolean.TRUE.toString()});
 				}
 
-				portletDataContext.setExportDataRootElement(_getCurrentExportDataRootElement(portletDataContext));
+				portletDataContext.setExportDataRootElement(null);
 
 				_exportSite(portletDataContext);
 			}
@@ -339,26 +337,6 @@ public class LayoutExportController implements ExportController {
 
 			parameterMap.putAll(originalParameterMap);
 		}
-	}
-
-	private Element _getCurrentExportDataRootElement(PortletDataContext portletDataContext)
-		throws PortletDataException {
-		String xml = portletDataContext.getZipEntryAsString(portletDataContext.getManifestXmlFilePath());
-
-		Element rootElement = null;
-
-		try {
-			Document document = SAXReaderUtil.read(xml);
-
-			rootElement = document.getRootElement();
-		}
-		catch (Exception exception) {
-			throw new PortletDataException(
-				"Unable to create portlet data context for the import " +
-				"process because of an invalid LAR manifest",
-				exception);
-		}
-		return rootElement;
 	}
 
 	private void _exportSite(PortletDataContext portletDataContext)
