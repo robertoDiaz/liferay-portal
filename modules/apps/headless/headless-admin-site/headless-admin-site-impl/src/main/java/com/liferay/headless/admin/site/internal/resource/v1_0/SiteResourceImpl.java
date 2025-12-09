@@ -5,6 +5,7 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.google.places.constants.GooglePlacesWebKeys;
 import com.liferay.headless.admin.site.dto.v1_0.Site;
@@ -12,6 +13,7 @@ import com.liferay.headless.admin.site.resource.v1_0.SiteResource;
 import com.liferay.layout.util.LayoutServiceContextHelper;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.ServicePreAction;
 import com.liferay.portal.events.ThemeServicePreAction;
@@ -39,11 +41,14 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -71,10 +76,12 @@ import java.io.File;
 import java.io.Serializable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -127,6 +134,55 @@ public class SiteResourceImpl
 			@Override
 			public String getModelClassName() {
 				return Group.class.getName();
+			}
+
+			@Override
+			public Map<String, Serializable> getParameters(
+				PortletDataContext portletDataContext) {
+
+				return HashMapBuilder.<String, Serializable>put(
+					"filter",
+					() -> {
+						Map<String, String[]> parameterMap =
+							portletDataContext.getParameterMap();
+
+						String multiSitesGroupIds = MapUtil.getString(
+							parameterMap, "multiSitesGroupIds");
+
+						if (Validator.isNull(multiSitesGroupIds)) {
+							return null;
+						}
+
+						long[] groupIds = GetterUtil.getLongValues(
+							ArrayUtil.toStringArray(
+								ListUtil.fromString(multiSitesGroupIds, ",")));
+
+						Set<String> siteExternalReferenceCodes =
+							new HashSet<>();
+
+						for (long groupId : groupIds) {
+							Group group = _groupLocalService.fetchGroup(groupId);
+
+							if (group != null) {
+								siteExternalReferenceCodes.add(group.getExternalReferenceCode());
+							}
+						}
+
+						StringBundler sb = new StringBundler(3);
+
+						sb.append("externalReferenceCode in ('");
+
+						sb.append(
+							ListUtil.toString(
+								ListUtil.fromCollection(
+									siteExternalReferenceCodes),
+								StringPool.BLANK, "', '"));
+
+						sb.append("')");
+
+						return sb.toString();
+					}
+				).build();
 			}
 
 			@Override
