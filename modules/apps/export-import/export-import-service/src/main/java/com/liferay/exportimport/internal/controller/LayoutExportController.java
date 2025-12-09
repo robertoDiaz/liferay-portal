@@ -16,6 +16,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -65,6 +66,7 @@ import com.liferay.site.model.adapter.StagedGroup;
 import java.io.File;
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +149,7 @@ public class LayoutExportController implements ExportController {
 	protected File doExport(PortletDataContext portletDataContext)
 		throws Exception {
 
-		_exportSite(null, portletDataContext);
+		_exportSite(portletDataContext);
 
 		_exportMultiSites(portletDataContext);
 
@@ -244,6 +246,8 @@ public class LayoutExportController implements ExportController {
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
 		long originalSourceGroupId = portletDataContext.getSourceGroupId();
 
+		Element originalExportDataRootElement = portletDataContext.getExportDataRootElement();
+
 		try {
 			for (long groupId : groupIds) {
 				portletDataContext.setGroupId(groupId);
@@ -319,7 +323,9 @@ public class LayoutExportController implements ExportController {
 						new String[] {Boolean.TRUE.toString()});
 				}
 
-				_exportSite(groupId, portletDataContext);
+				portletDataContext.setExportDataRootElement(_getCurrentExportDataRootElement(portletDataContext));
+
+				_exportSite(portletDataContext);
 			}
 		}
 		finally {
@@ -327,14 +333,35 @@ public class LayoutExportController implements ExportController {
 			portletDataContext.setScopeGroupId(originalScopeGroupId);
 			portletDataContext.setSourceGroupId(originalSourceGroupId);
 
+			portletDataContext.setExportDataRootElement(originalExportDataRootElement);
+
 			parameterMap.clear();
 
 			parameterMap.putAll(originalParameterMap);
 		}
 	}
 
-	private void _exportSite(
-			Long groupId, PortletDataContext portletDataContext)
+	private Element _getCurrentExportDataRootElement(PortletDataContext portletDataContext)
+		throws PortletDataException {
+		String xml = portletDataContext.getZipEntryAsString(portletDataContext.getManifestXmlFilePath());
+
+		Element rootElement = null;
+
+		try {
+			Document document = SAXReaderUtil.read(xml);
+
+			rootElement = document.getRootElement();
+		}
+		catch (Exception exception) {
+			throw new PortletDataException(
+				"Unable to create portlet data context for the import " +
+				"process because of an invalid LAR manifest",
+				exception);
+		}
+		return rootElement;
+	}
+
+	private void _exportSite(PortletDataContext portletDataContext)
 		throws Exception {
 
 		Map<String, String[]> parameterMap =
@@ -410,8 +437,8 @@ public class LayoutExportController implements ExportController {
 		headerElement.addAttribute(
 			"build-number", String.valueOf(ReleaseInfo.getBuildNumber()));
 
-		if (Validator.isNotNull(groupId)) {
-			Group group = _groupLocalService.getGroup(groupId);
+		if (_isCurrentMultiSite(portletDataContext)) {
+			Group group = _groupLocalService.getGroup(portletDataContext.getGroupId());
 
 			headerElement.addAttribute(
 				"site-external-reference-code", group.getExternalReferenceCode());
@@ -475,6 +502,28 @@ public class LayoutExportController implements ExportController {
 		}
 
 		headerElement.addAttribute("type", type);
+
+		if (_isMultiSitesExport(portletDataContext) && !_isCurrentMultiSite(portletDataContext)) {
+			Element multiSitesElement = headerElement.addElement("multi-sites");
+
+			long[] multiSitesGroupIds = _getMultiSitesGroupIds(portletDataContext);
+
+			for (long multiSitesGroupId : multiSitesGroupIds) {
+				Element multiSiteElement = multiSitesElement.addElement("multi-site");
+
+				multiSiteElement.addAttribute("group-id", String.valueOf(multiSitesGroupId));
+
+				Group multiSiteGroup = _groupLocalService.fetchGroup(multiSitesGroupId);
+
+				if (multiSiteGroup != null) {
+					multiSiteElement.addAttribute("name", multiSiteGroup.getNameCurrentValue());
+					multiSiteElement.addAttribute("friendly-url", multiSiteGroup.getFriendlyURL());
+					multiSiteElement.addAttribute("external-reference-code", multiSiteGroup.getExternalReferenceCode());
+					multiSiteElement.addAttribute("uuid", multiSiteGroup.getUuid());
+				}
+			}
+		}
+
 		portletDataContext.setType(type);
 		portletDataContext.setMissingReferencesElement(
 			rootElement.addElement("missing-references"));
@@ -545,6 +594,76 @@ public class LayoutExportController implements ExportController {
 
 		portletDataContext.addZipEntry(
 			portletDataContext.getManifestXmlFilePath(), document.formattedString());
+	}
+
+	private boolean _isCurrentMultiSite(PortletDataContext portletDataContext) {
+		if (!FeatureFlagManagerUtil.isEnabled(
+			portletDataContext.getCompanyId(), "LPD-35914")) {
+
+			return false;
+		}
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		long currentMultiSitesGroupId = MapUtil.getLong(
+			parameterMap, "currentMultiSitesGroupId");
+
+		if (Validator.isNull(currentMultiSitesGroupId)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private long[] _getMultiSitesGroupIds(PortletDataContext portletDataContext) {
+		if (!FeatureFlagManagerUtil.isEnabled(
+			portletDataContext.getCompanyId(), "LPD-35914")) {
+
+			return new long[] {};
+		}
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		String multiSitesGroupIds = MapUtil.getString(
+			parameterMap, "multiSitesGroupIds");
+
+		if (Validator.isNull(multiSitesGroupIds)) {
+			return new long[] {};
+		}
+
+		return GetterUtil.getLongValues(
+			ArrayUtil.toStringArray(
+				ListUtil.fromString(multiSitesGroupIds, ",")));
+	}
+
+	private boolean _isMultiSitesExport(PortletDataContext portletDataContext) {
+		if (!FeatureFlagManagerUtil.isEnabled(
+			portletDataContext.getCompanyId(), "LPD-35914")) {
+
+			return false;
+		}
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		String multiSitesGroupIds = MapUtil.getString(
+			parameterMap, "multiSitesGroupIds");
+
+		if (Validator.isNull(multiSitesGroupIds)) {
+			return false;
+		}
+
+		long[] groupIds = GetterUtil.getLongValues(
+			ArrayUtil.toStringArray(
+				ListUtil.fromString(multiSitesGroupIds, ",")));
+
+		if (groupIds.length == 0) {
+			return  false;
+		}
+
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
