@@ -537,7 +537,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		ElementHandler elementHandler = new ElementHandler(
 			new ManifestSummaryElementProcessor(group, manifestSummary),
-			new String[] {"header", "portlet", "staged-model"});
+			new String[] {"header", "portlet", "staged-model", "multi-site"});
 
 		xmlReader.setContentHandler(elementHandler);
 
@@ -1710,6 +1710,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 				_manifestSummary.addModelDeletionCount(
 					manifestSummaryKey, modelDeletionCount);
+			}
+			else if (elementName.equals("multi-site")) {
+				String groupId = element.attributeValue("group-id");
+
+				String multiSitesGroupIds = _manifestSummary.getStagedModelAssetTitle("multiSitesGroupIds");
+
+				if (multiSitesGroupIds == null) {
+					multiSitesGroupIds = "";
+				}
+
+				if (multiSitesGroupIds.length() > 0) {
+					multiSitesGroupIds += ",";
+				}
+
+				_manifestSummary.addAssetTitle("multiSitesGroupIds", multiSitesGroupIds + groupId);
 			}
 		}
 
