@@ -10,6 +10,14 @@ export function getRightSidebarWidth(
 	selectedObjectField?: ObjectFieldNodeRow,
 	selectedObjectRelationship?: ObjectRelationshipEdgeData | null
 ) {
+	const hasDefaultValue =
+		(Liferay.FeatureFlags['LPD-46451'] &&
+			(selectedObjectField?.businessType === 'Boolean' ||
+				selectedObjectField?.businessType === 'LongText' ||
+				selectedObjectField?.businessType === 'RichText' ||
+				selectedObjectField?.businessType === 'Text')) ||
+		selectedObjectField?.businessType === 'Picklist';
+
 	if (rightSidebarType === 'objectDefinitionDetails') {
 		return 500;
 	}
@@ -19,7 +27,7 @@ export function getRightSidebarWidth(
 			return 950;
 		}
 
-		if (selectedObjectField.businessType === 'Picklist') {
+		if (hasDefaultValue) {
 			return 500;
 		}
 	}

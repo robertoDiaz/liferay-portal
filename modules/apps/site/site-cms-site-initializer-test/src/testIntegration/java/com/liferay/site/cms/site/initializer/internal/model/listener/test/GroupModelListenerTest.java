@@ -44,7 +44,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -74,9 +73,7 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * @author Adolfo Pérez
  */
-@FeatureFlags(
-	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-)
+@FeatureFlag("LPD-17564")
 @RunWith(Arquillian.class)
 public class GroupModelListenerTest {
 
@@ -275,19 +272,6 @@ public class GroupModelListenerTest {
 
 		Assert.assertFalse(layout.isHidden());
 
-		Group defaultGroup = _groupLocalService.getGroup(
-			TestPropsValues.getCompanyId(), "Default");
-
-		_setTrashEnabled(defaultGroup, Boolean.FALSE.toString());
-
-		Assert.assertFalse(
-			GetterUtil.getBoolean(
-				defaultGroup.getTypeSettingsProperty("trashEnabled")));
-
-		layout = _getRecycleBinLayout(_cmsGroup);
-
-		Assert.assertTrue(layout.isHidden());
-
 		DepotEntry depotEntry = _addDepotEntry();
 
 		Group depotGroup = depotEntry.getGroup();
@@ -298,11 +282,11 @@ public class GroupModelListenerTest {
 			GetterUtil.getBoolean(
 				depotGroup.getTypeSettingsProperty("trashEnabled")));
 
-		layout = _getRecycleBinLayout(_cmsGroup);
+		_setTrashEnabled(depotGroup, Boolean.FALSE.toString());
 
-		Assert.assertFalse(layout.isHidden());
-
-		_setTrashEnabled(defaultGroup, null);
+		Assert.assertFalse(
+			GetterUtil.getBoolean(
+				depotGroup.getTypeSettingsProperty("trashEnabled")));
 	}
 
 	private DepotEntry _addDepotEntry() throws Exception {

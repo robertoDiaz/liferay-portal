@@ -10,8 +10,13 @@ import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParserU
 import com.liferay.headless.admin.site.client.dto.v1_0.CategoryFragmentConfigurationFieldValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.CheckboxFragmentConfigurationFieldValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.CollectionFragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.ColorPaletteFragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.ColorPaletteValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.ColorPickerFragmentConfigurationFieldValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.ContextualMenuNavigationMenuValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.FragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.HrefURLValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.ItemExternalReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.ItemFragmentConfigurationFieldValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.ItemValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.LengthFragmentConfigurationFieldValue;
@@ -19,9 +24,14 @@ import com.liferay.headless.admin.site.client.dto.v1_0.NavigationMenuFragmentCon
 import com.liferay.headless.admin.site.client.dto.v1_0.NavigationMenuValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.SelectFragmentConfigurationFieldValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.SiteMenuNavigationMenuValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.SitePageURLValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.SitePagesNavigationMenuValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.TemplateReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.TextFragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.URLFragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.URLValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.VideoFragmentConfigurationFieldValue;
+import com.liferay.headless.admin.site.client.dto.v1_0.VideoValue;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -83,7 +93,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			categoryFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					ReferencesTestUtil.getItemExternalReference(
 						object, scopeGroupId)
 				).build());
@@ -112,7 +122,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			checkboxFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					GetterUtil.getBoolean(object)
 				).build());
 		}
@@ -139,7 +149,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			collectionFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					ReferencesTestUtil.getCollectionReference(
 						object, scopeGroupId)
 				).build());
@@ -151,6 +161,72 @@ public class FragmentConfigurationFieldValueTestUtil {
 		}
 
 		return collectionFragmentConfigurationFieldValue;
+	}
+
+	private static FragmentConfigurationFieldValue
+		_getColorPaletteConfigurationFieldValue(
+			boolean localizable, Object object) {
+
+		ColorPaletteFragmentConfigurationFieldValue
+			colorPaletteFragmentConfigurationFieldValue =
+				new ColorPaletteFragmentConfigurationFieldValue() {
+					{
+						setType(() -> Type.COLOR_PALETTE);
+					}
+				};
+
+		if (localizable) {
+			colorPaletteFragmentConfigurationFieldValue.setValue_i18n(
+				HashMapBuilder.put(
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
+					_getColorPaletteValue((Map<String, String>)object)
+				).build());
+		}
+		else {
+			colorPaletteFragmentConfigurationFieldValue.setValue(
+				_getColorPaletteValue((Map<String, String>)object));
+		}
+
+		return colorPaletteFragmentConfigurationFieldValue;
+	}
+
+	private static ColorPaletteValue _getColorPaletteValue(
+		Map<String, String> map) {
+
+		ColorPaletteValue colorPaletteValue = new ColorPaletteValue();
+
+		colorPaletteValue.setColor(map.get("color"));
+		colorPaletteValue.setCssClass(map.get("cssClass"));
+		colorPaletteValue.setRgbValue(map.get("rgbValue"));
+
+		return colorPaletteValue;
+	}
+
+	private static FragmentConfigurationFieldValue
+		_getColorPickerFragmentConfigurationFieldValue(
+			boolean localizable, Object object) {
+
+		ColorPickerFragmentConfigurationFieldValue
+			colorPickerFragmentConfigurationFieldValue =
+				new ColorPickerFragmentConfigurationFieldValue() {
+					{
+						setType(() -> Type.COLOR_PICKER);
+					}
+				};
+
+		if (localizable) {
+			colorPickerFragmentConfigurationFieldValue.setValue_i18n(
+				HashMapBuilder.put(
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
+					GetterUtil.getString(object)
+				).build());
+		}
+		else {
+			colorPickerFragmentConfigurationFieldValue.setValue(
+				GetterUtil.getString(object));
+		}
+
+		return colorPickerFragmentConfigurationFieldValue;
 	}
 
 	private static FragmentConfigurationFieldValue
@@ -175,6 +251,16 @@ public class FragmentConfigurationFieldValueTestUtil {
 			return _getCollectionFragmentConfigurationFieldValue(
 				fragmentConfigurationField.isLocalizable(), value,
 				scopeGroupId);
+		}
+
+		if (Objects.equals(type, "colorPalette")) {
+			return _getColorPaletteConfigurationFieldValue(
+				fragmentConfigurationField.isLocalizable(), value);
+		}
+
+		if (Objects.equals(type, "colorPicker")) {
+			return _getColorPickerFragmentConfigurationFieldValue(
+				fragmentConfigurationField.isLocalizable(), value);
 		}
 
 		if (Objects.equals(type, "itemSelector")) {
@@ -204,6 +290,17 @@ public class FragmentConfigurationFieldValueTestUtil {
 				fragmentConfigurationField.isLocalizable(), value);
 		}
 
+		if (Objects.equals(type, "url")) {
+			return _getURLFragmentConfigurationFieldValue(
+				fragmentConfigurationField.isLocalizable(), value,
+				scopeGroupId);
+		}
+
+		if (Objects.equals(type, "videoSelector")) {
+			return _getVideoFragmentConfigurationFieldValue(
+				fragmentConfigurationField.isLocalizable(), value);
+		}
+
 		return null;
 	}
 
@@ -222,7 +319,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			itemFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					_getItemValue((Map<String, Object>)object, scopeGroupId)
 				).build());
 		}
@@ -278,7 +375,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			lengthFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					GetterUtil.getString(object)
 				).build());
 		}
@@ -305,7 +402,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			navigationMenuFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					_getNavigationMenuValue(
 						(Map<String, Object>)object, scopeGroupId)
 				).build());
@@ -404,7 +501,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			selectFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					GetterUtil.getString(object)
 				).build());
 		}
@@ -431,7 +528,7 @@ public class FragmentConfigurationFieldValueTestUtil {
 		if (localizable) {
 			textFragmentConfigurationFieldValue.setValue_i18n(
 				HashMapBuilder.put(
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
 					GetterUtil.getString(object)
 				).build());
 		}
@@ -441,6 +538,96 @@ public class FragmentConfigurationFieldValueTestUtil {
 		}
 
 		return textFragmentConfigurationFieldValue;
+	}
+
+	private static FragmentConfigurationFieldValue
+		_getURLFragmentConfigurationFieldValue(
+			boolean localizable, Object object, long scopeGroupId) {
+
+		URLFragmentConfigurationFieldValue urlFragmentConfigurationFieldValue =
+			new URLFragmentConfigurationFieldValue() {
+				{
+					setType(() -> Type.URL);
+				}
+			};
+
+		if (localizable) {
+			urlFragmentConfigurationFieldValue.setValue_i18n(
+				HashMapBuilder.put(
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
+					_getURLValue((Map<String, Object>)object, scopeGroupId)
+				).build());
+		}
+		else {
+			urlFragmentConfigurationFieldValue.setValue(
+				_getURLValue((Map<String, Object>)object, scopeGroupId));
+		}
+
+		return urlFragmentConfigurationFieldValue;
+	}
+
+	private static URLValue _getURLValue(
+		Map<String, Object> map, long scopeGroupId) {
+
+		if (map.containsKey("href")) {
+			return new HrefURLValue() {
+				{
+					setHref(() -> GetterUtil.getString(map.get("href")));
+					setUrlType(() -> UrlType.HREF);
+				}
+			};
+		}
+
+		ItemExternalReference itemExternalReference =
+			ReferencesTestUtil.getItemExternalReference(
+				map.get("layout"), scopeGroupId);
+
+		if (itemExternalReference == null) {
+			return null;
+		}
+
+		return new SitePageURLValue() {
+			{
+				setSitePage(() -> itemExternalReference);
+				setUrlType(() -> UrlType.SITE_PAGE);
+			}
+		};
+	}
+
+	private static FragmentConfigurationFieldValue
+		_getVideoFragmentConfigurationFieldValue(
+			boolean localizable, Object object) {
+
+		VideoFragmentConfigurationFieldValue
+			videoFragmentConfigurationFieldValue =
+				new VideoFragmentConfigurationFieldValue() {
+					{
+						setType(() -> Type.VIDEO);
+					}
+				};
+
+		if (localizable) {
+			videoFragmentConfigurationFieldValue.setValue_i18n(
+				HashMapBuilder.put(
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.getDefault()),
+					_getVideoValue((Map<String, String>)object)
+				).build());
+		}
+		else {
+			videoFragmentConfigurationFieldValue.setValue(
+				_getVideoValue((Map<String, String>)object));
+		}
+
+		return videoFragmentConfigurationFieldValue;
+	}
+
+	private static VideoValue _getVideoValue(Map<String, String> map) {
+		VideoValue videoValue = new VideoValue();
+
+		videoValue.setHtml(map.get("html"));
+		videoValue.setTitle(map.get("title"));
+
+		return videoValue;
 	}
 
 }

@@ -5,11 +5,15 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.google.places.constants.GooglePlacesWebKeys;
 import com.liferay.headless.admin.site.dto.v1_0.Site;
 import com.liferay.headless.admin.site.resource.v1_0.SiteResource;
 import com.liferay.layout.util.LayoutServiceContextHelper;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.ServicePreAction;
 import com.liferay.portal.events.ThemeServicePreAction;
@@ -37,13 +41,17 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -61,14 +69,19 @@ import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.initializer.SiteInitializerSerializer;
 import com.liferay.sites.kernel.util.Sites;
 
+import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.core.Response;
 
 import java.io.File;
+import java.io.Serializable;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -79,26 +92,16 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/site.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = SiteResource.class
 )
 @CTAware
-public class SiteResourceImpl extends BaseSiteResourceImpl {
+public class SiteResourceImpl
+	extends BaseSiteResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate<Site> {
 
 	@Override
-	public void deleteSite(Long siteId) throws Exception {
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-41306")) {
-
-			throw new UnsupportedOperationException();
-		}
-
-		_groupService.deleteGroup(siteId);
-	}
-
-	@Override
-	public void deleteSiteByExternalReferenceCode(String externalReferenceCode)
-		throws Exception {
-
+	public void deleteSite(String externalReferenceCode) throws Exception {
 		if (!FeatureFlagManagerUtil.isEnabled(
 				contextCompany.getCompanyId(), "LPD-41306")) {
 
@@ -118,22 +121,90 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Site getSite(Long siteId) {
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-41306")) {
+	public ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor
+		getExportImportDescriptor() {
 
-			throw new UnsupportedOperationException();
-		}
+		return new ExportImportDescriptor() {
 
-		Group group = _groupLocalService.fetchGroup(siteId);
+			@Override
+			public String getLabelLanguageKey() {
+				return "site";
+			}
 
-		return _toSite(group);
+			@Override
+			public String getModelClassName() {
+				return Group.class.getName();
+			}
+
+			@Override
+			public Map<String, Serializable> getParameters(
+				PortletDataContext portletDataContext) {
+
+				return HashMapBuilder.<String, Serializable>put(
+					"filter",
+					() -> {
+						Map<String, String[]> parameterMap =
+							portletDataContext.getParameterMap();
+
+						String multiSitesGroupIds = MapUtil.getString(
+							parameterMap, "multiSitesGroupIds");
+
+						if (Validator.isNull(multiSitesGroupIds)) {
+							return null;
+						}
+
+						long[] groupIds = GetterUtil.getLongValues(
+							ArrayUtil.toStringArray(
+								ListUtil.fromString(multiSitesGroupIds, ",")));
+
+						Set<String> siteExternalReferenceCodes =
+							new HashSet<>();
+
+						for (long groupId : groupIds) {
+							Group group = _groupLocalService.fetchGroup(groupId);
+
+							if (group != null) {
+								siteExternalReferenceCodes.add(group.getExternalReferenceCode());
+							}
+						}
+
+						StringBundler sb = new StringBundler(3);
+
+						sb.append("externalReferenceCode in ('");
+
+						sb.append(
+							ListUtil.toString(
+								ListUtil.fromCollection(
+									siteExternalReferenceCodes),
+								StringPool.BLANK, "', '"));
+
+						sb.append("')");
+
+						return sb.toString();
+					}
+				).build();
+			}
+
+			@Override
+			public String getPortletId() {
+				return "com_liferay_site_admin_web_portlet_SiteDataPortlet";
+			}
+
+			@Override
+			public String getResourceClassName() {
+				return SiteResource.class.getName();
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.COMPANY;
+			}
+
+		};
 	}
 
 	@Override
-	public Site getSiteByExternalReferenceCode(String externalReferenceCode)
-		throws Exception {
-
+	public Site getSite(String externalReferenceCode) throws Exception {
 		if (!FeatureFlagManagerUtil.isEnabled(
 				contextCompany.getCompanyId(), "LPD-41306")) {
 
@@ -147,8 +218,7 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Response getSiteByExternalReferenceCodeSiteInitializer(
-			String externalReferenceCode)
+	public Response getSiteSiteInitializer(String externalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled(
@@ -261,25 +331,35 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 
 		Site site = multipartBody.getValueAsInstance("site", Site.class);
 
-		return putSiteByExternalReferenceCode(
+		return putSiteSiteInitializer(
 			site.getExternalReferenceCode(), multipartBody);
 	}
 
 	@Override
-	public Site putSite(Site site) throws Exception {
+	public Site putSite(String siteExternalReferenceCode, Site site)
+		throws Exception {
+
 		if (!FeatureFlagManagerUtil.isEnabled(
 				contextCompany.getCompanyId(), "LPD-41306")) {
 
 			throw new UnsupportedOperationException();
 		}
 
-		String externalReferenceCode = site.getExternalReferenceCode();
+		if (site.getExternalReferenceCode() == null) {
+			site.setExternalReferenceCode(() -> siteExternalReferenceCode);
+		}
+
+		if (!Objects.equals(
+				siteExternalReferenceCode, site.getExternalReferenceCode())) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		Group group = _groupLocalService.fetchGroupByExternalReferenceCode(
-			externalReferenceCode, contextCompany.getCompanyId());
+			siteExternalReferenceCode, contextCompany.getCompanyId());
 
 		if (group == null) {
-			group = _addGroup(externalReferenceCode, site);
+			group = _addGroup(siteExternalReferenceCode, site);
 		}
 		else {
 			group = _updateGroup(group, site);
@@ -289,7 +369,7 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Site putSiteByExternalReferenceCode(
+	public Site putSiteSiteInitializer(
 			String externalReferenceCode, MultipartBody multipartBody)
 		throws Exception {
 
@@ -373,6 +453,40 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 		Group finalGroup = group;
 
 		return _toSite(finalGroup);
+	}
+
+	@Override
+	public void update(
+			Collection<Site> sites, Map<String, Serializable> parameters)
+		throws Exception {
+
+		UnsafeFunction<Site, Site, Exception> unsafeFunction = null;
+
+		String updateStrategy = (String)parameters.getOrDefault(
+			"updateStrategy", "UPDATE");
+
+		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+			unsafeFunction = site -> putSite(
+				site.getExternalReferenceCode(), site);
+		}
+
+		if (unsafeFunction == null) {
+			throw new NotSupportedException(
+				"Update strategy \"" + updateStrategy +
+					"\" is not supported for Site");
+		}
+
+		if (contextBatchUnsafeBiConsumer != null) {
+			contextBatchUnsafeBiConsumer.accept(sites, unsafeFunction);
+		}
+		else if (contextBatchUnsafeConsumer != null) {
+			contextBatchUnsafeConsumer.accept(sites, unsafeFunction::apply);
+		}
+		else {
+			for (Site site : sites) {
+				unsafeFunction.apply(site);
+			}
+		}
 	}
 
 	private Group _addGroup(String externalReferenceCode, Site site)
@@ -459,9 +573,7 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 
 		Group group = _groupService.addGroup(
 			externalReferenceCode,
-			_getParentGroupId(
-				null, site.getParentSiteExternalReferenceCode(),
-				site.getParentSiteKey()),
+			_getParentGroupId(null, site.getParentSiteExternalReferenceCode()),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, _getNameMap(site),
 			_getDescriptionMap(site), _getType(site.getMembershipType()),
 			_getTypeSettings(site.getTypeSettings(), null),
@@ -542,25 +654,18 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	private long _getParentGroupId(
-		Group group, String parentSiteExternalReferenceCode,
-		String parentSiteKey) {
+		Group group, String parentSiteExternalReferenceCode) {
 
-		if (Validator.isNull(parentSiteExternalReferenceCode) &&
-			Validator.isNull(parentSiteKey)) {
-
+		if (Validator.isNull(parentSiteExternalReferenceCode)) {
 			return GroupConstants.DEFAULT_PARENT_GROUP_ID;
 		}
 
-		Group parentGroup = _groupLocalService.loadFetchGroup(
-			contextCompany.getCompanyId(), parentSiteKey);
-
-		if (parentGroup == null) {
-			parentGroup = _groupLocalService.fetchGroupByExternalReferenceCode(
+		Group parentGroup =
+			_groupLocalService.fetchGroupByExternalReferenceCode(
 				parentSiteExternalReferenceCode, contextCompany.getCompanyId());
 
-			if (parentGroup == null) {
-				return GroupConstants.DEFAULT_PARENT_GROUP_ID;
-			}
+		if (parentGroup == null) {
+			return GroupConstants.DEFAULT_PARENT_GROUP_ID;
 		}
 
 		if (!LazyReferencingThreadLocal.isEnabled()) {
@@ -773,8 +878,7 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 			Group updatedGroup = _groupLocalService.updateGroup(
 				group.getGroupId(),
 				_getParentGroupId(
-					group, site.getParentSiteExternalReferenceCode(),
-					site.getParentSiteKey()),
+					group, site.getParentSiteExternalReferenceCode()),
 				_getNameMap(site), _getDescriptionMap(site),
 				_getType(site.getMembershipType()),
 				_getTypeSettings(

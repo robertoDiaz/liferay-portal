@@ -571,6 +571,12 @@ components:
                         The field type (e.g., image, text, etc.).
                     readOnly: true
                     type: string
+                fieldReference:
+                    # @review
+                    description:
+                        The field's friendly reference name. This is used by developers when referencing the field in
+                        custom implementations.
+                    type: string
                 inputControl:
                     description:
                         The field's control type (e.g., text, text area, etc.).
@@ -791,6 +797,13 @@ components:
                 dataType:
                     description:
                         The form field's type (e.g., date, geolocation, text, etc.).
+                    readOnly: true
+                    type: string
+                fieldReference:
+                    # @review
+                    description:
+                        The field's friendly reference name. This is used by developers when referencing the field in
+                        custom implementations.
                     readOnly: true
                     type: string
                 inputControl:
@@ -1146,6 +1159,34 @@ components:
                                 The mapping's field key.
                             type: string
                     type: object
+            type: object
+        DisplayPageFormSubmissionResult:
+            # @review
+            description:
+                Represents a definition of a submission result of type display page template.
+            properties:
+                defaultDisplayPage:
+                    # @review
+                    description:
+                        Default display page when a form container submission is successful.
+                    type: boolean
+                mapping:
+                    # @review
+                    description:
+                        The mapping of the display page template submission result.
+                    properties:
+                        fieldKey:
+                            # @review
+                            description:
+                                The mapping's field key.
+                            type: string
+                    type: object
+                notificationTextFragmentInlineValue:
+                    $ref: "#/components/schemas/FragmentInlineValue"
+                    description:
+                        The localized display page template form submission result's notification text.
+                showNotification:
+                    type: boolean
             type: object
         DisplayPageTemplate:
             description:
@@ -3400,6 +3441,10 @@ components:
                         The message form submission type (embedded, none).
                     enum: [Embedded, None]
                     type: string
+                notificationTextFragmentInlineValue:
+                    $ref: "#/components/schemas/FragmentInlineValue"
+                    description:
+                        The localized message form submission result's notification text.
                 showNotification:
                     type: boolean
             type: object
@@ -3973,6 +4018,7 @@ components:
                             description:
                                 The definition for the success message of the form.
                             oneOf:
+                                -   $ref: "#/components/schemas/DisplayPageFormSubmissionResult"
                                 -   $ref: "#/components/schemas/MessageFormSubmissionResult"
                                 -   $ref: "#/components/schemas/SitePageFormSubmissionResult"
                                 -   $ref: "#/components/schemas/URLFormSubmissionResult"
@@ -5402,6 +5448,12 @@ components:
                     # @review
                     description:
                         The localized submission of page type.
+                notificationTextFragmentInlineValue:
+                    $ref: "#/components/schemas/FragmentInlineValue"
+                    description:
+                        The localized site page form submission result's notification text.
+                showNotification:
+                    type: boolean
             type: object
         SitePageNavigationMenuSettings:
             # @review

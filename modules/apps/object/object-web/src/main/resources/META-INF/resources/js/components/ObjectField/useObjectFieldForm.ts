@@ -80,6 +80,14 @@ export function useObjectFieldForm({
 			return null;
 		};
 
+		const hasDefaultValue =
+			(Liferay.FeatureFlags['LPD-46451'] &&
+				(field.businessType === 'Boolean' ||
+					field.businessType === 'LongText' ||
+					field.businessType === 'RichText' ||
+					field.businessType === 'Text')) ||
+			field.businessType === 'Picklist';
+
 		const errors: ObjectFieldErrors = {};
 
 		const label = field.label?.[defaultLanguageId];
@@ -200,15 +208,18 @@ export function useObjectFieldForm({
 			}
 		}
 		else if (
-			field.businessType === 'LongText' ||
-			field.businessType === 'Text'
+			(field.businessType === 'LongText' ||
+				field.businessType === 'Text') &&
+			settings.showCounter &&
+			!settings.maxLength
 		) {
-			if (settings.showCounter && !settings.maxLength) {
-				errors.maxLength = constantsUtils.REQUIRED_MSG;
-			}
+			errors.maxLength = constantsUtils.REQUIRED_MSG;
 		}
-		else if (field.businessType === 'Picklist') {
-			if (!field.listTypeDefinitionId) {
+		else if (hasDefaultValue) {
+			if (
+				field.businessType === 'Picklist' &&
+				!field.listTypeDefinitionId
+			) {
 				errors.listTypeDefinitionId = constantsUtils.REQUIRED_MSG;
 			}
 

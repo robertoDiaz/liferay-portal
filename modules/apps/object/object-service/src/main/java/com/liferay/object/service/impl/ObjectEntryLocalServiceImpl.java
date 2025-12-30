@@ -30,6 +30,7 @@ import com.liferay.dynamic.data.mapping.expression.DDMExpression;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.dynamic.data.mapping.util.NumberUtil;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.list.type.exception.NoSuchListTypeEntryException;
@@ -385,6 +386,21 @@ public class ObjectEntryLocalServiceImpl
 
 		_validateObjectEntryFolderId(groupId, objectEntryFolderId);
 
+		int status = _getStatus(
+			objectDefinition,
+			GetterUtil.getInteger(serviceContext.getAttribute("status")));
+
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			if (status == WorkflowConstants.STATUS_DRAFT) {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
+			else {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_PUBLISH);
+			}
+		}
+
 		int workflowAction = serviceContext.getWorkflowAction();
 
 		_validateWorkflowAction(
@@ -441,11 +457,21 @@ public class ObjectEntryLocalServiceImpl
 		_setExternalReferenceCode(objectEntry, values);
 		_setRootObjectEntryId(objectDefinition, objectEntry, values);
 		_setDisplayDate(objectDefinition.getCompanyId(), objectEntry, values);
-		_setExpirationDate(
-			objectDefinition.getCompanyId(), objectEntry, values);
+
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			if (status == WorkflowConstants.STATUS_EXPIRED) {
+				objectEntry.setExpirationDate(
+					(Date)values.get("expirationDate"));
+			}
+		}
+		else {
+			_setExpirationDate(
+				objectDefinition.getCompanyId(), objectEntry, values);
+		}
+
 		_setReviewDate(objectDefinition.getCompanyId(), objectEntry, values);
 
-		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
+		objectEntry.setStatus(status);
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
@@ -460,7 +486,8 @@ public class ObjectEntryLocalServiceImpl
 
 		_addResourcePermissions(objectDefinition, objectEntry);
 
-		if (objectEntry.isRootDescendantNode() ||
+		if (ExportImportThreadLocal.isImportInProcess() ||
+			objectEntry.isRootDescendantNode() ||
 			(workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
 			try {
@@ -1602,20 +1629,33 @@ public class ObjectEntryLocalServiceImpl
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
 			_getDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId());
+
 		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
 			_getExtensionDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId());
+
+		Expression<?>[] extensionExpressions = ArrayUtil.remove(
+			_getSelectExpressions(
+				extensionDynamicObjectDefinitionTable,
+				objectEntry.getObjectEntryId(), null, null),
+			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn());
+
+		Predicate innerJoinPredicate = null;
+
+		if (extensionExpressions.length != 0) {
+			innerJoinPredicate =
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+				).eq(
+					extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()
+				);
+		}
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			_getSelectExpressions(dynamicObjectDefinitionLocalizationTable),
 			_getSelectExpressions(
 				dynamicObjectDefinitionTable, objectEntry.getObjectEntryId(),
 				null, null),
-			ArrayUtil.remove(
-				_getSelectExpressions(
-					extensionDynamicObjectDefinitionTable,
-					objectEntry.getObjectEntryId(), null, null),
-				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()));
+			extensionExpressions);
 
 		List<Object[]> rows = _list(
 			DSLQueryFactoryUtil.select(
@@ -1623,11 +1663,7 @@ public class ObjectEntryLocalServiceImpl
 			).from(
 				dynamicObjectDefinitionTable
 			).innerJoinON(
-				extensionDynamicObjectDefinitionTable,
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn(
-				).eq(
-					extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()
-				)
+				extensionDynamicObjectDefinitionTable, innerJoinPredicate
 			).leftJoinOn(
 				dynamicObjectDefinitionLocalizationTable,
 				ObjectEntrySearchUtil.getLeftJoinLocalizationTablePredicate(
@@ -1998,6 +2034,39 @@ public class ObjectEntryLocalServiceImpl
 			assetLinkEntryIds, priority, null);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public ObjectEntry updateModifiedDate(long objectEntryId, Date modifiedDate)
+		throws PortalException {
+
+		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntryId);
+
+		objectEntry.setModifiedDate(modifiedDate);
+
+		objectEntry = objectEntryPersistence.update(objectEntry);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectEntry.getObjectDefinitionId());
+
+		if (!objectDefinition.isEnableObjectEntryVersioning()) {
+			return objectEntry;
+		}
+
+		int objectEntryVersionsCount =
+			_objectEntryVersionLocalService.getObjectEntryVersionsCount(
+				objectEntry.getObjectEntryId());
+
+		if (objectEntryVersionsCount > 0) {
+			_objectEntryVersionLocalService.
+				updateLatestObjectEntryVersionModifiedDate(
+					modifiedDate, objectEntry.getObjectEntryId());
+		}
+
+		return objectEntry;
+	}
+
 	@Override
 	public ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId, long objectEntryFolderId,
@@ -2207,11 +2276,11 @@ public class ObjectEntryLocalServiceImpl
 		if ((status == WorkflowConstants.STATUS_EXPIRED) ||
 			originalObjectEntry.isDraft() || originalObjectEntry.isPending()) {
 
-			List<ObjectEntryVersion> objectEntryVersions =
-				_objectEntryVersionLocalService.getObjectEntryVersions(
+			int count =
+				_objectEntryVersionLocalService.getObjectEntryVersionsCount(
 					objectEntry.getObjectEntryId());
 
-			if (!objectEntryVersions.isEmpty()) {
+			if (count > 0) {
 				_updateLatestObjectEntryVersion(objectDefinition, objectEntry);
 			}
 		}
@@ -2651,6 +2720,10 @@ public class ObjectEntryLocalServiceImpl
 
 			long primaryKey = GetterUtil.getLong(
 				values.get(objectField.getName()));
+
+			if (primaryKey == 0) {
+				continue;
+			}
 
 			String objectRelationshipERCObjectFieldName =
 				ObjectFieldSettingUtil.getValue(
@@ -4777,6 +4850,32 @@ public class ObjectEntryLocalServiceImpl
 		return status;
 	}
 
+	private int _getStatus(ObjectDefinition objectDefinition, int status) {
+		if (!ExportImportThreadLocal.isImportInProcess()) {
+			return WorkflowConstants.STATUS_DRAFT;
+		}
+
+		if (status == WorkflowConstants.STATUS_EMPTY) {
+			return status;
+		}
+
+		if (objectDefinition.isEnableObjectEntryDraft() &&
+			((status == WorkflowConstants.STATUS_DRAFT) ||
+			 (status == WorkflowConstants.STATUS_PENDING))) {
+
+			return WorkflowConstants.STATUS_DRAFT;
+		}
+
+		if (objectDefinition.isEnableObjectEntrySchedule() &&
+			((status == WorkflowConstants.STATUS_EXPIRED) ||
+			 (status == WorkflowConstants.STATUS_SCHEDULED))) {
+
+			return status;
+		}
+
+		return WorkflowConstants.STATUS_APPROVED;
+	}
+
 	private List<ObjectValuePair<Long, Integer>> _getStatusOVPs(
 		List<ObjectEntryVersion> objectEntryVersions) {
 
@@ -6090,7 +6189,9 @@ public class ObjectEntryLocalServiceImpl
 			boolean skipModelListener)
 		throws PortalException {
 
-		if (objectEntry.isInTrash()) {
+		if (ExportImportThreadLocal.isImportInProcess() ||
+			objectEntry.isInTrash()) {
+
 			return;
 		}
 
@@ -6825,10 +6926,8 @@ public class ObjectEntryLocalServiceImpl
 			_objectScopeProviderRegistry.getObjectScopeProvider(scope);
 
 		if (!objectScopeProvider.isValidGroupId(groupId)) {
-			throw new ObjectEntryGroupIdException(
-				StringBundler.concat(
-					"Group ID ", groupId, " is not valid for scope \"", scope,
-					"\""));
+			throw new ObjectEntryGroupIdException.InvalidGroupIdForScope(
+				groupId, scope);
 		}
 
 		if (!StringUtil.equals(scope, ObjectDefinitionConstants.SCOPE_DEPOT) ||

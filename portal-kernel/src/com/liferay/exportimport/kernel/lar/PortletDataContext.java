@@ -211,6 +211,8 @@ public interface PortletDataContext extends Serializable {
 
 	public ManifestSummary getManifestSummary();
 
+	public String getManifestXmlFilePath();
+
 	public Element getMissingReferenceElement(ClassedModel classedModel);
 
 	public Element getMissingReferencesElement();

@@ -89,8 +89,13 @@ public class DynamicObjectDefinitionTableUtil {
 
 	public static int getMaxLength(String businessType) {
 		if (StringUtil.equals(
-				businessType,
-				ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT)) {
+
+			return 65000;
+		}
+		else if (StringUtil.equals(
+					businessType,
+					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
 
 			if (DBManagerUtil.getDBType() == DBType.SQLSERVER) {
 				return 4000;
@@ -126,6 +131,25 @@ public class DynamicObjectDefinitionTableUtil {
 
 	public static Integer getSQLType(String dbType) {
 		return _sqlTypes.get(dbType);
+	}
+
+	public static String getUpdateDefaultValueSQL(
+		String columnName, String dbType, Object defaultValue,
+		String tableName) {
+
+		String sql = StringPool.BLANK;
+
+		if (dbType.equals(ObjectFieldConstants.DB_TYPE_STRING)) {
+			sql = StringBundler.concat(
+				"update ", tableName, " set ", columnName, " = '", defaultValue,
+				"' where ", columnName, " is null");
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("SQL: " + sql);
+		}
+
+		return sql;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

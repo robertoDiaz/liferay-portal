@@ -13,4 +13,7 @@ public class SiteAdminPortletKeys {
 	public static final String SITE_ADMIN =
 		"com_liferay_site_admin_web_portlet_SiteAdminPortlet";
 
+	public static final String SITE_DATA =
+		"com_liferay_site_admin_web_portlet_SiteDataPortlet";
+
 }

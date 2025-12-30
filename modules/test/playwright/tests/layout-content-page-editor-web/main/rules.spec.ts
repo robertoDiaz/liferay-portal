@@ -69,12 +69,7 @@ test(
 
 		// Open new rule modal
 
-		const modal = page.locator('.modal-dialog');
-
-		await clickAndExpectToBeVisible({
-			target: modal.getByRole('heading', {name: 'New Rule'}),
-			trigger: pageEditorPage.newRuleButton,
-		});
+		const modal = await pageEditorPage.openRulesModal();
 
 		// Create new rule
 
@@ -429,7 +424,7 @@ test('Checks the accessibility of the rule modal by filling out a condition and 
 
 	await pageEditorPage.goToSidebarTab('Page Rules');
 
-	await pageEditorPage.newRuleButton.click();
+	await pageEditorPage.openRulesModal();
 
 	await pageEditorPage.addRandomRuleCondition();
 
@@ -726,5 +721,17 @@ test(
 		await expect(
 			page.getByRole('option', {name: 'Heading'})
 		).not.toBeAttached();
+
+		await page.getByText('Cancel', {exact: true}).click();
+
+		// Refresh the page and check that the rule is still disabled
+
+		await page.reload();
+
+		await pageEditorPage.goToSidebarTab('Page Rules');
+
+		await expect(
+			rule.locator('[data-title="Disabled Rule"]')
+		).toBeAttached();
 	}
 );

@@ -367,7 +367,7 @@ public class ObjectDefinitionGraphQLTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionTestUtil.getRandomName(),
 				Arrays.asList(
 					new MultiselectPicklistObjectFieldBuilder(
 					).userId(
@@ -576,7 +576,8 @@ public class ObjectDefinitionGraphQLTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 						RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_TEXT,
-						false)));
+						false)),
+				false);
 
 		String pluralName = TextFormatter.formatPlural(
 			StringUtil.lowerCaseFirstLetter(objectDefinition.getShortName()));
@@ -730,7 +731,7 @@ public class ObjectDefinitionGraphQLTest {
 
 		try {
 			objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionTestUtil.getRandomName(),
 				Arrays.asList(
 					new TextObjectFieldBuilder(
 					).labelMap(
@@ -1243,7 +1244,7 @@ public class ObjectDefinitionGraphQLTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, false, enableObjectEntryDraft, false, false, false, null,
+				true, enableObjectEntryDraft, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),

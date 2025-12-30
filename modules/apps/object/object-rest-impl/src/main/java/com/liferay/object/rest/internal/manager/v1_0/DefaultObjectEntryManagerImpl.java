@@ -93,7 +93,6 @@ import com.liferay.portal.kernel.model.ExternalReferenceCodeModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.PersistedModel;
-import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -145,12 +144,10 @@ import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
-import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.scope.Scope;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
-import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 import com.liferay.sharing.configuration.SharingConfiguration;
 import com.liferay.sharing.configuration.SharingConfigurationFactory;
@@ -1783,7 +1780,37 @@ public class DefaultObjectEntryManagerImpl
 						}
 					}
 
-					if (LazyReferencingThreadLocal.isEnabled()) {
+					// Root model check must precede lazy reference check
+
+					if (objectRelationship.isEdge()) {
+						com.liferay.object.model.ObjectEntry
+							nestedServiceBuilderObjectEntry =
+								_objectEntryService.fetchObjectEntry(
+									nestedObjectEntry.
+										getExternalReferenceCode(),
+									groupId,
+									relatedObjectDefinition.
+										getObjectDefinitionId());
+
+						if (nestedServiceBuilderObjectEntry == null) {
+							nestedObjectEntry = addRelatedObjectEntry(
+								dtoConverterContext,
+								serviceBuilderObjectEntry.
+									getExternalReferenceCode(),
+								nestedObjectEntry, objectRelationship,
+								nestedScopeKey);
+						}
+						else {
+							nestedObjectEntry = updateRelatedObjectEntry(
+								dtoConverterContext,
+								nestedObjectEntry.getExternalReferenceCode(),
+								nestedObjectEntry, objectRelationship,
+								serviceBuilderObjectEntry.
+									getExternalReferenceCode(),
+								nestedScopeKey);
+						}
+					}
+					else if (LazyReferencingThreadLocal.isEnabled()) {
 						nestedObjectEntry = _toObjectEntry(
 							dtoConverterContext, relatedObjectDefinition,
 							_objectEntryService.getOrAddEmptyObjectEntry(
@@ -2023,31 +2050,6 @@ public class DefaultObjectEntryManagerImpl
 				getGroupId(objectDefinition, scopeKey),
 				dtoConverterContext.getLocale(), null, objectEntry,
 				dtoConverterContext.getUserId());
-		}
-
-		if (LazyReferencingThreadLocal.isEnabled()) {
-			for (Permission permission : objectEntry.getPermissions()) {
-				if (Validator.isNull(
-						permission.getRoleExternalReferenceCode())) {
-
-					continue;
-				}
-
-				String className = StringPool.BLANK;
-
-				RoleTypeContributor roleTypeContributor =
-					_roleTypeContributorProvider.getRoleTypeContributor(
-						RoleConstants.getLabelType(permission.getRoleType()));
-
-				if (roleTypeContributor != null) {
-					className = roleTypeContributor.getClassName();
-				}
-
-				_roleService.getOrAddEmptyRole(
-					permission.getRoleExternalReferenceCode(), className, 0,
-					permission.getRoleName(),
-					RoleConstants.getLabelType(permission.getRoleType()));
-			}
 		}
 
 		ModelPermissions modelPermissions =
@@ -3370,7 +3372,7 @@ public class DefaultObjectEntryManagerImpl
 					}
 
 					return _addAction(
-						ActionKeys.ADD_ENTRY,
+						ActionKeys.UPDATE,
 						"postObjectEntryByObjectEntryFolderCopy",
 						serviceBuilderObjectEntry,
 						dtoConverterContext.getUriInfo());
@@ -3386,7 +3388,7 @@ public class DefaultObjectEntryManagerImpl
 					}
 
 					return _addAction(
-						ActionKeys.ADD_ENTRY,
+						ActionKeys.UPDATE,
 						"postObjectEntryByObjectEntryFolderCopyReplace",
 						serviceBuilderObjectEntry,
 						dtoConverterContext.getUriInfo());
@@ -3454,7 +3456,7 @@ public class DefaultObjectEntryManagerImpl
 					}
 
 					return _addAction(
-						ActionKeys.ADD_ENTRY,
+						ActionKeys.UPDATE,
 						"postObjectEntryByObjectEntryFolderMove",
 						serviceBuilderObjectEntry,
 						dtoConverterContext.getUriInfo());
@@ -3470,7 +3472,7 @@ public class DefaultObjectEntryManagerImpl
 					}
 
 					return _addAction(
-						ActionKeys.ADD_ENTRY,
+						ActionKeys.UPDATE,
 						"postObjectEntryByObjectEntryFolderMoveReplace",
 						serviceBuilderObjectEntry,
 						dtoConverterContext.getUriInfo());

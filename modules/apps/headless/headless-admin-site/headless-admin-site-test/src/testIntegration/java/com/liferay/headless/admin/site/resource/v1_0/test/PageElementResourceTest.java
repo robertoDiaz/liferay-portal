@@ -20,12 +20,15 @@ import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
-import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.headless.admin.site.client.dto.v1_0.ClassNameReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.CollectionDisplayListStyle;
@@ -47,6 +50,7 @@ import com.liferay.headless.admin.site.client.dto.v1_0.FormContainerContextRefer
 import com.liferay.headless.admin.site.client.dto.v1_0.FormContainerPageElementDefinition;
 import com.liferay.headless.admin.site.client.dto.v1_0.FormContainerReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.FragmentEditableElement;
+import com.liferay.headless.admin.site.client.dto.v1_0.FragmentEditableElementValueFragmentLink;
 import com.liferay.headless.admin.site.client.dto.v1_0.FragmentInlineValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.FragmentInstancePageElementDefinition;
 import com.liferay.headless.admin.site.client.dto.v1_0.FragmentLink;
@@ -60,6 +64,7 @@ import com.liferay.headless.admin.site.client.dto.v1_0.FragmentViewport;
 import com.liferay.headless.admin.site.client.dto.v1_0.GridPageElementDefinition;
 import com.liferay.headless.admin.site.client.dto.v1_0.GridViewport;
 import com.liferay.headless.admin.site.client.dto.v1_0.GridViewportDefinition;
+import com.liferay.headless.admin.site.client.dto.v1_0.HTMLFragmentValue;
 import com.liferay.headless.admin.site.client.dto.v1_0.HtmlProperties;
 import com.liferay.headless.admin.site.client.dto.v1_0.ItemExternalReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.ListStyle;
@@ -571,6 +576,9 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		return _addFragmentEntry(
 			configuration, groupId,
 			StringBundler.concat(
+				"<div data-lfr-editable-id=\"element-html\" ",
+				"data-lfr-editable-type=\"html\">",
+				RandomTestUtil.randomString(), "</div>",
 				"<h1 data-lfr-editable-id=\"element-text\" ",
 				"data-lfr-editable-type=\"text\">",
 				RandomTestUtil.randomString(), "</h1>"),
@@ -602,12 +610,60 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 
 		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
 
-		FragmentEntryLinkLocalServiceUtil.addFragmentEntryLink(
+		_fragmentEntryLinkLocalService.addFragmentEntryLink(
 			externalReferenceCode, TestPropsValues.getUserId(),
 			testGroup.getGroupId(), null, null, null, 0, layout.getPlid(),
 			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
 			StringPool.BLANK, StringPool.BLANK, namespace, 0, null,
 			FragmentConstants.TYPE_PORTLET, new ServiceContext());
+	}
+
+	private void _assertDefaultValues(
+			FragmentInstancePageElementDefinition
+				fragmentInstancePageElementDefinition,
+			String... keys)
+		throws Exception {
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.
+				getFragmentEntryLinkByExternalReferenceCode(
+					fragmentInstancePageElementDefinition.
+						getFragmentInstanceExternalReferenceCode(),
+					testGroup.getGroupId());
+
+		JSONObject defaultEditableValuesJSONObject =
+			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
+				fragmentEntryLink.getHtml(),
+				fragmentEntryLink.getConfigurationJSONObject());
+
+		JSONObject defaultEditableJSONObject =
+			defaultEditableValuesJSONObject.getJSONObject(
+				FragmentEntryProcessorConstants.
+					KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR);
+
+		JSONObject editableValuesJSONObject =
+			fragmentEntryLink.getEditableValuesJSONObject();
+
+		JSONObject editableJSONObject = editableValuesJSONObject.getJSONObject(
+			FragmentEntryProcessorConstants.
+				KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR);
+
+		for (String key : keys) {
+			JSONObject defaultElementJSONObject =
+				defaultEditableJSONObject.getJSONObject(key);
+
+			Object defaultValue = defaultElementJSONObject.get("defaultValue");
+
+			Assert.assertTrue(
+				defaultElementJSONObject.toString(),
+				Validator.isNotNull(defaultValue));
+
+			JSONObject elementJSONObject = editableJSONObject.getJSONObject(
+				key);
+
+			Assert.assertEquals(
+				defaultValue, elementJSONObject.get("defaultValue"));
+		}
 	}
 
 	private void _assertProblemException(
@@ -1476,10 +1532,11 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 			{
 				setValue_i18n(
 					HashMapBuilder.put(
-						LocaleUtil.SPAIN.toString(),
+						LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
 						RandomTestUtil.randomString()
 					).put(
-						LocaleUtil.US.toString(), RandomTestUtil.randomString()
+						LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+						RandomTestUtil.randomString()
 					).build());
 			}
 		};
@@ -1836,9 +1893,11 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 					null),
 				true, true,
 				HashMapBuilder.put(
-					LocaleUtil.SPAIN.toString(), RandomTestUtil.randomString()
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
+					RandomTestUtil.randomString()
 				).put(
-					LocaleUtil.US.toString(), RandomTestUtil.randomString()
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+					RandomTestUtil.randomString()
 				).build(),
 				true, RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
 				RandomTestUtil.randomInt(), RandomTestUtil.randomInt(),
@@ -1927,9 +1986,11 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				RandomTestUtil.randomStrings(RandomTestUtil.randomInt(1, 10)),
 				RandomTestUtil.randomString(), null, null, null,
 				HashMapBuilder.put(
-					LocaleUtil.SPAIN.toString(), "https://www.liferay.es"
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
+					"https://www.liferay.es"
 				).put(
-					LocaleUtil.US.toString(), "https://www.liferay.com"
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+					"https://www.liferay.com"
 				).build(),
 				false, RandomTestUtil.randomString()));
 	}
@@ -2078,9 +2139,11 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 					null),
 				true, true,
 				HashMapBuilder.put(
-					LocaleUtil.SPAIN.toString(), RandomTestUtil.randomString()
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
+					RandomTestUtil.randomString()
 				).put(
-					LocaleUtil.US.toString(), RandomTestUtil.randomString()
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+					RandomTestUtil.randomString()
 				).build(),
 				true, RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
 				RandomTestUtil.randomInt(), RandomTestUtil.randomInt(),
@@ -2173,9 +2236,11 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				RandomTestUtil.randomStrings(RandomTestUtil.randomInt(1, 10)),
 				RandomTestUtil.randomString(), null, null, null,
 				HashMapBuilder.put(
-					LocaleUtil.SPAIN.toString(), "https://www.liferay.es"
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
+					"https://www.liferay.es"
 				).put(
-					LocaleUtil.US.toString(), "https://www.liferay.com"
+					LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+					"https://www.liferay.com"
 				).build(),
 				false, externalReferenceCode));
 		_testPutSitePageSpecificationPageExperiencePageElement(
@@ -2397,6 +2462,8 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		String categoryFieldName = RandomTestUtil.randomString();
 		String checkboxFieldName = RandomTestUtil.randomString();
 		String collectionFieldName = RandomTestUtil.randomString();
+		String colorPaletteFieldName = RandomTestUtil.randomString();
+		String colorPickerFieldName = RandomTestUtil.randomString();
 		String itemFieldName = RandomTestUtil.randomString();
 		String lengthFieldName = RandomTestUtil.randomString();
 		String navigationMenuFieldName = RandomTestUtil.randomString();
@@ -2426,6 +2493,8 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				)));
 
 		String textFieldName = RandomTestUtil.randomString();
+		String urlFieldName = RandomTestUtil.randomString();
+		String videoFieldName = RandomTestUtil.randomString();
 
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithConfiguration(
 			FragmentConfigurationTestUtil.getConfiguration(
@@ -2445,6 +2514,16 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 					collectionFieldName,
 					HashMapBuilder.<String, Object>put(
 						"type", "collectionSelector"
+					).build()
+				).put(
+					colorPaletteFieldName,
+					HashMapBuilder.<String, Object>put(
+						"type", "colorPalette"
+					).build()
+				).put(
+					colorPickerFieldName,
+					HashMapBuilder.<String, Object>put(
+						"type", "colorPicker"
 					).build()
 				).put(
 					itemFieldName,
@@ -2479,6 +2558,16 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 					).put(
 						"type", "text"
 					).build()
+				).put(
+					urlFieldName,
+					HashMapBuilder.<String, Object>put(
+						"type", "url"
+					).build()
+				).put(
+					videoFieldName,
+					HashMapBuilder.<String, Object>put(
+						"type", "videoSelector"
+					).build()
 				).build()),
 			HashMapBuilder.<String, Object>put(
 				categoryFieldName, _getAssetCategory(testGroup.getGroupId())
@@ -2486,6 +2575,17 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				checkboxFieldName, RandomTestUtil.randomBoolean()
 			).put(
 				collectionFieldName, _getAssetListEntry(testGroup.getGroupId())
+			).put(
+				colorPaletteFieldName,
+				HashMapBuilder.put(
+					"color", RandomTestUtil.randomString()
+				).put(
+					"cssClass", RandomTestUtil.randomString()
+				).put(
+					"rgbValue", RandomTestUtil.randomString()
+				).build()
+			).put(
+				colorPickerFieldName, RandomTestUtil.randomString()
 			).put(
 				itemFieldName,
 				HashMapBuilder.put(
@@ -2513,6 +2613,18 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				selectFieldName, selectValue1
 			).put(
 				textFieldName, RandomTestUtil.randomString()
+			).put(
+				urlFieldName,
+				HashMapBuilder.put(
+					"href", RandomTestUtil.randomString()
+				).build()
+			).put(
+				videoFieldName,
+				HashMapBuilder.put(
+					"html", RandomTestUtil.randomString()
+				).put(
+					"title", RandomTestUtil.randomString()
+				).build()
 			).build(),
 			HashMapBuilder.<String, Object>put(
 				categoryFieldName,
@@ -2523,6 +2635,17 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				collectionFieldName,
 				"com.liferay.asset.internal.info.collection.provider." +
 					"HighestRatedAssetsInfoCollectionProvider"
+			).put(
+				colorPaletteFieldName,
+				HashMapBuilder.put(
+					"color", RandomTestUtil.randomString()
+				).put(
+					"cssClass", RandomTestUtil.randomString()
+				).put(
+					"rgbValue", RandomTestUtil.randomString()
+				).build()
+			).put(
+				colorPickerFieldName, RandomTestUtil.randomString()
 			).put(
 				itemFieldName,
 				HashMapBuilder.put(
@@ -2540,11 +2663,23 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				selectFieldName, selectValue2
 			).put(
 				textFieldName, RandomTestUtil.randomString()
+			).put(
+				urlFieldName,
+				HashMapBuilder.put(
+					"layout", _layout
+				).build()
+			).put(
+				videoFieldName,
+				HashMapBuilder.put(
+					"html", RandomTestUtil.randomString()
+				).put(
+					"title", RandomTestUtil.randomString()
+				).build()
 			).build(),
 			Collections.emptyMap());
 
 		_testMissingOptionalReference(
-			4,
+			5,
 			() ->
 				_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithConfiguration(
 					FragmentConfigurationTestUtil.getConfiguration(
@@ -2568,6 +2703,20 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 							collectionFieldName,
 							HashMapBuilder.<String, Object>put(
 								"type", "collectionSelector"
+							).build()
+						).put(
+							colorPaletteFieldName,
+							HashMapBuilder.<String, Object>put(
+								"localized", true
+							).put(
+								"type", "colorPalette"
+							).build()
+						).put(
+							colorPickerFieldName,
+							HashMapBuilder.<String, Object>put(
+								"localized", true
+							).put(
+								"type", "colorPicker"
 							).build()
 						).put(
 							itemFieldName,
@@ -2615,6 +2764,20 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 							).put(
 								"type", "text"
 							).build()
+						).put(
+							urlFieldName,
+							HashMapBuilder.<String, Object>put(
+								"localized", true
+							).put(
+								"type", "url"
+							).build()
+						).put(
+							videoFieldName,
+							HashMapBuilder.<String, Object>put(
+								"localized", true
+							).put(
+								"type", "videoSelector"
+							).build()
 						).build()),
 					HashMapBuilder.<String, Object>put(
 						categoryFieldName,
@@ -2624,6 +2787,17 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 					).put(
 						collectionFieldName,
 						_getAssetListEntry(irrelevantGroup.getGroupId())
+					).put(
+						colorPaletteFieldName,
+						HashMapBuilder.put(
+							"color", RandomTestUtil.randomString()
+						).put(
+							"cssClass", RandomTestUtil.randomString()
+						).put(
+							"rgbValue", RandomTestUtil.randomString()
+						).build()
+					).put(
+						colorPickerFieldName, RandomTestUtil.randomString()
 					).put(
 						itemFieldName,
 						HashMapBuilder.<String, Object>put(
@@ -2653,6 +2827,19 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 						selectFieldName, selectValue1
 					).put(
 						textFieldName, RandomTestUtil.randomString()
+					).put(
+						urlFieldName,
+						HashMapBuilder.put(
+							"layout",
+							LayoutTestUtil.addTypeContentLayout(irrelevantGroup)
+						).build()
+					).put(
+						videoFieldName,
+						HashMapBuilder.put(
+							"html", RandomTestUtil.randomString()
+						).put(
+							"title", RandomTestUtil.randomString()
+						).build()
 					).build(),
 					HashMapBuilder.<String, Object>put(
 						categoryFieldName,
@@ -2676,6 +2863,17 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 							"scopeExternalReferenceCode",
 							RandomTestUtil.randomString()
 						).build()
+					).put(
+						colorPaletteFieldName,
+						HashMapBuilder.put(
+							"color", RandomTestUtil.randomString()
+						).put(
+							"cssClass", RandomTestUtil.randomString()
+						).put(
+							"rgbValue", RandomTestUtil.randomString()
+						).build()
+					).put(
+						colorPickerFieldName, RandomTestUtil.randomString()
 					).put(
 						itemFieldName,
 						HashMapBuilder.put(
@@ -2715,6 +2913,27 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 						selectFieldName, selectValue2
 					).put(
 						textFieldName, RandomTestUtil.randomString()
+					).put(
+						urlFieldName,
+						HashMapBuilder.put(
+							"layout",
+							HashMapBuilder.<String, Object>put(
+								"className", Layout.class.getName()
+							).put(
+								"externalReferenceCode",
+								RandomTestUtil.randomString()
+							).put(
+								"scopeExternalReferenceCode",
+								RandomTestUtil.randomString()
+							).build()
+						).build()
+					).put(
+						videoFieldName,
+						HashMapBuilder.put(
+							"html", RandomTestUtil.randomString()
+						).put(
+							"title", RandomTestUtil.randomString()
+						).build()
 					).build(),
 					Collections.emptyMap()));
 
@@ -2767,34 +2986,78 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 	private void _testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements()
 		throws Exception {
 
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			testGroup.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-			FragmentEditableElementTestUtil.getFragmentEditableElements(
+			FragmentEditableElementTestUtil.getHTMLFragmentEditableElement(
+				null, null, HTMLFragmentValue.Type.INLINE),
+			FragmentEditableElementTestUtil.getTextFragmentEditableElement(
+				FragmentEditableElementValueFragmentLink.Prefix.EMAIL,
+				_getFragmentLink(
+					JournalArticle.class.getName(),
+					journalArticle.getExternalReferenceCode(),
+					"JournalArticle_title", null),
 				null, null, TextFragmentValue.Type.INLINE));
+
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-			FragmentEditableElementTestUtil.getFragmentEditableElements(
+			FragmentEditableElementTestUtil.getHTMLFragmentEditableElement(
+				FragmentMappedValueItemContextReference.ContextSource.
+					COLLECTION_ITEM,
+				FragmentMappedValueItemReference.Type.CONTEXT_REFERENCE,
+				HTMLFragmentValue.Type.MAPPED),
+			FragmentEditableElementTestUtil.getTextFragmentEditableElement(
+				null, null,
 				FragmentMappedValueItemContextReference.ContextSource.
 					COLLECTION_ITEM,
 				FragmentMappedValueItemReference.Type.CONTEXT_REFERENCE,
 				TextFragmentValue.Type.MAPPED));
+
+		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
+
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-			FragmentEditableElementTestUtil.getFragmentEditableElements(
+			FragmentEditableElementTestUtil.getHTMLFragmentEditableElement(
+				FragmentMappedValueItemContextReference.ContextSource.
+					DISPLAY_PAGE_ITEM,
+				FragmentMappedValueItemReference.Type.CONTEXT_REFERENCE,
+				HTMLFragmentValue.Type.MAPPED),
+			FragmentEditableElementTestUtil.getTextFragmentEditableElement(
+				FragmentEditableElementValueFragmentLink.Prefix.PHONE,
+				_getFragmentLink(
+					Layout.class.getName(), layout.getExternalReferenceCode(),
+					null, null),
 				FragmentMappedValueItemContextReference.ContextSource.
 					DISPLAY_PAGE_ITEM,
 				FragmentMappedValueItemReference.Type.CONTEXT_REFERENCE,
 				TextFragmentValue.Type.MAPPED));
+
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-			FragmentEditableElementTestUtil.getFragmentEditableElements(
+			FragmentEditableElementTestUtil.getHTMLFragmentEditableElement(
+				null,
+				FragmentMappedValueItemReference.Type.ITEM_EXTERNAL_REFERENCE,
+				HTMLFragmentValue.Type.MAPPED),
+			FragmentEditableElementTestUtil.getTextFragmentEditableElement(
+				null,
+				_getFragmentLink(
+					null, null, null,
+					HashMapBuilder.put(
+						LocaleUtil.toBCP47LanguageId(LocaleUtil.SPAIN),
+						"https://www.liferay.es"
+					).put(
+						LocaleUtil.toBCP47LanguageId(LocaleUtil.US),
+						"https://www.liferay.com"
+					).build()),
 				null,
 				FragmentMappedValueItemReference.Type.ITEM_EXTERNAL_REFERENCE,
 				TextFragmentValue.Type.MAPPED));
 		_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-			FragmentEditableElementTestUtil.getFragmentEditableElements(
-				null, null, null));
+			new FragmentEditableElement[0]);
 	}
 
 	private void
 			_testPutSitePageSpecificationPageExperiencePageElementWithFragmentPageElementWithFragmentEditableElements(
-				FragmentEditableElement[] fragmentEditableElements)
+				FragmentEditableElement... fragmentEditableElements)
 		throws Exception {
 
 		String externalReferenceCode = RandomTestUtil.randomString();
@@ -2803,12 +3066,19 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 			null, testGroup.getGroupId(),
 			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId()));
 
-		_testPutSitePageSpecificationPageExperiencePageElement(
-			_getFragmentInstancePageElement(
-				externalReferenceCode,
-				PageElementsTestUtil.getFragmentInstancePageElementDefinition(
-					null, fragmentEditableElements, fragmentEntry,
-					testGroup.getGroupId())));
+		PageElement pageElement =
+			_testPutSitePageSpecificationPageExperiencePageElement(
+				_getFragmentInstancePageElement(
+					externalReferenceCode,
+					PageElementsTestUtil.
+						getFragmentInstancePageElementDefinition(
+							null, fragmentEditableElements, fragmentEntry,
+							testGroup.getGroupId())));
+
+		_assertDefaultValues(
+			(FragmentInstancePageElementDefinition)
+				pageElement.getPageElementDefinition(),
+			"element-html", "element-text");
 	}
 
 	private void _testPutSitePageSpecificationPageExperiencePageElementWithGridPageElement()
@@ -2901,7 +3171,13 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 	private FragmentCollectionLocalService _fragmentCollectionLocalService;
 
 	@Inject
+	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Inject
 	private FragmentEntryLocalService _fragmentEntryLocalService;
+
+	@Inject
+	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
 
 	@Inject
 	private JSONFactory _jsonFactory;

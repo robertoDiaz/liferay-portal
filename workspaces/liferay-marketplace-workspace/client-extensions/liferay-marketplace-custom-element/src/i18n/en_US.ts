@@ -10,7 +10,7 @@ export default {
 		'A request will be sent to deactivate the selected activation key. From now on, it will be hidden and no longer visible.',
 	'a-sleek-and-intuitive-admin-dashboard-for-monitoring-key-metrics':
 		'A sleek and intuitive admin dashboard for monitoring key metrics.',
-	'access-console': 'Access Console',
+	'access-required': 'Access required.',
 	'account': 'Account',
 	'account-details': 'Account Details',
 	'account-name': 'Account Name',
@@ -30,7 +30,7 @@ export default {
 	'additional-apps-requested': 'Additional Apps Requested',
 	'address': 'Address',
 	'address-name': 'Address Name',
-	'admin-dashboard': 'Admin Dashboard',
+	'administrator-dashboard': 'Administrator Dashboard',
 	'agreements': 'Agreements',
 	'all-orders': 'All Orders',
 	'all-progress-and-information-related-to-the-creation-of-the-app-will-be-lost-do-you-still-want-to-exit':
@@ -84,6 +84,7 @@ export default {
 		'Are you sure you want to expire this trial? This action implies the permanent end of the test environment.',
 	'area': 'Area',
 	'areas': 'Areas',
+	'at-least-one-role-must-be-provided': 'At least one role must be provided.',
 	'available': 'Available',
 	'back': 'Back',
 	'back-to-apps': 'Back to Apps',
@@ -95,13 +96,12 @@ export default {
 	'backend-client-extensions-delivered-as-deployed-services-only-available-to-saas-and-paas-clients':
 		'Backend client extensions delivered as deployed services (only available to SaaS and PaaS clients).',
 	'batch': 'Batch',
-	'becoming-a-liferay-marketplace-customer':
-		'Becoming a Liferay Marketplace Customer',
 	'becoming-a-liferay-marketplace-publisher':
 		'Becoming a Liferay Marketplace publisher',
 	'billing-address': 'Billing Address',
 	'billing-email': 'Billing Email',
 	'blank-site': 'Blank Site',
+	'browse-catalog': 'Browse Catalog',
 	'build': 'Build',
 	'business': 'Business',
 	'business-account': 'Business Account',
@@ -119,7 +119,7 @@ export default {
 	'choose-the-marketplace-category-that-most-accurately-describes-what-your-solution-does-users-looking-for-specific-types-of-solutions-will-often-browse-categories-by-searching-for-a-specific-category-name-on-the-main-marketplace-home-page-having-your-solution-listed-under-the-appropriate-category-will-help-them-find-it':
 		'Choose the Marketplace category that most accurately describes what your solution does. Users looking for specific types of solutions will often browse categories by searching for a specific category name on the main Marketplace home page. Having your solution listed under the appropriate category will help them find it.',
 	'clear': 'Clear',
-	'click-on-add-apps-to-start': "Click on 'Add Apps' to start.",
+	'click-on-browse-catalog-to-start': "Click on 'Browse Catalog' to start.",
 	'client-extension': 'Client Extension',
 	'client-extensions': 'Client Extensions',
 	'close': 'Close',
@@ -161,6 +161,7 @@ export default {
 	'continue-to-download': 'Continue to Download',
 	'continue-to-install': 'Continue to Install',
 	'copied-x-to-the-clipboard': 'Copied {0} to the clipboard.',
+	'could-not-find-ssa-account': 'Could not find SSA account',
 	'could-not-upload-the-file-a-package-with-this-filename-already-exists':
 		'Could not upload the file. A package with this filename already exists.',
 	'coupon-code': 'Coupon Code',
@@ -258,6 +259,7 @@ export default {
 	'environment-selection': 'Environment Selection',
 	'environment-type': 'Environment Type',
 	'environments': 'Environments',
+	'error': 'Error',
 	'error-details': 'Error Details',
 	'excluding-vat': 'Excluding VAT',
 	'exit': 'Exit',
@@ -283,6 +285,7 @@ export default {
 	'failure': 'Failure',
 	'file-not-available-for-download': 'File not available for download.',
 	'filter': 'Filter',
+	'finance-dashboard': 'Finance Dashboard',
 	'first-name': 'First Name',
 	'for-businesses-with-a-vat-tax-number-this-account-type-support-multiple-users':
 		'For businesses with a VAT/Tax number; this account type support multiple users.',
@@ -348,6 +351,7 @@ export default {
 	'key-deactivation-requested-succesfully':
 		'Key deactivation requested successfully',
 	'key-type': 'Key Type',
+	'last-login': 'Last Login',
 	'last-name': 'Last Name',
 	'last-orders': 'Last Orders',
 	'last-update': 'Last Update',
@@ -386,7 +390,14 @@ export default {
 		'Manage and publish apps on the Marketplace',
 	'manage-app': 'Manage App',
 	'manage-license-keys': 'Manage License Key(s)',
+	'manage-members-and-access-for-ssa-accounts':
+		'Manage members and access for SSA accounts.',
+	'manage-roles': 'Manage Roles',
+	'manage-the-roles-associated-with-this-user-roles-determine-what-features-permissions-and-areas-of-the-platform-the-user-can-access-so-updating-them-allows-you-to-control-their-level-of-access-and-responsibilities':
+		'Manage the roles associated with this user. Roles determine what features, permissions, and areas of the platform the user can access, so updating them allows you to control their level of access and responsibilities.',
 	'manage-trial': 'Manage Trial',
+	'manage-user-roles': 'Manage User Roles',
+	'manage-users': 'Manage Users',
 	'manage-your-current-trials': 'Manage your current trials',
 	'manage-your-teams-trial': "Manage your team's trial",
 	'mark-as-paid': 'Mark as Paid',
@@ -407,6 +418,7 @@ export default {
 	'move-up': 'Move Up',
 	'mp-commission': 'MP Commission',
 	'my-apps': 'My Apps',
+	'my-saas-demos': 'My SaaS Demos',
 	'my-solutions': 'My Solutions',
 	'name': 'Name',
 	'net-price': 'Net Price',
@@ -455,8 +467,8 @@ export default {
 	'paid': 'Paid',
 	'paid-by': 'Paid By',
 	'paid-date': 'Paid Date',
-	'pay-with-card': 'Pay with card',
-	'pay-with-invoice': 'Pay with invoice',
+	'pay-with-bank-transfer': 'Pay with Bank Transfer',
+	'pay-with-card': 'Pay with Card',
 	'payment': 'Payment',
 	'payment-method': 'Payment Method',
 	'payment-status': 'Payment Status',
@@ -505,6 +517,7 @@ export default {
 		'Publish apps and they will show up here.',
 	'publish-apps-to-the-liferay-marketplace':
 		'Publish apps to the Liferay Marketplace',
+	'publish-new-app': 'Publish New App',
 	'published-apps': 'Published Apps',
 	'published-at': 'Published At',
 	'publisher': 'Publisher',
@@ -539,6 +552,9 @@ export default {
 	'reject-request': 'Reject Request',
 	'remove': 'Remove',
 	'remove-a-version': 'Remove a Version',
+	'remove-all-roles': 'Remove all roles',
+	'remove-user': 'Remove User',
+	'removed-user-from-account': 'Removed user from account',
 	'request-a-marketplace-publisher-account':
 		'Request a Marketplace Publisher Account',
 	'request-account': 'Request Account',
@@ -555,6 +571,9 @@ export default {
 	'review-and-submit-solution': 'Review and Submit Solution',
 	'review-the-new-publisher-info-and-the-liferay-marketplace-terms-before-proceeding':
 		'Review the new publisher info and the Liferay Marketplace terms before proceeding.',
+	'roles': 'Roles',
+	'saas-environments': 'SaaS Environments',
+	'saas-trials': 'SaaS Trials',
 	'save': 'Save',
 	'save-as-a-draft-exit': 'Save as a Draft & Exit',
 	'save-as-draft': 'Save as Draft',
@@ -582,6 +601,8 @@ export default {
 	'selected-project': 'Selected Project',
 	'self-managed': 'Self-Managed',
 	'send-request': 'Send Request',
+	'set-the-users-role-ssa-users-can-create-trials-while-ssa-admins-can-manage-users-roles-and-trials':
+		'Set the user’s role: SSA Users can create trials, while SSA Admins can manage users, roles, and trials.',
 	'showing-x-to-x-of-x': 'Showing {0} to {1} of {2}',
 	'sign-in-with-a-different-account': 'Sign in with a Different Account',
 	'site-initializer': 'Site Initializer',
@@ -596,6 +617,7 @@ export default {
 	'sorry-there-are-no-results-found': 'Sorry, there are no results found.',
 	'specify-your-apps-version-this-will-help-the-user-understand-the-latest-version-of-your-app-offered-on-the-marketplace':
 		'Specify your app’s version. This will help the user understand the latest version of your app offered on the Marketplace.',
+	'ssa-dashboard': 'SSA Dashboard',
 	'ssa-trial-installation-in-progress': 'SSA Trial Installation in Progress',
 	'ssa-trial-summary': 'SSA Trial Summary',
 	'ssa-trials': 'SSA Trials',
@@ -613,6 +635,7 @@ export default {
 	'subtotal': 'Subtotal',
 	'subtotal-discount': 'Subtotal Discount',
 	'success': 'Success',
+	'successfully-removed-roles': 'Successfully removed roles',
 	'summary': 'Summary',
 	'support': 'Support',
 	'support-and-help': 'Support & Help',
@@ -706,8 +729,10 @@ export default {
 	'trial-url': 'Trial URL',
 	'trials': 'Trials',
 	'type': 'Type',
+	'unable-to-assign-roles': 'Unable to assign roles',
 	'unable-to-download-your-license-file-please-try-again-and-or-contact-support-via-the-manage-menu-on-the-dashboard':
 		'Unable to download your license file.  Please try again and/or contact support via the manage menu on the dashboard.',
+	'unable-to-remove-roles': 'Unable to remove roles',
 	'under-review': 'Under Review',
 	'uninstall': 'Uninstall',
 	'unlock-exclusive-benefits-with-a-business-account':
@@ -727,7 +752,9 @@ export default {
 	'use-one-of-the-following-methods-to-provide-your-app-builds':
 		'Use one of the following methods to provide your app builds.',
 	'user-account': 'User Account',
+	'user-doesnt-exist': 'User doesn’t exist',
 	'user-email': 'User Email',
+	'user-roles-successfully-updated': 'User roles successfully updated',
 	'users-requests-to-become-a-publisher':
 		'Users requests to become a publisher',
 	'value-between-1-and-60': 'Value between 1 and 60.',
@@ -766,6 +793,8 @@ export default {
 	'x-will-be-deleted-and-this-action-cant-be-undone-are-you-sure-you-want-to-delete-it':
 		'{0} will be deleted and this action can’t be undone. Are you sure you want to delete it?',
 	'yes': 'Yes',
+	'you-are-about-to-remove-this-user-from-ssa-they-will-lose-access-to-their-account-and-all-associated-features-but-dont-worry-you-can-invite-them-again-later-if-needed':
+		'You are about to remove this user from SSA. They will lose access to their account and all associated features, but don’t worry — you can invite them again later if needed.',
 	'you-are-currently-on-a-text-element,-inside-of-a-list-box':
 		'You are currently on a text element, inside of a list box.',
 	'you-are-finalizing-your-connection-with-the-marketplace':

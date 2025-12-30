@@ -537,15 +537,30 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		ElementHandler elementHandler = new ElementHandler(
 			new ManifestSummaryElementProcessor(group, manifestSummary),
-			new String[] {"header", "portlet", "staged-model"});
+			new String[] {"header", "portlet", "staged-model", "multi-site"});
 
 		xmlReader.setContentHandler(elementHandler);
 
 		xmlReader.parse(
 			new InputSource(
-				portletDataContext.getZipEntryAsInputStream("/manifest.xml")));
+				portletDataContext.getZipEntryAsInputStream(portletDataContext.getManifestXmlFilePath())));
 
 		return manifestSummary;
+	}
+
+	@Override
+	public String getManifestXmlFilePath(
+		Map<String, String[]> parameterMap)
+		throws Exception {
+
+		long currentMultiSitesGroupId = MapUtil.getLong(
+			parameterMap, "currentMultiSitesGroupId");
+
+		if (Validator.isNull(currentMultiSitesGroupId)) {
+			return "/manifest.xml";
+		}
+
+		return "/group/" + currentMultiSitesGroupId + "/manifest.xml";
 	}
 
 	/**
@@ -1029,7 +1044,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		xmlReader.parse(
 			new InputSource(
-				portletDataContext.getZipEntryAsInputStream("/manifest.xml")));
+				portletDataContext.getZipEntryAsInputStream(portletDataContext.getManifestXmlFilePath())));
 
 		return missingReferences;
 	}
@@ -1695,6 +1710,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 				_manifestSummary.addModelDeletionCount(
 					manifestSummaryKey, modelDeletionCount);
+			}
+			else if (elementName.equals("multi-site")) {
+				String groupId = element.attributeValue("group-id");
+
+				String multiSitesGroupIds = _manifestSummary.getStagedModelAssetTitle("multiSitesGroupIds");
+
+				if (multiSitesGroupIds == null) {
+					multiSitesGroupIds = "";
+				}
+
+				if (multiSitesGroupIds.length() > 0) {
+					multiSitesGroupIds += ",";
+				}
+
+				_manifestSummary.addAssetTitle("multiSitesGroupIds", multiSitesGroupIds + groupId);
 			}
 		}
 

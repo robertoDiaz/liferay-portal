@@ -16,12 +16,9 @@ import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {LIST_ITEM_TYPES} from '../../../app/config/constants/listItemTypes';
+import {useRulesModal} from '../../../app/contexts/RulesModalContext';
 import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
-import {
-	useHighlightItems,
-	useHighlightedItemIds,
-	useKeyboardNavigation,
-} from '../../../app/js-index';
+import {useHighlightItems, useKeyboardNavigation} from '../../../app/js-index';
 import selectLayoutDataItemLabel from '../../../app/selectors/selectLayoutDataItemLabel';
 import deleteRule from '../../../app/thunks/deleteRule';
 import updateRule from '../../../app/thunks/updateRule';
@@ -33,10 +30,8 @@ import useConditionValues, {
 	ConditionValues,
 } from '../../../app/utils/useConditionValues';
 import {Rule} from '../../../types/Rule';
-import {LayoutData} from '../../../types/layout_data/LayoutData';
 import {Action as ActionType} from './Action';
 import {Condition as ConditionType} from './Condition';
-import RulesModal from './RulesModal';
 
 const MAX_RULES = 20;
 
@@ -47,18 +42,36 @@ export default function RulesList({
 	isSearching: boolean;
 	rules: Rule[];
 }) {
-	const [modalVisible, setModalVisible] = useState(false);
-	const [editingRule, setEditingRule] = useState<Rule | null>(null);
-	const [savedRuleId, setSavedRuleId] = useState<string | null>(null);
-
 	const dispatch = useDispatch();
+	const highlightItems = useHighlightItems();
 
-	const onCreateRule = () => setModalVisible(true);
+	const onUnhighlightItems = (event: Event) => {
+		const target = event.target as HTMLElement;
+
+		if (!target.classList.contains('page-editor__rule')) {
+			highlightItems([]);
+		}
+	};
+
+	useEventListener(
+		'keydown',
+		(event) => {
+			const {key} = event as KeyboardEvent;
+
+			if (key === 'Enter') {
+				onUnhighlightItems(event);
+			}
+		},
+		false,
+		document
+	);
+
+	const {openRulesModal} = useRulesModal();
 
 	const onDeleteRule = (rule: Rule) => {
 		dispatch(
 			deleteRule({
-				ruleId: rule.id,
+				ruleId: rule.id!,
 			})
 		).then(() =>
 			openToast({
@@ -70,11 +83,8 @@ export default function RulesList({
 		);
 	};
 
-	const onEditRule = (rule: Rule) => {
-		setEditingRule(rule);
-
-		setModalVisible(true);
-	};
+	const onEditRule = (rule: Rule, trigger: HTMLButtonElement | null) =>
+		openRulesModal({rule, trigger});
 
 	return (
 		<>
@@ -82,7 +92,7 @@ export default function RulesList({
 				<ClayButton
 					className="mb-3 mx-3"
 					displayType="secondary"
-					onClick={onCreateRule}
+					onClick={() => openRulesModal()}
 					size="sm"
 				>
 					<ClayIcon className="mr-2" symbol="plus" />
@@ -111,26 +121,9 @@ export default function RulesList({
 							onDelete={onDeleteRule}
 							onEdit={onEditRule}
 							rule={rule}
-							savedRuleId={savedRuleId}
-							setSavedRuleId={setSavedRuleId}
 						/>
 					))}
 				</ClayList>
-
-				{modalVisible && (
-					<RulesModal
-						editingRule={editingRule}
-						onCloseModal={(ruleId) => {
-							if (ruleId) {
-								setSavedRuleId(ruleId);
-							}
-
-							setEditingRule(null);
-
-							setModalVisible(false);
-						}}
-					/>
-				)}
 			</div>
 		</>
 	);
@@ -140,18 +133,13 @@ function RuleItem({
 	onDelete,
 	onEdit,
 	rule,
-	savedRuleId,
-	setSavedRuleId,
 }: {
 	onDelete: (rule: Rule) => void;
-	onEdit: (rule: Rule) => void;
+	onEdit: (rule: Rule, trigger: HTMLButtonElement | null) => void;
 	rule: Rule;
-	savedRuleId: string | null;
-	setSavedRuleId: (id: string | null) => void;
 }) {
 	const highlightItems = useHighlightItems();
-	const highlightedItemIds = useHighlightedItemIds();
-	const {element, isTarget, setElement} = useKeyboardNavigation({
+	const {isTarget, setElement} = useKeyboardNavigation({
 		type: LIST_ITEM_TYPES.listItem,
 	});
 	const layoutData = useSelector((state) => state.layoutData);
@@ -166,14 +154,6 @@ function RuleItem({
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		if (savedRuleId === rule.id) {
-			triggerElement?.focus();
-
-			setSavedRuleId(null);
-		}
-	}, [savedRuleId, triggerElement, rule, setSavedRuleId]);
-
-	useEffect(() => {
 		if (editing && inputRef.current) {
 			inputRef.current.focus();
 		}
@@ -184,7 +164,7 @@ function RuleItem({
 			updateRule({
 				...rule,
 				name,
-				ruleId: rule.id,
+				ruleId: rule.id!,
 			})
 		);
 	}, [dispatch, name, rule]);
@@ -205,33 +185,13 @@ function RuleItem({
 	const actions = useActionValues({...rule, items});
 
 	const ruleItemIds = useMemo(
-		() => getRuleItemIds(rule.actions, rule.conditions, layoutData.items),
-		[rule.actions, rule.conditions, layoutData.items]
+		() => getRuleItemIds(rule.actions, rule.conditions),
+		[rule.actions, rule.conditions]
 	);
 
 	const onHighlightItems = async () => {
 		highlightItems(ruleItemIds);
 	};
-
-	const onUnhighlightItems = (event: Event) => {
-		if (highlightedItemIds.length && !element.contains(event.target)) {
-			highlightItems([]);
-		}
-	};
-
-	useEventListener('click', onUnhighlightItems, false, document);
-	useEventListener(
-		'keydown',
-		(event) => {
-			const {key} = event as KeyboardEvent;
-
-			if (key === 'Enter') {
-				onUnhighlightItems(event);
-			}
-		},
-		false,
-		document
-	);
 
 	const onScroll = () => {
 		const fragment = document.querySelector('.highlighted-from-rule');
@@ -350,7 +310,10 @@ function RuleItem({
 								)}
 								borderless
 								displayType="secondary"
-								onClick={(event) => event.stopPropagation()}
+								onClick={(event) => {
+									event.stopPropagation();
+									highlightItems([]);
+								}}
 								ref={setTriggerElement}
 								size="sm"
 								symbol="ellipsis-v"
@@ -363,7 +326,7 @@ function RuleItem({
 					>
 						<ClayDropDown.ItemList>
 							<ClayDropDown.Item
-								onClick={() => onEdit(rule)}
+								onClick={() => onEdit(rule, triggerElement)}
 								symbolLeft="pencil"
 							>
 								{Liferay.Language.get('edit')}
@@ -481,21 +444,17 @@ function getRuleAriaLabel(
 	return `${name}${disabled ? ` ${Liferay.Language.get('disabled-rule')}` : ''}: ${conditionsDescription} ${actionsDescription}`;
 }
 
-function getRuleItemIds(
-	actions: ActionType[],
-	conditions: ConditionType[],
-	items: LayoutData['items']
-) {
+function getRuleItemIds(actions: ActionType[], conditions: ConditionType[]) {
 	const ruleItemIds = new Set<string>();
 
 	for (const {itemId} of actions) {
-		if (itemId && items[itemId]) {
+		if (itemId) {
 			ruleItemIds.add(itemId);
 		}
 	}
 
 	for (const {field, type} of conditions) {
-		if (field && type === 'form' && items[field]) {
+		if (field && type === 'form') {
 			ruleItemIds.add(field);
 		}
 	}

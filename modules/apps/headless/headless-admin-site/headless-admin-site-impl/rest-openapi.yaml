@@ -1262,6 +1262,22 @@ components:
                         -   Text
                     type: string
             type: object
+        FragmentEditableElementValueFragmentLink:
+            # @review
+            description:
+                A fragment editable element value fragment link.
+            properties:
+                fragmentLink:
+                    $ref: "#/components/schemas/FragmentLink"
+                    # @review
+                    description:
+                        The fragment link of a fragment editable element value.
+                prefix:
+                    description:
+                        The fragment link prefix of a fragment editable element value.
+                    enum: [Email, None, Phone]
+                    type: string
+            type: object
         FragmentImage:
             # @review
             description:
@@ -2017,16 +2033,59 @@ components:
             allOf:
                 -   $ref: "#/components/schemas/FragmentEditableElementValue"
                 -   properties:
-                        html:
+                        htmlFragmentValue:
+                            $ref: "#/components/schemas/HTMLFragmentValue"
                             # @review
                             description:
                                 The fragment editable element's HTML. Can be inline or mapped to an external value.
-                            oneOf:
-                                -   $ref: "#/components/schemas/FragmentInlineValue"
-                                -   $ref: "#/components/schemas/FragmentMappedValue"
             # @review
             description:
                 A fragment editable element value of type HTML.
+            type: object
+        HTMLFragmentInlineValue:
+            # @review
+            allOf:
+                -   properties:
+                        fragmentInlineValue:
+                            $ref: "#/components/schemas/FragmentInlineValue"
+                            # @review
+                            description:
+                                The fragment inline value.
+                -   $ref: "#/components/schemas/HTMLFragmentValue"
+            # @review
+            description:
+                An inline value of a fragment HTML element.
+            type: object
+        HTMLFragmentMappedValue:
+            # @review
+            allOf:
+                -   properties:
+                        fragmentMappedValue:
+                            $ref: "#/components/schemas/FragmentMappedValue"
+                            # @review
+                            description:
+                                The fragment mapped value.
+                -   $ref: "#/components/schemas/HTMLFragmentValue"
+            # @review
+            description:
+                A mapped value of a fragment HTML element.
+            type: object
+        HTMLFragmentValue:
+            # @review
+            description:
+                The value of a fragment HTML element.
+            discriminator:
+                mapping:
+                    Inline: "#/components/schemas/HTMLFragmentInlineValue"
+                    Mapped: "#/components/schemas/HTMLFragmentMappedValue"
+                propertyName: type
+            properties:
+                type:
+                    # @review
+                    description:
+                        Whether the value is set inline or mapped.
+                    enum: [Inline, Mapped]
+                    type: string
             type: object
         HrefURLValue:
             allOf:
@@ -3247,9 +3306,6 @@ components:
                     type: object
                 parentSiteExternalReferenceCode:
                     type: string
-                parentSiteKey:
-                    type: string
-                    writeOnly: true
                 templateKey:
                     type: string
                     writeOnly: true
@@ -3643,11 +3699,11 @@ components:
             allOf:
                 -   $ref: "#/components/schemas/FragmentEditableElementValue"
                 -   properties:
-                        fragmentLink:
-                            $ref: "#/components/schemas/FragmentLink"
+                        fragmentEditableElementValueFragmentLink:
+                            $ref: "#/components/schemas/FragmentEditableElementValueFragmentLink"
                             # @review
                             description:
-                                The fragment link of a text fragment editable element.
+                                The fragment link of a text fragment editable element value.
                         textFragmentValue:
                             $ref: "#/components/schemas/TextFragmentValue"
                             # @review
@@ -3657,24 +3713,7 @@ components:
             description:
                 A fragment editable element of type text.
             type: object
-        TextFragmentValue:
-            # @review
-            description:
-                The value of a fragment text element.
-            discriminator:
-                mapping:
-                    Inline: "#/components/schemas/TextInlineFragmentValue"
-                    Mapped: "#/components/schemas/TextMappedFragmentValue"
-                propertyName: type
-            properties:
-                type:
-                    # @review
-                    description:
-                        Whether the value is set inline or mapped.
-                    enum: [Inline, Mapped]
-                    type: string
-            type: object
-        TextInlineFragmentValue:
+        TextFragmentInlineValue:
             # @review
             allOf:
                 -   properties:
@@ -3688,7 +3727,7 @@ components:
             description:
                 An inline value of a fragment text element.
             type: object
-        TextMappedFragmentValue:
+        TextFragmentMappedValue:
             # @review
             allOf:
                 -   properties:
@@ -3701,6 +3740,23 @@ components:
             # @review
             description:
                 A mapped value of a fragment text element.
+            type: object
+        TextFragmentValue:
+            # @review
+            description:
+                The value of a fragment text element.
+            discriminator:
+                mapping:
+                    Inline: "#/components/schemas/TextFragmentInlineValue"
+                    Mapped: "#/components/schemas/TextFragmentMappedValue"
+                propertyName: type
+            properties:
+                type:
+                    # @review
+                    description:
+                        Whether the value is set inline or mapped.
+                    enum: [Inline, Mapped]
+                    type: string
             type: object
         URLActionExecutionResult:
             # @review
@@ -10038,43 +10094,6 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["UtilityPage"]
-    "/sites/{siteId}":
-        delete:
-            description:
-                Deletes a site and all of its associated content.
-            operationId: deleteSite
-            parameters:
-                -   in: path
-                    name: siteId
-                    required: true
-                    schema:
-                        format: int64
-                        type: integer
-            responses:
-                204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
-            tags: ["Site"]
-        get:
-            operationId: getSite
-            parameters:
-                -   in: path
-                    name: siteId
-                    required: true
-                    schema:
-                        format: int64
-                        type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-            tags: ["Site"]
     /sites:
         get:
             description:
@@ -10137,10 +10156,81 @@ paths:
                     description:
                         default response
             tags: ["Site"]
+    /sites/site-initializer:
+        post:
+            description:
+                Adds a new site based on a multipart/form-data
+            operationId: postSiteSiteInitializer
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            properties:
+                                file:
+                                    format: binary
+                                    type: string
+                                site:
+                                    $ref: "#/components/schemas/Site"
+                            type: object
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                    description:
+                        default response
+            tags: ["Site"]
+    /sites/{siteExternalReferenceCode}:
+        delete:
+            description:
+                Deletes a site and all of its associated content.
+            operationId: deleteSite
+            parameters:
+                -   in: path
+                    name: siteExternalReferenceCode
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["Site"]
+        get:
+            operationId: getSite
+            parameters:
+                -   in: path
+                    name: siteExternalReferenceCode
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                    description:
+                        default response
+            tags: ["Site"]
         put:
             description:
                 Updates a site and all of its associated content.
             operationId: putSite
+            parameters:
+                -   in: path
+                    name: siteExternalReferenceCode
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 content:
                     application/json:
@@ -10159,80 +10249,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Site"
             tags: ["Site"]
-    /sites/by-external-reference-code/{externalReferenceCode}:
-        delete:
-            description:
-                Deletes a site and all of its associated content.
-            operationId: deleteSiteByExternalReferenceCode
-            parameters:
-                -   in: path
-                    name: externalReferenceCode
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
-            tags: ["Site"]
+    /sites/{siteExternalReferenceCode}/site-initializer:
         get:
-            operationId: getSiteByExternalReferenceCode
+            operationId: getSiteSiteInitializer
             parameters:
                 -   in: path
-                    name: externalReferenceCode
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                    description:
-                        default response
-            tags: ["Site"]
-        put:
-            description:
-                Adds or update a new site
-            operationId: putSiteByExternalReferenceCode
-            parameters:
-                -   in: path
-                    name: externalReferenceCode
-                    required: true
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    multipart/form-data:
-                        schema:
-                            properties:
-                                file:
-                                    format: binary
-                                    type: string
-                            type: object
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                    description:
-                        default response
-            tags: ["Site"]
-    /sites/by-external-reference-code/{externalReferenceCode}/site-initializer:
-        get:
-            operationId: getSiteByExternalReferenceCodeSiteInitializer
-            parameters:
-                -   in: path
-                    name: externalReferenceCode
+                    name: siteExternalReferenceCode
                     required: true
                     schema:
                         type: string
@@ -10244,11 +10266,16 @@ paths:
                                 format: binary
                                 type: string
             tags: ["Site"]
-    /sites/site-initializer:
-        post:
+        put:
             description:
-                Adds a new site based on a multipart/form-data
-            operationId: postSiteSiteInitializer
+                Adds or update a new site
+            operationId: putSiteSiteInitializer
+            parameters:
+                -   in: path
+                    name: siteExternalReferenceCode
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 content:
                     multipart/form-data:
@@ -10257,8 +10284,6 @@ paths:
                                 file:
                                     format: binary
                                     type: string
-                                site:
-                                    $ref: "#/components/schemas/Site"
                             type: object
             responses:
                 200:

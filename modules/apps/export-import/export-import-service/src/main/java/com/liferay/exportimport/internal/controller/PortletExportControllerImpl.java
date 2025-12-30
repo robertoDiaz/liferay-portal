@@ -893,7 +893,7 @@ public class PortletExportControllerImpl implements PortletExportController {
 
 		try {
 			portletDataContext.addZipEntry(
-				"/manifest.xml", document.formattedString());
+				portletDataContext.getManifestXmlFilePath(), document.formattedString());
 		}
 		catch (IOException ioException) {
 			ExportImportIOException exportImportIOException =

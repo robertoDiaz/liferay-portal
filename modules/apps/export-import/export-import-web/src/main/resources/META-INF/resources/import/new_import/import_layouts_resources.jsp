@@ -407,6 +407,8 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 					cmd="<%= Constants.IMPORT %>"
 				/>
 
+				<aui:input label="multiSitesGroupIds" maxlength="500" name="multiSitesGroupIds" value="<%= manifestSummary.getStagedModelAssetTitle("multiSitesGroupIds") %>"/>
+
 				<liferay-staging:permissions
 					action="<%= Constants.IMPORT %>"
 					descriptionCSSClass="permissions-description"

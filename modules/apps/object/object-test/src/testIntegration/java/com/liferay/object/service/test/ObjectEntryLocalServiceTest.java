@@ -232,7 +232,6 @@ import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -348,7 +347,6 @@ public class ObjectEntryLocalServiceTest {
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())));
 		_irrelevantObjectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -369,7 +367,6 @@ public class ObjectEntryLocalServiceTest {
 						"Multiple List Type Entry Key ", 6)));
 
 		_objectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
@@ -611,7 +608,8 @@ public class ObjectEntryLocalServiceTest {
 							RandomTestUtil.randomString())
 					).name(
 						"name"
-					).build()));
+					).build()),
+				false);
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.publishObjectDefinition();
 
@@ -773,7 +771,6 @@ public class ObjectEntryLocalServiceTest {
 		}
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntry() throws Exception {
 		_assertCount(0);
@@ -1101,7 +1098,6 @@ public class ObjectEntryLocalServiceTest {
 				).build()));
 
 		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -1164,7 +1160,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition modifiableSystemObjectDefinition =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1186,7 +1182,6 @@ public class ObjectEntryLocalServiceTest {
 			modifiableSystemObjectDefinition.getObjectDefinitionId());
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryAfterDeletingLocalizedObjectField()
 		throws Exception {
@@ -1202,7 +1197,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		ObjectField localizedObjectField1 =
 			ObjectFieldUtil.addCustomObjectField(
@@ -1361,9 +1356,7 @@ public class ObjectEntryLocalServiceTest {
 		}
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddObjectEntryWithAssetTag() throws Exception {
 		_setUpCMSContext();
@@ -1376,7 +1369,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionTestUtil.getRandomName(),
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -1428,7 +1421,8 @@ public class ObjectEntryLocalServiceTest {
 						RandomTestUtil.randomLocaleStringMap()
 					).name(
 						"assignee"
-					).build()));
+					).build()),
+				false);
 
 		Map<String, Long> assigneeMap = HashMapBuilder.put(
 			"classNameId", _portal.getClassNameId(User.class.getName())
@@ -1743,9 +1737,7 @@ public class ObjectEntryLocalServiceTest {
 				ObjectFieldUtil.getCounterName(objectField)));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddObjectEntryWithDraftWorkflowDefinition()
 		throws Exception {
@@ -2107,7 +2099,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectFieldLocalService.deleteObjectField(objectField5);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithFormulaObjectFieldAndObjectRelationship()
 		throws Exception {
@@ -2254,13 +2245,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		TreeTestUtil.bind(
 			_objectRelationshipLocalService,
@@ -2340,13 +2331,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		ObjectValidationRule objectValidationRuleA = _addObjectValidationRule(
 			objectDefinitionA,
@@ -2451,7 +2442,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService, _objectRelationshipLocalService);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithLocalizedAttachmentObjectField()
 		throws Exception {
@@ -2538,7 +2528,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithLocalizedBooleanObjectField()
 		throws Exception {
@@ -2556,7 +2545,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				Collections.singletonList(objectField));
+				Collections.singletonList(objectField), false);
 
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.RequiredLanguageId.class,
@@ -2654,7 +2643,8 @@ public class ObjectEntryLocalServiceTest {
 						listTypeDefinition.getListTypeDefinitionId()
 					).name(
 						"multiselectPicklistObjectField"
-					).build()));
+					).build()),
+				false);
 
 		_objectEntryLocalService.addObjectEntry(
 			0, TestPropsValues.getUserId(),
@@ -2692,9 +2682,7 @@ public class ObjectEntryLocalServiceTest {
 				new ServiceContext()));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddObjectEntryWithObjectEntryScheduleEnabled()
 		throws Exception {
@@ -3542,7 +3530,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition companyObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.emptyList());
+				Collections.emptyList());
 
 		companyObjectDefinition.setFriendlyURLSeparator("test1");
 
@@ -3992,7 +3980,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.isEnableFormContainer(),
 			_objectDefinition.isEnableFriendlyURLCustomization(),
 			_objectDefinition.isEnableIndexSearch(),
-			_objectDefinition.isEnableLocalization(),
 			_objectDefinition.isEnableObjectEntryDraft(),
 			_objectDefinition.isEnableObjectEntryHistory(),
 			_objectDefinition.isEnableObjectEntrySchedule(),
@@ -4016,7 +4003,6 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition draftObjectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4025,7 +4011,6 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition publishedObjectDefinition =
 			_publishCustomObjectDefinition(
-				false,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4225,10 +4210,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
 				TestPropsValues.getCompanyId(), User.class.getName());
 
-		boolean enableLocalization = objectDefinition.isEnableLocalization();
-
-		objectDefinition.setEnableLocalization(true);
-
 		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
 			objectDefinition);
 
@@ -4351,8 +4332,6 @@ public class ObjectEntryLocalServiceTest {
 			objectField2.getObjectFieldId());
 		_objectFieldLocalService.deleteObjectField(
 			objectField3.getObjectFieldId());
-
-		objectDefinition.setEnableLocalization(enableLocalization);
 
 		_objectDefinitionLocalService.updateObjectDefinition(objectDefinition);
 	}
@@ -4979,9 +4958,7 @@ public class ObjectEntryLocalServiceTest {
 			24, values3, valuesList.get(2), selectedObjectFieldNames);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testMoveObjectEntryToTrashWithComments() throws Exception {
 		Group group = GroupTestUtil.addGroup();
@@ -5001,9 +4978,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCommentsCount(0, _siteObjectDefinition, objectEntry);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testMoveObjectEntryToTrashWithObjectAction() throws Exception {
 		_addObjectAction(
@@ -5025,9 +5000,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(1);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testMoveObjectEntryToTrashWithObjectEntryFolder()
 		throws Exception {
@@ -5059,9 +5032,7 @@ public class ObjectEntryLocalServiceTest {
 				trashEntry.getTypeSettingsProperty("objectEntryFolderId")));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testMoveObjectEntryToTrashWithOngoingWorkflowInstances()
 		throws Exception {
@@ -5455,9 +5426,7 @@ public class ObjectEntryLocalServiceTest {
 		_testPartialUpdateObjectEntryWithObjectRelationship();
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testRestoreObjectEntryFromTrashWithComments() throws Exception {
 		Group group = GroupTestUtil.addGroup();
@@ -5478,9 +5447,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCommentsCount(1, _siteObjectDefinition, objectEntry);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testRestoreObjectEntryFromTrashWithObjectAction()
 		throws Exception {
@@ -5515,9 +5482,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(2);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testRestoreObjectEntryFromTrashWithObjectEntryFolder()
 		throws Exception {
@@ -5563,9 +5528,7 @@ public class ObjectEntryLocalServiceTest {
 				objectEntry.getObjectEntryId()));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testRestoreObjectEntryFromTrashWithOngoingWorkflowInstances()
 		throws Exception {
@@ -6375,9 +6338,7 @@ public class ObjectEntryLocalServiceTest {
 		_testUpdateObjectEntryWithObjectRelationship();
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testUpdateObjectEntryWithAttachmentObjectFieldAndEnableObjectEntryVersioning()
 		throws Exception {
@@ -6573,13 +6534,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		Assert.assertNotNull(
 			WorkflowHandlerRegistryUtil.getWorkflowHandler(
@@ -7676,12 +7637,11 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	private ObjectDefinition _publishCustomObjectDefinition(
-			boolean enableLocalization, List<ObjectField> objectFields)
+			List<ObjectField> objectFields)
 		throws Exception {
 
 		ObjectDefinition objectDefinition =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				enableLocalization, objectFields);
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(objectFields);
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -8376,7 +8336,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionTestUtil.getRandomName(),
 				Arrays.asList(
 					new RichTextObjectFieldBuilder(
 					).labelMap(
@@ -8650,14 +8610,12 @@ public class ObjectEntryLocalServiceTest {
 		Map<String, Serializable> values = objectEntry1.getValues();
 
 		Assert.assertEquals("Charles", values.get("firstName"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionId"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship2_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,
@@ -8746,8 +8704,7 @@ public class ObjectEntryLocalServiceTest {
 		values = objectEntry1.getValues();
 
 		Assert.assertEquals("Zape", values.get("firstName"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,
@@ -8773,7 +8730,6 @@ public class ObjectEntryLocalServiceTest {
 		throws Exception {
 
 		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			false,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -8963,6 +8919,8 @@ public class ObjectEntryLocalServiceTest {
 	private void _testUpdateObjectEntryObjectStateTransitions()
 		throws Exception {
 
+		// Update with existing picklist field
+
 		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
 			_objectDefinition.getObjectDefinitionId(), "state");
 
@@ -9067,6 +9025,62 @@ public class ObjectEntryLocalServiceTest {
 				).build(),
 				ServiceContextTestUtil.getServiceContext()));
 
+		// Update with new picklist field
+
+		_addCustomObjectField(
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap("New State")
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"newState"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						"listTypeEntryKey2"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build())
+			).required(
+				true
+			).state(
+				true
+			).build());
+
+		objectEntry = _objectEntryLocalService.getObjectEntry(
+			objectEntry.getObjectEntryId());
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals("listTypeEntryKey2", values.get("newState"));
+
+		_objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(),
+			HashMapBuilder.<String, Serializable>put(
+				"newState", "listTypeEntryKey3"
+			).putAll(
+				requiredValues
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		objectEntry = _objectEntryLocalService.getObjectEntry(
+			objectEntry.getObjectEntryId());
+
+		values = objectEntry.getValues();
+
+		Assert.assertEquals("listTypeEntryKey3", values.get("newState"));
+
 		_objectEntryLocalService.deleteObjectEntry(
 			objectEntry.getObjectEntryId());
 	}
@@ -9127,14 +9141,12 @@ public class ObjectEntryLocalServiceTest {
 		Map<String, Serializable> values = objectEntry1.getValues();
 
 		Assert.assertEquals("Charles", values.get("firstName"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionId"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship2_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,
@@ -9229,8 +9241,7 @@ public class ObjectEntryLocalServiceTest {
 		values = objectEntry1.getValues();
 
 		Assert.assertEquals("Zape", values.get("firstName"));
-		Assert.assertEquals(
-			StringPool.BLANK,
+		Assert.assertNull(
 			values.get("r_objectRelationship1_c_relatedObjectDefinitionERC"));
 		Assert.assertEquals(
 			0L,

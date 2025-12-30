@@ -74,6 +74,19 @@ portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(backURL);
 
 renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custom-export") : LanguageUtil.format(request, "new-export-based-on-x", exportImportConfiguration.getName(), false));
+
+List<Long> mGroupIds = new ArrayList<>();
+
+List<Group> groups = GroupLocalServiceUtil.getGroups(-1, -1);
+
+for (Group group1 : groups) {
+	if (group1.getNameCurrentValue().startsWith("site")) {
+		mGroupIds.add(group1.getGroupId());
+	}
+}
+
+String multiSitesGroupIds = StringUtil.merge(mGroupIds);
+
 %>
 
 <clay:container-fluid
@@ -158,6 +171,8 @@ renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custo
 						exportImportConfigurationId="<%= exportImportConfigurationId %>"
 						type="<%= Constants.EXPORT %>"
 					/>
+
+					<aui:input label="multiSitesGroupIds" maxlength="500" name="multiSitesGroupIds" value="<%= multiSitesGroupIds %>"/>
 
 					<liferay-staging:permissions
 						action="<%= Constants.EXPORT %>"
