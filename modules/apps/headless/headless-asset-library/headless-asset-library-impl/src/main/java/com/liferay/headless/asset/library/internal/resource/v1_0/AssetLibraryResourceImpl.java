@@ -16,6 +16,7 @@ import com.liferay.depot.service.DepotEntryService;
 import com.liferay.document.library.configuration.DLSizeLimitConfigurationProvider;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.headless.asset.library.dto.v1_0.AssetLibrary;
 import com.liferay.headless.asset.library.dto.v1_0.MimeTypeLimit;
 import com.liferay.headless.asset.library.dto.v1_0.Settings;
@@ -77,9 +78,12 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/asset-library.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = AssetLibraryResource.class
 )
-public class AssetLibraryResourceImpl extends BaseAssetLibraryResourceImpl {
+public class AssetLibraryResourceImpl
+	extends BaseAssetLibraryResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate<AssetLibrary> {
 
 	@Override
 	public void deleteAssetLibrary(String assetLibraryExternalReferenceCode)
@@ -151,6 +155,40 @@ public class AssetLibraryResourceImpl extends BaseAssetLibraryResourceImpl {
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
 		return _assetLibraryEntityModel;
+	}
+
+	@Override
+	public ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor
+		getExportImportDescriptor() {
+
+		return new ExportImportDescriptor() {
+
+			@Override
+			public String getLabelLanguageKey() {
+				return "asset-library";
+			}
+
+			@Override
+			public String getModelClassName() {
+				return DepotEntry.class.getName();
+			}
+
+			@Override
+			public String getPortletId() {
+				return "com_liferay_depot_web_portlet_DepotDataPortlet";
+			}
+
+			@Override
+			public String getResourceClassName() {
+				return AssetLibraryResource.class.getName();
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.COMPANY;
+			}
+
+		};
 	}
 
 	@Override
@@ -545,6 +583,7 @@ public class AssetLibraryResourceImpl extends BaseAssetLibraryResourceImpl {
 
 		serviceContext.setCompanyId(contextCompany.getCompanyId());
 		serviceContext.setModifiedDate(new Date());
+		serviceContext.setUserId(contextUser.getUserId());
 
 		return serviceContext;
 	}
