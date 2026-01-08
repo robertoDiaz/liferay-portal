@@ -13,6 +13,9 @@ public class DepotPortletKeys {
 	public static final String DEPOT_ADMIN =
 		"com_liferay_depot_web_portlet_DepotAdminPortlet";
 
+	public static final String DEPOT_DATA =
+		"com_liferay_depot_web_portlet_DepotDataPortlet";
+
 	public static final String DEPOT_SETTINGS =
 		"com_liferay_depot_web_portlet_DepotSettingsPortlet";
 
