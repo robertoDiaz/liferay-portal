@@ -67,27 +67,27 @@ public class DLFileEntryWorkflowHandler
 		boolean hasAssetDisplayPage = GetterUtil.getBoolean(
 			serviceContext.getAttribute("hasAssetDisplayPage"));
 
-		if ((themeDisplay == null) || !hasAssetDisplayPage) {
-			return;
-		}
+		if ((themeDisplay != null) || hasAssetDisplayPage) {
+			long classPK = GetterUtil.getLong(
+				(String)workflowContext.get(
+					WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
 
-		long classPK = GetterUtil.getLong(
-			(String)workflowContext.get(
-				WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+			DLFileVersion dlFileVersion =
+				_dlFileVersionLocalService.getFileVersion(classPK);
 
-		DLFileVersion dlFileVersion = _dlFileVersionLocalService.getFileVersion(
-			classPK);
+			String friendlyURL =
+				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+					new InfoItemReference(
+						FileEntry.class.getName(),
+						new ClassPKInfoItemIdentifier(
+							dlFileVersion.getFileEntryId())),
+					themeDisplay);
 
-		String friendlyURL =
-			_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-				new InfoItemReference(
-					FileEntry.class.getName(),
-					new ClassPKInfoItemIdentifier(
-						dlFileVersion.getFileEntryId())),
-				themeDisplay);
-
-		if (Validator.isNotNull(friendlyURL)) {
-			serviceContext.setAttribute("friendlyURL", friendlyURL);
+			if (Validator.isNotNull(friendlyURL)) {
+				serviceContext.setAttribute(
+					WorkflowConstants.CONTEXT_URL, friendlyURL);
+				serviceContext.setAttribute("friendlyURL", friendlyURL);
+			}
 		}
 	}
 
