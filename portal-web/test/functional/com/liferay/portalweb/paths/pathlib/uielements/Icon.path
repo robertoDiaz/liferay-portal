@@ -277,7 +277,7 @@
 </tr>
 <tr>
 	<td>INFO_DM</td>
-	<td>//*[*[name()='svg'][contains(@class,'lexicon-icon-info-circle-open')]]</td>
+	<td>//button[contains(@data-qa-id, 'infoButton')]//*[*[name()='svg'][contains(@class,'lexicon-icon-info-circle-open')]]</td>
 	<td></td>
 </tr>
 <tr>
