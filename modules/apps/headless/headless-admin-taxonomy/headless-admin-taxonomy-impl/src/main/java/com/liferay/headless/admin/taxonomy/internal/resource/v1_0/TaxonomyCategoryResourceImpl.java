@@ -873,16 +873,18 @@ public class TaxonomyCategoryResourceImpl
 			long groupId, TaxonomyCategory taxonomyCategory)
 		throws Exception {
 
-		Long taxonomyVocabularyId = taxonomyCategory.getTaxonomyVocabularyId();
+		ParentTaxonomyVocabulary taxonomyVocabulary =
+			taxonomyCategory.getParentTaxonomyVocabulary();
 
-		if (taxonomyVocabularyId != null) {
+		if (taxonomyVocabulary != null) {
 			AssetVocabulary assetVocabulary =
-				_assetVocabularyService.fetchVocabulary(taxonomyVocabularyId);
+				_assetVocabularyService.fetchVocabularyByExternalReferenceCode(
+					taxonomyVocabulary.getExternalReferenceCode(), groupId);
 
 			if ((assetVocabulary != null) &&
 				(assetVocabulary.getGroupId() == groupId)) {
 
-				return taxonomyVocabularyId;
+				return assetVocabulary.getVocabularyId();
 			}
 		}
 
