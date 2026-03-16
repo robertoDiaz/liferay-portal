@@ -19,6 +19,7 @@ import Modal from '../../../../../../components/Modal';
 import StatusCell from '../../../../../../components/Table/StatusCell';
 import Table from '../../../../../../components/Table/Table';
 import {useMarketplaceContext} from '../../../../../../context/MarketplaceContext';
+import {OrderStatus, OrderTypes} from '../../../../../../enums/Order';
 import useGetProductByOrderId from '../../../../../../hooks/useGetProductByOrderId';
 import i18n from '../../../../../../i18n';
 import provisioningOAuth2 from '../../../../../../services/oauth/Provisioning';
@@ -31,7 +32,6 @@ import TitleSubtitleHeader from '../../../../components/TitleSubtitleHeader';
 import useLicenseActions from './useLicensesActions';
 
 import './Licenses.scss';
-import {OrderStatus, OrderTypes} from '../../../../../../enums/Order';
 
 type OutletContext = ReturnType<typeof useGetProductByOrderId>;
 
@@ -72,7 +72,7 @@ const Licenses = () => {
 		`/order-license-keys/${orderId}/${page}/${pageSize}`,
 		async () => {
 			try {
-				return provisioningOAuth2.getOrderLicenseKeys(
+				return provisioningOAuth2.getOrderAppLicenseKeys(
 					orderId as string,
 					new URLSearchParams({
 						page: page.toString(),
@@ -94,7 +94,7 @@ const Licenses = () => {
 	const orderStatusIsNotCompleted =
 		placedOrder?.orderStatusInfo?.label !== OrderStatus.COMPLETED;
 
-	const {onDeativateLicenseKey, onDownload, onViewLicenseKey} =
+	const {onDeativateLicenseKey, onDownloadAppLicenseKey, onViewLicenseKey} =
 		useLicenseActions({
 			deactivateLicenseModal,
 			keyType,
@@ -136,7 +136,7 @@ const Licenses = () => {
 						)}
 						displayType="primary"
 						onClick={() => {
-							onDownload(modalData as LicenseKey);
+							onDownloadAppLicenseKey(modalData as LicenseKey);
 						}}
 						title={
 							isLicenseExpired(
@@ -154,7 +154,12 @@ const Licenses = () => {
 				</>
 			),
 		}),
-		[licenseKeyModal, modalData, deactivateLicenseModal, onDownload]
+		[
+			deactivateLicenseModal,
+			licenseKeyModal,
+			modalData,
+			onDownloadAppLicenseKey,
+		]
 	);
 
 	if (isLoading) {
@@ -173,7 +178,7 @@ const Licenses = () => {
 
 								deactivateLicenseModal.onOpenChange(true);
 							}}
-							onDownload={() => onDownload(row)}
+							onDownload={() => onDownloadAppLicenseKey(row)}
 							onView={() => onViewLicenseKey(row)}
 							tooltip={
 								isLicenseExpired(row.expirationDate)

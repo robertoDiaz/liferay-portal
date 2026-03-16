@@ -1519,6 +1519,13 @@ public class GroupLocalServiceWrapper
 		return _groupLocalService.getUserGroupsRelatedGroups(userGroups);
 	}
 
+	@Override
+	public java.util.Map<Long, long[]> getUserInheritedSiteGroupIds(
+		long companyId) {
+
+		return _groupLocalService.getUserInheritedSiteGroupIds(companyId);
+	}
+
 	/**
 	 * Returns the range of all groups associated with the user's organization
 	 * groups, including the ancestors of the organization groups, unless portal

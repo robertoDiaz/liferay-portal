@@ -6,21 +6,27 @@ backup:
             schedule: cron(0 5 * * ? *)
             startWindow: 60
 database:
+    autoMinorVersionUpgrade: true
+    databaseInsightsMode: standard
+    deletionProtection: true
     engine: postgres
     engineVersion: "16.11"
     instanceClass: db.t3.medium
+    multiAz: false
     storageGB: 20
     username: liferay_database_admin
-deletionProtection: false
 enabled: true
 endpoints: {}
 gateway: {}
 license: {}
+orphanOnDelete: false
 overlay: {}
 search:
     opensearch:
+        autoSoftwareUpdateEnabled: true
         engineVersion: OpenSearch_2.15
-        instanceCount: 1
+        instanceCount: 2
         instanceType: t3.small.search
         username: liferay_search_admin
+        volumeSizeGB: 20
 storage: {}

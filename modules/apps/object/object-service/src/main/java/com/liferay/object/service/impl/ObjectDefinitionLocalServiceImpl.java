@@ -266,63 +266,6 @@ public class ObjectDefinitionLocalServiceImpl
 			objectFields, workflowDefinitionLinks, serviceContext);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public ObjectDefinition addObjectDefinition(
-			String externalReferenceCode, long userId, long objectFolderId,
-			boolean modifiable, String scope, boolean system)
-		throws PortalException {
-
-		_validateExternalReferenceCode(externalReferenceCode, system);
-
-		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
-			counterLocalService.increment());
-
-		objectDefinition.setExternalReferenceCode(externalReferenceCode);
-
-		User user = _userLocalService.getUser(userId);
-
-		objectDefinition.setCompanyId(user.getCompanyId());
-		objectDefinition.setUserId(user.getUserId());
-		objectDefinition.setUserName(user.getFullName());
-		objectDefinition.setObjectFolderId(
-			_getObjectFolderId(user.getCompanyId(), objectFolderId));
-
-		objectDefinition.setActive(false);
-		objectDefinition.setLabel(externalReferenceCode);
-		objectDefinition.setModifiable(modifiable);
-		objectDefinition.setName(externalReferenceCode);
-		objectDefinition.setPluralLabel(externalReferenceCode);
-		objectDefinition.setScope(scope);
-		objectDefinition.setStorageType(
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
-		objectDefinition.setSystem(system);
-		objectDefinition.setStatus(WorkflowConstants.STATUS_EMPTY);
-
-		if (objectDefinition.isUnmodifiableSystemObject() || !modifiable) {
-			throw new ObjectDefinitionModifiableException.MustBeModifiable();
-		}
-
-		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
-
-		addOrUpdateObjectDefinitionPLOEntries(objectDefinition);
-
-		_resourceLocalService.addResources(
-			objectDefinition.getCompanyId(), 0, objectDefinition.getUserId(),
-			ObjectDefinition.class.getName(),
-			objectDefinition.getObjectDefinitionId(), false, true, true);
-
-		_objectFolderItemLocalService.addObjectFolderItem(
-			userId, objectDefinition.getObjectDefinitionId(),
-			objectDefinition.getObjectFolderId(), 0, 0);
-
-		_addSystemObjectFields(
-			ObjectEntryTable.INSTANCE.getTableName(), objectDefinition,
-			ObjectEntryTable.INSTANCE.objectEntryId.getName(), userId);
-
-		return _updateTitleObjectFieldId(objectDefinition, null);
-	}
-
 	@Override
 	public void addOrUpdateObjectDefinitionPLOEntries(
 			ObjectDefinition objectDefinition)
@@ -806,19 +749,12 @@ public class ObjectDefinitionLocalServiceImpl
 
 		undeployObjectDefinition(objectDefinition);
 
-		try (SafeCloseable safeCloseable =
-				CompanyThreadLocal.setCompanyIdWithSafeCloseable(
-					objectDefinition.getCompanyId())) {
-
-			_inactiveServiceRegistrationsMap.computeIfAbsent(
-				DBPartitionUtil.getPartitionKey(
-					objectDefinition.getObjectDefinitionId()),
-				objectDefinitionId ->
-					InactiveObjectDefinitionDeployerUtil.deploy(
-						_bundleContext, _objectEntryService,
-						_objectFieldLocalService,
-						_objectRelationshipLocalService, objectDefinition));
-		}
+		_inactiveServiceRegistrationsMap.computeIfAbsent(
+			DBPartitionUtil.getPartitionKey(
+				objectDefinition.getObjectDefinitionId()),
+			objectDefinitionId -> InactiveObjectDefinitionDeployerUtil.deploy(
+				_bundleContext, _objectEntryService, _objectFieldLocalService,
+				_objectRelationshipLocalService, objectDefinition));
 	}
 
 	@Override
@@ -1056,7 +992,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return _emptyModelManager.getOrAddEmptyModel(
 			ObjectDefinition.class, companyId,
-			() -> objectDefinitionLocalService.addObjectDefinition(
+			() -> _addObjectDefinition(
 				externalReferenceCode, userId, objectFolderId, modifiable,
 				scope, system),
 			externalReferenceCode,
@@ -1523,6 +1459,61 @@ public class ObjectDefinitionLocalServiceImpl
 
 	private ObjectDefinition _addObjectDefinition(
 			String externalReferenceCode, long userId, long objectFolderId,
+			boolean modifiable, String scope, boolean system)
+		throws PortalException {
+
+		_validateExternalReferenceCode(externalReferenceCode, system);
+
+		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
+			counterLocalService.increment());
+
+		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+
+		User user = _userLocalService.getUser(userId);
+
+		objectDefinition.setCompanyId(user.getCompanyId());
+		objectDefinition.setUserId(user.getUserId());
+		objectDefinition.setUserName(user.getFullName());
+		objectDefinition.setObjectFolderId(
+			_getObjectFolderId(user.getCompanyId(), objectFolderId));
+
+		objectDefinition.setActive(false);
+		objectDefinition.setLabel(externalReferenceCode);
+		objectDefinition.setModifiable(modifiable);
+		objectDefinition.setName(externalReferenceCode);
+		objectDefinition.setPluralLabel(externalReferenceCode);
+		objectDefinition.setScope(scope);
+		objectDefinition.setStorageType(
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
+		objectDefinition.setSystem(system);
+		objectDefinition.setStatus(WorkflowConstants.STATUS_EMPTY);
+
+		if (objectDefinition.isUnmodifiableSystemObject() || !modifiable) {
+			throw new ObjectDefinitionModifiableException.MustBeModifiable();
+		}
+
+		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
+
+		addOrUpdateObjectDefinitionPLOEntries(objectDefinition);
+
+		_resourceLocalService.addResources(
+			objectDefinition.getCompanyId(), 0, objectDefinition.getUserId(),
+			ObjectDefinition.class.getName(),
+			objectDefinition.getObjectDefinitionId(), false, true, true);
+
+		_objectFolderItemLocalService.addObjectFolderItem(
+			userId, objectDefinition.getObjectDefinitionId(),
+			objectDefinition.getObjectFolderId(), 0, 0);
+
+		_addSystemObjectFields(
+			ObjectEntryTable.INSTANCE.getTableName(), objectDefinition,
+			ObjectEntryTable.INSTANCE.objectEntryId.getName(), userId);
+
+		return _updateTitleObjectFieldId(objectDefinition, null);
+	}
+
+	private ObjectDefinition _addObjectDefinition(
+			String externalReferenceCode, long userId, long objectFolderId,
 			String className, String dbTableName, boolean enableComments,
 			boolean enableFormContainer, boolean enableFriendlyURLCustomization,
 			boolean enableIndexSearch, boolean enableObjectEntryDraft,
@@ -1670,23 +1661,7 @@ public class ObjectDefinitionLocalServiceImpl
 			dbTableName = "ObjectEntry";
 		}
 
-		if (Validator.isNotNull(className) &&
-			!StringUtil.equals(className, objectDefinition.getClassName())) {
-
-			_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
-				objectDefinition.getUserId(),
-				objectDefinition.getObjectDefinitionId(),
-				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME,
-				className);
-
-			for (long classNameId : _getClassNameIds(className)) {
-				_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
-					objectDefinition.getUserId(),
-					objectDefinition.getObjectDefinitionId(),
-					ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME_ID,
-					String.valueOf(classNameId));
-			}
-		}
+		_addOldClassNameObjectDefinitionSettings(className, objectDefinition);
 
 		_addOrUpdateObjectDefinitionSettings(
 			objectDefinition, objectDefinitionSettings);
@@ -1769,6 +1744,39 @@ public class ObjectDefinitionLocalServiceImpl
 		_throwObjectDefinitionValidationException(objectDefinition);
 
 		return objectDefinition;
+	}
+
+	private void _addOldClassNameObjectDefinitionSettings(
+			String className, ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		if (Validator.isNull(className) ||
+			StringUtil.equals(className, objectDefinition.getClassName())) {
+
+			return;
+		}
+
+		ObjectDefinitionSetting objectDefinitionSetting =
+			_objectDefinitionSettingLocalService.fetchObjectDefinitionSetting(
+				objectDefinition.getObjectDefinitionId(),
+				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME);
+
+		if (objectDefinitionSetting != null) {
+			return;
+		}
+
+		_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
+			objectDefinition.getUserId(),
+			objectDefinition.getObjectDefinitionId(),
+			ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME, className);
+
+		for (long classNameId : _getClassNameIds(className)) {
+			_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
+				objectDefinition.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME_ID,
+				String.valueOf(classNameId));
+		}
 	}
 
 	private void _addOrUpdateObjectActions(
@@ -2803,6 +2811,8 @@ public class ObjectDefinitionLocalServiceImpl
 			serviceContext.getLanguageId());
 		objectDefinition.setPluralLabelCurrentLanguageId(
 			serviceContext.getLanguageId());
+
+		_addOldClassNameObjectDefinitionSettings(className, objectDefinition);
 
 		_addOrUpdateObjectDefinitionSettings(
 			objectDefinition, objectDefinitionSettings);

@@ -236,6 +236,59 @@ test.describe('Email notification template', () => {
 		await expect(test.info().errors).toHaveLength(0);
 	});
 
+	test(
+		'can save notification template using empty roles and user groups in CC and BCC recipients',
+		{tag: ['@LPD-78398']},
+		async ({
+			apiHelpers,
+			emailNotificationTemplatePage,
+			notificationTemplatesPage,
+			page,
+		}) => {
+			const notificationTemplate =
+				await apiHelpers.notification.postRandomNotificationTemplate(
+					'notification template test ' + getRandomInt()
+				);
+
+			apiHelpers.data.push({
+				id: notificationTemplate.id,
+				type: 'notificationTemplate',
+			});
+
+			await notificationTemplatesPage.goto();
+
+			for (const recipientType of ['User Groups', 'Roles']) {
+				await notificationTemplatesPage
+					.getFrontEndDatasetItemLocator(notificationTemplate.name)
+					.click();
+
+				await emailNotificationTemplatePage.secondaryRecipientTypeCC.click();
+
+				await page.getByRole('option', {name: recipientType}).click();
+
+				await emailNotificationTemplatePage.secondaryRecipientTypeBCC.click();
+
+				await page.getByRole('option', {name: recipientType}).click();
+
+				await emailNotificationTemplatePage.saveButton.click();
+
+				await notificationTemplatesPage
+					.getFrontEndDatasetItemLocator(notificationTemplate.name)
+					.click();
+
+				await expect(
+					emailNotificationTemplatePage.secondaryRecipientTypeBCC
+				).toHaveText(recipientType);
+
+				await expect(
+					emailNotificationTemplatePage.secondaryRecipientTypeCC
+				).toHaveText(recipientType);
+
+				await emailNotificationTemplatePage.backURLButton.click();
+			}
+		}
+	);
+
 	test('can have rich text source code verifying that the source code is persisted', async ({
 		emailNotificationTemplatePage,
 		notificationTemplatesPage,

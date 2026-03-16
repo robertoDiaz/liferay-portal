@@ -1259,58 +1259,60 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 	test('can only edit external reference code of custom fields through the UI', async ({
 		apiHelpers,
 		objectFieldsPage,
-		page,
 	}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
+		let objectDefinition: ObjectDefinition;
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+		await test.step('Create an object definition', async () => {
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
 		});
 
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
+		await test.step('Go to the object definition fields page', async () => {
+			await objectFieldsPage.goto(objectDefinition.label['en_US']);
+		});
 
-		await objectFieldsPage.openObjectField(
-			objectDefinition.objectFields[0].label['en_US']
-		);
+		const systemField = objectDefinition.objectFields.find((item) => {
+			return item.system;
+		});
 
-		await expect(
-			objectFieldsPage.externalReferenceCodeField
-		).toBeDisabled();
+		await test.step(`Check that the ERC input is disabled for a system field (${systemField.label['en_US']}) `, async () => {
+			await objectFieldsPage.openObjectField(systemField.label['en_US']);
 
-		const field = objectDefinition.objectFields.find((item) => {
+			await expect(
+				objectFieldsPage.externalReferenceCodeField
+			).toBeDisabled();
+		});
+
+		const customField = objectDefinition.objectFields.find((item) => {
 			return !item.system;
 		});
 
-		await objectFieldsPage.openObjectField(field.label['en_US']);
+		const newERCValue = getRandomString();
 
-		await objectFieldsPage.externalReferenceCodeField.click();
+		await test.step(`Edit the ERC of a custom field (${customField.label['en_US']})`, async () => {
+			await objectFieldsPage.openObjectField(customField.label['en_US']);
 
-		const ERCValue = getRandomString();
+			await objectFieldsPage.externalReferenceCodeField.click();
 
-		await objectFieldsPage.externalReferenceCodeField.fill(ERCValue);
+			await objectFieldsPage.externalReferenceCodeField.fill(newERCValue);
 
-		await objectFieldsPage.editFieldSaveButton.click();
+			await objectFieldsPage.saveObjectField();
+		});
 
-		await waitForAlert(
-			page,
-			'Success:The object field was updated successfully.'
-		);
+		await test.step('Verify that the ERC was updated', async () => {
+			await objectFieldsPage.openObjectField(customField.label['en_US']);
 
-		await objectFieldsPage.openObjectField(field.label['en_US']);
-
-		await page
-			.frameLocator('iframe')
-			.getByText('Field')
-			.first()
-			.waitFor({state: 'visible'});
-
-		expect(objectFieldsPage.externalReferenceCodeField).toHaveValue(
-			ERCValue
-		);
+			expect(objectFieldsPage.externalReferenceCodeField).toHaveValue(
+				newERCValue
+			);
+		});
 	});
 
 	test('cannot create localized object fields in unmodifiable system object definition', async ({
@@ -1807,80 +1809,100 @@ test.describe('Manage object fields default value properties', () => {
 				},
 			];
 
-			const objectFields = generateObjectFields({
-				objectFieldBusinessTypes: FIELDS.map(
-					({businessType, initialValue}) => ({
-						businessType,
-						objectFieldSettings: [
-							{
-								name: 'defaultValueType',
-								value: 'inputAsValue',
-							},
-							{name: 'defaultValue', value: initialValue},
-						],
-					})
-				),
-			});
+			let objectDefinition: ObjectDefinition;
+			let objectFields: Partial<ObjectField>[];
 
-			const objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					objectFields,
-					status: {code: 0},
+			await test.step('Create an object definition with default values', async () => {
+				objectFields = generateObjectFields({
+					objectFieldBusinessTypes: FIELDS.map(
+						({businessType, initialValue}) => ({
+							businessType,
+							objectFieldSettings: [
+								{
+									name: 'defaultValueType',
+									value: 'inputAsValue',
+								},
+								{name: 'defaultValue', value: initialValue},
+							],
+						})
+					),
 				});
 
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
+				objectDefinition =
+					await apiHelpers.objectAdmin.postRandomObjectDefinition({
+						objectFields,
+						status: {code: 0},
+					});
+
+				apiHelpers.data.push({
+					id: objectDefinition.id,
+					type: 'objectDefinition',
+				});
+
+				FIELDS.forEach((field, index) => {
+					field.label = objectFields[index].label['en_US'];
+				});
 			});
 
-			FIELDS.forEach((field, index) => {
-				field.label = objectFields[index].label['en_US'];
-			});
+			await test.step('Check that initial default values are set in the object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
-
-			for (const {initialValueUI, label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue(
-					initialValueUI
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
 				);
-			}
 
-			await objectFieldsPage.goto(objectDefinition.label['en_US']);
+				for (const {initialValueUI, label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue(
+						initialValueUI
+					);
+				}
+			});
 
-			for (const {businessType, editedValue, label} of FIELDS) {
-				await objectFieldsPage.setDefaultValue({
-					defaultValue: editedValue,
-					objectFieldBusinessType: businessType,
-					objectFieldName: label,
-				});
-			}
+			await test.step('Update default values', async () => {
+				await objectFieldsPage.goto(objectDefinition.label['en_US']);
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
+				for (const {businessType, editedValue, label} of FIELDS) {
+					await objectFieldsPage.setDefaultValue({
+						defaultValue: editedValue,
+						objectFieldBusinessType: businessType,
+						objectFieldName: label,
+					});
+				}
+			});
 
-			for (const {editedValue, label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue(editedValue);
-			}
+			await test.step('Check default values are updated in object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
 
-			await objectFieldsPage.goto(objectDefinition.label['en_US']);
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
 
-			for (const {label} of FIELDS) {
-				await objectFieldsPage.disableDefaultValue(label);
-			}
+				for (const {editedValue, label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue(
+						editedValue
+					);
+				}
+			});
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
+			await test.step('Disable default values', async () => {
+				await objectFieldsPage.goto(objectDefinition.label['en_US']);
 
-			for (const {label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue('');
-			}
+				for (const {label} of FIELDS) {
+					await objectFieldsPage.disableDefaultValue(label);
+				}
+			});
+
+			await test.step('Check default values are cleared in object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
+
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
+
+				for (const {label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue('');
+				}
+			});
 		}
 	);
 
@@ -1920,78 +1942,100 @@ test.describe('Manage object fields default value properties', () => {
 				},
 			];
 
-			const objectFields = generateObjectFields({
-				objectFieldBusinessTypes: FIELDS.map(
-					({businessType, initialValue}) => ({
-						businessType,
-						objectFieldSettings: [
-							{
-								name: 'defaultValueType',
-								value: 'inputAsValue',
-							},
-							{name: 'defaultValue', value: initialValue},
-						],
-					})
-				),
-			});
+			let objectDefinition: ObjectDefinition;
+			let objectFields: Partial<ObjectField>[];
 
-			const objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					objectFields,
-					status: {code: 0},
+			await test.step('Create object definition with default values', async () => {
+				objectFields = generateObjectFields({
+					objectFieldBusinessTypes: FIELDS.map(
+						({businessType, initialValue}) => ({
+							businessType,
+							objectFieldSettings: [
+								{
+									name: 'defaultValueType',
+									value: 'inputAsValue',
+								},
+								{name: 'defaultValue', value: initialValue},
+							],
+						})
+					),
 				});
 
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
+				objectDefinition =
+					await apiHelpers.objectAdmin.postRandomObjectDefinition({
+						objectFields,
+						status: {code: 0},
+					});
 
-			FIELDS.forEach((field, index) => {
-				field.label = objectFields[index].label['en_US'];
-			});
-
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
-
-			for (const {initialValue, label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue(initialValue);
-			}
-
-			await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-			for (const {businessType, editedValue, label} of FIELDS) {
-				await objectFieldsPage.setDefaultValue({
-					defaultValue: editedValue,
-					objectFieldBusinessType: businessType,
-					objectFieldName: label,
+				apiHelpers.data.push({
+					id: objectDefinition.id,
+					type: 'objectDefinition',
 				});
-			}
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
+				FIELDS.forEach((field, index) => {
+					field.label = objectFields[index].label['en_US'];
+				});
+			});
 
-			for (const {editedValue, label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue(editedValue);
-			}
+			await test.step('Check initial default values in object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
 
-			await objectFieldsPage.goto(objectDefinition.label['en_US']);
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
 
-			for (const {label} of FIELDS) {
-				await objectFieldsPage.disableDefaultValue(label);
-			}
+				for (const {initialValue, label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue(
+						initialValue
+					);
+				}
+			});
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
-			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
-			);
+			await test.step('Update default values', async () => {
+				await objectFieldsPage.goto(objectDefinition.label['en_US']);
 
-			for (const {label} of FIELDS) {
-				await expect(page.getByLabel(label)).toHaveValue('');
-			}
+				for (const {businessType, editedValue, label} of FIELDS) {
+					await objectFieldsPage.setDefaultValue({
+						defaultValue: editedValue,
+						objectFieldBusinessType: businessType,
+						objectFieldName: label,
+					});
+				}
+			});
+
+			await test.step('Check updated default values in object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
+
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
+
+				for (const {editedValue, label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue(
+						editedValue
+					);
+				}
+			});
+
+			await test.step('Disable default values', async () => {
+				await objectFieldsPage.goto(objectDefinition.label['en_US']);
+
+				for (const {label} of FIELDS) {
+					await objectFieldsPage.disableDefaultValue(label);
+				}
+			});
+
+			await test.step('Check default values are cleared in object entry creation', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
+
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
+
+				for (const {label} of FIELDS) {
+					await expect(page.getByLabel(label)).toHaveValue('');
+				}
+			});
 		}
 	);
 

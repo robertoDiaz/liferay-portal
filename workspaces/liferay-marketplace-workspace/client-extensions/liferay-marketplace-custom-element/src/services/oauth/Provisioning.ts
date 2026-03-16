@@ -8,14 +8,20 @@ import {MarketplaceSpringBootOAuth2} from './OAuth2Client';
 import {LicenseKey, LicenseTypePayload} from './types';
 
 class ProvisioningOAuth2 extends MarketplaceSpringBootOAuth2 {
-	async createLicenseKey(payload: LicenseTypePayload) {
-		return this.post<LicenseKey>('/license-keys', payload, {
+	async createAppLicenseKey(payload: LicenseTypePayload) {
+		return this.post<LicenseKey>('/app-license-keys', payload, {
 			earlyReturn: true,
 		});
 	}
 
-	async deactivateLicenseKey(licenseKey: number) {
-		await this.post(`/license-keys/${licenseKey}/deactivate`);
+	async createLicenseKeyTypeFree(payload: {
+		assetReceiptLicenseUuid: number;
+		domains: string;
+		owner: string;
+	}) {
+		return this.post<Response>('/license-key-type-free', payload, {
+			earlyReturn: false,
+		});
 	}
 
 	async downloadLicenseKey(id: number) {
@@ -29,24 +35,39 @@ class ProvisioningOAuth2 extends MarketplaceSpringBootOAuth2 {
 		await downloadFile('license.xml', response);
 	}
 
-	async licenseKeysRenew(licenseKey: number) {
-		await this.post(`/license-keys/${licenseKey}/renew`);
+	async downloadAppLicenseKey(id: number) {
+		const response = await this.get<Response>(
+			`/app-license-keys/${id}/download`,
+			{
+				earlyReturn: true,
+			}
+		);
+
+		await downloadFile('license.xml', response);
 	}
 
-	async getOrderDXPLicenseKeys(orderId: string) {
-		return this.get<LicenseKey[]>(`/order-dxp-license-keys/${orderId}`, {
-			earlyReturn: true,
-		});
+	async deactivateAppLicenseKey(licenseKey: number) {
+		await this.post(`/app-license-keys/${licenseKey}/deactivate`);
 	}
 
-	async getOrderLicenseKeys(
+	async getOrderLicenseKeys(orderId: string) {
+		return this.get<APIResponse<LicenseKey>>(
+			`/order-license-keys/${orderId}`
+		);
+	}
+
+	async getOrderAppLicenseKeys(
 		orderId: string,
 		searchParams: URLSearchParams = new URLSearchParams()
 	) {
 		return this.get<APIResponse>(
-			`/order-license-keys/${orderId}?${searchParams.toString()}`,
+			`/order-app-license-keys/${orderId}?${searchParams.toString()}`,
 			{earlyReturn: true}
 		);
+	}
+
+	async licenseKeyTypeFreeRenew(licenseKey: number) {
+		await this.post(`/license-key-type-free/${licenseKey}/renew`);
 	}
 }
 

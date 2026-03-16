@@ -1370,6 +1370,12 @@ public class GroupLocalServiceUtil {
 		return getService().getUserGroupsRelatedGroups(userGroups);
 	}
 
+	public static Map<Long, long[]> getUserInheritedSiteGroupIds(
+		long companyId) {
+
+		return getService().getUserInheritedSiteGroupIds(companyId);
+	}
+
 	/**
 	 * Returns the range of all groups associated with the user's organization
 	 * groups, including the ancestors of the organization groups, unless portal

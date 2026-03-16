@@ -9,13 +9,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.oauth.client.persistence.constants.OAuthClientEntryConstants;
 import com.liferay.oauth.client.persistence.model.OAuthClientEntry;
 import com.liferay.oauth.client.persistence.service.OAuthClientEntryLocalService;
+import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -109,7 +109,7 @@ public class OpenIdConnectProviderConfigurationUpgradeProcessTest {
 			).put(
 				"subject_type", "public"
 			).toString(),
-			0, OAuthClientEntryConstants.OIDC_USER_INFO_MAPPER_JSON,
+			"email", 0, OAuthClientEntryConstants.OIDC_USER_INFO_MAPPER_JSON,
 			StringPool.BLANK);
 		_oAuthClientEntry2 = _oAuthClientEntryLocalService.addOAuthClientEntry(
 			TestPropsValues.getUserId(), StringPool.BLANK,
@@ -128,7 +128,7 @@ public class OpenIdConnectProviderConfigurationUpgradeProcessTest {
 			).put(
 				"subject_type", "public"
 			).toString(),
-			OAuthClientEntryConstants.METADATA_CACHE_TIME_DEFAULT,
+			"email", OAuthClientEntryConstants.METADATA_CACHE_TIME_DEFAULT,
 			OAuthClientEntryConstants.OIDC_USER_INFO_MAPPER_JSON,
 			StringPool.BLANK);
 	}

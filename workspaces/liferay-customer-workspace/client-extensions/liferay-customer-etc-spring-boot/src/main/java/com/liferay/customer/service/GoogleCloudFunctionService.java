@@ -44,10 +44,11 @@ public class GoogleCloudFunctionService {
 		throws Exception {
 
 		return _handleRequest(
+			accountKey, _gcfCustomerServiceAccountKey,
+			_FUNCTION_PATH_CUSTOMER_USAGE_API,
 			StringBundler.concat(
-				_gcfBaseUrl, _FUNCTION_CUSTOMER_USAGE_API_PATH,
-				"/api/v1/customer/usage/accounts/", accountKey),
-			accountKey);
+				_gcfBaseURL, _FUNCTION_PATH_CUSTOMER_USAGE_API,
+				"/api/v1/customer/usage/accounts/", accountKey));
 	}
 
 	@Cacheable("accountUsage")
@@ -55,10 +56,11 @@ public class GoogleCloudFunctionService {
 		throws Exception {
 
 		return _handleRequest(
+			accountKey, _gcfComposableServiceAccountKey,
+			_FUNCTION_PATH_COMPOSABLE_USAGE_API,
 			StringBundler.concat(
-				_gcfBaseUrl, _FUNCTION_CUSTOMER_USAGE_API_PATH,
-				"/api/v1/accounts/", accountKey, "/usage/month/", month),
-			accountKey);
+				_gcfBaseURL, _FUNCTION_PATH_COMPOSABLE_USAGE_API,
+				"/api/v1/accounts/", accountKey, "/usage/month/", month));
 	}
 
 	@CacheEvict(allEntries = true, value = "accountUsage")
@@ -66,18 +68,20 @@ public class GoogleCloudFunctionService {
 	public void scheduledCacheEviction() throws Exception {
 	}
 
-	private JSONObject _handleRequest(String url, String accountKey)
+	private JSONObject _handleRequest(
+			String accountKey, String serviceAccountKey, String targetAudience,
+			String url)
 		throws Exception {
 
 		try (InputStream inputStream = new ByteArrayInputStream(
-				_gcfServiceAccountKey.getBytes())) {
+				serviceAccountKey.getBytes())) {
 
 			IdTokenCredentials idTokenCredential =
 				IdTokenCredentials.newBuilder(
 				).setIdTokenProvider(
 					(IdTokenProvider)GoogleCredentials.fromStream(inputStream)
 				).setTargetAudience(
-					_gcfBaseUrl + _FUNCTION_CUSTOMER_USAGE_API_PATH
+					_gcfBaseURL + targetAudience
 				).build();
 
 			HttpRequest httpRequest = new NetHttpTransport(
@@ -122,13 +126,19 @@ public class GoogleCloudFunctionService {
 		}
 	}
 
-	private static final String _FUNCTION_CUSTOMER_USAGE_API_PATH =
+	private static final String _FUNCTION_PATH_COMPOSABLE_USAGE_API =
+		"/composable_usage_api";
+
+	private static final String _FUNCTION_PATH_CUSTOMER_USAGE_API =
 		"/customer_usage_api";
 
 	@Value("${liferay.customer.gcf.base.url}")
-	private String _gcfBaseUrl;
+	private String _gcfBaseURL;
 
-	@Value("${liferay.customer.gcf.service.account.key}")
-	private String _gcfServiceAccountKey;
+	@Value("${liferay.customer.gcf.composable.service.account.key}")
+	private String _gcfComposableServiceAccountKey;
+
+	@Value("${liferay.customer.gcf.customer.service.account.key}")
+	private String _gcfCustomerServiceAccountKey;
 
 }

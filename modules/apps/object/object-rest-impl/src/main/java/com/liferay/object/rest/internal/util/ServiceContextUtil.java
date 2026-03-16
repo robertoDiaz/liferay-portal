@@ -6,7 +6,7 @@
 package com.liferay.object.rest.internal.util;
 
 import com.liferay.asset.kernel.model.AssetCategory;
-import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetCategoryServiceUtil;
 import com.liferay.object.comment.ObjectEntryComment;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.ParentTaxonomyCategory;
@@ -94,8 +94,7 @@ public class ServiceContextUtil {
 		serviceContext.setAddGuestPermissions(true);
 
 		if (objectEntry.getTaxonomyCategoryIds() == null) {
-			_setObjectEntryTaxonomyCategoryIds(
-				companyId, groupId, userId, objectEntry);
+			_setObjectEntryTaxonomyCategoryIds(companyId, groupId, objectEntry);
 		}
 
 		if (objectEntry.getTaxonomyCategoryIds() != null) {
@@ -170,7 +169,7 @@ public class ServiceContextUtil {
 	}
 
 	private static void _setObjectEntryTaxonomyCategoryIds(
-		long companyId, long groupId, long userId, ObjectEntry objectEntry) {
+		long companyId, long groupId, ObjectEntry objectEntry) {
 
 		TaxonomyCategoryBrief[] taxonomyCategoryBriefs =
 			objectEntry.getTaxonomyCategoryBriefs();
@@ -218,11 +217,10 @@ public class ServiceContextUtil {
 				}
 
 				AssetCategory assetCategory =
-					AssetCategoryLocalServiceUtil.
-						getOrAddEmptyCategoryWithAncestors(
-							externalReferenceCode, userId, groupId,
-							parentTaxonomyCategoryExternalReferenceCode,
-							parentTaxonomyVocabularyExternalReferenceCode);
+					AssetCategoryServiceUtil.getOrAddEmptyCategoryWithAncestors(
+						externalReferenceCode, groupId,
+						parentTaxonomyCategoryExternalReferenceCode,
+						parentTaxonomyVocabularyExternalReferenceCode);
 
 				assetCategoryIds.add(assetCategory.getCategoryId());
 			}

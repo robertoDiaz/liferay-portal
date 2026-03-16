@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {FrameLocator, Locator, Page} from '@playwright/test';
+import {FrameLocator, Locator, Page, expect, test} from '@playwright/test';
 
-import {waitForAlert} from '../../../utils/waitForAlert';
+import {clickAndExpectToBeVisible} from '../../../utils/clickAndExpectToBeVisible';
+import {waitForPageToBeLoaded} from '../../../utils/waitForPageToBeLoaded';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ObjectFieldsPage {
@@ -169,18 +170,15 @@ export class ObjectFieldsPage {
 	}
 
 	async disableDefaultValue(objectFieldName: string) {
-		await this.openObjectField(objectFieldName);
+		await test.step(`Disable default value for '${objectFieldName}'`, async () => {
+			await this.openObjectField(objectFieldName);
 
-		await this.advancedTab.click();
+			await this.advancedTab.click();
 
-		await this.useDefaultValueToggle.uncheck();
+			await this.useDefaultValueToggle.uncheck();
 
-		await this.editFieldSaveButton.click();
-
-		await waitForAlert(
-			this.page,
-			'The object field was updated successfully'
-		);
+			await this.saveObjectField();
+		});
 	}
 
 	async goto(objectDefinitionLabel: string) {
@@ -194,11 +192,42 @@ export class ObjectFieldsPage {
 	}
 
 	async openObjectField(fieldLabel: string) {
-		await this.page
-			.getByRole('cell')
-			.getByRole('link')
-			.filter({hasText: fieldLabel})
-			.click();
+		await test.step(`Open object field '${fieldLabel}'`, async () => {
+			await expect(async () => {
+				const trigger = this.page
+					.getByRole('cell')
+					.getByRole('link')
+					.filter({hasText: fieldLabel});
+
+				// Click on trigger again here because clickAndExpectToBeVisible
+				// won't click again if the side panel is already open.
+
+				await trigger.click();
+
+				// Check that the side panel is opened after clicking.
+
+				await clickAndExpectToBeVisible({
+					target: this.page.locator('.fds-side-panel.is-visible'),
+					trigger,
+				});
+
+				// Check that the correct field was opened.
+
+				await expect(
+					this.iframeLocator.locator('#objectFieldLabelInput')
+				).toHaveValue(fieldLabel);
+			}).toPass();
+
+			await this.page.waitForLoadState('networkidle');
+		});
+	}
+
+	async saveObjectField() {
+		await this.editFieldSaveButton.click();
+
+		await this.page.locator('.fds-side-panel').waitFor({state: 'hidden'});
+
+		await waitForPageToBeLoaded(this.page);
 	}
 
 	async selectDefaultValue(value: string) {
@@ -221,61 +250,58 @@ export class ObjectFieldsPage {
 		objectFieldBusinessType: string;
 		objectFieldName: string;
 	}) {
-		await this.openObjectField(objectFieldName);
+		await test.step(`Set default value '${defaultValue}' for '${objectFieldName}' (${objectFieldBusinessType})`, async () => {
+			await this.openObjectField(objectFieldName);
 
-		await this.advancedTab.click();
+			await this.advancedTab.click();
 
-		await this.useDefaultValueToggle.check({timeout: 1000});
+			await this.useDefaultValueToggle.check({timeout: 1000});
 
-		if (objectFieldBusinessType === 'Boolean') {
-			await this.selectDefaultValue(defaultValue);
-		}
+			if (objectFieldBusinessType === 'Boolean') {
+				await this.selectDefaultValue(defaultValue);
+			}
 
-		if (objectFieldBusinessType === 'Date') {
-			await this.iframeLocator
-				.getByPlaceholder('__/__/____')
-				.fill(defaultValue);
-		}
+			if (objectFieldBusinessType === 'Date') {
+				await this.iframeLocator
+					.getByPlaceholder('__/__/____')
+					.fill(defaultValue);
+			}
 
-		if (objectFieldBusinessType === 'DateTime') {
-			await this.iframeLocator
-				.getByPlaceholder('__/__/____ __:__ _')
-				.fill(defaultValue);
-		}
+			if (objectFieldBusinessType === 'DateTime') {
+				await this.iframeLocator
+					.getByPlaceholder('__/__/____ __:__ _')
+					.fill(defaultValue);
+			}
 
-		if (
-			objectFieldBusinessType === 'Decimal' ||
-			objectFieldBusinessType === 'Integer' ||
-			objectFieldBusinessType === 'LongInteger' ||
-			objectFieldBusinessType === 'PrecisionDecimal'
-		) {
-			await this.iframeLocator
-				.getByPlaceholder('Enter a default value.')
-				.fill(defaultValue);
-		}
+			if (
+				objectFieldBusinessType === 'Decimal' ||
+				objectFieldBusinessType === 'Integer' ||
+				objectFieldBusinessType === 'LongInteger' ||
+				objectFieldBusinessType === 'PrecisionDecimal'
+			) {
+				await this.iframeLocator
+					.getByPlaceholder('Enter a default value.')
+					.fill(defaultValue);
+			}
 
-		if (
-			objectFieldBusinessType === 'LongText' ||
-			objectFieldBusinessType === 'Text'
-		) {
-			await this.iframeLocator
-				.getByLabel('Default ValueMandatory')
-				.fill(defaultValue);
-		}
+			if (
+				objectFieldBusinessType === 'LongText' ||
+				objectFieldBusinessType === 'Text'
+			) {
+				await this.iframeLocator
+					.getByLabel('Default ValueMandatory')
+					.fill(defaultValue);
+			}
 
-		if (objectFieldBusinessType === 'RichText') {
-			await this.iframeLocator
-				.getByLabel('Rich Text Editor')
-				.nth(1)
-				.fill(defaultValue);
-		}
+			if (objectFieldBusinessType === 'RichText') {
+				await this.iframeLocator
+					.getByLabel('Rich Text Editor')
+					.nth(1)
+					.fill(defaultValue);
+			}
 
-		await this.editFieldSaveButton.click();
-
-		await waitForAlert(
-			this.page,
-			'The object field was updated successfully'
-		);
+			await this.saveObjectField();
+		});
 	}
 
 	getMaximumFileSizeErrorMessage({

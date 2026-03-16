@@ -34,8 +34,8 @@ spec:
                         {{- $uidHash := printf "%s-%s-%s" $accountId $deploymentName $projectIdFull | sha256sum | trunc 6 -}}
                         {{- $baseName := printf "%.18s-%s" $projectIdFull $uidHash -}}
 
-                        {{- $managementPolicies := $xr.spec.deletionProtection | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
-                        {{- $managementPoliciesNoUpdate := $xr.spec.deletionProtection | ternary (list "Create" "Observe") (list "Create" "Delete" "Observe") | toJson -}}
+                        {{- $managementPolicies := $xr.spec.orphanOnDelete | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
+                        {{- $managementPoliciesNoUpdate := $xr.spec.orphanOnDelete | ternary (list "Create" "Observe") (list "Create" "Delete" "Observe") | toJson -}}
                         {{- $namespace := $xr.metadata.namespace -}}
                         {{- $oidcProvider := `}}{{ .Values.aws.oidcProvider | quote }}{{` -}}
                         {{- $storageName := printf "%s-%s-storage" $accountId $baseName -}}
@@ -528,8 +528,11 @@ spec:
                             forProvider:
                                 allocatedStorage: {{ $databaseSpec.storageGB }}
                                 applyImmediately: {{ and (eq $dataPlane $targetActiveDataPlane) (ne $restorePhase "none") }}
+                                autoMinorVersionUpgrade: {{ $databaseSpec.autoMinorVersionUpgrade }}
                                 autoGeneratePassword: true
                                 backupRetentionPeriod: 7
+                                copyTagsToSnapshot: true
+                                databaseInsightsMode: {{ $databaseSpec.databaseInsightsMode | quote }}
                                 dbName: lportal
                                 dbSubnetGroupNameSelector:
                                     matchLabels:
@@ -538,11 +541,13 @@ spec:
                                         dataPlane: {{ $dataPlane }}
                                         environmentId: {{ $environmentId }}
                                         projectId: {{ $projectId }}
+                                deletionProtection: {{ $databaseSpec.deletionProtection }}
                                 engine: {{ $databaseSpec.engine | quote }}
                                 engineVersion: {{ $databaseSpec.engineVersion | quote }}
+                                iamDatabaseAuthenticationEnabled: true
                                 identifier: {{ $baseName }}-database-{{ $dataPlane }}
                                 instanceClass: {{ $databaseSpec.instanceClass }}
-                                multiAz: false
+                                multiAz: {{ $databaseSpec.multiAz }}
                                 passwordSecretRef:
                                     key: password
                                     name: liferay-database-{{ $dataPlane }}-password
@@ -551,6 +556,7 @@ spec:
                                 {{- if and (eq $restorePhase "provisioning") (eq $dataPlane $targetActiveDataPlane) }}
                                 snapshotIdentifier: {{ $databaseSpec.snapshotIdentifier }}
                                 {{- end }}
+                                storageEncrypted: true
                                 storageType: gp3
                                 username: {{ $databaseSpec.username }}
                                 vpcSecurityGroupIdSelector:
@@ -1096,14 +1102,23 @@ spec:
                                 domainName: {{ $searchName }}
                                 ebsOptions:
                                     ebsEnabled: true
-                                    volumeSize: 20
+                                    volumeSize: {{ $searchSpec.volumeSizeGB }}
                                     volumeType: gp3
                                 encryptAtRest:
                                     enabled: true
                                 engineVersion: {{ $searchSpec.engineVersion | quote }}
+                                logPublishingOptions:
+                                    -   cloudwatchLogGroupArn: arn:aws:logs:{{ $searchRegion }}:{{ $accountId }}:log-group:{{ $searchName }}-audit-logs
+                                        enabled: true
+                                        logType: AUDIT_LOGS
+                                    -   cloudwatchLogGroupArn: arn:aws:logs:{{ $searchRegion }}:{{ $accountId }}:log-group:{{ $searchName }}-index-logs
+                                        enabled: true
+                                        logType: INDEX_SLOW_LOGS
                                 nodeToNodeEncryption:
                                     enabled: true
                                 region: {{ $searchRegion }}
+                                softwareUpdateOptions:
+                                    autoSoftwareUpdateEnabled: {{ $searchSpec.autoSoftwareUpdateEnabled }}
                                 tags:
                                     Name: {{ $searchName }}
                                 vpcOptions:
@@ -1156,6 +1171,56 @@ spec:
                                         projectId: {{ $projectId }}
                                 region: {{ $searchRegion }}
                             managementPolicies: {{ $managementPolicies }}
+                        ---
+                        apiVersion: cloudwatchlogs.aws.m.upbound.io/v1beta1
+                        kind: Group
+                        metadata:
+                            annotations:
+                                gotemplating.fn.crossplane.io/composition-resource-name: {{ $searchName }}-audit-logs
+                            name: {{ $searchName }}-audit-logs
+                        spec:
+                            forProvider:
+                                region: {{ $searchRegion }}
+                                retentionInDays: 7
+                        ---
+                        apiVersion: cloudwatchlogs.aws.m.upbound.io/v1beta1
+                        kind: Group
+                        metadata:
+                            annotations:
+                                gotemplating.fn.crossplane.io/composition-resource-name: {{ $searchName }}-index-logs
+                            name: {{ $searchName }}-index-logs
+                        spec:
+                            forProvider:
+                                region: {{ $searchRegion }}
+                                retentionInDays: 7
+                        ---
+                        apiVersion: cloudwatchlogs.aws.m.upbound.io/v1beta1
+                        kind: ResourcePolicy
+                        metadata:
+                            annotations:
+                                gotemplating.fn.crossplane.io/composition-resource-name: {{ $searchName }}-log-publishing-policy
+                            name: {{ $searchName }}-log-publishing-policy
+                            namespace: {{ $namespace }}
+                        spec:
+                            forProvider:
+                                policyDocument: |
+                                    {
+                                        "Statement": [
+                                            {
+                                                "Action": [
+                                                    "logs:CreateLogStream",
+                                                    "logs:PutLogEvents"
+                                                ],
+                                                "Effect": "Allow",
+                                                "Principal": {
+                                                    "Service": "es.amazonaws.com"
+                                                },
+                                                "Resource": "arn:aws:logs:{{ $searchRegion }}:{{ $accountId }}:log-group:{{ $searchName }}-*"
+                                            }
+                                        ],
+                                        "Version": "2012-10-17"
+                                    }
+                                region: {{ $searchRegion }}
                         ---
                         apiVersion: kubernetes.m.crossplane.io/v1alpha1
                         kind: Object
@@ -1249,7 +1314,7 @@ spec:
                         {{- $xr := .observed.composite.resource -}}
 
                         {{- $environmentId := $xr.spec.environmentId -}}
-                        {{- $managementPolicies := $xr.spec.deletionProtection | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
+                        {{- $managementPolicies := $xr.spec.orphanOnDelete | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
                         {{- $namespace := $xr.metadata.namespace -}}
                         {{- $projectId := $xr.spec.projectId -}}
                         {{- $restorePhase := $xr.spec.restorePhase | default "none" -}}

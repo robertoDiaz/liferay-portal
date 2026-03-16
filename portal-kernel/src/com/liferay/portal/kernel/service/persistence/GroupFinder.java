@@ -76,4 +76,7 @@ public interface GroupFinder {
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.portal.kernel.model.Group> orderByComparator);
 
+	public java.util.Map<Long, long[]> findByC_C_S_A_UserInheritedGroupIds(
+		long companyId);
+
 }

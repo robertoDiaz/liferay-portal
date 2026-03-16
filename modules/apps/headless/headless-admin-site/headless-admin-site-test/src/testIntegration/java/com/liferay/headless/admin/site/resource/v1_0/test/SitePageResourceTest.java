@@ -412,7 +412,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	@TestInfo(
 		{
 			"LPD-72013", "LPD-74331", "LPD-75450", "LPD-77124", "LPD-77505",
-			"LPD-77576", "LPD-77852", "LPD-78667", "LPD-79415"
+			"LPD-77576", "LPD-77852", "LPD-78667", "LPD-79415", "LPD-81793"
 		}
 	)
 	public void testPutSiteSitePage() throws Exception {
@@ -445,6 +445,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_testPutSiteSitePageWithPageElements();
 		_testPutSiteSitePageWithPageExperiences();
 		_testPutSiteSitePageWithPageSpecifications();
+		_testPutSiteSitePageWithParentLayout();
 		_testPutSiteSitePageWithPriority();
 		_testPutSiteSitePageWithWidgetPageSettings();
 		_testPutSiteSitePageWithWidgetPageSettingsWithWidgetPageTemplate();
@@ -1244,6 +1245,19 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		objectFieldSetting.setValue(value);
 
 		return objectFieldSetting;
+	}
+
+	private SitePage _exportImportSitePage(
+			Layout layout, SitePageResource sitePageResource)
+		throws Exception {
+
+		Group group = _groupLocalService.getGroup(layout.getGroupId());
+
+		SitePage sitePage = sitePageResource.getSiteSitePage(
+			group.getExternalReferenceCode(),
+			layout.getExternalReferenceCode());
+
+		return _testPutSiteSitePage(sitePage, testGroup, sitePage);
 	}
 
 	private CustomMetaTag[] _getCustomMetaTags() {
@@ -3405,7 +3419,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			putSitePage.getTaxonomyCategoryBriefs();
 
 		Assert.assertEquals(
-			Arrays.toString(putTaxonomyCategoryBriefs), 3,
+			Arrays.toString(putTaxonomyCategoryBriefs), 1,
 			putTaxonomyCategoryBriefs.length);
 
 		TaxonomyCategoryBrief putTaxonomyCategoryBrief =
@@ -3417,6 +3431,10 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		Assert.assertNotEquals(
 			taxonomyCategoryBrief3.getParentTaxonomyVocabulary(),
 			putTaxonomyCategoryBrief.getParentTaxonomyVocabulary());
+		Assert.assertEquals(
+			taxonomyCategoryBrief3.getTaxonomyCategoryExternalReferenceCode(),
+			putTaxonomyCategoryBrief.
+				getTaxonomyCategoryExternalReferenceCode());
 	}
 
 	private void _testPutSiteSitePageWithPageElements() throws Exception {
@@ -3782,6 +3800,41 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		PageSpecificationsTestUtil.assertWidgetPageSpecifications(
 			sitePage.getPageSpecifications(),
 			putSitePage.getPageSpecifications());
+	}
+
+	private void _testPutSiteSitePageWithParentLayout() throws Exception {
+		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(
+			irrelevantGroup);
+
+		SitePageResource sitePageResource = _getSitePageResource(
+			"pageSpecifications");
+
+		SitePage importedParentSitePage = _exportImportSitePage(
+			parentLayout, sitePageResource);
+
+		Assert.assertTrue(
+			Validator.isNull(
+				importedParentSitePage.
+					getParentSitePageExternalReferenceCode()));
+
+		Layout layout = LayoutTestUtil.addTypePortletLayout(
+			irrelevantGroup, parentLayout.getPlid());
+
+		SitePage importedSitePage = _exportImportSitePage(
+			layout, sitePageResource);
+
+		Assert.assertEquals(
+			parentLayout.getExternalReferenceCode(),
+			importedSitePage.getParentSitePageExternalReferenceCode());
+
+		layout = _layoutLocalService.updateParentLayoutId(
+			layout.getPlid(), LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+		importedSitePage = _exportImportSitePage(layout, sitePageResource);
+
+		Assert.assertTrue(
+			Validator.isNull(
+				importedSitePage.getParentSitePageExternalReferenceCode()));
 	}
 
 	private void _testPutSiteSitePageWithPriority() throws Exception {

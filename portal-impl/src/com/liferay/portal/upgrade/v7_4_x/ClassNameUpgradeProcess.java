@@ -7,6 +7,7 @@ package com.liferay.portal.upgrade.v7_4_x;
 
 import com.liferay.document.library.kernel.processor.RawMetadataProcessor;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.instance.PortalInstancePool;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
@@ -134,6 +135,40 @@ public class ClassNameUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
+	private void _deleteDLFileEntryMetadata(
+			long newStructureId, long oldStructureId)
+		throws Exception {
+
+		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
+				StringBundler.concat(
+					"select d1.fileEntryMetadataId from DLFileEntryMetadata ",
+					"d1 where d1.DDMStructureId = ? and exists (select 1 from ",
+					"DLFileEntryMetadata d2 where d1.ctCollectionId = ",
+					"d2.ctCollectionId and d2.DDMStructureId = ? and ",
+					"d1.fileVersionId = d2.fileVersionId)"))) {
+
+			preparedStatement1.setLong(1, oldStructureId);
+			preparedStatement1.setLong(2, newStructureId);
+
+			try (PreparedStatement preparedStatement2 =
+					AutoBatchPreparedStatementUtil.autoBatch(
+						connection,
+						"delete from DLFileEntryMetadata where " +
+							"fileEntryMetadataId = ?");
+				ResultSet resultSet = preparedStatement1.executeQuery()) {
+
+				while (resultSet.next()) {
+					preparedStatement2.setLong(
+						1, resultSet.getLong("fileEntryMetadataId"));
+
+					preparedStatement2.addBatch();
+				}
+
+				preparedStatement2.executeBatch();
+			}
+		}
+	}
+
 	private long _getClassNameId(String value) throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select classNameId from ClassName_ where value = ?")) {
@@ -256,6 +291,8 @@ public class ClassNameUpgradeProcess extends UpgradeProcess {
 	private void _updateDDMStructureRelatedTables(
 			long newStructureId, long oldStructureId)
 		throws Exception {
+
+		_deleteDLFileEntryMetadata(newStructureId, oldStructureId);
 
 		_update(
 			"DDMStorageLink", "structureId", newStructureId, oldStructureId);

@@ -1152,7 +1152,9 @@ test.describe('Manage object entries through Friendly URL', () => {
 	let _objectEntryFriendlyURLPath: string;
 	let _objectField: ObjectField;
 
-	test.beforeEach(async ({apiHelpers, site, viewObjectEntriesPage}) => {
+	test.beforeEach(async ({apiHelpers, page, site, viewObjectEntriesPage}) => {
+		page.setViewportSize({height: 1080, width: 1920});
+
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: [
 				{
@@ -1223,7 +1225,9 @@ test.describe('Manage object entries through Friendly URL', () => {
 		await test.step('Create object entry with friendly URL', async () => {
 			await viewObjectEntriesPage.friendlyUrlInput.fill('Test URL');
 
-			await page.getByRole('textbox').first().fill(objectFieldValue);
+			await page
+				.getByLabel(_objectField.label.en_US)
+				.fill(objectFieldValue);
 
 			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
@@ -1264,7 +1268,11 @@ test.describe('Manage object entries through Friendly URL', () => {
 
 			displayPageTemplatesPage.editTemplate(displayPageTemplateName);
 
-			await pageEditorPage.addFragment('Basic Components', 'Heading');
+			await pageEditorPage.addFragment(
+				'Basic Components',
+				'Heading',
+				page.getByText('Drag and drop fragments or widgets here')
+			);
 
 			await page.getByText('Heading Example', {exact: true}).click();
 
@@ -2434,6 +2442,98 @@ test.describe('Manage object entries through View Object Entries', () => {
 		await expect(
 			viewObjectEntriesPage.successMessage.first()
 		).toBeVisible();
+	});
+
+	test('can edit object entry with object field picklist mark as state', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const {listTypeDefinition, listTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				listTypeEntriesLength: 3,
+			});
+
+		const objectFields = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Picklist',
+					objectFieldSettings: [
+						{
+							name: 'defaultValueType',
+							value: 'inputAsValue' as any,
+						},
+						{
+							name: 'defaultValue',
+							value: listTypeEntries[0].name,
+						},
+					],
+					required: true,
+					state: true,
+				},
+			],
+		});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		const {body: objectDefinition} =
+			await objectDefinitionAPIClient.postObjectDefinition({
+				active: true,
+				label: {
+					en_US: 'ObjectDefinitionLabel' + getRandomInt(),
+				},
+				name: 'ObjectDefinitionName' + getRandomInt(),
+				objectFields,
+				pluralLabel: {
+					en_US: 'ObjectDefinitionLabel' + getRandomInt(),
+				},
+				portlet: true,
+				scope: 'company',
+				status: {
+					code: 0,
+				},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const picklistFieldLabel = objectFields[0].label['en_US'];
+		const firstEntryName = listTypeEntries[0].name_i18n['en-US'];
+		const secondEntryName = listTypeEntries[1].name_i18n['en-US'];
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
+
+		await viewObjectEntriesPage.selectDropdownItem(
+			picklistFieldLabel,
+			firstEntryName
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await waitForAlert(page);
+
+		await viewObjectEntriesPage.backButton.click();
+
+		await viewObjectEntriesPage.frontendDatasetItems.first().click();
+
+		await viewObjectEntriesPage.selectDropdownItem(
+			picklistFieldLabel,
+			secondEntryName
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await waitForAlert(page);
 	});
 
 	test('can view all entries related to an object in the relationship field using autocomplete', async ({
