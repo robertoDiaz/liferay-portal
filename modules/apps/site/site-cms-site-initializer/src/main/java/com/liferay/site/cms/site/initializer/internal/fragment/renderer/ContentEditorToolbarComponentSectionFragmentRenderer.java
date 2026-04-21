@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -31,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -111,7 +113,13 @@ public class ContentEditorToolbarComponentSectionFragmentRenderer
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		boolean translation = _isTranslation(themeDisplay);
+
 		return hashMapWrapper.put(
+			"defaultLanguageTitle",
+			() -> _getDefaultLanguageTitle(
+				layoutDisplayPageObjectProvider, objectDefinition)
+		).put(
 			"displayDate",
 			() -> {
 				Date displayDate = objectEntry.getDisplayDate();
@@ -143,18 +151,7 @@ public class ContentEditorToolbarComponentSectionFragmentRenderer
 				String title = _getTitle(
 					layoutDisplayPageObjectProvider, objectEntry, themeDisplay);
 
-				Layout layout = themeDisplay.getLayout();
-
-				LayoutPageTemplateEntry layoutPageTemplateEntry =
-					_layoutPageTemplateEntryLocalService.
-						fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
-
-				String layoutPageTemplateEntryKey =
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryKey();
-
-				if (layoutPageTemplateEntryKey.startsWith(
-						"LFR_CMS_TRANSLATION_")) {
-
+				if (translation) {
 					return language.format(
 						themeDisplay.getLocale(), "translate-x", title);
 				}
@@ -172,6 +169,8 @@ public class ContentEditorToolbarComponentSectionFragmentRenderer
 					themeDisplay.getLocale(), "edit-x", title);
 			}
 		).put(
+			"isTranslation", translation
+		).put(
 			"type",
 			() -> {
 				if (objectDefinition == null) {
@@ -181,6 +180,26 @@ public class ContentEditorToolbarComponentSectionFragmentRenderer
 				return objectDefinition.getLabel(themeDisplay.getLocale());
 			}
 		).build();
+	}
+
+	private String _getDefaultLanguageTitle(
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider,
+		ObjectDefinition objectDefinition) {
+
+		if (objectDefinition == null) {
+			return null;
+		}
+
+		Locale defaultLocale = LocaleUtil.fromLanguageId(
+			objectDefinition.getDefaultLanguageId());
+
+		String title = layoutDisplayPageObjectProvider.getTitle(defaultLocale);
+
+		if (Validator.isNull(title)) {
+			return objectDefinition.getLabel(defaultLocale);
+		}
+
+		return title;
 	}
 
 	private String _getTitle(
@@ -199,6 +218,27 @@ public class ContentEditorToolbarComponentSectionFragmentRenderer
 		}
 
 		return title;
+	}
+
+	private boolean _isTranslation(ThemeDisplay themeDisplay) {
+		Layout layout = themeDisplay.getLayout();
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
+
+		if (layoutPageTemplateEntry == null) {
+			return false;
+		}
+
+		String layoutPageTemplateEntryKey =
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryKey();
+
+		if (layoutPageTemplateEntryKey == null) {
+			return false;
+		}
+
+		return layoutPageTemplateEntryKey.startsWith("LFR_CMS_TRANSLATION_");
 	}
 
 	@Reference

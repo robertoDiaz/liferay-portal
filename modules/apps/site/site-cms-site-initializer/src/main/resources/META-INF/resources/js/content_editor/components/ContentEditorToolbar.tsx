@@ -24,15 +24,19 @@ const STATUS_DRAFT_CODE = 2;
 
 export default function ContentEditorToolbar({
 	backURL,
+	defaultLanguageTitle,
 	displayDate: initialDisplayDate,
 	hasWorkflow,
 	headerTitle,
+	isTranslation,
 	type,
 }: {
 	backURL: string;
+	defaultLanguageTitle?: string;
 	displayDate: string;
 	hasWorkflow: boolean;
 	headerTitle: string;
+	isTranslation?: boolean;
 	type: string;
 }) {
 	const [displayDate, setDisplayDate] = useState<string>('');
@@ -64,11 +68,18 @@ export default function ContentEditorToolbar({
 			const form = getForm();
 
 			if (form?.checkValidity?.()) {
-				const titleInput = form.querySelector(
-					'[name^="ObjectField_title"]'
-				) as HTMLInputElement;
+				let value: string;
 
-				const value = titleInput ? titleInput.value : headerTitle;
+				if (isTranslation && defaultLanguageTitle) {
+					value = defaultLanguageTitle;
+				}
+				else {
+					const titleInput = form.querySelector(
+						'[name^="ObjectField_title"]'
+					) as HTMLInputElement;
+
+					value = titleInput ? titleInput.value : headerTitle;
+				}
 
 				sessionStorage.setItem(
 					'com.liferay.site.cms.site.initializer.successMessage',
@@ -77,7 +88,7 @@ export default function ContentEditorToolbar({
 				);
 			}
 		},
-		[getForm, headerTitle]
+		[defaultLanguageTitle, getForm, headerTitle, isTranslation]
 	);
 
 	const handleSaveSuccessMessage = useCallback(() => {
