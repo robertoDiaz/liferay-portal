@@ -61,6 +61,8 @@ public class RoleConstants {
 
 	public static final String POWER_USER = "Power User";
 
+	public static final String[] PROTECTED_ROLE_NAMES = {CMS_ADMINISTRATOR};
+
 	public static final String PUBLICATIONS_ADMIN = "Publications Admin";
 
 	public static final String PUBLICATIONS_EDITOR = "Publications Editor";
@@ -181,6 +183,20 @@ public class RoleConstants {
 		}
 
 		return TYPE_REGULAR_LABEL;
+	}
+
+	public static boolean isProtectedRoleName(String name) {
+		if (name == null) {
+			return false;
+		}
+
+		for (String protectedRoleName : PROTECTED_ROLE_NAMES) {
+			if (protectedRoleName.equals(name)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static String toSystemRoleExternalReferenceCode(String roleName) {

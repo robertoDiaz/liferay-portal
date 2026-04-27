@@ -98,6 +98,11 @@ public class RoleImpl extends RoleBaseImpl {
 	}
 
 	@Override
+	public boolean hasProtectedName() {
+		return RoleConstants.isProtectedRoleName(getName()) || isSystem();
+	}
+
+	@Override
 	public boolean isSystem() {
 		return PortalUtil.isSystemRole(getName());
 	}

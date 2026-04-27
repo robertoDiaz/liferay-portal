@@ -1990,7 +1990,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		validate(roleId, role.getCompanyId(), role.getClassNameId(), name);
 
-		if (role.isSystem()) {
+		if (role.hasProtectedName()) {
 			name = role.getName();
 			subtype = null;
 		}

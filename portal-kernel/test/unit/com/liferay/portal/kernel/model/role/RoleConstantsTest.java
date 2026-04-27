@@ -14,6 +14,18 @@ import org.junit.Test;
 public class RoleConstantsTest {
 
 	@Test
+	public void testIsProtectedRoleName() {
+		Assert.assertFalse(RoleConstants.isProtectedRoleName(null));
+		Assert.assertFalse(RoleConstants.isProtectedRoleName(""));
+		Assert.assertFalse(
+			RoleConstants.isProtectedRoleName(RoleConstants.ADMINISTRATOR));
+		Assert.assertFalse(RoleConstants.isProtectedRoleName("Random Role"));
+
+		Assert.assertTrue(
+			RoleConstants.isProtectedRoleName(RoleConstants.CMS_ADMINISTRATOR));
+	}
+
+	@Test
 	public void testToSystemRoleExternalReferenceCode() {
 		Assert.assertEquals(
 			"L_AA", RoleConstants.toSystemRoleExternalReferenceCode("AA"));
