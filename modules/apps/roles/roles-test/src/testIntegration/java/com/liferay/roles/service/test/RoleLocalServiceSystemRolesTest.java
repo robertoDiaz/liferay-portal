@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -168,6 +169,42 @@ public class RoleLocalServiceSystemRolesTest {
 				_roleLocalService.fetchRoleByExternalReferenceCode(
 					RoleConstants.toSystemRoleExternalReferenceCode(name),
 					company.getCompanyId()));
+		}
+	}
+
+	@Test
+	public void testUpdateProtectedRoleNameIsNotChanged() throws Exception {
+		Role cmsAdministratorRole = _roleLocalService.fetchRole(
+			TestPropsValues.getCompanyId(), RoleConstants.CMS_ADMINISTRATOR);
+
+		boolean preExisting = false;
+
+		if (cmsAdministratorRole != null) {
+			preExisting = true;
+		}
+
+		if (!preExisting) {
+			cmsAdministratorRole = _roleLocalService.addRole(
+				null, TestPropsValues.getUserId(), null, 0,
+				RoleConstants.CMS_ADMINISTRATOR, null, null,
+				RoleConstants.TYPE_REGULAR, null, null);
+		}
+
+		try {
+			Role updatedRole = _roleLocalService.updateRole(
+				cmsAdministratorRole.getExternalReferenceCode(),
+				cmsAdministratorRole.getRoleId(), RandomTestUtil.randomString(),
+				cmsAdministratorRole.getTitleMap(),
+				cmsAdministratorRole.getDescriptionMap(),
+				cmsAdministratorRole.getSubtype(), null);
+
+			Assert.assertEquals(
+				RoleConstants.CMS_ADMINISTRATOR, updatedRole.getName());
+		}
+		finally {
+			if (!preExisting) {
+				_roleLocalService.deleteRole(cmsAdministratorRole.getRoleId());
+			}
 		}
 	}
 
